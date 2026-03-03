@@ -21,7 +21,7 @@ description: |
 
   - User: "/fix sec-001"
     Assistant: "Let me fix the specific security issue (will ask for approval)"
-model: sonnet
+model: opus
 color: green
 allowed_tools:
   - Read

@@ -1,20 +1,40 @@
 ---
 name: qa
 description: "QA 統合チェック & 修正"
-disable-model-invocation: true
+argument-hint: "[check|fix|full|verify]"
+disable-model-invocation: false
 allowed-tools:
   - Task
   - Read
   - Bash
   - Write
   - Glob
+  - Grep
+  - Edit
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # QA 統合チェック & 修正
 
+## Dynamic Context
+
+```
+QA scripts available:
+!`ls scripts/qa/ 2>/dev/null || echo "(empty)"`
+```
+
 納品前の品質チェックを実行し、問題を自動修正します。
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | `/review` → `/fix` 完了後（推奨） |
+| **後工程** | `/delivery` |
+| **呼び出し元** | ユーザー直接 |
+| **呼び出し先** | qa-agent, production-reviewer, code-fixer エージェント |
 
 ## 使用方法
 
@@ -74,39 +94,13 @@ agent: general-purpose
 
 ### `/qa full`
 
-完全なQAワークフロー（納品前推奨）:
+完全なQAワークフロー（納品前推奨）: Phase 1-7 の7段階で機械的チェック→修正→人間的レビュー→最終検証→納品判定を実施。
 
-1. **Phase 1**: 機械的チェック（npm run check:all）
-2. **Phase 2**: 機械的修正（lint --fix）
-3. **Phase 3**: 人間的レビュー（production-reviewer）
-4. **Phase 4**: レビュー結果に基づく修正（code-fixer）
-5. **Phase 5**: 最終検証
-6. **Phase 6**: 本番判定
-7. **Phase 7**: 納品チェックリスト生成
+**詳細**: → [references/full-workflow-phases.md](references/full-workflow-phases.md)（7フェーズ詳細 + 禁止事項 + 出力例）
 
 ### `/qa verify`
 
 修正後の確認。問題が0件なら「納品準備完了」。
-
-## 出力
-
-```
-📊 QA Check Results
-
-Total Issues: 15
-
-By Category:
-- SCSS (lint-scss): 5 issues
-- JavaScript (lint-js): 3 issues
-- Links: 4 issues
-- Images: 2 issues
-- Templates: 1 issue
-
-Next Steps:
-- /qa fix       # 自動修正を実行
-- /qa fix scss  # SCSS のみ修正
-- /qa full      # フルQA（納品前推奨）
-```
 
 ## 関連コマンド
 
@@ -120,26 +114,17 @@ Next Steps:
 
 **Instructions for Claude:**
 
-## アーキテクチャ（メモリリーク対策）
-
-**重要**: サブエージェントのネストを禁止。メインエージェントがオーケストレーターとして直接制御する。
-
-```
-メインエージェント（このコマンド実行者）
- │
- ├─ check/fix/verify: Bash直接実行
- │
- └─ full: フェーズごとに直接制御
-     ├─ Phase 1-2: Bash直接
-     ├─ Phase 3: production-reviewer (Task) ─┐
-     ├─ Phase 4: code-fixer (Task)          ─┴─ 必要に応じて並列可
-     └─ Phase 5-7: Bash直接
-```
-
 ## 実行手順
 
 ### `/qa check`
 
+Phase 1 では最初に `bash .claude/skills/qa/scripts/qa-pipeline.sh` を実行する。スクリプトが SCSS Lint・JS Lint・PHP Syntax・Build の4項目を自動チェックし、`reports/qa-spec-{TIMESTAMP}.json` に結果を保存する。スクリプト終了後に結果 JSON を読み取り、サマリーを報告する。
+
+```bash
+bash .claude/skills/qa/scripts/qa-pipeline.sh
+```
+
+スクリプトが利用できない場合のフォールバック:
 ```bash
 npm run check:all
 ```
@@ -148,6 +133,13 @@ npm run check:all
 
 ### `/qa fix` / `/qa fix {type}`
 
+Phase 1 では `bash .claude/skills/qa/scripts/qa-pipeline.sh --fix` を実行する。`--fix` フラグにより自動修正まで実行される。
+
+```bash
+bash .claude/skills/qa/scripts/qa-pipeline.sh --fix
+```
+
+スクリプトが利用できない場合のフォールバック:
 ```bash
 # Phase 1: チェック
 npm run check:all
@@ -164,50 +156,7 @@ npm run check:all
 
 ### `/qa full`（フラットなオーケストレーション）
 
-**Phase 1-2: 機械的チェック・修正（Bash直接）**
-```bash
-npm run check:all
-npm run lint:css:fix
-npm run lint:js -- --fix
-npm run check:all
-```
-
-**Phase 3: 人間的レビュー（サブエージェント）**
-```
-Task tool:
-  subagent_type: production-reviewer
-  prompt: |
-    QA Phase 3: 人間的レビューを実行してください。
-
-    reports/qa-spec.json の結果を踏まえ、
-    コード品質・セキュリティ・ベストプラクティスを確認。
-
-    レビュー結果は .claude/reviews/ に保存してください。
-```
-
-**Phase 4: レビュー結果に基づく修正（サブエージェント）**
-```
-Task tool:
-  subagent_type: code-fixer
-  prompt: |
-    QA Phase 4: レビュー結果に基づく修正を実行してください。
-
-    .claude/reviews/ の最新レビューファイルを読み、
-    safe 分類の問題を自動修正してください。
-```
-
-**Phase 5: 最終検証（Bash直接）**
-```bash
-npm run check:all
-npm run build
-```
-
-**Phase 6: 本番判定**
-- エラー 0 → READY
-- エラーあり → NEEDS REVISIONS
-
-**Phase 7: 納品チェックリスト**
-reports/delivery-checklist.md を生成。
+**詳細**: → [references/full-workflow-phases.md](references/full-workflow-phases.md)（Phase 1-7 実行手順 + サブエージェント委譲 + フォールバック）
 
 ### `/qa verify`
 
@@ -217,18 +166,24 @@ npm run check:all
 
 問題が0件なら「納品準備完了」を報告。
 
-## 禁止事項
+## Error Handling
 
-| 禁止 | 理由 |
-|------|------|
-| qa-agent からサブエージェント起動 | メモリリーク |
-| サブエージェントのネスト | コンテキスト累積 |
-| 3つ以上のサブエージェント同時起動 | WSLメモリ制限 |
+| Error | Detection | Recovery |
+|-------|-----------|----------|
+| `npm run check:all` 失敗 | exit code != 0 | 個別コマンド (`npm run lint:css`, `npm run lint:js`, `npm run build`) を順番に実行して問題を特定 |
+| qa-pipeline.sh が存在しない | File not found | フォールバックとして `npm run check:all` を直接実行 |
+| production-reviewer 不在 | Task tool 失敗 | Claude が直接 Read/Grep でコードレビューを実行し、`.claude/reviews/` にレポートを Write |
+| code-fixer 不在 | Task tool 失敗 | Claude が直接 Edit ツールで Safe issues を修正 |
+| WSL メモリ不足 | サブエージェント起動失敗 / OOM | サブエージェントを使用せず、Bash 直接実行のみで処理。Phase 3-4 をスキップし Phase 5 へ |
+| Phase 3-4 ループ超過 | 2回目の Phase 5 でも問題残存 | ループを停止し、残存課題リストをユーザーに提示。手動修正を案内 |
+| レポートディレクトリ不在 | `reports/` が存在しない | `mkdir -p reports` で自動作成 |
 
-## 並列起動の条件
+## Scripts
 
-Phase 3 と Phase 4 を並列起動する場合：
-- Phase 3 の結果に Phase 4 が依存しないこと
-- WSL のメモリに余裕があること（8GB以上推奨）
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
 
-通常は**順次実行を推奨**。
+| スクリプト | 目的 | exit code |
+|-----------|------|-----------|
+| `scripts/qa-pipeline.sh [--fix]` | Lint + Build 統合チェック | 0=PASS, 1=FAIL |
+
+**出力**: `reports/qa-spec-{TIMESTAMP}.json`

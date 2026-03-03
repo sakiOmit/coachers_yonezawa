@@ -196,27 +196,23 @@ Task tool: wordpress-professional-engineer (page B)
 
 ```
 サイクル1: Draft実装
-└─ Agent: wordpress-professional-engineer (model: haiku)
-   └─ 高速で叩き台を作成
+└─ Agent: wordpress-professional-engineer (model: opus)
+   └─ 叩き台を作成
 
 サイクル2: 初回レビュー
-└─ Agent: production-reviewer (model: sonnet)
+└─ Agent: production-reviewer (model: opus)
    └─ 致命的な問題のみ指摘
 
 サイクル3: Polish実装
-└─ Agent: wordpress-professional-engineer (model: sonnet)
+└─ Agent: wordpress-professional-engineer (model: opus)
    └─ レビュー指摘を反映 + 細部を磨く
 
 サイクル4: 最終レビュー
-└─ Agent: production-reviewer (model: sonnet)
+└─ Agent: production-reviewer (model: opus)
    └─ 本番準備完了を確認
 ```
 
-**トークン効率 & コスト最適化:**
-- Haiku draft: ~5,000 tokens (低コスト)
-- Sonnet review: ~10,000 tokens
-- Sonnet polish: ~8,000 tokens
-- Sonnet final: ~7,000 tokens
+**備考:** Max プランのため全エージェント opus で統一。
 - 合計: ~30,000 tokens (適切なモデル選択で コスト削減)
 
 ---
@@ -327,13 +323,13 @@ production-reviewer を起動
 - [ ] 必要な規約ファイルは何か明確か？
 - [ ] Serenaツールで事前調査すべきことはないか？
 - [ ] 並列実行できる部分はないか？
-- [ ] 適切なmodelを選択しているか？ (haiku vs sonnet)
+- [ ] 適切なmodelを選択しているか？ (基本 opus)
 
 ### 2. トークン効率化のコツ
 
 - **Just-in-Time読み込み**: 全規約を読まず、必要な部分のみ
 - **Serenaメモリ活用**: 繰り返し参照する情報はメモリに保存
-- **段階的実装**: Draft (haiku) → Review (sonnet) → Polish (sonnet)
+- **段階的実装**: Draft → Review → Polish (全て opus)
 - **並列実行**: 独立タスクは同時起動
 
 ### 3. 品質保証のポイント
@@ -347,10 +343,10 @@ production-reviewer を起動
 
 | タスク | 推奨Model | 理由 |
 |--------|----------|------|
-| 叩き台作成 | haiku | 高速・低コスト |
-| 本実装 | sonnet | 品質重視 |
-| レビュー | sonnet | 精度重視 |
-| 簡単な修正 | haiku | 高速・低コスト |
+| 叩き台作成 | opus | 品質重視 |
+| 本実装 | opus | 品質重視 |
+| レビュー | opus | 精度重視 |
+| 簡単な修正 | opus | 品質重視 |
 
 ---
 

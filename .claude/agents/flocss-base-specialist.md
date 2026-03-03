@@ -19,7 +19,7 @@ description: |
 
   - After user completes work on base styles:
     Assistant: "Now that you've updated the base styles, let me proactively use the flocss-base-specialist agent to review the changes for FLOCSS compliance"
-model: sonnet
+model: opus
 color: purple
 allowed_tools:
   - Read

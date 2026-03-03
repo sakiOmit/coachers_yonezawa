@@ -1,7 +1,8 @@
 ---
 name: astro-to-wordpress
 description: "Convert approved Astro static pages to WordPress PHP templates with ACF integration, escaping, and validation"
-disable-model-invocation: false
+argument-hint: "{page-slug}"
+disable-model-invocation: true
 allowed-tools:
   - Read
   - Write
@@ -15,19 +16,35 @@ allowed-tools:
   - mcp__serena__get_symbols_overview
   - mcp__serena__replace_symbol_body
   - mcp__serena__insert_after_symbol
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # Astro to WordPress Converter
 
+## Dynamic Context
+
+```
+Available Astro pages:
+!`ls astro/src/pages/*.astro 2>/dev/null || echo "No Astro pages"`
+```
+
 ## Overview
 
 デザイン承認済みのAstroページをWordPress PHPテンプレートに変換する。
 Astroコンポーネントを読み取り、WordPress規約に準拠したPHP・ACF統合コードを生成する。
 
-**自動変換ではなく、規約に基づく手動変換をガイドする。**
-理由: PHP固有のACFヘルパー、エスケープ、バリデーションは手動の方が正確。
+**半自動変換**: 機械的な変換をスクリプトで自動化し、ACFロジック・条件分岐等はLLMが担当する。
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | `/figma-implement`, `/astro-page-generator` |
+| **後工程** | `/review`, `/qa` |
+| **呼び出し元** | ユーザー直接 |
+| **呼び出し先** | wordpress-professional-engineer エージェント |
 
 ## Usage
 
@@ -43,106 +60,65 @@ Astroコンポーネントを読み取り、WordPress規約に準拠したPHP・
 
 ## Processing Flow
 
-```
-1. Astroソース読み取り
-   ├─ astro/src/pages/{slug}.astro
-   ├─ astro/src/components/sections/{slug}/*.astro
-   ├─ astro/src/data/pages/{slug}.json
-   └─ 使用されている共通コンポーネントの特定
+### Step 0: Automated Scaffold (Script)
 
-2. 既存WordPress環境チェック
-   ├─ PHPテンプレートが既に存在するか
-   ├─ SCSSエントリーが存在するか
-   ├─ vite.config.jsにエントリーがあるか
-   └─ enqueue.phpに条件分岐があるか
+スクリプトで機械的な変換を先行実行する。
 
-3. 変換マッピング生成
-   ├─ コンポーネント → get_template_part() マッピング
-   ├─ Props → PHP $args マッピング
-   ├─ データ → ACFフィールド マッピング
-   └─ 画像 → render_responsive_image() マッピング
-
-4. PHP生成（セクション単位）
-   ├─ ページテンプレート（page-{slug}.php）
-   ├─ セクション template-parts（{slug}/section.php）
-   └─ ACFフィールド定義メモ
-
-5. 検証チェックリスト実行
-   └─ 全項目パス確認
-
-6. ビルド構成更新（不足分のみ）
-   ├─ vite.config.js
-   └─ enqueue.php
+```bash
+bash .claude/skills/astro-to-wordpress/scripts/convert-astro-to-php.sh {slug}
 ```
 
-## Conversion Rules (Mandatory)
+**スクリプトが自動実行する内容:**
+- ソースファイル検証（Astro ページ、セクション、データの存在確認）
+- Props interface 解析（camelCase → snake_case マッピング）
+- PHP スタブファイル生成（ページテンプレート + セクション template-parts）
+- ビルド設定チェック（vite.config.js, enqueue.php のエントリー確認）
+- PHP syntax チェック + パーミッション検証
 
-### 変換テーブル
+**出力**: `reports/convert-{slug}-{TIMESTAMP}.json`（変換レポート）
 
-| Astro | WordPress PHP |
-|-------|---------------|
-| `<Component prop={value} />` | `get_template_part('...', null, ['prop' => $value])` |
-| `import data from '../data/...'` | `get_field('field')` / `get_acf_or_default(...)` |
-| `<ResponsiveImage src="..." />` | `render_responsive_image([...])` |
-| `{text}` | `<?php echo esc_html($text); ?>` |
-| `set:html={html}` | `<?php echo wp_kses_post($html); ?>` |
-| `{condition && <div>...</div>}` | `<?php if ($cond): ?><div>...</div><?php endif; ?>` |
-| `{items.map(i => <Item />)}` | `<?php while (have_rows('items')): the_row(); ?>...<?php endwhile; ?>` |
-| Astro `Props` interface | `validate_template_args()` + `merge_template_defaults()` |
-| `import '@root-src/css/...'` | `vite_enqueue_page_style()` in enqueue.php |
+**exit code**: 0 = 成功、1 = ソース検証失敗
 
-### Props → PHP Args 変換
+### Step 1: Script Report Analysis
+- **入力**: Step 0 のレポート JSON を Read で読み込み
+- **処理**: 自動生成されたスタブの確認、manual_required 項目の把握
+- **出力**: LLM が担当すべき変換タスクの一覧
+- **検証**: レポートの verdict が `READY_FOR_LLM` であること
 
-```
-// Astro (camelCase)          // PHP (snake_case)
-interface Props {
-  enHeading: string;     →    'en_heading' => '',
-  jaLabel?: string;      →    'ja_label' => '',
-  modifierClass?: string; →   'modifier_class' => '',
-  isTall?: boolean;      →    'is_tall' => false,
-}
-```
+### Step 2: HTML Conversion (LLM)
+- **入力**: Astro セクションファイル（HTML テンプレート部分）、conversion-patterns.md
+- **処理**: 自動生成スタブの `<!-- TODO -->` を実際の HTML に変換。ACF ロジック、条件分岐、ループ構造は LLM が判断。
+  - Repeater フィールド: `{items.map(...)}` → `<?php while (have_rows('items')): the_row(); ?> ... <?php endwhile; ?>`
+  - Group フィールド: `{data.group.field}` → `<?php echo esc_html(get_field('field', get_field('group'))); ?>`
+  - テキストフィールド: `{text}` → `<?php echo esc_html(get_field('text_field')); ?>`
+  - URL フィールド: `{url}` → `<?php echo esc_url(get_field('url_field')); ?>`
+  - 条件分岐: `{condition && <div>...</div>}` → `<?php if (get_field('condition')): ?><div>...</div><?php endif; ?>`
+- **出力**: 完成した PHP テンプレート
+- **検証**: BEM クラス名が Astro 版と完全一致、全出力にエスケープ関数適用
+- **エージェント委譲**: wordpress-professional-engineer が利用可能な場合、PHP 実装を Task として委譲する
 
-### 必須PHP処理の追加
+### Step 3: Build Configuration Update
+- **入力**: Step 0 レポートの manual_required 項目、Step 2 で完成した PHP テンプレート
+- **処理**: `vite.config.js` へのエントリー追加、`enqueue.php` への条件分岐追加
+- **出力**: 更新済みの設定ファイル
+- **検証**: `npm run build` が成功すること
+- **エージェント委譲**: 複雑な Vite 設定変更が必要な場合、wordpress-professional-engineer に委譲可能
 
-Astroには存在しないが、PHPで必須の処理:
+### Step 4: Verification Checklist Execution
+- **入力**: Step 2 で完成した全 PHP ファイル
+- **処理**: 後述の Verification Checklist の全項目を確認
+- **出力**: チェックリスト結果（全項目パス / 要修正の項目一覧）
+- **検証**: 全項目パスするまで修正を繰り返すこと
 
-1. **出力エスケープ**
-   - テキスト: `esc_html()`
-   - URL: `esc_url()`
-   - 属性: `esc_attr()`
-   - HTML: `wp_kses_post()`
+## Conversion Rules
 
-2. **引数バリデーション**
-   ```php
-   if (!validate_template_args($args, ['en_heading', 'breadcrumbs'], 'page-header')) {
-       return;
-   }
-   ```
+変換パターンの詳細は [references/conversion-patterns.md](references/conversion-patterns.md) を参照。
 
-3. **デフォルト値マージ**
-   ```php
-   $args = merge_template_defaults($args, [
-       'en_heading' => '',
-       'ja_label' => '',
-   ]);
-   ```
-
-4. **ACF空チェック**
-   ```php
-   <?php if ($title = get_field('title')): ?>
-     <h2><?php echo esc_html($title); ?></h2>
-   <?php endif; ?>
-   ```
-
-5. **Template Name コメント**
-   ```php
-   <?php
-   /**
-    * Template Name: ページ名
-    * @package Theme
-    */
-   ```
+**主要な変換の概要:**
+- Props → PHP $args（camelCase → snake_case）
+- テンプレート構文（`{text}` → `<?php echo esc_html() ?>`）
+- ACF フィールド取得パターン
+- エスケープルール（esc_html / esc_url / wp_kses_post）
 
 ## Verification Checklist
 
@@ -173,6 +149,16 @@ Astroには存在しないが、PHPで必須の処理:
 - [ ] enqueue.php に条件分岐追加済み
 - [ ] `npm run build` 成功
 - [ ] ファイルパーミッション 644
+
+## Scripts
+
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
+
+| スクリプト | 目的 | exit code |
+|-----------|------|-----------|
+| `scripts/convert-astro-to-php.sh <slug> [--dry-run]` | 半自動変換（Props抽出 + PHPスタブ生成） | 0=PASS, 1=ソース検証失敗 |
+
+**出力**: `reports/convert-{slug}-{TIMESTAMP}.json`
 
 ## Error Handling
 
@@ -218,6 +204,46 @@ Next steps:
 | `astro-page-generator` | Astro版ページ生成 |
 | `wordpress-page-generator` | WordPress版ページ生成（ゼロから） |
 | `acf-field-generator` | ACFフィールド生成 |
+
+---
+
+**Instructions for Claude:**
+
+## 引数パース
+
+`$ARGUMENTS` を以下のルールでパースする:
+
+1. **引数あり** (`{page-slug}`): 直接変換を開始
+   - 例: `/astro-to-wordpress about`
+2. **引数なし**: Astro ページ一覧を表示し、対話で変換対象を選択
+
+## 実行手順
+
+1. **ソース検証**
+   - `astro/src/pages/{slug}.astro` が存在するか確認
+   - 存在しない場合: 動的コンテキストの Astro ページ一覧を表示し、有効なスラッグの選択を促す
+
+2. **スクリプト実行**
+   - `scripts/convert-astro-to-php.sh {slug}` が利用可能であれば先行実行
+   - スクリプトが利用できない場合は直接 Read/Write/Edit で変換を実行
+
+3. **レポート分析**
+   - スクリプト出力の `reports/convert-{slug}-*.json` を Read で読み込み
+   - `manual_required` 項目を把握し、LLM が担当すべき変換タスクを特定
+
+4. **ACF ロジック付与**
+   - HTML テンプレートの `<!-- TODO -->` を実際の ACF ロジックに変換
+   - `get_field()` + エスケープ、`have_rows()` ループ、空チェック等を適用
+   - wordpress-professional-engineer エージェントが利用可能であれば Task で委譲
+
+5. **ビルド検証**
+   - `npm run build` が成功することを確認
+   - PHP syntax check (`php -l`) を実行
+   - Verification Checklist の全項目を確認
+
+### Fallback
+
+wordpress-professional-engineer エージェントが利用できない場合は、Claude が直接 Edit ツールで変換を実行する。
 
 ---
 

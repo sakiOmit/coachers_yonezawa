@@ -16,7 +16,7 @@ description: |
   **IMPORTANT: After completing implementation, automatically launch production-reviewer agent.**
 
   This agent should be consulted for:\n\n<example>\nContext: User is working on a WordPress recruitment site theme with Vite, SCSS, and ACF.\nuser: "I need to create a new custom post type for job listings with ACF fields"\nassistant: "Let me use the wordpress-professional-engineer agent to help design and implement this custom post type with proper ACF integration."\n<commentary>\nThe user needs WordPress-specific expertise for custom post types and ACF, so the wordpress-professional-engineer agent should handle this task.\n</commentary>\n</example>\n\n<example>\nContext: User is implementing WordPress theme functionality.\nuser: "How should I structure the functions.php file for better maintainability?"\nassistant: "I'll use the wordpress-professional-engineer agent to provide best practices for organizing functions.php."\n<commentary>\nThis requires WordPress architectural expertise, so the wordpress-professional-engineer agent should provide guidance.\n</commentary>\n</example>\n\n<example>\nContext: User is debugging WordPress template hierarchy issues.\nuser: "The wrong template is loading for my custom post type archive"\nassistant: "Let me consult the wordpress-professional-engineer agent to diagnose this template hierarchy issue."\n<commentary>\nTemplate hierarchy debugging requires WordPress expertise, making this appropriate for the wordpress-professional-engineer agent.\n</commentary>\n</example>
-model: sonnet
+model: opus
 color: red
 allowed_tools:
   - Read

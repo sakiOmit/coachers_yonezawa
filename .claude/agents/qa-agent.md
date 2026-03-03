@@ -25,7 +25,7 @@ description: |
 
   - User: "/qa fix scss"
     Assistant: "I'll fix SCSS-specific QA issues"
-model: sonnet
+model: opus
 color: cyan
 allowed_tools:
   - Read

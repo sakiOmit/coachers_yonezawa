@@ -14,7 +14,7 @@ description: |
   - Code quality verification (FLOCSS, BEM, base styles)
   - Build configuration validation
   - Report generation for both internal QA and client delivery
-model: sonnet
+model: opus
 color: green
 allowed_tools:
   - Read

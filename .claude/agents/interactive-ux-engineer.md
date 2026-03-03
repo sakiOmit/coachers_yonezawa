@@ -42,7 +42,7 @@ description: |
   The agent proactively identifies opportunities to enhance UX through animations, suggesting improvements even when not explicitly requested.
   </commentary>
   </example>
-model: sonnet
+model: opus
 color: red
 allowed_tools:
   - Read

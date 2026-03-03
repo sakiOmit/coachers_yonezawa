@@ -1,7 +1,8 @@
 ---
 name: figma-analyze
-description: "Analyze multiple Figma page URLs to detect shared components, determine split strategies, and plan implementation order. Use when user provides multiple Figma URLs, says 'analyze', '分析', 'compare pages', or wants pre-implementation planning."
-disable-model-invocation: true
+description: "Analyze Figma pages to detect shared components, split strategies, and implementation order. Trigger: 'analyze', '分析'."
+argument-hint: "{url1} [url2] [--tokens]"
+disable-model-invocation: false
 allowed-tools:
   - Read
   - Write
@@ -11,11 +12,22 @@ allowed-tools:
   - Bash
   - mcp__figma__get_metadata
   - mcp__figma__get_variable_defs
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # Figma Analyze
+
+## Dynamic Context
+
+```
+Existing Figma cache:
+!`ls .claude/cache/figma/ 2>/dev/null || echo "(empty)"`
+
+Component catalog size:
+!`wc -l < .claude/data/component-catalog.yaml 2>/dev/null || echo "0"`
+```
 
 ## Overview
 
@@ -28,6 +40,15 @@ agent: general-purpose
 - **複雑度ベース戦略判定**: セクションごとに NORMAL / SPLIT / SPLIT_REQUIRED を判定
 - **カタログマッチング**: 既存コンポーネントとの再利用可能性をスコアリング
 - **実装順序最適化**: 依存関係と共通コンポーネントに基づく最適な実装順序
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | なし（起点） |
+| **後工程** | `/figma-implement` |
+| **呼び出し元** | ユーザー直接 |
+| **呼び出し先** | なし |
 
 ## Usage
 
@@ -81,6 +102,19 @@ Options:
 | サイズオーバー時のスクリーンショットフォールバック | 実装精度低下 | メタデータ + セクション分割で対処 |
 
 ## Processing Flow
+
+### Argument Parsing
+
+```
+入力: $ARGUMENTS
+パース:
+  - URL リスト: スペース区切りの Figma URL を配列として取得
+  - --tokens フラグ: デザイントークン取得の有効化
+
+例:
+  /figma-analyze https://figma.com/design/abc/Page1?node-id=0-1 https://figma.com/design/abc/Page2?node-id=0-2
+  /figma-analyze https://figma.com/design/abc/Page1?node-id=0-1 --tokens
+```
 
 ```
 Phase 1: URL解析 + カタログ読込
@@ -140,139 +174,23 @@ ls -la .claude/cache/figma/
 
 ## Phase 2: ページ別メタデータ取得 + 複雑度分析
 
-### 2-1. get_metadata 実行
+各ページURLに対して `get_metadata` を実行し、トップレベルフレームごとに複雑度スコア（0-100）を算出。
+スコアに基づき NORMAL / SPLIT / SPLIT_REQUIRED の戦略を判定する。
 
-各ページURLに対して `get_metadata` を実行:
-
-```
-mcp__figma__get_metadata
-  fileKey: "{fileKey}"
-  nodeId: "{nodeId}"
-```
-
-### 2-2. 複雑度スコア計算
-
-各トップレベルフレーム（セクション）に対してスコアを算出:
-
-```
-complexity = min(children * 2, 40)
-           + min(depth * 5, 30)
-           + min(text_count, 20)
-           + min(height / 1000, 10)
-```
-
-| 要素 | 最大スコア | 計算方法 |
-|------|-----------|---------|
-| 子要素数 | 40 | children × 2 |
-| ネスト深度 | 30 | depth × 5 |
-| テキスト要素数 | 20 | text_count × 1 |
-| フレーム高さ | 10 | height / 1000 |
-| **合計** | **100** | |
-
-### 2-3. 戦略判定
-
-各セクションに戦略を割り当て:
-
-| 条件 | 戦略 | アクション |
-|------|------|----------|
-| height < 5000 AND score < 50 | `NORMAL` | 通常取得（get_design_context 1回） |
-| height >= 8000 OR score >= 70 | `SPLIT` | 分割取得推奨 |
-| height >= 10000 | `SPLIT_REQUIRED` | 分割取得必須 |
-| それ以外 | `NORMAL` | 通常取得 |
-
-### 2-4. 除外条件
-
-- `visible: false` のフレームはスキップ
-- hidden レイヤーは複雑度計算から除外
+**詳細**: → [references/complexity-and-matching.md](references/complexity-and-matching.md) の「Phase 2」セクション
 
 ## Phase 3: ページ横断 共通コンポーネント検出
 
-4つの手法で共通コンポーネントを検出:
+4つの手法（名前一致・位置一致・構造一致・Instance検出）で共通コンポーネントを検出。
 
-### 3-1. 名前一致検出
-
-メタデータのレイヤー名が複数ページで一致するものを抽出:
-
-```
-例: "Header", "Footer", "CTA Section" が3ページに出現
-→ 共通コンポーネント候補
-```
-
-### 3-2. 位置一致検出
-
-同一の相対位置（top/bottom）に同種の要素が配置されているものを検出:
-
-```
-例: 全ページの最上部に "Header" (y=0, height≈80)
-→ 共通ヘッダー
-```
-
-### 3-3. 構造一致検出
-
-子要素の構成が類似するフレームを検出:
-
-```
-例: Page A の "Card" と Page B の "Card" が同じ子要素構造
-→ 共通カードコンポーネント
-```
-
-### 3-4. Instance検出
-
-Figma Component Instance（`type: "INSTANCE"`）を検出:
-
-```
-例: 同一 componentId を持つ Instance が複数ページに存在
-→ Figma上で既にコンポーネント化済み
-```
-
-### 検出結果
-
-各コンポーネント候補に以下を記録:
-
-| フィールド | 説明 |
-|-----------|------|
-| name | コンポーネント名 |
-| detection_method | 検出手法（name/position/structure/instance） |
-| pages | 出現ページリスト |
-| occurrence_count | 出現回数 |
-| suggested_type | 推定タイプ（header/footer/card/button/etc） |
+**詳細**: → [references/complexity-and-matching.md](references/complexity-and-matching.md) の「Phase 3」セクション
 
 ## Phase 4: カタログマッチング
 
-### 4-1. 既存カタログとの照合
+Phase 3 で検出した共通コンポーネントを `component-catalog.yaml` と照合し、
+REUSE（70%+）/ EXTEND（40-69%）/ NEW（40%未満）を判定。
 
-Phase 3 で検出した共通コンポーネントを `component-catalog.yaml` と照合:
-
-### 4-2. マッチングスコア計算
-
-| 条件 | スコア |
-|------|--------|
-| type 一致 | +40% |
-| 必須props充足 | +30% |
-| variant対応可能 | +20% |
-| figma_patterns一致 | +10% |
-
-**注意**: Code Connect は使用しない。カタログのみで判定。
-
-### 4-3. 判定閾値
-
-| スコア | 判定 | アクション |
-|--------|------|----------|
-| 70%以上 | `REUSE` | 既存コンポーネントをそのまま使用 |
-| 40-69% | `EXTEND` | 既存ベース + カスタムスタイル |
-| 40%未満 | `NEW` | 新規コンポーネント作成 |
-
-### 4-4. 再利用判定表
-
-各コンポーネントの判定結果を表形式で出力:
-
-```
-| Component | Score | Decision | Existing Match | Action |
-|-----------|-------|----------|----------------|--------|
-| Header    | 85%   | REUSE    | c-page-header  | Use as-is |
-| CTA Card  | 55%   | EXTEND   | c-card         | Add variant |
-| Hero      | 20%   | NEW      | -              | Create new |
-```
+**詳細**: → [references/complexity-and-matching.md](references/complexity-and-matching.md) の「Phase 4」セクション
 
 ## Phase 5: デザイントークン取得（任意）
 
@@ -462,6 +380,34 @@ Next steps:
   /figma-implement {url} --section {section}
 ```
 
+### Next Commands（自動生成）
+
+分析結果から `/figma-implement` コマンドを自動生成してコンソールに表示する:
+
+```
+📋 推奨実装コマンド（コピー可能）:
+
+# 1. {page_name} - {section_name} (complexity: {score})
+/figma-implement {url} --section {section_name}
+
+# 2. {page_name} - {section_name} (complexity: {score})
+/figma-implement {url} --section {section_name}
+
+# 共通コンポーネント（先に実装推奨）:
+/figma-implement {url} --section {shared_component_name}
+```
+
+analysis-report.yaml にも `next_commands` フィールドとして出力する:
+```yaml
+next_commands:
+  shared_components:
+    - "/figma-implement {url} --section {name}"
+  pages:
+    - page: "{page_name}"
+      commands:
+        - "/figma-implement {url} --section {section}"
+```
+
 ## Error Handling
 
 | Error | Detection | Response |
@@ -472,6 +418,68 @@ Next steps:
 | カタログファイル未存在 | File not found | 空リストで続行（警告表示） |
 | 全ページ取得失敗 | All pages failed | エラー終了 + 原因一覧を表示 |
 
+## Scripts
+
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
+
+| スクリプト | 目的 | 入力 | 出力 |
+|-----------|------|------|------|
+| `scripts/calculate-complexity.sh` | メタデータJSONから複雑度スコア計算 | Figma metadata JSON file | JSON (scores + strategy) |
+| `scripts/detect-shared-components.sh` | ページ横断の共通コンポーネント自動検出 | 2+ metadata JSON files | JSON (shared components) |
+
+### calculate-complexity.sh
+
+```bash
+bash .claude/skills/figma-analyze/scripts/calculate-complexity.sh <metadata.json>
+```
+
+- **入力**: `get_metadata` の出力を保存した JSON ファイル
+- **出力**: セクション別スコア + 合計 + 分割戦略を JSON で出力
+- **計算式**: `children×2 + depth×5 + text_count + height/1000`
+- **戦略判定**: NORMAL (<100) / SPLIT (100-200) / SPLIT_REQUIRED (>200)
+- **依存**: python3 + json モジュール（標準ライブラリ）
+- **終了コード**: 0=成功, 1=エラー
+
+### detect-shared-components.sh
+
+```bash
+bash .claude/skills/figma-analyze/scripts/detect-shared-components.sh <page1.json> <page2.json> [page3.json ...]
+```
+
+- **入力**: 2つ以上の `get_metadata` 出力 JSON ファイル（各ページ1ファイル）
+- **出力**: 共通コンポーネント一覧を JSON で出力（名前・検出手法・出現ページ・推定タイプ）
+- **検出手法**: 4種類
+  1. **名前一致**: 同一レイヤー名が複数ページに出現
+  2. **位置一致**: 同一相対位置（top/bottom）に同種要素が配置
+  3. **構造一致**: 子要素の構成（タイプ・数）が類似
+  4. **Instance検出**: 同一 componentId の Instance が複数ページに存在
+- **重複排除**: 複数手法で検出された場合、優先度（instance > name > structure > position）で統合
+- **依存**: python3 + json モジュール（標準ライブラリ）
+- **終了コード**: 0=成功, 1=エラー
+
+## Agent Integration
+
+Phase 2-4（メタデータ取得 + 複雑度分析 + カタログマッチング）を Explore エージェントに委譲可能:
+
+```
+Task tool:
+  subagent_type: Explore
+  prompt: |
+    以下の Figma ページのメタデータを分析してください:
+    - URLs: {url_list}
+
+    実行内容:
+    1. 各 URL の get_metadata 結果を確認（キャッシュ .claude/cache/figma/ を優先参照）
+    2. トップレベルフレームの子要素数・ネスト深度・テキスト要素数を集計
+    3. 複雑度スコアを算出: children×2 + depth×5 + text_count + height/1000
+    4. .claude/data/component-catalog.yaml と照合し REUSE/EXTEND/NEW を判定
+
+    結果を構造化して返してください。
+```
+
+**委譲条件**: 分析対象ページ数 >= 3 の場合
+**Fallback**: エージェント不在時は直接 Bash + Read で分析
+
 ## Related Files
 
 | File | Purpose |
@@ -481,6 +489,7 @@ Next steps:
 | `.claude/rules/figma-workflow.md` | Figmaワークフロールール |
 | `.claude/rules/figma.md` | Figma統合ルール |
 | `.claude/skills/figma-implement/SKILL.md` | 実装スキル（後続） |
+| `.claude/skills/scripts-standard.md` | スクリプト標準規約 |
 
 ---
 

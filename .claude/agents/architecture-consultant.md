@@ -38,7 +38,7 @@ description: |
   Architecture documentation for onboarding requires comprehensive review and clear explanation.
   </commentary>
   </example>
-model: sonnet
+model: opus
 allowed_tools:
   - Read
   - Glob

@@ -1,7 +1,8 @@
 ---
 name: astro-page-generator
 description: "Generate Astro page with section components, mock data, and SCSS wiring interactively"
-disable-model-invocation: false
+argument-hint: "[page-slug]"
+disable-model-invocation: true
 allowed-tools:
   - Read
   - Write
@@ -12,16 +13,33 @@ allowed-tools:
   - mcp__serena__read_memory
   - mcp__serena__search_for_pattern
   - mcp__serena__find_symbol
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # Astro Page Generator
 
+## Dynamic Context
+
+```
+Existing Astro pages:
+!`ls astro/src/pages/*.astro 2>/dev/null || echo "No pages yet"`
+```
+
 ## Overview
 
 Astro静的コーディング環境で新規ページを対話的に生成する。
 ページ名、セクション構成、データ構造を収集し、Astroページ・セクションコンポーネント・モックデータJSON・SCSS接続を一括生成する。
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | `/figma-analyze`（任意） |
+| **後工程** | `/figma-implement`, `/astro-to-wordpress` |
+| **呼び出し元** | ユーザー直接 |
+| **呼び出し先** | なし |
 
 ## Usage
 
@@ -90,91 +108,22 @@ Astro静的コーディング環境で新規ページを対話的に生成する
 
 ## Generation Rules (Mandatory)
 
-### Page File Template
+Page/Section/Data テンプレートと命名規則は references に定義。
 
-```astro
----
-/**
- * {ページ名}
- * WordPress pages/page-{slug}.php に相当
- *
- * 変換先: pages/page-{slug}.php
- * Template Name: {ページ名}
- */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/sections/{slug}/Hero.astro';
-// ... 他セクション
-
-import '@root-src/css/pages/{slug}/style.scss';
-import pageData from '../data/pages/{slug}.json';
----
-
-<BaseLayout title="{ページ名} | サイト名">
-  <main class="p-{slug}">
-    <Hero {...pageData.hero} />
-    <!-- 他セクション -->
-  </main>
-</BaseLayout>
-```
-
-### Section Component Template
-
-```astro
----
-/**
- * {SectionName}
- * WordPress template-parts/{slug}/{section}.php に相当
- *
- * 変換先: get_template_part('template-parts/{slug}/{section}')
- */
-interface Props {
-  // ACFフィールドに対応するprops
-}
-
-const { ... } = Astro.props;
----
-
-<section class="p-{slug}-{section}">
-  <div class="p-{slug}-{section}__container">
-    <!-- Content -->
-  </div>
-</section>
-```
-
-### Data JSON Template
-
-```json
-{
-  "hero": {
-    "title": "...",
-    "description": "...",
-    "image": "/assets/images/{slug}/hero.png"
-  },
-  "sectionName": {
-    "items": []
-  }
-}
-```
-
-### Naming Rules
-
-| Target | Convention | Example |
-|--------|-----------|---------|
-| Astro file | PascalCase | `Hero.astro` |
-| PHP target | kebab-case | `hero.php` |
-| BEM block | `p-{slug}-{section}` | `p-about-hero` |
-| Props | camelCase | `enHeading` |
-| PHP args | snake_case | `en_heading` |
-| Data key | camelCase | `hero.mainImage` |
+**詳細**: → [references/generation-templates.md](references/generation-templates.md)（テンプレート + Naming Rules + 実装例）
 
 ## Error Handling
 
-| Error | Response |
-|-------|----------|
-| Slug duplicate (Astro page exists) | 確認してから上書きまたは別名提案 |
-| SCSS already exists | 既存SCSSを再利用、エントリーポイントのみ接続 |
-| Build failure | エラー内容を表示し修正提案 |
-| Invalid kebab-case | バリデーションして修正提案 |
+| Error | Detection | Response |
+|-------|-----------|----------|
+| Slug duplicate | ファイル存在チェック | 確認してから上書きまたは別名提案 |
+| SCSS already exists | Glob 検索 | 既存SCSSを再利用、エントリーポイントのみ接続 |
+| Invalid kebab-case | 正規表現 `/^[a-z][a-z0-9-]*$/` | バリデーションして修正提案 |
+| astro/package.json 不在 | File not found | `npm run astro:install` の実行を案内 |
+| `npm run astro:build` 失敗 (import error) | exit code != 0 + "Cannot find module" | インポートパスを確認、`@root-src` alias の存在を検証 |
+| `npm run astro:build` 失敗 (type error) | exit code != 0 + "Type error" | Props interface を確認、型不一致を修正 |
+| `npm run astro:build` 失敗 (SCSS compile) | exit code != 0 + "SassError" | SCSS 構文を確認、`@use` パスの正当性を検証 |
+| BaseLayout.astro 不在 | File not found | layouts/ ディレクトリの確認を促す |
 
 ## Related Files
 
@@ -186,66 +135,87 @@ const { ... } = Astro.props;
 | `astro/src/lib/data-helpers.ts` | データヘルパー |
 | `astro/src/components/common/` | 共通コンポーネント |
 
-## Examples
+---
 
-### Example: Creating an About Page
+**Instructions for Claude:**
 
-**Step 1: Start skill**
+## 引数パース
+
+`$ARGUMENTS` を以下のルールでパースする:
+
+1. **引数あり** (`{page-slug}`): 非対話モードで直接生成を開始
+   - `--sections s1,s2,s3` オプション: セクション一覧をカンマ区切りで指定
+   - 例: `/astro-page-generator about --sections hero,mission,team`
+2. **引数なし**: 対話モード（従来通りユーザーに質問）
+
+## 実行手順
+
+1. **ファイル存在確認**
+   - `astro/package.json` が存在するか確認
+   - 存在しない場合: 「Astro環境が未セットアップです。`npm run astro:install` を実行してください」と案内して終了
+   - 同名ページ `astro/src/pages/{slug}.astro` が存在する場合: 上書き確認
+
+2. **セクション確定**
+   - 引数に `--sections` あり → カンマ区切りでパース
+   - 引数に `--sections` なし → 対話で収集（非対話モードでも）
+   - 各セクション名を kebab-case でバリデーション
+
+3. **生成実行**
+   - Processing Flow のステップ1-5に従ってファイルを生成
+   - `scripts/generate-astro-page.sh` が利用可能であれば先行実行
+   - スクリプトが利用できない場合は直接 Write/Edit で生成
+
+4. **検証**
+   - `npm run astro:build` を実行してビルド成功を確認
+   - 生成ファイル一覧と WordPress 変換先の対応表を出力
+
+## Scripts
+
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
+
+| スクリプト | 目的 | 入力 | 出力 |
+|-----------|------|------|------|
+| `scripts/generate-astro-page.sh` | テンプレートベースの Astro ページ足場生成 | slug, sections | .astro + .json + .scss files |
+
+### generate-astro-page.sh
+
+```bash
+bash .claude/skills/astro-page-generator/scripts/generate-astro-page.sh <page-slug> <sections>
+# Example:
+bash .claude/skills/astro-page-generator/scripts/generate-astro-page.sh about hero,mission,team
 ```
-/astro-page-generator
+
+- **入力**: page-slug (kebab-case), sections (カンマ区切り)
+- **出力**: Astro ページ, セクションコンポーネント, モックデータ JSON, SCSS 構造
+- **生成ファイル**:
+  - `astro/src/pages/{slug}.astro` - ページファイル
+  - `astro/src/components/sections/{slug}/{Pascal}.astro` - セクションコンポーネント
+  - `astro/src/data/pages/{slug}.json` - モックデータ
+  - `src/scss/object/project/{slug}/` - SCSS ファイル群
+  - `src/css/pages/{slug}/style.scss` - CSS エントリーポイント
+- **前提**: `astro/package.json` が存在すること
+- **終了コード**: 0=成功, 1=バリデーションエラー
+
+## Agent Integration
+
+Step 3（ファイル生成）が複雑な場合、astro-component-engineer エージェントに委譲可能:
+
+```
+Task tool:
+  subagent_type: astro-component-engineer
+  prompt: |
+    以下の仕様で Astro ページを生成してください:
+    - slug: {slug}
+    - sections: {sections}
+    - データ構造: {data_structure}
+
+    生成ルール: references/generation-templates.md を参照。
+    SCSS は src/scss/object/project/{slug}/ に配置。
+    npm run astro:build で検証してください。
 ```
 
-**Step 2: Interactive input**
-```
-Agent: ページ名（日本語）:
-User: 会社概要
-
-Agent: ページスラッグ（kebab-case）:
-User: about
-
-Agent: セクション一覧（カンマ区切り）:
-User: hero, mission, history, team, access
-
-Agent: 既存のWordPress PHPテンプレートはありますか？:
-User: themes/test-theme/pages/page-about.php
-```
-
-**Step 3: Confirmation**
-```
-Agent: 以下のファイルを生成します:
-
-📄 astro/src/pages/about.astro
-📁 astro/src/components/sections/about/
-   ├── Hero.astro
-   ├── Mission.astro
-   ├── History.astro
-   ├── Team.astro
-   └── Access.astro
-📄 astro/src/data/pages/about.json
-
-SCSS（既存チェック）:
-  → src/scss/object/projects/about/ が存在しない場合は新規作成
-  → 存在する場合は既存を利用
-
-Continue? (yes/no)
-```
-
-**Step 4: Generation complete**
-```
-✅ Astro page generated!
-
-| Astro File | WordPress Target |
-|-----------|-----------------|
-| pages/about.astro | pages/page-about.php |
-| sections/about/Hero.astro | template-parts/about/hero.php |
-| sections/about/Mission.astro | template-parts/about/mission.php |
-| data/pages/about.json | ACF fields |
-
-Next steps:
-1. npm run astro:dev で確認
-2. モックデータを実際のコンテンツに更新
-3. デザイン承認後、WordPress PHPに変換（/astro-to-wordpress）
-```
+**委譲条件**: セクション数 >= 5 またはモックデータが複雑な場合
+**Fallback**: エージェント不在時は直接 Write/Edit で生成
 
 ## Related Skills
 

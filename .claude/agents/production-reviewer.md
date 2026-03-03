@@ -40,7 +40,7 @@ description: |
   User specified scss type, so the review will focus on SCSS/FLOCSS/BEM compliance.
   </commentary>
   </example>
-model: sonnet
+model: opus
 color: yellow
 allowed_tools:
   - Read

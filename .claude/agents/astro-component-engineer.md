@@ -26,7 +26,7 @@ description: |
   user: "Create a TestimonialCard component for Astro"
   assistant: "Let me use the astro-component-engineer agent to create the component with proper Props interface and BEM classes."
   </example>
-model: sonnet
+model: opus
 color: cyan
 allowed_tools:
   - Read

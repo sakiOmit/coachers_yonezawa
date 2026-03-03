@@ -1309,3 +1309,287 @@ Task toolでproduction-reviewerを起動:
 1. Astro開発サーバー（localhost:4321）で表示確認
 2. 問題なければ承認
 3. WordPress変換は `/astro-to-wordpress [slug]` で実行
+
+---
+
+## Step 0.5 詳細: raw_jsx 検証条件
+
+### 検証条件（6項目）
+
+キャッシュファイル `nodes/{nodeId}.json` の `raw_jsx` フィールドが以下を満たすか検証:
+
+| # | 条件 | 理由 |
+|---|------|------|
+| 1 | 文字列長 >= 500文字 | 省略されていないか |
+| 2 | `export default function` を含む | JSXコードか |
+| 3 | `return (` を含む | JSX return文があるか |
+| 4 | `className=` を含む | Tailwindクラスがあるか |
+| 5 | `data-node-id=` を含む | Figmaノード対応があるか |
+| 6 | 省略コメントを含まない | 抽象化されていないか |
+
+### 省略コメントパターン（検出対象）
+
+```
+- "// Large JSX content"
+- "// Section heading"
+- "// Cards"
+- "// Contains"
+- "// Key styles:"
+```
+
+### 検証フロー (SCRIPT REQUIRED)
+
+**MUST** run validation script for each cached node:
+
+```bash
+for node_file in .claude/cache/figma/{page-slug}/nodes/*.json; do
+  node_id=$(basename "$node_file" .json)
+  bash .claude/skills/figma-implement/scripts/validate-raw-jsx.sh \
+    "$node_file" "$node_id"
+done
+```
+
+Exit code handling:
+- Exit 0 (PASS) → キャッシュを使用
+- Exit 1 (FAIL) → get_design_context を直接呼び出し
+
+### 例: 検証失敗
+
+```
+⚠️ raw_jsx validation FAILED for 5:2687 (MVV Section):
+   - Too short: 423 chars (min: 500)
+   - Missing 'export default function'
+   - Contains abstraction comment: '// Key styles:'
+
+→ キャッシュは使用せず、get_design_context を直接呼び出します。
+```
+
+### 例: 検証成功
+
+```
+✅ raw_jsx validated: 5:2687 (12,847 chars)
+   - export default function: ✓
+   - return statement: ✓
+   - className attributes: ✓
+   - data-node-id attributes: ✓
+   - No abstraction comments: ✓
+
+→ キャッシュからの読み込みを使用します。
+```
+
+---
+
+## Step 5 詳細: ページタイトル自動抽出パターン
+
+### 抽出パターン（優先順位順）
+
+| Priority | Pattern | Criteria |
+|----------|---------|----------|
+| 1 | 大きなテキスト要素（h1相当） | fontSize ≥ 24px かつページ最上部 |
+| 2 | ページヘッダー内のテキスト | レイヤー名に "header", "title", "heading" を含む |
+| 3 | パンくずの末尾テキスト | レイヤー名に "breadcrumb" or "パンくず" を含む |
+
+### 抽出ロジック
+
+```javascript
+// 日本語タイトル
+- 最初に見つかった日本語の大見出しテキスト（ひらがな・カタカナ・漢字を含む）
+- 例: "募集要項一覧", "会社概要", "企業理念"
+
+// 英語タイトル
+- 英単語パターンマッチ
+- 例: "Job Description", "Requirements", "About Us", "Philosophy"
+
+// スラッグ
+- 英語タイトルをケバブケース化
+- 例: "Job Description" → "job-description"
+```
+
+### 抽出成功時
+
+```
+✅ ページタイトルを自動抽出しました:
+  - スラッグ: job-description
+  - 日本語名: 募集要項一覧
+  - 英語見出し: Job Description
+
+※ 自動抽出値を使用します。変更が必要な場合はお知らせください。
+```
+
+### フォールバック（抽出失敗時）
+
+抽出できなかった項目のみユーザーに確認（H3 介入）:
+
+```
+⚠️ 以下の情報を自動抽出できませんでした。入力してください:
+
+- ページスラッグ: [入力必須]
+- ページの日本語名: [入力必須]
+- ページの英語見出し: [入力必須]
+```
+
+---
+
+## Step 6 詳細: SCSS実装品質チェックリスト
+
+### コンテナ構造
+
+- [ ] `__container` は `@include container()` のみ
+- [ ] レイアウト（display, flex, gap）は `__inner` に分離
+- [ ] `__container` 直下に `__inner` がある
+
+### BEM命名
+
+- [ ] 全てのクラスが kebab-case
+- [ ] 二重アンダースコアがない（`__heading__en` 禁止）
+- [ ] ハイフン区切りで統一（`__hero-container`, `__field-label`）
+
+### プロパティ順序
+
+- [ ] position 系が最初
+- [ ] display, flex 系が次
+- [ ] サイズ系（width, height, margin, padding）
+- [ ] タイポグラフィ系（font, line-height, color）
+- [ ] ビジュアル系（background, border）
+
+### Astroコンポーネント禁止事項
+
+- [ ] `.astro` 内での SCSS/JS インポートがない
+- [ ] `<style>` scoped ブロックがない
+- [ ] `<script>` インラインがない
+- [ ] `<img>` 直接記述がない（`<ResponsiveImage />` を使用）
+- [ ] Props interface が定義されている
+
+---
+
+## Step 7 詳細: Playwrightによる検証フロー
+
+### 7-1. ページ表示
+
+```
+mcp__playwright__browser_navigate
+  url: "http://localhost:4321/[slug]/"
+```
+
+### 7-2. セクション自動抽出ロジック
+
+**推測ロジック（優先順位順）:**
+
+1. フレーム内のテキストコンテンツから推測
+   ```
+   フレーム名: "Frame 123"
+   含まれるテキスト: "企業理念", "Philosophy"
+   → 推測セクション名: "philosophy"
+   ```
+
+2. フレーム内の画像・要素構成から推測
+   ```
+   フレーム名: "Group 456"
+   構成: 大きな背景画像 + キャッチコピー + CTAボタン
+   → 推測セクション名: "hero"
+   ```
+
+3. フレームの位置・順序から推測
+   ```
+   フレーム名: "Frame 789"
+   位置: ページ最下部、連絡先情報を含む
+   → 推測セクション名: "contact"
+   ```
+
+### 7-3〜7-4. セクション別スクリーンショット + 差分検証
+
+```bash
+# Figma側
+mcp__figma__get_screenshot (各セクション)
+# → .claude/cache/visual-diff/figma_{section}.png
+
+# Astro側
+mcp__playwright__browser_take_screenshot (各セクション)
+# → .claude/cache/visual-diff/astro_{section}.png
+
+# 差分検証
+node scripts/visual-diff.js \
+  .claude/cache/visual-diff/figma_{section}.png \
+  .claude/cache/visual-diff/astro_{section}.png \
+  --preset default \
+  --output .claude/cache/visual-diff/diff_{section}.png \
+  --json
+```
+
+**閾値プリセット:**
+
+| プリセット | threshold | maxDiffPixelRatio | 用途 |
+|-----------|-----------|-------------------|------|
+| strict | 0.1 | 0.01 (1%) | ピクセルパーフェクト重視 |
+| default | 0.2 | 0.05 (5%) | 標準（推奨） |
+| lenient | 0.3 | 0.10 (10%) | レスポンシブ・フォント差許容 |
+
+### 7-5. 差分修正イテレーション
+
+```
+for each failedSection:
+  iteration = 0
+  while iteration < 5 and not passed:
+    1. 差分画像から問題箇所を特定
+    2. astro-component-engineer に修正指示
+    3. ビルド待機（Vite自動リビルド）
+    4. 該当セクションのみ再キャプチャ
+    5. visual-diff.js で再検証
+    6. iteration++
+
+  if iteration >= 5 and not passed:
+    → H5: 人間に報告（差分画像提示 + 手動確認依頼）
+```
+
+### 7-8b. ブラウザリソース解放（必須）
+
+```
+mcp__playwright__browser_close
+```
+
+**実行タイミング:**
+- Step 7 全体完了後（必須）
+- 10セクション以上: 5セクションごとに閉じて再起動
+- 複数ページ連続実装: 各ページ完了後に必ず閉じる
+
+---
+
+## Step 8 詳細: Quick Quality Check の検出パターン
+
+### 検出パターンと対応
+
+| Pattern | Severity | Fix |
+|---------|----------|-----|
+| `<img ` (非ResponsiveImage) | **BLOCK** | `<ResponsiveImage />` に変更 |
+| `<style` scoped | **BLOCK** | 削除し `src/scss/` に移動 |
+| `import.*\.scss` | **BLOCK** | 削除し `src/css/` エントリーに追加 |
+| `import.*\.js` | **BLOCK** | 削除し `src/js/` に移動 |
+| ビルドエラー | **BLOCK** | エラー内容に基づき修正 |
+| Lint警告 | WARN | 次回修正（続行可） |
+
+### 自動実行コマンド
+
+```bash
+# スクリプト実行（MUST）
+bash .claude/skills/figma-implement/scripts/quality-check.sh \
+  {実装したSCSSファイル} \
+  {実装したAstroファイル}
+
+# 追加チェック
+npm run astro:build
+npm run lint:css
+grep -rn '<img ' {Astroファイル}
+grep -rn '<style' {Astroファイル}
+grep -rn 'import.*\.scss' {Astroファイル}
+grep -rn 'import.*\.js' {Astroファイル}
+```
+
+### エラー時のフロー
+
+```
+Step 8 実行
+    ↓
+エラー検出?
+    ├─ YES → 修正を実行 → Step 8 再実行
+    └─ NO  → Step 9 へ進む
+```

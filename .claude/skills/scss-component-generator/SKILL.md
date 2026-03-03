@@ -1,23 +1,43 @@
 ---
 name: scss-component-generator
-description: "Generate FLOCSS-compliant SCSS components interactively, collecting component type (component/project/layout), BEM naming, and responsive settings to create standard-compliant SCSS files."
-disable-model-invocation: false
+description: "Generate FLOCSS+BEM compliant SCSS components (component/project/layout) interactively."
+argument-hint: "[component|project|layout] [name]"
+disable-model-invocation: true
 allowed-tools:
   - Read
   - Write
   - Glob
   - Grep
+  - Bash
   - mcp__serena__read_memory
   - mcp__serena__search_for_pattern
+  - mcp__serena__find_symbol
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # SCSS Component Generator
 
+## Dynamic Context
+
+```
+Existing SCSS components:
+!`ls src/scss/object/component/ src/scss/object/project/ 2>/dev/null || echo "(empty)"`
+```
+
 ## Overview
 
 Generate FLOCSS + BEM compliant SCSS components interactively. This skill collects component information through dialogue and automatically generates SCSS files following project conventions.
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | `/figma-implement` Step 6（任意） |
+| **後工程** | `/review scss`, `/qa` |
+| **呼び出し元** | ユーザー直接, `/figma-implement` |
+| **呼び出し先** | なし |
 
 ## Usage
 
@@ -86,199 +106,11 @@ Automatically adds `@use` to:
    └─ Guide user to next steps
 ```
 
-## Component Types
+## Component Types & Generation Rules
 
-### Component (c-)
+3種類のコンポーネント（c-/p-/l-）のテンプレートと BEM/Responsive/Container ルールは references に定義。
 
-Reusable generic components:
-
-```scss
-// Example: _c-button.scss
-.c-button {
-  // Base styles
-
-  &__icon {
-    // Element
-  }
-
-  &--primary {
-    // Modifier
-  }
-}
-```
-
-### Project (p-)
-
-Page-specific components:
-
-```scss
-// Example: _p-top-hero.scss
-.p-top-hero {
-  // Section-specific styles
-
-  &__title {
-    // Element
-  }
-
-  &__description {
-    // Element
-  }
-}
-```
-
-### Layout (l-)
-
-Layout-related components:
-
-```scss
-// Example: _l-header.scss
-.l-header {
-  // Layout styles
-
-  &__container {
-    @include container();
-  }
-}
-```
-
-## Generation Rules (Mandatory)
-
-### BEM Naming Rules
-
-- **Always use kebab-case** (camelCase, PascalCase prohibited)
-- **Elements must use `&__` nesting** (top-level definition prohibited)
-- **`&-` nesting prohibited**
-
-```scss
-// ✅ Correct
-.p-example {
-  &__main-visual {
-    // styles
-  }
-
-  &__content-area {
-    // styles
-  }
-}
-
-// ❌ Prohibited
-.p-example__mainVisual { }  // camelCase
-.p-example { &-item { } }   // &- nesting
-```
-
-### Responsive
-
-- **Default: PC styles**
-- **Use `@include sp` for SP override**
-
-```scss
-.p-example {
-  &__title {
-    font-size: rv(32);
-
-    @include sp {
-      font-size: svw(24);
-    }
-  }
-}
-```
-
-### Base Style Duplication Prohibited
-
-The following are defined in base styles - **DO NOT write**:
-- `font-size: rv(16)` - body default
-- `line-height: 1.6` - body default
-- `letter-spacing: 0.08em` - body default
-
-### Container Rules
-
-Classes containing `container` may **only** have `@include container()`:
-
-```scss
-.p-example {
-  &__container {
-    @include container(1200px);
-    // Other properties prohibited
-  }
-
-  &__inner {
-    // Layout properties go here
-    display: flex;
-    padding: rv(40);
-  }
-}
-```
-
-## Interactive Example
-
-### Step 1: Start Skill
-
-```
-/scss-component-generator
-```
-
-### Step 2: Interactive Input
-
-**Agent:**
-```
-Creating an SCSS component.
-
-1. Select component type:
-   - component (c-) - Reusable generic component
-   - project (p-) - Page-specific section
-   - layout (l-) - Layout related
-```
-
-**User:** `project`
-
-**Agent:**
-```
-2. Enter page name (kebab-case)
-Example: top, about, contact
-```
-
-**User:** `top`
-
-**Agent:**
-```
-3. Enter component name (kebab-case)
-Example: hero, news-list, contact-form
-```
-
-**User:** `hero`
-
-**Agent:**
-```
-4. Enter elements (comma-separated, kebab-case)
-Example: title, description, background-image, cta-button
-```
-
-**User:** `title, catch-copy, background, scroll-indicator`
-
-**Agent:**
-```
-5. Do you need responsive support? (yes/no)
-```
-
-**User:** `yes`
-
-### Step 3: Code Generation
-
-Agent automatically generates SCSS file and saves to appropriate directory.
-
-### Step 4: Completion Notification
-
-```
-✅ SCSS component created!
-
-📁 File: src/scss/object/projects/top/_p-top-hero.scss
-📝 Added @use to style.scss
-
-Next steps:
-1. Run npm run dev to verify build
-2. Create corresponding PHP template
-3. Adjust styles as needed
-```
+**詳細**: → [references/scss-generation-rules.md](references/scss-generation-rules.md)（テンプレート + ルール + 対話例）
 
 ## Error Handling
 
@@ -289,6 +121,116 @@ Next steps:
 | Stylelint error | Run check and report issues |
 | Base style duplication | Warn user about redundant styles |
 
+---
+
+**Instructions for Claude:**
+
+## 引数パース
+
+`$ARGUMENTS` を以下のルールでパースする:
+
+1. **引数あり** (`[component|project|layout] [name]`): 非対話モードで直接生成
+   - `--elements e1,e2,e3` オプション: BEM Elements をカンマ区切りで指定
+   - `--modifiers m1,m2` オプション: BEM Modifiers をカンマ区切りで指定
+   - 例: `/scss-component-generator project top-hero --elements title,description,image --modifiers large`
+2. **引数なし**: 対話モード（従来通りユーザーに質問）
+
+## 実行手順
+
+1. **型判定**
+   - 第1引数が `component`/`project`/`layout` のいずれかを確認
+   - 不正な場合: 正しい型を提示して選択を促す
+
+2. **名前検証**
+   - 第2引数が kebab-case であることをバリデーション
+   - `project` 型の場合: `{page}-{section}` 形式であることを確認（例: `top-hero`）
+   - 既存ファイルとの重複チェック
+
+3. **テンプレート適用**
+   - `scripts/generate-scss.sh` が利用可能であれば先行実行
+   - スクリプトが利用できない場合は直接 Write で生成
+   - Generation Rules (Mandatory) セクションのテンプレートに従う
+
+4. **BEM/FLOCSS 検証**
+   - `scripts/validate-scss-component.sh` を生成ファイルに対して実行:
+     ```bash
+     bash .claude/skills/scss-component-generator/scripts/validate-scss-component.sh {生成ファイル}
+     ```
+   - FAIL の場合: 指摘箇所を修正して再検証
+   - PASS の場合: Stylelint へ進む
+
+5. **Stylelint 検証**
+   - `npm run lint:css` を実行して追加の準拠チェック
+   - エラーがあれば自動修正を試行
+
+## Scripts
+
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
+
+| スクリプト | 目的 | 入力 | 出力 |
+|-----------|------|------|------|
+| `scripts/generate-scss.sh` | テンプレートからの SCSS 自動生成 | type, name, page, elements, modifiers | SCSS file |
+| `scripts/validate-scss-component.sh` | BEM/FLOCSS 品質自動検証 | SCSS file path | Validation results (text) |
+
+### generate-scss.sh
+
+```bash
+bash .claude/skills/scss-component-generator/scripts/generate-scss.sh <type> <name> [page] [elements] [modifiers]
+# Examples:
+bash .claude/skills/scss-component-generator/scripts/generate-scss.sh component button '' icon,text primary,secondary
+bash .claude/skills/scss-component-generator/scripts/generate-scss.sh project hero top title,description,image large
+bash .claude/skills/scss-component-generator/scripts/generate-scss.sh layout sidebar
+```
+
+- **入力**: type (component|project|layout), name (kebab-case), page (project時必須), elements (カンマ区切り), modifiers (カンマ区切り)
+- **出力**: FLOCSS 準拠の SCSS ファイル
+- **生成先**:
+  - component → `src/scss/object/component/_c-{name}.scss`
+  - project → `src/scss/object/project/{page}/_p-{page}-{name}.scss`
+  - layout → `src/scss/layout/_l-{name}.scss`
+- **container 要素**: `@include container()` が自動挿入される
+- **終了コード**: 0=成功, 1=バリデーションエラー
+
+### validate-scss-component.sh
+
+```bash
+bash .claude/skills/scss-component-generator/scripts/validate-scss-component.sh <scss-file>
+# Example:
+bash .claude/skills/scss-component-generator/scripts/validate-scss-component.sh src/scss/object/component/_c-button.scss
+```
+
+- **入力**: SCSS ファイルパス
+- **検証項目** (6チェック):
+  1. FLOCSS プレフィックス (c-/p-/l-/u-)
+  2. kebab-case 命名 (camelCase 検出)
+  3. BEM ネスト (&__ 使用、&- 禁止)
+  4. container ルール (@include container() のみ)
+  5. hover ルール (&:hover 直接使用禁止)
+  6. ネスト深度 (最大4階層)
+- **終了コード**: 0=PASS, 1=FAIL (issue count 付き)
+
+## Agent Integration
+
+Step 2（Base Style Check）で flocss-base-specialist エージェントに相談可能:
+
+```
+Task tool:
+  subagent_type: flocss-base-specialist
+  prompt: |
+    以下の SCSS コンポーネントについて Base Style との重複チェックを実行してください:
+    - type: {type} (component/project/layout)
+    - name: {name}
+    - elements: {elements}
+
+    確認観点:
+    - foundation/ で定義済みのスタイルとの重複
+    - 変数・mixin の適切な使用
+    - FLOCSS レイヤー配置の妥当性
+```
+
+**委譲条件**: 新規 component (c-) 作成時、または base style 重複が懸念される場合
+**Fallback**: エージェント不在時は `.claude/rules/scss.md` を Read して直接チェック
+
 ## Related Files
 
 | File | Purpose |
@@ -296,6 +238,7 @@ Next steps:
 | `templates/` | SCSS templates for code generation |
 | `docs/coding-guidelines/02-scss-design.md` | SCSS design guidelines |
 | `.claude/rules/scss.md` | SCSS rules |
+| `.claude/skills/scripts-standard.md` | スクリプト標準規約 |
 
 ---
 

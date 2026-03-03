@@ -1,7 +1,8 @@
 ---
 name: figma-implement
-description: "Orchestrate Figma to Astro static coding implementation (9-step workflow). Use when user says 'implement this design', 'convert Figma to code', 'create page from Figma', or after /figma-prefetch. Supports --section option for precision implementation. WordPress conversion is done separately via /astro-to-wordpress."
-disable-model-invocation: true
+description: "Implement Figma design as Astro static code (9-step). Trigger: 'implement design', 'Figma to code', 'create page from Figma'."
+argument-hint: "{pc_url} [--sp {sp_url}] [--section {name}] [--resume]"
+disable-model-invocation: false
 allowed-tools:
   - Read
   - Write
@@ -17,11 +18,22 @@ allowed-tools:
   - mcp__playwright__browser_navigate
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_take_screenshot
+model: opus
 context: fork
 agent: general-purpose
 ---
 
 # Figma Implement Orchestrator
+
+## Dynamic Context
+
+```
+Figma cache status:
+!`ls .claude/cache/figma/ 2>/dev/null || echo "(empty)"`
+
+Resume state:
+!`cat .claude/cache/figma-implement-state.yaml 2>/dev/null || echo "No state"`
+```
 
 ## Overview
 
@@ -37,6 +49,15 @@ Provides state persistence, resume capability, and error recovery to maximize ef
 - **Error Recovery**: Auto-retry and pause at human intervention points
 - **Progress Reports**: Real-time progress display and completion report generation
 - **Context Optimization**: Screenshot省略モードでトークン消費を削減
+
+## Pipeline Position
+
+| Position | Skill |
+|----------|-------|
+| **前工程** | `/figma-analyze`（任意） |
+| **後工程** | `/astro-to-wordpress`, `/review` |
+| **呼び出し元** | ユーザー直接, `/figma-analyze` 出力から |
+| **呼び出し先** | astro-component-engineer エージェント |
 
 ## Prerequisites
 
@@ -357,35 +378,18 @@ ORCHESTRATOR START
 
 **このステップはスキップ不可。検証スクリプトを実行して結果を確認する。**
 
-### Implementation
-
-**MUST** run validation script first:
+- **目的**: キャッシュの有効性を確認し、不正なキャッシュによる実装ミスを防止する
+- **入力**: `.claude/cache/figma/{page-slug}` ディレクトリ
+- **出力**: CACHE_VALID / CACHE_EXPIRED / CACHE_NOT_FOUND
+- **成功条件**: Exit 0 でスクリプトが完了
+- **詳細**: → references/workflow-steps.md の Step 0 セクション参照
 
 ```bash
 bash .claude/skills/figma-implement/scripts/validate-cache.sh \
   .claude/cache/figma/{page-slug}
 ```
 
-Exit code handling:
-- Exit 0 (PASS) → Step 1 へ進む
-- Exit 1 (FAIL) → 停止、/figma-prefetch 実行を指示
-
-### Why Script Validation?
-
-| Approach | Reliability |
-|----------|-------------|
-| Subagent task (LLM-based) | ❌ May skip checks |
-| Script validation (exit code) | ✅ Deterministic |
-
-コードは決定論的、言語解釈はそうではない。
-
-### Why Mandatory?
-
-| 問題 | 解決策 |
-|------|--------|
-| キャッシュ確認忘れ | サブエージェントが強制確認 |
-| API無駄呼び出し | キャッシュ有効時は再利用 |
-| トークン浪費 | 24時間以内のデータを活用 |
+Exit code: 0 (PASS) → Step 1 へ / 1 (FAIL) → 停止、/figma-prefetch 実行を指示
 
 ### Error Handling
 
@@ -396,97 +400,20 @@ Exit code handling:
 
 ## Step 0.5: raw_jsx Validation (Mandatory for Cached Data)
 
-**キャッシュから読み込む際、raw_jsx の品質を必ず検証する。**
-
-### Why This Step Exists
-
-`figma-recursive-splitter` がキャッシュを作成する際に、raw_jsx が省略・抽象化される問題が発生した。
-この検証により、不完全なキャッシュを使用することを防止する。
-
-### Validation Criteria
-
-キャッシュファイル `nodes/{nodeId}.json` の `raw_jsx` フィールドが以下を満たすか検証:
-
-| # | 条件 | 理由 |
-|---|------|------|
-| 1 | 文字列長 >= 500文字 | 省略されていないか |
-| 2 | `export default function` を含む | JSXコードか |
-| 3 | `return (` を含む | JSX return文があるか |
-| 4 | `className=` を含む | Tailwindクラスがあるか |
-| 5 | `data-node-id=` を含む | Figmaノード対応があるか |
-| 6 | 省略コメントを含まない | 抽象化されていないか |
-
-### 省略コメントパターン（検出対象）
-
-```
-- "// Large JSX content"
-- "// Section heading"
-- "// Cards"
-- "// Contains"
-- "// Key styles:"
-```
-
-### Implementation Flow (SCRIPT REQUIRED)
-
-**MUST** run validation script for each cached node:
+- **目的**: キャッシュの raw_jsx が省略・抽象化されていないか検証する
+- **入力**: `nodes/*.json` の `raw_jsx` フィールド
+- **出力**: VALID / INVALID（検証条件 6 項目）
+- **成功条件**: 全条件クリア（文字列長 >= 500、JSX構造あり、省略コメントなし）
+- **詳細**: → references/workflow-steps.md の「Step 0.5 詳細」セクション参照
 
 ```bash
-# For each node in the cache
 for node_file in .claude/cache/figma/{page-slug}/nodes/*.json; do
-  node_id=$(basename "$node_file" .json)
   bash .claude/skills/figma-implement/scripts/validate-raw-jsx.sh \
-    "$node_file" "$node_id"
+    "$node_file" "$(basename "$node_file" .json)"
 done
 ```
 
-Exit code handling:
-- Exit 0 (PASS) → キャッシュを使用
-- Exit 1 (FAIL) → get_design_context を直接呼び出し
-
-Or manually:
-```
-1. キャッシュファイルを Read で読み込む
-   nodes/{nodeId}.json
-
-2. raw_jsx フィールドを抽出
-
-3. 6つの検証条件をチェック
-
-4. 検証結果に基づく分岐:
-   ├─ ALL PASS → キャッシュを使用
-   └─ ANY FAIL → 以下を実行:
-       ├─ WARNING 出力
-       ├─ get_design_context を直接呼び出し
-       └─ 新しいデータで実装（キャッシュは使用しない）
-```
-
-### Example: Validation Failure
-
-```
-⚠️ raw_jsx validation FAILED for 5:2687 (MVV Section):
-   - Too short: 423 chars (min: 500)
-   - Missing 'export default function'
-   - Contains abstraction comment: '// Key styles:'
-
-→ キャッシュは使用せず、get_design_context を直接呼び出します。
-```
-
-### Example: Validation Success
-
-```
-✅ raw_jsx validated: 5:2687 (12,847 chars)
-   - export default function: ✓
-   - return statement: ✓
-   - className attributes: ✓
-   - data-node-id attributes: ✓
-   - No abstraction comments: ✓
-
-→ キャッシュからの読み込みを使用します。
-```
-
 ## Memory Leak Mitigation (Lightweight Main Context)
-
-このスキルは通常エージェント（fork なし）として動作し、メモリを節約：
 
 | Step | Execution | Memory Impact |
 |------|-----------|---------------|
@@ -495,173 +422,77 @@ Or manually:
 | Step 7-8 | Direct execution (lightweight checks) | ✅ Low (main context) |
 | Step 9 | Direct execution | ✅ Low (main context) |
 
-### Architecture Comparison
-
-**Before (Memory Leak):**
+**Data Flow:**
 ```
-figma-implement (context: fork)
-  ├─ Main context holds design-context.json (76KB) ❌
-  │
-  └─ Task → astro-component-engineer (fork)
-      └─ Double fork + large data in main ❌
-      └─ Main context not released ❌
+Step 1-4: Cache design data to files
+Step 5: Read specs, write to project-convention.yaml
+Step 6: astro-component-engineer reads YAML directly (not via main context)
+Step 7-9: Continue with lightweight main context
 ```
 
-**After (Memory Optimized):**
-```
-figma-implement (no fork)
-  ├─ Main context: state.yaml only (1.3KB) ✅
-  ├─ design-context.json NOT loaded in main ✅
-  │
-  └─ Step 6: Task → astro-component-engineer (fork)
-      ├─ Reads project-convention.yaml directly ✅
-      └─ Subagent context released after completion ✅
-```
+## Step 1: Node ID Extraction
 
-### Key Points
+- **目的**: Figma URL から fileKey と nodeId を抽出する
+- **入力**: pc_url（および --sp オプションの sp_url）
+- **出力**: pc_fileKey, pc_nodeId（, sp_fileKey, sp_nodeId）
+- **成功条件**: 正規表現で両値が取得できた
+- **詳細**: → references/workflow-steps.md の Step 1 セクション参照
 
-1. **Main Context = Lightweight**
-   - Only state.yaml loaded (~1.3KB)
-   - design-context.json read from file when needed, not held in memory
+## Step 2: Design Context Retrieval
 
-2. **Subagent = Isolated**
-   - astro-component-engineer runs in fork context
-   - Auto-released after Step 6 completion
+- **目的**: Figma からデザインコンテキスト（raw_jsx, スタイル情報）を取得する
+- **入力**: fileKey, nodeId（PC/SP）
+- **出力**: design-context.json（PC/SP）、トークン制限時は H1 介入
+- **成功条件**: raw_jsx を含む node データが取得でき、キャッシュに保存された
+- **詳細**: → references/workflow-steps.md の Step 2 セクション参照
 
-3. **Data Flow**
-   ```
-   Step 1-4: Cache design data to files
-   Step 5: Read specs, write to project-convention.yaml
-   Step 6: astro-component-engineer reads YAML directly (not via main context)
-   Step 7-9: Continue with lightweight main context
-   ```
+## Step 3: Visual Reference (Optional)
 
-### Completion Verification
+- **目的**: 視覚的参照用スクリーンショットを取得する（--no-screenshot でスキップ推奨）
+- **入力**: fileKey, nodeId（PC/SP）
+- **出力**: figma_{section}_pc.png（, figma_{section}_sp.png）
+- **成功条件**: スクリーンショットが保存された、またはスキップ指定
+- **詳細**: → references/workflow-steps.md の Step 3 セクション参照
 
-| Step | Method | Blocking |
-|------|--------|----------|
-| Step 6 | Task tool (`astro-component-engineer`) | ✅ Yes |
-| Step 8 | Direct execution (lightweight checks) | ✅ Yes |
+## Step 4: Assets + Design Tokens
 
-**Implementation:**
-```
-1. Task tool 呼び出し（astro-component-engineer）
-   - subagent_type: "astro-component-engineer"
-   - Passes: page_slug, specs location
-   - run_in_background: false（ブロッキング）
+- **目的**: アセットをダウンロードし、Figma Variables を SCSS 変数に変換する
+- **入力**: design-context.json のアセット URL、mcp__figma__get_variable_defs
+- **出力**: assets/images/ 配置済みファイル、_variables.scss 差分（H2 確認後に適用）
+- **成功条件**: アセット配置完了・変数差分ユーザー確認済み
+- **詳細**: → references/workflow-steps.md の Step 4 セクション参照
 
-2. 完了確認
-   - Subagent の完了を待機
-   - エラー時は state.yaml に記録して再試行
+## Step 5: Project Convention Translate
 
-3. Step 8: Quick Quality Check（軽量）
-   - npm run astro:build
-   - npm run lint:css
-   - grep によるAstroパターン検出
-   - サブエージェント不要 ✅
-```
+- **目的**: デザイン情報をプロジェクト規約（FLOCSS + BEM, ページ情報）に変換する
+- **入力**: design-context.json、component-catalog.yaml
+- **出力**: project-convention.yaml（ページスラッグ・Node 仕様・PC/SP 差分表）
+- **成功条件**: ページタイトル確定・コンポーネント照合完了・Node 仕様書生成
+- **詳細**: → references/workflow-steps.md の「Step 5 詳細」セクション参照
 
-## Step 5 Details: Auto Title Extraction
+## Step 6: Pixel-Perfect Implementation
 
-### Extraction Patterns (Priority Order)
+- **目的**: astro-component-engineer エージェントを使い Astro/SCSS を実装する
+- **入力**: project-convention.yaml（Node 仕様、PC/SP 差分表）
+- **出力**: Astro ページ・セクションコンポーネント・モックデータ・SCSS ファイル
+- **成功条件**: npm run astro:build 成功・lint:css 違反 0 件
+- **詳細**: → references/workflow-steps.md の「Step 6 詳細」セクション参照
 
-The skill automatically extracts page titles from `design-context.json` using the following patterns:
+## Step 7: Figma Validation
 
-| Priority | Pattern | Criteria |
-|----------|---------|----------|
-| 1 | Large text element (h1 equivalent) | fontSize ≥ 24px AND positioned in top area |
-| 2 | Page header text | Layer name contains "header", "title", or "heading" |
-| 3 | Breadcrumb last item | Layer name contains "breadcrumb" or "パンくず" |
+- **目的**: Playwright + visual-diff.js でピクセルパーフェクトを検証・修正する
+- **入力**: Astro 開発サーバー（localhost:4321）、Figma スクリーンショット
+- **出力**: diff_{section}.png、差分検証レポート、最終フルページ PNG
+- **成功条件**: 全セクション passed: true（または H5 で人間承認）
+- **詳細**: → references/workflow-steps.md の「Step 7 詳細」セクション参照
 
-### Extraction Logic
+## Step 8: Quick Quality Check (Auto-Execute - SCRIPT REQUIRED)
 
-```javascript
-// Japanese Title
-- First heading text containing Japanese characters (hiragana, katakana, kanji)
-- Example: "募集要項一覧", "会社概要", "企業理念"
-
-// English Title
-- Pattern matching with English keywords
-- Example: "Job Description", "Requirements", "About Us", "Philosophy"
-
-// Slug
-- English title converted to kebab-case
-- Example: "Job Description" → "job-description"
-```
-
-### Extraction Success
-
-When extraction succeeds, the skill automatically uses the extracted values:
-
-```
-✅ ページタイトルを自動抽出しました:
-  - スラッグ: job-description
-  - 日本語名: 募集要項一覧
-  - 英語見出し: Job Description
-
-※ 自動抽出値を使用します。変更が必要な場合はお知らせください。
-```
-
-### Fallback (Extraction Failed)
-
-Only items that could not be extracted are requested from the user (H3 intervention):
-
-```
-⚠️ 以下の情報を自動抽出できませんでした。入力してください:
-
-- ページスラッグ: [input required]
-- ページの日本語名: [input required if not extracted]
-- ページの英語見出し: [input required if not extracted]
-```
-
-## Step 6 Details: SCSS Implementation Quality Checklist
-
-### 実装品質チェックリスト（必須）
-
-#### コンテナ構造
-- [ ] __container は @include container() のみ
-- [ ] レイアウト（display, flex, gap）は __inner に分離
-- [ ] __container 直下に __inner がある
-
-#### BEM命名
-- [ ] 全てのクラスが kebab-case
-- [ ] 二重アンダースコアがない（__heading__en 禁止）
-- [ ] ハイフン区切りで統一（__hero-container, __field-label）
-
-#### プロパティ順序
-- [ ] position 系が最初
-- [ ] display, flex 系が次
-- [ ] サイズ系（width, height, margin, padding）
-- [ ] タイポグラフィ系（font, line-height, color）
-- [ ] ビジュアル系（background, border）
-
-## Step 7 Details: Astro Component Implementation Quality Checklist
-
-### 実装品質チェックリスト（必須）
-
-#### コンポーネント
-- [ ] Props interface が定義されている
-- [ ] BEMクラス名がWordPress変換時と完全一致
-- [ ] `<ResponsiveImage />` コンポーネントを使用（`<img>` 直接記述禁止）
-
-#### データモデル
-- [ ] モックデータがACF構造を模倣（`data-helpers.ts` 使用）
-- [ ] `astro/src/data/pages/{slug}.json` にデータ配置
-
-#### 禁止事項
-- [ ] `.astro` 内での SCSS/JS インポートがない
-- [ ] `<style>` scoped ブロックがない
-- [ ] `<script>` インラインがない
-
-## Step 8 Details: Quick Quality Check (Auto-Execute - SCRIPT REQUIRED)
-
-**⚠️ このステップは自動実行。スキップ不可。**
-
-Step 6 完了後、以下を自動で実行する。エラーがあれば停止し修正を促す。
-
-### 自動実行内容 (SCRIPT REQUIRED)
-
-**MUST** run quality check script:
+- **目的**: 実装ファイルの Astro/SCSS パターン違反を自動検出・修正する
+- **入力**: 実装済み .scss ファイル、.astro ファイル
+- **出力**: チェック結果（PASS / BLOCK エラー一覧）
+- **成功条件**: quality-check.sh が Exit 0 で完了
+- **詳細**: → references/workflow-steps.md の「Step 8 詳細」セクション参照
 
 ```bash
 bash .claude/skills/figma-implement/scripts/quality-check.sh \
@@ -669,60 +500,13 @@ bash .claude/skills/figma-implement/scripts/quality-check.sh \
   {実装したAstroファイル}
 ```
 
-Example:
-```bash
-bash .claude/skills/figma-implement/scripts/quality-check.sh \
-  src/scss/object/project/_p-about.scss \
-  astro/src/pages/about.astro
-```
+## Step 9: Token Efficiency Report
 
-Exit code handling:
-- Exit 0 (PASS) → Step 9 へ進む
-- Exit 1 (FAIL) → 修正してから再実行
-
-### Additional Checks (after script)
-
-```bash
-# 1. Build check（必須）
-npm run astro:build
-# → 失敗時: ビルドエラーを表示して停止
-
-# 2. SCSS Lint（必須）
-npm run lint:css
-# → 警告のみ: 続行、エラー: 停止
-
-# 3. Astro pattern check（対象ファイルのみ）
-grep -rn '<img ' {実装したAstroファイル}           # <img> 直接使用
-grep -rn '<style' {実装したAstroファイル}           # scoped <style> ブロック
-grep -rn 'import.*\.scss' {実装したAstroファイル}   # SCSS インポート
-grep -rn 'import.*\.js' {実装したAstroファイル}     # JS インポート
-# → ヒット時: 修正を指示して停止
-```
-
-### 検出パターンと自動修正
-
-| Pattern | Severity | Fix |
-|---------|----------|-----|
-| `<img ` (非ResponsiveImage) | **BLOCK** | `<ResponsiveImage />` に変更 |
-| `<style` scoped | **BLOCK** | 削除し `src/scss/` に移動 |
-| `import.*\.scss` | **BLOCK** | 削除し `src/css/` エントリーに追加 |
-| `import.*\.js` | **BLOCK** | 削除し `src/js/` に移動 |
-| ビルドエラー | **BLOCK** | エラー内容に基づき修正 |
-| Lint警告 | WARN | 次回修正（続行可） |
-
-### エラー時のフロー
-
-```
-Step 8 実行
-    ↓
-エラー検出?
-    ├─ YES → 修正を実行 → Step 8 再実行
-    └─ NO  → Step 9 へ進む
-```
-
-### 重いレビューが必要な場合
-
-ページ全体完成後または納品前のみ `/review` または `/delivery` を使用。
+- **目的**: トークン使用量・キャッシュ効果・検証イテレーション回数をレポートする
+- **入力**: 各ステップの実行ログ・キャッシュ利用状況
+- **出力**: 効率レポート（キャッシュ利用状況・削減率・コンポーネント照合結果）
+- **成功条件**: レポート出力完了
+- **詳細**: → references/workflow-steps.md の Step 9 セクション参照
 
 ## Human Intervention Points (H1-H5)
 
@@ -758,8 +542,6 @@ The orchestrator automatically pauses at the following points and waits for huma
 ```
 
 ### State Structure (PC/SP Dual Mode)
-
-When `--sp` option is provided, the state file includes additional SP-related fields:
 
 ```yaml
 # Standard fields
@@ -804,44 +586,11 @@ step_status:
 
 ### State File Size Management
 
-状態ファイルの肥大化を防止:
-
 | ルール | 内容 |
 |--------|------|
 | 最大サイズ目安 | 50KB |
 | ログ圧縮 | 完了ステップの詳細ログは削除、サマリのみ保持 |
 | アーカイブ | 実装完了後、状態ファイルを `.claude/archive/` に移動 |
-
-**--resume 時の処理:**
-1. 状態ファイルサイズを確認
-2. 50KB超過の場合、古いログを自動削除
-3. 警告メッセージを表示
-
-**ログ圧縮の例:**
-```yaml
-# 圧縮前（詳細ログ）
-step_status:
-  Step2:
-    status: completed
-    details: |
-      - get_design_context 実行
-      - レスポンスサイズ: 77,000 tokens
-      - セクション数: 8
-      - 各セクションの詳細ログ...（長文）
-
-# 圧縮後（サマリのみ）
-step_status:
-  Step2:
-    status: completed
-    summary: "Design context retrieved (8 sections)"
-```
-
-**アーカイブ手順（実装完了後）:**
-```bash
-mkdir -p .claude/archive/
-mv .claude/cache/figma-implement-state.yaml \
-   .claude/archive/figma-implement-state-{page-name}-{timestamp}.yaml
-```
 
 ## References
 
@@ -849,16 +598,17 @@ For detailed information, see the following reference documents:
 
 | File | Content |
 |------|---------|
-| [references/workflow-steps.md](references/workflow-steps.md) | Detailed 9-step workflow instructions |
+| [references/workflow-steps.md](references/workflow-steps.md) | 9ステップ詳細手順（検証条件・チェックリスト・フロー含む） |
 | [references/state-management.md](references/state-management.md) | State file structure and resume capability |
 | [references/error-catalog.md](references/error-catalog.md) | Comprehensive error handling catalog |
 | [references/pc-sp-dual-mode.md](references/pc-sp-dual-mode.md) | PC/SP dual implementation details |
+| [references/troubleshooting.md](references/troubleshooting.md) | エラー別トラブルシューティング |
+| [CHANGELOG.md](CHANGELOG.md) | バージョン履歴 |
 
 ## Related Files
 
 | File | Purpose |
 |------|---------|
-| [workflow-steps.md](workflow-steps.md) | Detailed 9-step workflow instructions |
 | `.claude/cache/figma-implement-state.yaml` | State persistence file |
 | `.claude/cache/figma-implement-report-*.yaml` | Completion reports |
 | `.claude/cache/figma/` | Figma cache directory |
@@ -877,23 +627,21 @@ For detailed information, see the following reference documents:
 ### Resume from Interruption
 
 ```bash
-# Check previous state
 cat .claude/cache/figma-implement-state.yaml
-
-# Resume
 /figma-implement --resume
 ```
 
-### Dry Run (Plan Confirmation)
+### PC/SP Dual Implementation
 
 ```bash
-/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 --dry-run
+/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 \
+  --sp https://www.figma.com/design/abc123/MyDesign?node-id=5-6
 ```
 
-### Interactive Mode
+### Token-Saving Mode (Recommended)
 
 ```bash
-/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 --interactive
+/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 --no-screenshot
 ```
 
 ### Strict Validation Mode
@@ -902,185 +650,12 @@ cat .claude/cache/figma-implement-state.yaml
 /figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 --preset strict
 ```
 
-### PC/SP Dual Implementation
+## Scripts
 
-```bash
-# Implement with both PC and SP Figma designs
-/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 \
-  --sp https://www.figma.com/design/abc123/MyDesign?node-id=5-6
-```
+スクリプト標準規約: [scripts-standard.md](../scripts-standard.md)
 
-This mode:
-- Retrieves both PC and SP design contexts in Step 2
-- Captures screenshots for both versions in Step 3
-- Generates PC/SP diff table in Step 5
-- Implements responsive styles based on actual SP specs in Step 6
-- Validates SP against Figma SP (not just resize) in Step 7
-
-### Token-Saving Mode (Recommended)
-
-```bash
-# Skip screenshots for faster, token-efficient implementation
-/figma-implement https://www.figma.com/design/abc123/MyDesign?node-id=1-2 --no-screenshot
-```
-
-This mode:
-- Skips Step 3 (get_screenshot) entirely
-- Relies on JSX code from get_design_context for accurate implementation
-- Recommended when design has proper Auto Layout
-
-## Design Prerequisites
-
-For high implementation accuracy, ensure the Figma design meets these conditions:
-
-### Required
-
-| Condition | Reason |
-|-----------|--------|
-| Auto Layout properly used | Accurate spacing and alignment in JSX output |
-| Semantic layer naming | AI can infer element purposes from names |
-| Flattened vector groups | Prevents multiple `<img>` tags per element |
-
-### High Accuracy Elements
-
-When prerequisites are met, these are accurately reproduced:
-
-- Font family, weight, size, line-height
-- Text/background/border colors
-- Auto Layout based positioning and margins
-
-### May Need Adjustment
-
-| Element | Reason |
-|---------|--------|
-| Absolute positioned elements | May need manual CSS adjustments |
-| Complex vector graphics | Consider placeholders or SVG export |
-
-## Research Reference
-
-Implementation based on Figma MCP best practices research.
-See: `.shogun/reports/figma-mcp-research.md`
-
-## Troubleshooting
-
-### Error: "Cache not found"
-
-**Cause**: `/figma-prefetch` was not run before implementation.
-
-**Solution**:
-1. Run `/figma-prefetch {url}` first
-2. Verify cache:
-   ```bash
-   bash .claude/skills/figma-implement/scripts/validate-cache.sh \
-     .claude/cache/figma/{page-name}
-   ```
-3. Then run `/figma-implement`
-
-### Error: "raw_jsx validation failed"
-
-**Cause**: Cached raw_jsx is abstracted or incomplete.
-
-**Solution**:
-1. Check the specific node:
-   ```bash
-   cat .claude/cache/figma/{page}/nodes/{nodeId}.json | jq '.raw_jsx | length'
-   ```
-2. If length < 500 or contains "// Section", re-fetch:
-   ```bash
-   /figma-recursive-splitter {url} --force
-   ```
-3. Or use `get_design_context` directly for that section
-
-### Error: "Token limit exceeded"
-
-**Cause**: Page is too large for single retrieval.
-
-**Solution**:
-1. Use `/figma-recursive-splitter` for split retrieval
-2. Or use `--section` option to implement one section at a time:
-   ```bash
-   /figma-implement --page {page} --section hero
-   ```
-
-### Error: "Build failed" (Step 8)
-
-**Cause**: SCSS/Astro syntax error or missing import.
-
-**Solution**:
-1. Run build manually to see detailed error:
-   ```bash
-   npm run astro:build
-   ```
-2. Check SCSS imports in `src/css/pages/{page}/style.scss`
-3. Verify Astro page imports and Props interface
-4. Fix errors and re-run Step 8
-
-### Error: "Playwright connection failed"
-
-**Cause**: Browser not installed or Docker network issue.
-
-**Solution**:
-1. Check Playwright installation:
-   ```bash
-   npx playwright install chromium
-   ```
-2. Verify Docker is running if using containerized browser
-3. Check MCP Playwright server is connected
-
-### Error: "Container width incorrect"
-
-**Cause**: Wrong calculation method or missing artboard info.
-
-**Solution**:
-1. Use `/figma-container-width-calculator` for accurate calculation
-2. Verify artboard margin-based formula:
-   ```
-   containerWidth = artboardWidth - (firstContentFrame.x * 2)
-   ```
-3. Check metadata.json for artboard dimensions
-
-### Error: "Design tokens extraction failed"
-
-**Cause**: Figma Variables not defined or API error.
-
-**Solution**:
-1. Check if Figma file has Variables defined
-2. If Variables are empty, manually extract from design-context:
-   - Colors: Look for `fill` and `stroke` properties
-   - Fonts: Look for `fontFamily`, `fontSize`, `fontWeight`
-   - Spacing: Look for `gap`, `padding`, `margin` values
-3. Add extracted values to `foundation/_variables.scss`
-
-## Related Files
-
-| File | Purpose |
-|------|---------|
-| `.claude/cache/figma/` | Figma cache directory |
-| `.claude/rules/figma-workflow.md` | Workflow rules |
-| `.claude/rules/figma.md` | Figma integration rules |
-| `scripts/validate-cache.sh` | Cache validation script |
-| `scripts/validate-raw-jsx.sh` | raw_jsx validation script |
-| `scripts/quality-check.sh` | Quality check script |
-
----
-
-**Version**: 3.0.0
-**Created**: 2026-01-30
-**Updated**: 2026-03-03
-**Changes**:
-- v3.0.0: Astro-first ワークフローに移行
-  - Step 6: wordpress-professional-engineer → astro-component-engineer
-  - Step 7: Playwright URL を localhost:4321 に変更
-  - Step 8: PHP パターンチェック → Astro パターンチェック
-  - Step 9: 完了案内に /astro-to-wordpress を追加
-  - WordPress変換は /astro-to-wordpress の範囲に分離
-- v2.3.0: 公式スキルガイド準拠の改修
-  - scripts/ ディレクトリ追加（validate-cache.sh, validate-raw-jsx.sh, quality-check.sh）
-  - Step 0, 0.5, 8 にスクリプト検証を明示的に追加
-  - Troubleshooting セクション追加
-  - description にトリガーフレーズ追加
-- v2.2.0: Step 0.5 追加 - キャッシュ読み込み時の raw_jsx 検証
-  - 不完全なキャッシュを検出して API 再取得
-  - recruit-info/mvv の省略問題を防止
-- v2.1.0: Step 8 を軽量チェックに変更（production-reviewer 削除）
-- v2.0.0: Phase 0 を `/figma-prefetch` スキルに分離
+| スクリプト | 目的 | exit code |
+|-----------|------|-----------|
+| `scripts/validate-cache.sh` | Figmaキャッシュ検証 | 0=PASS, 1=FAIL |
+| `scripts/validate-raw-jsx.sh` | Figma生成コード検証 | 0=PASS, 1=FAIL |
+| `scripts/quality-check.sh` | 実装品質チェック | 0=PASS, 1=FAIL |

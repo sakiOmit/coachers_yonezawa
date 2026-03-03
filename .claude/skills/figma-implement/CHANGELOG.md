@@ -1,5 +1,42 @@
 # Changelog: figma-implement
 
+## [3.0.0] - 2026-03-03
+
+### Changed
+- **BREAKING**: Astro-first ワークフローに移行
+- Step 6: `wordpress-professional-engineer` → `astro-component-engineer` に変更
+- Step 7: Playwright URL を `localhost:4321` に変更
+- Step 8: PHP パターンチェック → Astro パターンチェック（`<img>`, `<style>` scoped, SCSS/JS インポート）
+- Step 9: 完了案内に `/astro-to-wordpress` を追加
+- WordPress変換は `/astro-to-wordpress` の範囲に分離
+
+### Added
+- `scripts/` ディレクトリ追加（`validate-cache.sh`, `validate-raw-jsx.sh`, `quality-check.sh`）
+- Step 0, 0.5, 8 にスクリプト検証を明示的に追加
+- `description` にトリガーフレーズ追加
+- `references/troubleshooting.md` 追加
+
+---
+
+## [2.3.0] - 2026-02-xx
+
+### Added
+- `scripts/` ディレクトリ追加（公式スキルガイド準拠）
+- Step 0, 0.5, 8 にスクリプト検証を明示的に追加
+- Troubleshooting セクション追加
+
+---
+
+## [2.2.0] - 2026-02-xx
+
+### Added
+- Step 0.5: キャッシュ読み込み時の `raw_jsx` 検証
+  - 不完全なキャッシュを検出して API 再取得
+  - recruit-info/mvv の省略問題を防止
+- 省略コメントパターン検出（"// Large JSX content" 等）
+
+---
+
 ## [2.1.0] - 2026-01-31
 
 ### Changed
