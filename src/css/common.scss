@@ -1,0 +1,20 @@
+// 共通スタイル（全ページで読み込み）
+
+// Foundation
+@use "../scss/foundation/reset";
+@use "../scss/foundation/base";
+@use "../scss/foundation/variables";
+@use "../scss/foundation/utilities";
+@use "../scss/foundation/function" as *;
+@use "../scss/foundation/mixins/responsive" as *;
+@use "../scss/foundation/mixins/block" as *;
+
+// Layout
+@use "../scss/layout/_header";
+@use "../scss/layout/_footer";
+
+// Components（共通コンポーネント）
+
+// Utility
+@use "../scss/object/utility/u-text";
+@use "../scss/object/utility/u-responsive";

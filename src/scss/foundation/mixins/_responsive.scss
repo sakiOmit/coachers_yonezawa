@@ -1,0 +1,41 @@
+// レスポンシブブレークポイント
+// 集約された値は _breakpoints.scss を参照
+
+@forward "../breakpoints";
+@use "../breakpoints" as bp;
+
+@mixin mq1440() {
+  @media (max-width: bp.$bp-rv-max * 1px) {
+    @content;
+  }
+}
+
+@mixin mq1280() {
+  @media (width <= 1280px) {
+    @content;
+  }
+}
+
+@mixin mq1024() {
+  @media (width <= 1024px) {
+    @content;
+  }
+}
+
+@mixin tab() {
+  @media (min-width: bp.$bp-pc-min) and (width <= 1024px) {
+    @content;
+  }
+}
+
+@mixin pc() {
+  @media (min-width: bp.$bp-pc-min) {
+    @content;
+  }
+}
+
+@mixin sp() {
+  @media (max-width: bp.$bp-sp-max) {
+    @content;
+  }
+}

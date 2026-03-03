@@ -1,0 +1,84 @@
+{
+  "description": "フィールド定義サンプル - エージェントがこの構造を参考にコード生成します",
+  "examples": {
+    "office_location": {
+      "post_type": "office_location",
+      "description": "オフィス・工場情報",
+      "root_key": "locations",
+      "taxonomy": {
+        "name": "office_category",
+        "field": "category"
+      },
+      "fields": [
+        {
+          "name": "postal_code",
+          "type": "text",
+          "description": "郵便番号"
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "description": "住所"
+        },
+        {
+          "name": "map_url",
+          "type": "url",
+          "description": "地図URL"
+        },
+        {
+          "name": "sort_order",
+          "type": "number",
+          "description": "並び順"
+        }
+      ],
+      "image_fields": {
+        "type": "group",
+        "name": "image_group",
+        "subfields": [
+          {
+            "name": "pc",
+            "yaml_key": "image_pc"
+          },
+          {
+            "name": "sp",
+            "yaml_key": "image_sp"
+          }
+        ]
+      }
+    },
+    "company_statistic": {
+      "post_type": "company_statistic",
+      "description": "企業統計データ",
+      "root_key": "statistics",
+      "taxonomy": null,
+      "fields": [
+        {
+          "name": "icon",
+          "type": "text",
+          "description": "アイコンファイル名"
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "description": "数値"
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "description": "単位"
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "description": "注釈"
+        },
+        {
+          "name": "sort_order",
+          "type": "number",
+          "description": "並び順"
+        }
+      ],
+      "image_fields": null
+    }
+  }
+}

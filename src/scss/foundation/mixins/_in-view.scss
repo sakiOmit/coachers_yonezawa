@@ -1,0 +1,189 @@
+/**
+ * InView Utility Mixin
+ *
+ * Intersection Observer APIと連携したアニメーション用のスタイル
+ * JavaScript側で is-in-view クラスが自動付与される
+ */
+
+/**
+ * 基本的なフェードインアニメーション
+ *
+ * @param {number} $duration - アニメーション時間（秒）
+ * @param {string} $easing - イージング関数
+ * @param {number} $delay - 遅延時間（秒）
+ *
+ * @example
+ *   .fade-in-element {
+ *     @include in-view-fade-in();
+ *   }
+ */
+@mixin in-view-fade-in($duration: 0.6s, $easing: ease-out, $delay: 0s) {
+  opacity: 0;
+  transition:
+    opacity $duration $easing $delay,
+    transform $duration $easing $delay;
+  transform: translateY(20px);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * 上からスライドイン
+ *
+ * @param {number} $distance - 移動距離
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-slide-down($distance: 30px, $duration: 0.6s) {
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    transform $duration ease-out;
+  transform: translateY(-$distance);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * 左からスライドイン
+ *
+ * @param {number} $distance - 移動距離
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-slide-right($distance: 30px, $duration: 0.6s) {
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    transform $duration ease-out;
+  transform: translateX(-$distance);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/**
+ * 右からスライドイン
+ *
+ * @param {number} $distance - 移動距離
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-slide-left($distance: 30px, $duration: 0.6s) {
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    transform $duration ease-out;
+  transform: translateX($distance);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/**
+ * スケールアップ
+ *
+ * @param {number} $scale - 初期スケール
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-scale-up($scale: 0.9, $duration: 0.6s) {
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    transform $duration ease-out;
+  transform: scale($scale);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/**
+ * 回転しながらフェードイン
+ *
+ * @param {number} $rotation - 初期回転角度（度）
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-rotate($rotation: 5deg, $duration: 0.6s) {
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    transform $duration ease-out;
+  transform: rotate($rotation);
+
+  &.is-in-view {
+    opacity: 1;
+    transform: rotate(0);
+  }
+}
+
+/**
+ * ブラーからフェードイン
+ *
+ * @param {number} $blur - 初期ブラー量（px）
+ * @param {number} $duration - アニメーション時間（秒）
+ */
+@mixin in-view-blur($blur: 10px, $duration: 0.8s) {
+  filter: blur($blur);
+  opacity: 0;
+  transition:
+    opacity $duration ease-out,
+    filter $duration ease-out;
+
+  &.is-in-view {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+/**
+ * 段階的なディレイを設定（stagger効果）
+ *
+ * @param {number} $count - 要素数
+ * @param {number} $delay - ディレイ増分（秒）
+ *
+ * @example
+ *   .stagger-items {
+ *     @include in-view-fade-in();
+ *     @include in-view-stagger(5, 0.1s);
+ *   }
+ */
+@mixin in-view-stagger($count: 10, $delay: 0.1s) {
+  @for $i from 1 through $count {
+    &:nth-child(#{$i}) {
+      transition-delay: #{($i - 1) * $delay};
+    }
+  }
+}
+
+/**
+ * アニメーションを無効化（prefers-reduced-motion対応）
+ *
+ * @example
+ *   .animated-element {
+ *     @include in-view-fade-in();
+ *     @include in-view-respect-reduced-motion();
+ *   }
+ */
+@mixin in-view-respect-reduced-motion() {
+  @media (prefers-reduced-motion: reduce) {
+    filter: none;
+    opacity: 1;
+    transition: none;
+    transform: none;
+
+    &.is-in-view {
+      filter: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

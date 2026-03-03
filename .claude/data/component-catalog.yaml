@@ -1,0 +1,198 @@
+# Component Catalog
+# Figma → WordPress コンポーネント自動マッピング用カタログ
+#
+# 用途:
+# - Code Connect 自動照合
+# - 再利用判定の自動化
+# - オンボーディング時の参照
+#
+# 更新ルール:
+# - 新規コンポーネント作成時は必ず追加
+# - figma_patterns は Figma コンポーネント名のパターン（ワイルドカード対応）
+# - props.required は必須引数、props.optional はオプション引数
+
+version: "1.0"
+updated_at: "2026-01-29"
+
+components:
+  # ============================================================
+  # template-parts/common/ - 汎用コンポーネント
+  # ============================================================
+
+  - name: c-link-button
+    file: template-parts/common/link-button.php
+    scss: src/scss/object/component/_c-link-button.scss
+    type: button
+    description: "リンクボタン（日英テキスト対応）"
+    variants:
+      - blue
+      - white
+    props:
+      required:
+        - ja_text
+        - en_text
+      optional:
+        - tag        # a | button（デフォルト: button）
+        - href       # tag="a" の場合
+        - external   # 外部リンクか（デフォルト: false）
+        - type       # tag="button" の場合: button|submit|reset
+        - variant    # blue | white（デフォルト: blue）
+        - class_name # 追加CSSクラス
+    figma_patterns:
+      - "Button/*"
+      - "CTA/*"
+      - "LinkButton/*"
+      - "*Button/Primary"
+      - "*Button/Secondary"
+
+  - name: p-page-header
+    file: template-parts/common/page-header.php
+    scss: src/scss/object/project/_p-page-header.scss
+    type: header
+    description: "ページヘッダー（タイトル + サブタイトル）"
+    variants: []
+    props:
+      required:
+        - title
+      optional:
+        - subtitle
+    figma_patterns:
+      - "PageHeader/*"
+      - "Header/Page*"
+
+  - name: c-section-heading
+    file: template-parts/common/section-heading.php
+    scss: src/scss/object/component/_c-section-heading.scss
+    type: heading
+    description: "セクション見出し（日本語ラベル + 英語見出し）"
+    variants: []
+    props:
+      required:
+        - ja_label
+        - en_heading
+      optional:
+        - wrapper_class
+        - ja_class
+        - en_class
+    figma_patterns:
+      - "Heading/Section*"
+      - "SectionTitle/*"
+      - "SectionHeading/*"
+
+  - name: c-article-card
+    file: template-parts/common/article-card.php
+    scss: src/scss/object/component/_c-article-card.scss
+    type: card
+    description: "記事カード"
+    variants: []
+    props:
+      required:
+        - post_id
+      optional:
+        - variant
+    figma_patterns:
+      - "Card/Article*"
+      - "ArticleCard/*"
+      - "NewsCard/*"
+
+  - name: c-category-badge
+    file: template-parts/common/category-badge.php
+    scss: src/scss/object/component/_c-category-badge.scss
+    type: badge
+    description: "カテゴリバッジ"
+    variants: []
+    props:
+      required:
+        - category
+      optional: []
+    figma_patterns:
+      - "Badge/Category*"
+      - "CategoryBadge/*"
+      - "Tag/*"
+
+  - name: c-breadcrumbs
+    file: template-parts/common/breadcrumbs.php
+    scss: src/scss/object/component/_c-breadcrumbs.scss
+    type: navigation
+    description: "パンくずリスト"
+    variants: []
+    props:
+      required: []
+      optional: []
+    figma_patterns:
+      - "Breadcrumb*"
+      - "Navigation/Breadcrumb*"
+
+  - name: c-pagination
+    file: template-parts/common/pagination.php
+    scss: src/scss/object/component/_c-pagination.scss
+    type: navigation
+    description: "ページネーション"
+    variants: []
+    props:
+      required: []
+      optional: []
+    figma_patterns:
+      - "Pagination/*"
+      - "Pager/*"
+
+  - name: c-logo
+    file: template-parts/common/logo.php
+    scss: src/scss/object/component/_c-logo.scss
+    type: branding
+    description: "ロゴ"
+    variants: []
+    props:
+      required: []
+      optional: []
+    figma_patterns:
+      - "Logo/*"
+      - "Brand/Logo*"
+
+  # ============================================================
+  # template-parts/components/ - 機能コンポーネント
+  # ============================================================
+
+  - name: c-faq-accordion
+    file: template-parts/components/faq-accordion.php
+    scss: src/scss/object/component/_c-faq-accordion.scss
+    type: accordion
+    description: "FAQアコーディオン"
+    variants: []
+    props:
+      required:
+        - items
+      optional: []
+    figma_patterns:
+      - "FAQ/*"
+      - "Accordion/*"
+      - "QA/*"
+
+# ============================================================
+# マッチングロジック設定
+# ============================================================
+
+matching:
+  # スコア計算の重み付け
+  weights:
+    code_connect_registered: 100  # Code Connect 登録済み → 即座に100%
+    type_match: 40                # type が一致
+    props_coverage: 30            # 必須props充足率
+    variant_available: 20         # variant対応可能
+    pattern_match: 10             # figma_patterns一致
+
+  # 判定閾値
+  thresholds:
+    high_match: 80      # 80%以上 → 既存使用
+    medium_match: 50    # 50-79% → 既存ベース + カスタム
+    low_match: 0        # 50%未満 → 新規作成
+
+# ============================================================
+# 使用方法
+# ============================================================
+#
+# Figma実装時（figma-implement.md Step 5-2）で参照:
+# 1. get_code_connect_map で Code Connect 情報取得
+# 2. このカタログと照合してマッチングスコア算出
+# 3. 再利用判定表を自動生成
+# 4. 新規作成時は add_code_connect_map で登録 & カタログ追加

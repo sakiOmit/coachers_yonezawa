@@ -1,0 +1,21 @@
+@use "../foundation/function" as *;
+@use "../foundation/mixins/responsive" as *;
+@use "../foundation/mixins/block" as *;
+
+.l-{{NAME}} {
+  &__container {
+    @include container();
+  }
+{{#ELEMENTS}}
+
+  &__{{ELEMENT_NAME}} {
+    // TODO: スタイルを追加
+{{#RESPONSIVE}}
+
+    @include sp {
+      // SP スタイル
+    }
+{{/RESPONSIVE}}
+  }
+{{/ELEMENTS}}
+}

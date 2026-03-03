@@ -1,0 +1,316 @@
+@use "../foundation/function" as *;
+@use "../foundation/mixins/responsive" as *;
+@use "../foundation/mixins/block" as *;
+@use "../foundation/mixins/hover" as *;
+
+// =============================================================================
+// Footer - Figma nodeId: 22:2487
+// =============================================================================
+// 背景画像付きフッター（ナビゲーション、CTA、キャッチコピー、ロゴ）
+// PC: 1440x557px, SP: フルワイド
+// =============================================================================
+
+.l-footer {
+  position: relative;
+  min-height: rv(557);
+  overflow: hidden;
+
+  @include sp {
+    min-height: auto;
+  }
+
+  // Background Layer
+  &__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  &__bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      256.15deg,
+      rgba(54, 45, 47, 0.81) 5.43%,
+      rgba(16, 51, 71, 0.72) 34.98%,
+      rgba(8, 47, 49, 0.72) 93.46%
+    );
+  }
+
+  // Container
+  &__container {
+    @include container();
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 1;
+    padding: rv(126) rv(106);
+
+    @include sp {
+      padding: svw(60) svw(20) svw(40);
+    }
+  }
+
+  // Content Grid (2 columns)
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    @include sp {
+      flex-direction: column-reverse;
+      gap: svw(40);
+    }
+  }
+
+  // Left Column: Navigation + CTA + External Link
+  &__left {
+    display: flex;
+    flex-direction: column;
+    width: rv(354);
+
+    @include sp {
+      width: 100%;
+    }
+  }
+
+  // Navigation
+  &__nav {
+    margin-bottom: rv(24);
+
+    @include sp {
+      margin-bottom: svw(20);
+    }
+  }
+
+  &__nav-grid {
+    display: flex;
+    gap: rv(68);
+
+    @include sp {
+      flex-direction: column;
+      gap: svw(16);
+    }
+  }
+
+  &__nav-column {
+    display: flex;
+    flex-direction: column;
+    gap: rv(24);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @include sp {
+      gap: svw(12);
+    }
+  }
+
+  &__nav-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  &__nav-link {
+    display: inline-block;
+    font-family: var(--font-primary);
+    font-size: rv(16);
+    font-weight: 500;
+    line-height: 1.7;
+    color: var(--color-white);
+    letter-spacing: rv(0.8);
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+
+    @include sp {
+      font-size: svw(14);
+      letter-spacing: svw(0.7);
+    }
+
+    @include hover {
+      opacity: 0.7;
+    }
+  }
+
+  // CTA Buttons
+  &__cta {
+    display: flex;
+    gap: rv(16);
+    margin-bottom: rv(40);
+
+    @include sp {
+      flex-direction: column;
+      gap: svw(12);
+      margin-bottom: svw(24);
+    }
+  }
+
+  &__cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: rv(8);
+    padding: rv(7) rv(28) rv(7) rv(30);
+    font-family: var(--font-primary);
+    font-size: rv(16);
+    font-weight: 500;
+    line-height: 1.7;
+    color: var(--color-white);
+    text-decoration: none;
+    letter-spacing: rv(1.28);
+    border-radius: rv(50);
+    transition: opacity 0.3s ease;
+
+    @include sp {
+      padding: svw(10) svw(24);
+      font-size: svw(14);
+      letter-spacing: svw(1);
+      border-radius: svw(50);
+    }
+
+    @include hover {
+      opacity: 0.8;
+    }
+
+    &--jobs {
+      background-color: rgba(228, 228, 228, 0.45);
+    }
+
+    &--entry {
+      background-color: rgba(131, 197, 213, 0.55);
+    }
+  }
+
+  &__cta-text {
+    display: inline-block;
+  }
+
+  &__cta-icon {
+    display: inline-block;
+    width: rv(6);
+    height: rv(6);
+    background-color: var(--color-white);
+    transform: rotate(45deg);
+
+    @include sp {
+      width: svw(5);
+      height: svw(5);
+    }
+  }
+
+  // Divider
+  &__divider {
+    width: 100%;
+    max-width: rv(354);
+    height: 1px;
+    margin-bottom: rv(40);
+    background-color: var(--color-white);
+
+    @include sp {
+      max-width: 100%;
+      margin-bottom: svw(24);
+    }
+  }
+
+  // External Link
+  &__external {
+    display: inline-flex;
+    align-items: center;
+    gap: rv(4);
+    font-family: var(--font-primary);
+    font-size: rv(14);
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--color-white);
+    text-decoration: none;
+    letter-spacing: rv(1.12);
+    transition: opacity 0.3s ease;
+
+    @include sp {
+      font-size: svw(12);
+      letter-spacing: svw(0.96);
+    }
+
+    @include hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__external-text {
+    display: inline-block;
+  }
+
+  &__external-icon {
+    display: inline-block;
+    width: rv(13);
+    height: rv(13);
+    flex-shrink: 0;
+
+    @include sp {
+      width: svw(12);
+      height: svw(12);
+    }
+  }
+
+  // Right Column: Catchphrase + Logo
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: rv(32);
+
+    @include sp {
+      align-items: flex-start;
+      gap: svw(24);
+    }
+  }
+
+  // Catchphrase
+  &__catchphrase {
+    margin: 0;
+    font-family: var(--font-secondary);
+    font-size: rv(36);
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--color-white);
+    text-align: right;
+    letter-spacing: rv(3.6);
+
+    @include sp {
+      font-size: svw(24);
+      text-align: left;
+      letter-spacing: svw(2.4);
+    }
+  }
+
+  &__catchphrase-line {
+    display: block;
+  }
+
+  // Logo
+  &__logo {
+    display: flex;
+    align-items: center;
+
+    @include sp {
+      // SP用の調整
+    }
+  }
+
+  // 統合ロゴ画像（baseスタイル max-width:100%, height:auto に任せる）
+  &__logo-image {
+    max-width: rv(130);
+
+    @include sp {
+      max-width: svw(100);
+    }
+  }
+}

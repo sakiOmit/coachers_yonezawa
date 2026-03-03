@@ -1,0 +1,40 @@
+# カスタム投稿タイプ用フィールドグループ
+
+## 配置例
+
+```php
+// groups/post-types/news.php
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+return [
+    'key'    => 'group_news_post',
+    'title'  => 'ニュース投稿設定',
+    'fields' => [
+        [
+            'key'   => 'field_news_date',
+            'label' => '公開日',
+            'name'  => 'news_date',
+            'type'  => 'date_picker',
+        ],
+    ],
+    'location' => [
+        [
+            [
+                'param'    => 'post_type',
+                'operator' => '==',
+                'value'    => 'news',
+            ]
+        ]
+    ],
+];
+```
+
+## 注意点
+
+- `key` はグローバルでユニークにすること
+- `location` で正しい投稿タイプを指定すること
+- config.php に追加すること

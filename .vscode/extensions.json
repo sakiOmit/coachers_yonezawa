@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    // Formatter
+    "esbenp.prettier-vscode",
+    // Linters
+    "dbaeumer.vscode-eslint",
+    "stylelint.vscode-stylelint",
+    // PHP
+    "bmewburn.vscode-intelephense-client",
+    "wongjn.php-sniffer",
+    // WordPress
+    "wordpresstoolbox.wordpress-toolbox",
+    // SCSS
+    "mrmlnc.vscode-scss",
+    // Utilities
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

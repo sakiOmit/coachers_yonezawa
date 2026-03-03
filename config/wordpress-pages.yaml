@@ -1,0 +1,64 @@
+# WordPress固定ページ設定
+#
+# このファイルはWordPress固定ページの構成を定義します。
+# npm run wp:setup でページを自動作成
+# npm run wp:create-templates でテンプレートファイルを自動生成
+#
+# 属人化防止:
+# - ページ構成をコードで管理（バージョン管理可能）
+# - WP管理画面での手動作成を不要に
+# - チーム全員が同じ構成を再現可能
+
+pages:
+  # ============================================
+  # トップページ
+  # ============================================
+  - title: "HOME"
+    slug: "home"
+    template: "front-page.php"
+    description: "トップページ"
+
+  # ============================================
+  # 固定ページ
+  # ============================================
+  - title: "会社概要"
+    slug: "about"
+    template: "pages/page-about.php"
+    description: "会社概要ページ"
+
+  - title: "お問い合わせ"
+    slug: "contact"
+    template: "pages/page-contact.php"
+    description: "お問い合わせフォーム"
+
+  - title: "お問い合わせ完了"
+    slug: "thanks"
+    template: "pages/page-thanks.php"
+    parent: "contact"
+    description: "お問い合わせ送信完了"
+
+  - title: "プライバシーポリシー"
+    slug: "privacy"
+    template: "pages/page-privacy.php"
+    description: "プライバシーポリシー"
+
+# ============================================
+# 設定項目の説明
+# ============================================
+#
+# title: ページタイトル（WordPress管理画面に表示）
+# slug: URLスラッグ（/slug/ の形式でアクセス）
+# template: テンプレートファイルのパス（themes/{{THEME_DIR}}/ からの相対パス）
+# description: メタディスクリプション（Yoast SEO使用時に設定）
+# parent: 親ページのスラッグ（子ページの場合のみ指定）
+#
+# 使用方法:
+#   1. このファイルを編集してページ構成を定義
+#   2. npm run wp:create-templates でテンプレートファイルを自動生成
+#   3. npm run wp:setup でWordPressにページを作成
+#
+# 注意事項:
+#   - スラッグは英小文字とハイフンのみ使用
+#   - 親ページは子ページより先に定義すること
+#   - テンプレートファイルは pages/ ディレクトリに配置
+#   - 子ページの場合、URLは自動的に /parent-slug/child-slug/ となります

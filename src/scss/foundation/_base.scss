@@ -1,0 +1,37 @@
+@use "function" as *;
+@use "mixins/block" as *;
+@use "mixins/hover" as *;
+@use "mixins/responsive" as *;
+
+html {
+  // CSS カスタムプロパティでヘッダー高さを動的に設定
+  // JavaScript (main.js) が実際のヘッダー高さを測定してセット
+  scroll-padding-top: var(--header-height, 100px); // フォールバック値: 100px
+}
+
+body {
+  position: relative;
+  min-width: 320px;
+  margin: auto;
+  font-family: var(--font-primary);
+  font-size: rv(16);
+  color: var(--color-text);
+
+  @include sp {
+    font-size: svw(14);
+  }
+
+  &.is-scroll-locked {
+    height: 100%;
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+}
+
+main {
+  overflow: clip;
+
+  @include sp {
+    overflow: hidden;
+  }
+}

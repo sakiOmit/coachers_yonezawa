@@ -1,0 +1,42 @@
+@use "../function" as *;
+@use "./responsive" as *;
+
+// ============================================
+// Typography Mixins
+// ============================================
+// セクションタイトル・サブタイトルの共通スタイル
+
+// セクションタイトル用mixin
+// @param {Number} $size-pc - PCサイズ（px）
+// @param {Number} $size-sp - SPサイズ（px）
+// @param {Number} $weight - font-weight（デフォルト: 500）
+// @param {String|Number} $line-height - line-height（デフォルト: normal）
+@mixin section-title($size-pc, $size-sp, $weight: 500, $line-height: normal) {
+  font-family: var(--font-english);
+  font-size: rv($size-pc);
+  font-weight: $weight;
+  line-height: $line-height;
+  text-transform: capitalize;
+
+  @include sp {
+    font-size: svw($size-sp);
+    letter-spacing: normal;
+  }
+}
+
+// セクションサブタイトル用mixin
+// @param {Number} $size-pc - PCサイズ（px、デフォルト: 20）
+// @param {Number} $size-sp - SPサイズ（px、デフォルト: 16）
+// @param {String} $font - font-family（デフォルト: var(--font-primary)）
+@mixin section-subtitle($size-pc: 20, $size-sp: 16, $font: var(--font-primary)) {
+  font-family: $font;
+  font-size: rv($size-pc);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+
+  @include sp {
+    position: relative;
+    left: -1em;
+    font-size: svw($size-sp);
+  }
+}

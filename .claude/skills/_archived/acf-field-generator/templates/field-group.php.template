@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * ACF フィールドグループ：{{GROUP_TITLE}}
+ *
+ * このファイルは acf-field-generator スキルで自動生成されました。
+ * 必要に応じて手動で編集してください。
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+return [
+    'key'    => '{{GROUP_KEY}}',
+    'title'  => '{{GROUP_TITLE}}',
+    'fields' => {{FIELDS}},
+    'location' => [
+        [
+            [
+                'param'    => '{{LOCATION_PARAM}}',
+                'operator' => '==',
+                'value'    => '{{LOCATION_VALUE}}',
+            ]
+        ]
+    ],
+    'menu_order'            => 0,
+    'position'              => 'normal',
+    'style'                 => 'default',
+    'label_placement'       => 'top',
+    'instruction_placement' => 'label',
+    'hide_on_screen'        => '',
+    'active'                => true,
+    'description'           => '',
+];

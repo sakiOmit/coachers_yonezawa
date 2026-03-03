@@ -1,0 +1,68 @@
+---
+/**
+ * BaseLayout
+ * WordPress header.php + footer.php に相当する共通レイアウト
+ *
+ * 変換先:
+ *   - <head>部分 → header.php
+ *   - <footer>部分 → footer.php
+ *   - slot → 各ページテンプレートの本文
+ *
+ * CSS/JS読み込み:
+ *   - 共通CSS: /assets/css/common.css（プリコンパイル済み）
+ *   - 共通JS: /assets/js/main.js（バンドル済み）
+ *   - ページ固有: <slot name="addCSS" /> / <slot name="addJS" /> で注入
+ */
+interface Props {
+  title?: string;
+  description?: string;
+  bodyClass?: string;
+}
+
+const {
+  title = 'サイト名',
+  description = '',
+  bodyClass = '',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+
+  <!-- 共通CSS（プリコンパイル済み） -->
+  <link rel="stylesheet" href="/assets/css/common.css" />
+  <!-- ページ固有CSS（slotで注入） -->
+  <slot name="addCSS" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Poppins:wght@400;500;600;700&display=swap"
+    as="style"
+    onload="this.onload=null;this.rel='stylesheet'"
+  />
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Poppins:wght@400;500;600;700&display=swap"
+    />
+  </noscript>
+</head>
+<body class={bodyClass}>
+
+  <slot />
+
+  <footer></footer>
+
+  <!-- 共通JS（バンドル済み） -->
+  <script src="/assets/js/main.js" is:inline></script>
+  <!-- ページ固有JS（slotで注入） -->
+  <slot name="addJS" />
+</body>
+</html>

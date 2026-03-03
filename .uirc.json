@@ -1,0 +1,11 @@
+{
+  "outputDir": "./src/scss/object/components",
+  "astroOutputDir": "./astro/src/components",
+  "foundationDir": "./src/scss/foundation",
+  "overwrite": false,
+  "pathRewrites": {
+    "../../scss/foundation/function": "{foundation}/function",
+    "../../scss/foundation/breakpoints": "{foundation}/mixins/responsive",
+    "../../scss/foundation/hover": "{foundation}/mixins/hover"
+  }
+}

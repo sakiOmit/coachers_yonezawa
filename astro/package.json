@@ -1,0 +1,20 @@
+{
+  "name": "astro-static",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "image-size": "^2.0.0",
+    "xml2js": "^0.6.0"
+  },
+  "devDependencies": {
+    "sass": "^1.70.0",
+    "chokidar": "^4.0.0",
+    "glob": "^11.0.0"
+  }
+}

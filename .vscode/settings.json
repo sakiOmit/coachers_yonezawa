@@ -1,0 +1,20 @@
+{
+  // phpcs (shevaua.phpcs) 設定
+  "phpcs.enable": true,
+  "phpcs.executablePath": "/home/sakiomit/proj/hypex_acusnet/vendor/bin/phpcs",
+  // phpcs.xml.dist を自動検出して使用
+  // phpcbf 設定
+  "phpcbf.enable": true,
+  "phpcbf.executablePath": "/home/sakiomit/proj/hypex_acusnet/vendor/bin/phpcbf",
+  // phpcs.xml.dist を自動検出して使用
+  "phpcbf.onsave": true,
+  "phpcbf.documentFormattingProvider": true,
+  // PHP設定
+  "php.validate.executablePath": "/usr/bin/php",
+  // Format on Save 設定
+  "editor.formatOnSave": true,
+  "[php]": {
+    "editor.defaultFormatter": "shevaua.phpcs",
+    "editor.formatOnSave": true
+  }
+}

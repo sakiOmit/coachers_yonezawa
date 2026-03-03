@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Project">
+  <description>WordPress Coding Standards for this project</description>
+
+  <!-- チェック対象のファイル -->
+  <file>./themes/</file>
+
+  <!-- 除外するファイル/ディレクトリ -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>*/wordpress_data/*</exclude-pattern>
+
+  <!-- WordPress Coding Standards を使用 -->
+  <rule ref="WordPress">
+    <!-- 翻訳関数のテキストドメインチェックを無効化（必要に応じて） -->
+    <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
+  </rule>
+
+  <!-- WordPress-Extra ルールを追加 -->
+  <rule ref="WordPress-Extra"/>
+
+  <!-- WordPress-Docs ルールを追加 -->
+  <rule ref="WordPress-Docs"/>
+
+  <!-- PHP 8.0+ を想定 -->
+  <config name="testVersion" value="8.0-"/>
+
+  <!-- 並列処理を有効化 -->
+  <arg name="parallel" value="8"/>
+
+  <!-- 進捗表示 -->
+  <arg value="ps"/>
+
+  <!-- カラー出力 -->
+  <arg name="colors"/>
+
+  <!-- タブインデント（必要に応じて変更） -->
+  <arg name="tab-width" value="4"/>
+</ruleset>

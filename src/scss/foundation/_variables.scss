@@ -1,0 +1,27 @@
+// CSS Variables - Project
+:root {
+  // カラーパレット
+  --color-primary: #d71218; // プライマリカラー
+  --color-accent-red: #e60012; // アクセントレッド
+  --color-text: #111; // メインテキスト
+  --color-black: #000; // 純黒
+  --color-white: #fff; // 純白
+  --color-dark-gray: #1b1b1c; // フッター背景
+  --color-gray-dark: #555; // ダークグレー
+  --color-gray-medium: #999; // ミディアムグレー
+  --color-border: #aaa; // ボーダー・区切り線
+  --color-gray-lighter: #ccc; // より薄いグレー
+  --color-gray-lightest: #ddd; // 最も薄いグレー
+  --color-gray-light: #e0e0e0; // 薄いグレー
+  --color-gray-off-white: #eee; // オフホワイト
+  --color-gray: #fafafa; // 背景用薄いグレー
+  --color-background-light: #f5f5f5; // 薄い背景
+  --color-background-disabled: #f2f2f2; // 無効状態の背景
+  --color-beige: #f6f4ef; // ベージュ背景
+  --color-red-pure: #f00; // 純赤
+
+  // フォントファミリー
+  --font-primary: "Noto Sans JP", sans-serif; // 本文・ゴシック
+  --font-english: "Poppins", sans-serif; // 英字タイトル（セリフ）※プロジェクトに応じて変更
+  --font-poppins: "Poppins", sans-serif; // 英字サンセリフ
+}

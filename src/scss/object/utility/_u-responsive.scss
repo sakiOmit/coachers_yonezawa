@@ -1,0 +1,62 @@
+/**
+ * Responsive Utility Classes
+ *
+ * デバイス別の表示/非表示、順序変更用ユーティリティ
+ */
+
+@use "../../foundation/mixins/responsive" as *;
+
+// SP時に非表示
+.u-hidden-sp {
+  @include sp {
+    display: none !important;
+  }
+}
+
+// PC時に非表示
+.u-hidden-pc {
+  display: none !important;
+}
+
+// タブレット時に非表示
+.u-hidden-tab {
+  @include tab {
+    display: none !important;
+  }
+}
+
+// SP時のみ表示
+.u-visible-sp {
+  display: none !important;
+
+  @include sp {
+    display: block !important;
+  }
+}
+
+// PC時のみ表示
+.u-visible-pc {
+  @include sp {
+    display: none !important;
+  }
+}
+
+// SP時の順序変更（Flexbox用）
+@for $i from 1 through 12 {
+  .u-sp-order-#{$i} {
+    @include sp {
+      order: $i;
+    }
+  }
+}
+
+// PC時の順序変更（Flexbox用）
+@for $i from 1 through 12 {
+  .u-pc-order-#{$i} {
+    order: $i;
+
+    @include sp {
+      order: initial;
+    }
+  }
+}

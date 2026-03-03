@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Coding Standards with Spaces">
+  <description>WordPress coding standards with space indentation</description>
+
+  <!-- Use WordPress-Core as base -->
+  <rule ref="WordPress-Core">
+    <!-- Exclude whitespace rules that conflict with spaces -->
+    <exclude name="Generic.WhiteSpace.DisallowSpaceIndent"/>
+    <exclude name="Universal.WhiteSpace.PrecisionAlignment"/>
+    <exclude name="WordPress.Arrays.MultipleStatementAlignment"/>
+    <exclude name="WordPress.Arrays.ArrayIndentation"/>
+    <exclude name="PEAR.Functions.FunctionCallSignature"/>
+    <exclude name="NormalizedArrays.Arrays.CommaAfterLast"/>
+    <!-- Allow short array syntax [] -->
+    <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+    <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+    <!-- Yoda条件は可読性を下げるため除外 -->
+    <exclude name="WordPress.PHP.YodaConditions"/>
+    <!-- 予約語のパラメータ名警告を除外（$defaultは一般的） -->
+    <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+  </rule>
+
+  <!-- Allow space indentation (2 spaces) -->
+  <rule ref="Generic.WhiteSpace.ScopeIndent">
+    <properties>
+      <property name="indent" value="2"/>
+      <property name="tabIndent" value="false"/>
+    </properties>
+  </rule>
+
+  <!-- Check PHP files only -->
+  <arg name="extensions" value="php"/>
+
+  <!-- Show progress and sniff codes -->
+  <arg value="ps"/>
+
+  <!-- Use colors in output -->
+  <arg name="colors"/>
+
+  <!-- Check themes directory -->
+  <file>themes/</file>
+
+  <!-- Exclude vendor and node_modules -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>*/assets/*</exclude-pattern>
+</ruleset>

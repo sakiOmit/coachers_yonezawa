@@ -1,0 +1,17 @@
+@use "../function" as *;
+@use "./responsive" as *;
+
+// コンテナmixin
+@mixin container($max-width: $container-max-width) {
+  width: 100%;
+  max-width: $max-width;
+  margin-inline: auto;
+
+  @media (max-width: $max-width) {
+    padding-inline: rv(20);
+  }
+
+  @include sp {
+    padding-inline: svw(10);
+  }
+}

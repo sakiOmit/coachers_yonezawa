@@ -1,0 +1,23 @@
+{
+  "name": "your-project/wordpress-vite-flocss",
+  "description": "WordPress + Vite + FLOCSS template",
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true
+    },
+    "platform": {
+      "ext-xmlreader": "8.0"
+    }
+  },
+  "require-dev": {
+    "wp-coding-standards/wpcs": "^3.0",
+    "phpstan/phpstan": "^2.1",
+    "tomasvotruba/unused-public": "^2.1",
+    "phpstan/extension-installer": "^1.4"
+  },
+  "scripts": {
+    "lint:php": "phpcs",
+    "lint:php:fix": "phpcbf"
+  }
+}

@@ -1,0 +1,68 @@
+@use "sass:math";
+@use "./breakpoints" as bp;
+
+// PC用vw関数（基準幅: 1440px）
+@function pvw($pixelsVw) {
+  $baseWidth: bp.$bp-pvw-base;
+  $ratio: math.div($pixelsVw, $baseWidth) * 100;
+  $roundedRatio: math.div(math.round($ratio * 100), 100);
+
+  @return #{$roundedRatio}vw;
+}
+
+// SP用vw関数（基準幅: 375px）
+@function svw($pixelsVw) {
+  $baseWidth: bp.$bp-svw-base;
+  $ratio: math.div($pixelsVw, $baseWidth) * 100;
+  $roundedRatio: math.div(math.round($ratio * 100), 100);
+
+  @return #{$roundedRatio}vw;
+}
+
+// px → em変換
+@function px-to-em($value, $base-font-size: 16) {
+  $ratio: math.div($value, $base-font-size) * 100;
+  $roundedValue: math.div(math.floor($ratio), 100);
+
+  @return #{$roundedValue}em;
+}
+
+// 小数点丸め
+@function rounded-value($value, $decimals: 2) {
+  $factor: math.pow(10, $decimals);
+
+  @return calc(math.round($value * $factor) / $factor);
+}
+
+// レスポンシブ値関数（PC幅フルード: 768px〜1440px）
+// 使用例: font-size: rv(16); → 768pxで12px、1440pxで16px
+@function rv($value, $min-view-port: bp.$bp-rv-min, $max-view-port: bp.$bp-rv-max) {
+  @if $value >= 0 {
+    $min: $value * 0.75;
+    $max: $value;
+    $variable-part: math.div(($max - $min), ($max-view-port - $min-view-port));
+    $constant: $min - $variable-part * $min-view-port;
+    $min-rem: math.div($min, 16) * 1rem;
+    $max-rem: math.div($max, 16) * 1rem;
+    $variable-part-vw: rounded-value($variable-part * 100) * 1vw;
+    $variable-rem: rounded-value(math.div($constant, 16)) * 1rem;
+
+    @return clamp($min-rem, calc(#{$variable-rem} + #{$variable-part-vw}), $max-rem);
+  } @else {
+    $small-vp-value: $value * 0.75;
+    $large-vp-value: $value;
+    $min: $large-vp-value;
+    $max: $small-vp-value;
+    $variable-part: math.div(
+      ($large-vp-value - $small-vp-value),
+      ($max-view-port - $min-view-port)
+    );
+    $constant: $small-vp-value - $variable-part * $min-view-port;
+    $min-rem: math.div($min, 16) * 1rem;
+    $max-rem: math.div($max, 16) * 1rem;
+    $variable-part-vw: rounded-value($variable-part * 100) * 1vw;
+    $variable-rem: rounded-value(math.div($constant, 16)) * 1rem;
+
+    @return clamp($min-rem, calc(#{$variable-rem} + #{$variable-part-vw}), $max-rem);
+  }
+}

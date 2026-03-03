@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+
+# ビルド成果物（プラグインで生成）
+public/assets/css/
+public/assets/js/

@@ -1,0 +1,178 @@
+@use "../foundation/function" as *;
+@use "../foundation/mixins/responsive" as *;
+@use "../foundation/mixins/block" as *;
+
+.l-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  padding-block: rv(26);
+
+  &:not(&--home) {
+    background-color: var(--color-white);
+  }
+
+  &--home {
+    background-color: transparent;
+
+    .l-header__menu-link {
+      color: var(--color-white);
+    }
+
+    .l-header__cta-button {
+      color: var(--color-text);
+      background-color: var(--color-white);
+    }
+  }
+
+  // bodyにbg-blackがある場合は背景色を透明に、文字色とボタンを調整
+  .bg-black & {
+    background-color: transparent;
+
+    .l-header__menu-link {
+      color: var(--color-white);
+    }
+
+    .l-header__cta-button {
+      color: var(--color-text);
+      background-color: var(--color-white);
+    }
+  }
+
+  // c-page-headerを越えた時（スクロール時）のスタイル
+  &.is-scrolled {
+    background-color: var(--color-white);
+
+    .l-header__menu-link {
+      color: var(--color-text);
+    }
+
+    .l-header__cta-button {
+      color: var(--color-white);
+      background-color: var(--color-text);
+    }
+  }
+
+  &__container {
+    @include container(1360px);
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  // Logo
+  &__logo-link {
+    position: relative;
+    z-index: 1100;
+    flex-shrink: 0;
+  }
+
+  &__logo-image {
+    width: rv(120);
+
+    @include sp {
+      width: svw(120);
+      height: auto;
+    }
+  }
+
+  // Navigation (PC only)
+  &__nav {
+    margin-right: rv(40);
+    margin-left: auto;
+
+    @include sp {
+      display: none;
+    }
+  }
+
+  &__menu {
+    display: flex;
+    gap: rv(40);
+    align-items: center;
+  }
+
+  &__menu-item {
+    // Inherit from body
+  }
+
+  &__menu-link {
+    font-family: var(--font-english);
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  // CTA Buttons (PC only)
+  &__cta {
+    position: relative;
+    z-index: 1100;
+    display: flex;
+    gap: rv(16);
+
+    @include sp {
+      display: none;
+    }
+  }
+
+  &__cta-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: rv(6);
+    padding-inline: rv(40);
+    color: var(--color-white);
+    background-color: var(--color-text);
+    border-radius: rv(50);
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__cta-text {
+    font-family: var(--font-english);
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  // Hamburger Menu
+  &__hamburger {
+    position: relative;
+    z-index: 1100;
+    margin-left: rv(40);
+
+    @include sp {
+      margin-left: auto;
+    }
+  }
+
+  // Menu Open State（header に付与）
+  &.is-menu-open {
+    .l-header__cta-button {
+      color: var(--color-text);
+      background-color: var(--color-white);
+    }
+  }
+}
+
+// body scroll lock（JS の disableScroll() で body に付与）
+body.is-scroll-locked {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}

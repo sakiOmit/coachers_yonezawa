@@ -1,0 +1,18 @@
+# 画像ソースディレクトリ
+#
+# ここに元画像（@1x）を配置してください。
+# npm run image-opt を実行すると:
+# - @2x Retina画像の自動生成
+# - WebP変換
+# - SVG最適化
+# - themes/trf_wp/assets/images/ への出力
+# - images-meta.php の自動生成（width/height自動取得用）
+#
+# ディレクトリ構造例:
+# src/images/
+# ├── common/
+# │   ├── logo.png
+# │   └── hero.jpg
+# └── about/
+#     ├── image-01.png
+#     └── image-01_sp.png  # SP用画像（_sp suffix）

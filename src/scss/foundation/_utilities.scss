@@ -1,0 +1,22 @@
+/**
+ * Utility Classes
+ *
+ * @package {{PACKAGE_NAME}}
+ */
+
+/**
+ * Screen Reader Only
+ * 視覚的には非表示だがスクリーンリーダーでは読み上げられる
+ * アクセシビリティ向上のため、意味的に重要だが視覚的に不要な見出しなどに使用
+ */
+.u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

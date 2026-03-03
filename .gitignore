@@ -1,0 +1,87 @@
+# WordPress + Vite + FLOCSS Project .gitignore
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+themes/*/assets/css/
+themes/*/assets/js/
+dist/
+
+# Vite
+*.local
+.vite/
+
+# Environment files
+# .env is tracked for local development defaults
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+
+# IDE / Editor
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker (local data)
+docker-data/
+mysql-data/
+
+# WordPress uploads (optional - uncomment if needed)
+# themes/*/uploads/
+# wp-content/uploads/
+
+# Cache
+.cache/
+*.cache
+
+# Temporary files
+tmp/
+temp/
+
+# Claude Code (project-specific)
+.claude/reviews/
+.claude/checkpoints/
+
+# Figma cache (generated, do not commit)
+.claude/cache/*
+!.claude/cache/figma/
+.claude/cache/figma/*
+!.claude/cache/figma/analysis-report.yaml
+
+# Serena temporary files (keep memories)
+.serena/project.yml
+.serena/*.log
+
+# Test output
+coverage/
+test-results/
+playwright-report/
+
+# Docker WordPress data (local only)
+wordpress_data/
+
+# Playwright MCP screenshots
+.playwright-mcp/
+
+themes/*/assets
+themes/twenty*
+themes/test-theme
+
+# Astro
+astro/node_modules/
+astro/dist/
+astro/.astro/

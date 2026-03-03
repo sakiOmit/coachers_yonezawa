@@ -1,0 +1,33 @@
+# シェルスクリプトは常にLF（Unix形式）
+*.sh text eol=lf
+
+# TypeScript/JavaScriptもLF
+*.ts text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+
+# その他のテキストファイル
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# PHP
+*.php text eol=lf
+
+# CSS/SCSS
+*.css text eol=lf
+*.scss text eol=lf
+
+# バイナリファイルは変換しない
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

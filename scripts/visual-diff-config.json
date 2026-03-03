@@ -1,0 +1,30 @@
+{
+  "threshold": 0.2,
+  "maxDiffPixelRatio": 0.05,
+  "outputDir": ".claude/cache/visual-diff",
+  "diffColor": {
+    "red": 255,
+    "green": 0,
+    "blue": 255
+  },
+  "antialiasing": true,
+  "alpha": 0.1,
+  "presets": {
+    "strict": {
+      "threshold": 0.1,
+      "maxDiffPixelRatio": 0.01,
+      "description": "厳格設定（ピクセルパーフェクト重視）"
+    },
+    "default": {
+      "threshold": 0.2,
+      "maxDiffPixelRatio": 0.05,
+      "description": "標準設定（微細なレンダリング差を許容）"
+    },
+    "lenient": {
+      "threshold": 0.3,
+      "maxDiffPixelRatio": 0.10,
+      "description": "緩和設定（レスポンシブ等の許容範囲拡大）"
+    }
+  },
+  "maxIterations": 5
+}

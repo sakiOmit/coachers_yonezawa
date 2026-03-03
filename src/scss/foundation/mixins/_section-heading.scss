@@ -1,0 +1,56 @@
+@use "../function" as *;
+@use "./responsive" as *;
+
+// 縦書きセクション見出し（日本語 + 90度回転英語）
+// 使用例: 会社概要、グループ会社、社会貢献など
+
+@mixin vertical-section-heading {
+  display: flex;
+  flex-shrink: 0;
+  gap: rv(24);
+
+  @include sp {
+    width: auto;
+    text-align: center;
+  }
+}
+
+@mixin vertical-section-heading-ja {
+  margin-bottom: rv(24);
+  font-family: var(--font-secondary);
+  font-size: rv(40);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.4em;
+  writing-mode: vertical-rl;
+
+  @include sp {
+    margin-bottom: svw(16);
+    font-size: svw(32);
+    letter-spacing: svw(12);
+    writing-mode: horizontal-tb;
+  }
+}
+
+@mixin vertical-section-heading-en-wrapper {
+  writing-mode: vertical-rl;
+
+  @include sp {
+    width: auto;
+    height: auto;
+  }
+}
+
+@mixin vertical-section-heading-en {
+  font-family: var(--font-english);
+  font-size: rv(20);
+  font-weight: 400;
+  text-transform: capitalize;
+  letter-spacing: rv(6);
+  white-space: nowrap;
+
+  @include sp {
+    font-size: svw(16);
+    letter-spacing: svw(4);
+  }
+}

@@ -1,0 +1,61 @@
+# 共通フィールド部品
+
+複数のフィールドグループで再利用するフィールドをここに配置します。
+
+## 使用例
+
+### 共通フィールドの定義（link-button.php）
+
+```php
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+return [
+    'key'   => 'field_common_link_button',
+    'label' => 'リンクボタン',
+    'name'  => 'link_button',
+    'type'  => 'group',
+    'sub_fields' => [
+        [
+            'key'   => 'field_common_link_button_text',
+            'label' => 'ボタンテキスト',
+            'name'  => 'text',
+            'type'  => 'text',
+        ],
+        [
+            'key'   => 'field_common_link_button_url',
+            'label' => 'リンク先URL',
+            'name'  => 'url',
+            'type'  => 'url',
+        ],
+    ],
+];
+```
+
+### 共通フィールドの使用
+
+```php
+// groups/pages/example.php
+return [
+    'key'    => 'group_example',
+    'title'  => 'サンプル',
+    'fields' => [
+        include __DIR__ . '/../common/link-button.php',
+
+        [
+            'key'   => 'field_example_text',
+            'label' => 'テキスト',
+            'name'  => 'example_text',
+            'type'  => 'text',
+        ],
+    ],
+];
+```
+
+## 注意点
+
+- 共通フィールドの `key` は必ず `field_common_` で始めること
+- 他のフィールドとキーが重複しないように注意

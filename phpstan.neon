@@ -1,0 +1,15 @@
+parameters:
+    level: 6
+    paths:
+        - themes/
+    ignoreErrors:
+        # WordPress関数の未定義を無視
+        - '#Function (wp_|get_|the_|is_|has_|add_|remove_|register_|enqueue_|esc_|sanitize_)#'
+        # ACF関数の未定義を無視
+        - '#Function (get_field|the_field|have_rows|get_sub_field|the_sub_field)#'
+    reportUnmatchedIgnoredErrors: false
+    # 未使用public要素の検出
+    unused_public:
+        methods: true
+        properties: true
+        constants: true

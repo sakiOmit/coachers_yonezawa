@@ -1,0 +1,40 @@
+# 固定ページ用フィールドグループ
+
+## 配置例
+
+```php
+// groups/pages/about-page.php
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+return [
+    'key'    => 'group_about_page',
+    'title'  => 'アバウトページ設定',
+    'fields' => [
+        [
+            'key'   => 'field_about_title',
+            'label' => 'タイトル',
+            'name'  => 'about_title',
+            'type'  => 'text',
+        ],
+    ],
+    'location' => [
+        [
+            [
+                'param'    => 'page_template',
+                'operator' => '==',
+                'value'    => 'pages/page-about.php',
+            ]
+        ]
+    ],
+];
+```
+
+## 注意点
+
+- `key` はグローバルでユニークにすること
+- `location` で正しいテンプレートを指定すること
+- config.php に追加すること

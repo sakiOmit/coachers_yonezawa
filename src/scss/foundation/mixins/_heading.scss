@@ -1,0 +1,52 @@
+@use "../function" as *;
+@use "./responsive" as *;
+
+// ====================
+// セクション見出し関連のmixin
+// ====================
+
+// 日本語ラベルスタイル（小サイズ）
+@mixin section-label {
+  font-weight: 700;
+  color: var(--color-primary);
+
+  @include sp {
+    font-size: svw(12);
+  }
+}
+
+// 英語見出しスタイル（サイズ可変）
+@mixin section-heading($size: 96) {
+  font-family: var(--font-english);
+  font-size: rv($size);
+  font-style: italic;
+  font-weight: 700;
+  line-height: 0.8;
+  color: var(--color-primary);
+
+  @include sp {
+    font-size: svw($size * 0.5);
+  }
+}
+
+// 見出しラッパー（縦並び）
+@mixin section-heading-wrapper($gap: 20) {
+  display: flex;
+  flex-direction: column;
+  gap: rv($gap);
+
+  @include sp {
+    gap: svw($gap);
+  }
+}
+
+// 説明文スタイル
+@mixin description-line {
+  font-size: rv(14);
+  font-weight: 700;
+  color: var(--color-primary);
+
+  @include sp {
+    font-size: svw(14);
+  }
+}

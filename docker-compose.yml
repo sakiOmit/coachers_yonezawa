@@ -1,0 +1,58 @@
+services:
+  db:
+    image: mariadb:10.5
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "${WORDPRESS_PORT:-8000}:80"
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      VITE_DEV: ${VITE_DEV:-0}
+    volumes:
+      - ./wordpress_data:/var/www/html
+      - ./themes/${THEME_NAME}:/var/www/html/wp-content/themes/${THEME_NAME}
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    env_file:
+      - .env
+    ports:
+      - "${PHPMYADMIN_PORT:-8080}:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+  mailhog:
+    image: mailhog/mailhog
+    env_file:
+      - .env
+    ports:
+      - "${MAILHOG_SMTP_PORT:-1025}:1025" # SMTP server
+      - "${MAILHOG_WEB_PORT:-8025}:8025" # Web UI
+
+volumes:
+  db_data:
+    driver: local
+  wordpress_data:
+    driver: local
