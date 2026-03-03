@@ -1,6 +1,6 @@
 ---
 name: figma-implement
-description: "Orchestrate Figma to WordPress implementation (9-step workflow). Use when user says 'implement this design', 'convert Figma to code', 'create page from Figma', or after /figma-prefetch. Supports --section option for precision implementation."
+description: "Orchestrate Figma to Astro static coding implementation (9-step workflow). Use when user says 'implement this design', 'convert Figma to code', 'create page from Figma', or after /figma-prefetch. Supports --section option for precision implementation. WordPress conversion is done separately via /astro-to-wordpress."
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -25,7 +25,8 @@ agent: general-purpose
 
 ## Overview
 
-Orchestration skill that manages the Figma to WordPress implementation workflow (9 steps).
+Orchestration skill that manages the Figma to Astro static coding implementation workflow (9 steps).
+WordPress conversion is handled separately by `/astro-to-wordpress`.
 Provides state persistence, resume capability, and error recovery to maximize efficiency in large-scale page implementation.
 
 ### Key Features
@@ -303,10 +304,10 @@ ORCHESTRATOR START
         ▼
 ┌───────────────────────────────────────┐
 │  Step 6: Pixel-Perfect Implementation │
-│  ├─ 6-1. wordpress-engineer (Task)    │
-│  │       └─ PC/SP specs (if --sp)     │
-│  ├─ 6-2. PHP/SCSS implementation      │
-│  ├─ 6-3. Build (npm run dev)          │
+│  ├─ 6-1. astro-component-engineer     │
+│  │       (Task) + PC/SP specs         │
+│  ├─ 6-2. Astro/SCSS implementation    │
+│  ├─ 6-3. Build (npm run astro:build)  │
 │  └─ 6-4. SCSS Rule Compliance Check   │
 │          ├─ npm run lint:css          │
 │          ├─ Container rule auto-fix   │
@@ -332,11 +333,12 @@ ORCHESTRATOR START
         ▼
 ┌───────────────────────────────────────┐
 │  Step 8: Quick Quality Check (AUTO)   │
-│  ├─ 8-1. npm run build → BLOCK on err │
+│  ├─ 8-1. npm run astro:build → BLOCK  │
 │  ├─ 8-2. npm run lint:css → WARN only │
-│  └─ 8-3. PHP pattern check (grep)     │
+│  └─ 8-3. Astro pattern check (grep)   │
 │          ├─ <img> → BLOCK             │
-│          └─ the_field() → BLOCK       │
+│          ├─ <style> scoped → BLOCK    │
+│          └─ .astro SCSS/JS import     │
 │  ⚠️ Error detected → Fix → Re-run     │
 └───────────────────────────────────────┘
         │
@@ -489,7 +491,7 @@ Or manually:
 | Step | Execution | Memory Impact |
 |------|-----------|---------------|
 | Step 1-5 | Direct execution | ✅ Low (main context) |
-| Step 6 | Task → wordpress-professional-engineer | ✅ Isolated (subagent fork) |
+| Step 6 | Task → astro-component-engineer | ✅ Isolated (subagent fork) |
 | Step 7-8 | Direct execution (lightweight checks) | ✅ Low (main context) |
 | Step 9 | Direct execution | ✅ Low (main context) |
 
@@ -500,7 +502,7 @@ Or manually:
 figma-implement (context: fork)
   ├─ Main context holds design-context.json (76KB) ❌
   │
-  └─ Task → wordpress-professional-engineer (fork)
+  └─ Task → astro-component-engineer (fork)
       └─ Double fork + large data in main ❌
       └─ Main context not released ❌
 ```
@@ -511,7 +513,7 @@ figma-implement (no fork)
   ├─ Main context: state.yaml only (1.3KB) ✅
   ├─ design-context.json NOT loaded in main ✅
   │
-  └─ Step 6: Task → wordpress-professional-engineer (fork)
+  └─ Step 6: Task → astro-component-engineer (fork)
       ├─ Reads project-convention.yaml directly ✅
       └─ Subagent context released after completion ✅
 ```
@@ -523,14 +525,14 @@ figma-implement (no fork)
    - design-context.json read from file when needed, not held in memory
 
 2. **Subagent = Isolated**
-   - wordpress-professional-engineer runs in fork context
+   - astro-component-engineer runs in fork context
    - Auto-released after Step 6 completion
 
 3. **Data Flow**
    ```
    Step 1-4: Cache design data to files
    Step 5: Read specs, write to project-convention.yaml
-   Step 6: wordpress-engineer reads YAML directly (not via main context)
+   Step 6: astro-component-engineer reads YAML directly (not via main context)
    Step 7-9: Continue with lightweight main context
    ```
 
@@ -538,13 +540,13 @@ figma-implement (no fork)
 
 | Step | Method | Blocking |
 |------|--------|----------|
-| Step 6 | Task tool (`wordpress-professional-engineer`) | ✅ Yes |
+| Step 6 | Task tool (`astro-component-engineer`) | ✅ Yes |
 | Step 8 | Direct execution (lightweight checks) | ✅ Yes |
 
 **Implementation:**
 ```
-1. Task tool 呼び出し（wordpress-professional-engineer）
-   - subagent_type: "wordpress-professional-engineer"
+1. Task tool 呼び出し（astro-component-engineer）
+   - subagent_type: "astro-component-engineer"
    - Passes: page_slug, specs location
    - run_in_background: false（ブロッキング）
 
@@ -553,9 +555,9 @@ figma-implement (no fork)
    - エラー時は state.yaml に記録して再試行
 
 3. Step 8: Quick Quality Check（軽量）
-   - npm run build
+   - npm run astro:build
    - npm run lint:css
-   - grep によるPHPパターン検出
+   - grep によるAstroパターン検出
    - サブエージェント不要 ✅
 ```
 
@@ -633,19 +635,23 @@ Only items that could not be extracted are requested from the user (H3 intervent
 - [ ] タイポグラフィ系（font, line-height, color）
 - [ ] ビジュアル系（background, border）
 
-## Step 7 Details: PHP Template Implementation Quality Checklist
+## Step 7 Details: Astro Component Implementation Quality Checklist
 
 ### 実装品質チェックリスト（必須）
 
-#### ACF出力
-- [ ] 単一行フィールド: p + esc_html()
-- [ ] 複数行フィールド: div + wp_kses_post(nl2br())
-- [ ] nl2br() で改行を <br> に変換
+#### コンポーネント
+- [ ] Props interface が定義されている
+- [ ] BEMクラス名がWordPress変換時と完全一致
+- [ ] `<ResponsiveImage />` コンポーネントを使用（`<img>` 直接記述禁止）
 
-#### ボタンコンポーネント
-- [ ] c-button 使用（c-link-button 廃止）
-- [ ] get_template_part('template-parts/common/button') で呼び出し
-- [ ] variant を class パラメータで指定
+#### データモデル
+- [ ] モックデータがACF構造を模倣（`data-helpers.ts` 使用）
+- [ ] `astro/src/data/pages/{slug}.json` にデータ配置
+
+#### 禁止事項
+- [ ] `.astro` 内での SCSS/JS インポートがない
+- [ ] `<style>` scoped ブロックがない
+- [ ] `<script>` インラインがない
 
 ## Step 8 Details: Quick Quality Check (Auto-Execute - SCRIPT REQUIRED)
 
@@ -660,14 +666,14 @@ Step 6 完了後、以下を自動で実行する。エラーがあれば停止�
 ```bash
 bash .claude/skills/figma-implement/scripts/quality-check.sh \
   {実装したSCSSファイル} \
-  {実装したPHPファイル}
+  {実装したAstroファイル}
 ```
 
 Example:
 ```bash
 bash .claude/skills/figma-implement/scripts/quality-check.sh \
   src/scss/object/project/_p-about.scss \
-  themes/{{THEME_NAME}}/pages/page-about.php
+  astro/src/pages/about.astro
 ```
 
 Exit code handling:
@@ -678,16 +684,18 @@ Exit code handling:
 
 ```bash
 # 1. Build check（必須）
-npm run build
+npm run astro:build
 # → 失敗時: ビルドエラーを表示して停止
 
 # 2. SCSS Lint（必須）
 npm run lint:css
 # → 警告のみ: 続行、エラー: 停止
 
-# 3. PHP pattern check（対象ファイルのみ）
-grep -rn '<img ' {実装したPHPファイル}
-grep -rn 'the_field(' {実装したPHPファイル}
+# 3. Astro pattern check（対象ファイルのみ）
+grep -rn '<img ' {実装したAstroファイル}           # <img> 直接使用
+grep -rn '<style' {実装したAstroファイル}           # scoped <style> ブロック
+grep -rn 'import.*\.scss' {実装したAstroファイル}   # SCSS インポート
+grep -rn 'import.*\.js' {実装したAstroファイル}     # JS インポート
 # → ヒット時: 修正を指示して停止
 ```
 
@@ -695,8 +703,10 @@ grep -rn 'the_field(' {実装したPHPファイル}
 
 | Pattern | Severity | Fix |
 |---------|----------|-----|
-| `<img src=` | **BLOCK** | `render_responsive_image()` に変更 |
-| `the_field(` | **BLOCK** | `get_field()` + `esc_html()` に変更 |
+| `<img ` (非ResponsiveImage) | **BLOCK** | `<ResponsiveImage />` に変更 |
+| `<style` scoped | **BLOCK** | 削除し `src/scss/` に移動 |
+| `import.*\.scss` | **BLOCK** | 削除し `src/css/` エントリーに追加 |
+| `import.*\.js` | **BLOCK** | 削除し `src/js/` に移動 |
 | ビルドエラー | **BLOCK** | エラー内容に基づき修正 |
 | Lint警告 | WARN | 次回修正（続行可） |
 
@@ -994,15 +1004,15 @@ See: `.shogun/reports/figma-mcp-research.md`
 
 ### Error: "Build failed" (Step 8)
 
-**Cause**: SCSS/PHP syntax error or missing import.
+**Cause**: SCSS/Astro syntax error or missing import.
 
 **Solution**:
 1. Run build manually to see detailed error:
    ```bash
-   npm run build
+   npm run astro:build
    ```
-2. Check SCSS imports in `src/css/pages/{page}.css`
-3. Verify PHP file has `Template Name:` comment
+2. Check SCSS imports in `src/css/pages/{page}/style.scss`
+3. Verify Astro page imports and Props interface
 4. Fix errors and re-run Step 8
 
 ### Error: "Playwright connection failed"
@@ -1054,10 +1064,16 @@ See: `.shogun/reports/figma-mcp-research.md`
 
 ---
 
-**Version**: 2.3.0
+**Version**: 3.0.0
 **Created**: 2026-01-30
-**Updated**: 2026-02-02
+**Updated**: 2026-03-03
 **Changes**:
+- v3.0.0: Astro-first ワークフローに移行
+  - Step 6: wordpress-professional-engineer → astro-component-engineer
+  - Step 7: Playwright URL を localhost:4321 に変更
+  - Step 8: PHP パターンチェック → Astro パターンチェック
+  - Step 9: 完了案内に /astro-to-wordpress を追加
+  - WordPress変換は /astro-to-wordpress の範囲に分離
 - v2.3.0: 公式スキルガイド準拠の改修
   - scripts/ ディレクトリ追加（validate-cache.sh, validate-raw-jsx.sh, quality-check.sh）
   - Step 0, 0.5, 8 にスクリプト検証を明示的に追加
