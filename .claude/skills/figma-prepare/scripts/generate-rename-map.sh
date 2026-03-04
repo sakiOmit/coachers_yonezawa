@@ -21,7 +21,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, re, sys, unicodedata, os
+import json, re, sys, os
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str
 
@@ -70,13 +70,14 @@ def to_kebab(text):
     return text[:40] if text else ''
 
 def get_text_children_content(children):
-    \"\"\"Collect named TEXT children's name as text content proxy.\"\"\"
+    \"\"\"Collect TEXT children's content. Prefer enriched characters over name.\"\"\"
     texts = []
     for c in children:
         if c.get('type') == 'TEXT':
-            name = c.get('name', '')
-            if name and not UNNAMED_RE.match(name):
-                texts.append(name)
+            # Prefer characters (from enrichment) over name (Issue 38)
+            content = c.get('characters', '') or c.get('name', '')
+            if content and not UNNAMED_RE.match(content):
+                texts.append(content)
     return texts
 
 def infer_text_role(text_content, font_size=None):
@@ -104,9 +105,10 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     w = abs_bbox.get('width', 0)
     h = abs_bbox.get('height', 0)
 
-    # Priority 1: Text content (TEXT nodes have content as name in get_metadata)
+    # Priority 1: Text content
+    # Prefer enriched characters over name (Issue 38)
     if node_type == 'TEXT':
-        text_content = name  # TEXT nodes store content in name field
+        text_content = node.get('characters', '') or name
         role = infer_text_role(text_content)
         slug = to_kebab(text_content[:30])
         if role and slug:
@@ -130,6 +132,9 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         return f'{prefix}-{sibling_index}'
 
     # Priority 3: Position analysis (top-level frames)
+    # Note (Issue 39): This fires only when metadata root is PAGE/CANVAS (page-level query).
+    # In typical /figma-prepare usage (artboard-level query), root is FRAME, so this
+    # branch is unreachable. Priority 3.1 handles header/footer in that case.
     if node_type == 'FRAME' and parent and parent.get('type') in ('PAGE', 'CANVAS'):
         y = abs_bbox.get('y', 0)
         if sibling_index == 0 or y < 100:
@@ -138,9 +143,10 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             return f'section-footer'
         return f'section-{sibling_index}'
 
-    # Priority 3.1: Header/Footer heuristic (Issue 16)
+    # Priority 3.1: Header/Footer heuristic (Issue 16, Issue 37)
     # Detects headers/footers within section roots (not just PAGE/CANVAS children)
-    if node_type in ('FRAME', 'GROUP') and parent and children:
+    # Include INSTANCE/COMPONENT/SECTION as headers/footers may be component instances
+    if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and parent and children:
         parent_bbox = parent.get('absoluteBoundingBox', {})
         parent_y = parent_bbox.get('y', 0)
         parent_h = parent_bbox.get('height', 0)

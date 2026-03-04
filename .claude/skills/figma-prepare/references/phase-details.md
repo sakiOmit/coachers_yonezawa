@@ -337,11 +337,12 @@ HORIZONTAL layout:
 
 | 条件 | 信頼度 |
 |------|-------|
-| 子要素 3+ & Gap 均一 | high |
+| enriched layoutMode あり | exact（実 Figma データ由来） |
+| 子要素 3+ | high |
 | 子要素 2 | medium |
-| Gap ばらつき大 | low |
 
-信頼度 `low` の場合は dry-run で警告を表示。
+enriched metadata に `layoutMode` が含まれる場合、推論ではなく実データから直接取得するため
+信頼度 `exact` が付与される（Issue 18）。
 
 ## フェーズ間の依存関係
 

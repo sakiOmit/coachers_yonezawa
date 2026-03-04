@@ -2,8 +2,8 @@
 
 ## Overview
 
-Phase 3 Stage B で Claude にセクション分割を推論させる際のプロンプトテンプレート。
-SKILL.md の Phase 3 Stage B Step 3-2c から参照される。
+Phase 2 Stage B で Claude にセクション分割を推論させる際のプロンプトテンプレート。
+SKILL.md の Phase 2 Stage B Step 2-2c から参照される。
 
 ## Prompt Template
 

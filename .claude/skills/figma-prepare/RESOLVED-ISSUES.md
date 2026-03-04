@@ -310,6 +310,20 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正日**: 2026-03-04
 - **テスト**: 全60件パス（3件追加）
 
+## Issue 23: ネストされたグルーピングが Stage A で未対応 — CLOSED (Won't Fix)
+
+- **Phase**: 2
+- **優先度**: 低
+- **概要**: Stage A の proximity/pattern 検出は各階層を独立に走査するため、
+  「兄弟要素のサブグループをネストした階層構造」は生成できない。
+  例: ヒーロー領域で「画像 + 見出しフレーム」を内部グループ化し、さらにそれと
+  パンくずをまとめた外部グループを作る2段階ネスト。
+- **クローズ理由**: Stage B（Claude 推論ベース）がスクリーンショット + コンテキスト情報を
+  使って意味的なセクション分割を行うため、この機能は設計上 Stage B に委譲される。
+  Stage A にマルチパス・ネストグルーピングを追加すると、アルゴリズムの複雑度が大幅に
+  増加する割に Stage B が同等の結果を出せるため、費用対効果が低い。
+- **クローズ日**: 2026-03-04
+
 ## Issue 27: YAML出力の特殊文字エスケープ — FIXED
 
 - **Phase**: 全体
@@ -453,3 +467,105 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
   コンソール出力例を `0 (excluded)` に修正。
 - **修正日**: 2026-03-04
 - **ファイル**: `references/phase-details.md`
+
+## Issue 37: INSTANCE/COMPONENT/SECTION 型のヘッダー/フッター検出漏れ — FIXED
+
+- **Phase**: 2, 3
+- **優先度**: 中
+- **概要**: `prepare-sectioning-context.sh` の `detect_heuristic_hints()` と `generate-rename-map.sh` の
+  Priority 3.1 で、ヘッダー/フッター候補のノード型を `('FRAME', 'GROUP')` のみチェックしていた。
+  Figma ではヘッダー/フッターが INSTANCE（コンポーネントインスタンス）や COMPONENT、SECTION として
+  定義されることがあり、これらの型が検出から漏れていた。
+- **修正内容**: 型チェックを `('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION')` に拡張。
+  `prepare-sectioning-context.sh` のヘッダー/フッター候補検出と `generate-rename-map.sh` の
+  Priority 3.1 の両方を修正。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/prepare-sectioning-context.sh`, `scripts/generate-rename-map.sh`
+- **テスト**: INSTANCE header + COMPONENT footer 検出テスト追加、全67件パス
+
+## Issue 38: characters フィールド活用でリネーム精度向上 — FIXED
+
+- **Phase**: 3
+- **優先度**: 中
+- **概要**: TEXT ノードのリネームで `name` フィールドのみ使用していたが、
+  enrichment 後は `characters` フィールド（実際の表示テキスト）が利用可能。
+  `name` はレイヤー名（手動リネーム済みの場合は表示テキストと異なる可能性）であるのに対し、
+  `characters` は常に実際の表示テキストを含む。
+- **修正内容**:
+  - `generate-rename-map.sh`: `infer_name()` の Priority 1 で `characters` を `name` より優先
+  - `generate-rename-map.sh`: `get_text_children_content()` で `characters` を優先
+  - `prepare-sectioning-context.sh`: `get_text_children_preview()` で `characters` を優先
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `scripts/prepare-sectioning-context.sh`
+- **テスト**: characters フィールド優先テスト追加、全67件パス
+
+## Issue 39: Priority 3 デッドコード文書化 — FIXED
+
+- **Phase**: 3
+- **優先度**: 低
+- **概要**: `generate-rename-map.sh` の Priority 3 は `parent.get('type') in ('PAGE', 'CANVAS')` を
+  チェックするが、`/figma-prepare` は通常アートボード（FRAME型）の nodeId で呼び出されるため、
+  root の子要素の parent.type は常に FRAME。Priority 3 は実質的に到達不可能。
+- **修正内容**: コードコメントで到達条件（PAGE/CANVAS レベルクエリ時のみ有効）を明記。
+  Priority 3.1 がアートボードレベルのヘッダー/フッター検出を担っていることを文書化。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`
+
+## Issue 40: Phase 1 スコアリングの detect_grouping_candidates 不一致を文書化 — FIXED
+
+- **Phase**: 1
+- **優先度**: 低
+- **概要**: Phase 1 の `analyze-structure.sh` 内の `detect_grouping_candidates()` は簡易版で、
+  Phase 2 の `detect-grouping-candidates.sh` と異なるアルゴリズム（Union-Find proximity なし、
+  structure hash ではなく type+children_count ベース）を使用。
+- **影響**: `ungrouped_candidates` メトリクスが Phase 2 の実際の検出結果と乖離する可能性があるが、
+  スコアリングでの重みが最小（cap=10, weight=1）のため実質的な影響は軽微。
+- **修正内容**: コードコメントで意図的な差異と、重みが低いため実害なしであることを文書化。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/analyze-structure.sh`
+
+## Issue 41: YAML出力の `'pattern'` キー誤り → `'structure_hash'` に修正 — FIXED
+
+- **Phase**: 2
+- **優先度**: 低
+- **概要**: `detect-grouping-candidates.sh` の YAML 出力セクションで、パターン検出されたグループの
+  構造ハッシュを出力する条件分岐が `if 'pattern' in c:` となっていたが、実際のキー名は
+  `'structure_hash'`。結果として YAML 出力にパターン情報が含まれないバグ。
+- **影響**: JSON 出力は全キーをダンプするため影響なし。YAML 出力のみ `structure_hash` が欠落。
+- **修正内容**: `'pattern'` → `'structure_hash'` にキー名を修正。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/detect-grouping-candidates.sh`
+- **テスト**: Issue 41 テストケース追加（YAML出力にstructure_hashキーが存在することを検証）
+
+## Issue 42: sectioning-prompt-template.md の Phase 番号誤り — FIXED
+
+- **Phase**: docs
+- **優先度**: 低
+- **概要**: `references/sectioning-prompt-template.md` の冒頭に "Phase 3 Stage B" と記載されていたが、
+  Issue 21 の Phase 番号入れ替え後は "Phase 2 Stage B" が正しい。
+- **修正内容**: "Phase 3 Stage B" → "Phase 2 Stage B"、"Step 3-2c" → "Step 2-2c" に修正。
+- **修正日**: 2026-03-04
+- **ファイル**: `references/sectioning-prompt-template.md`
+
+## Issue 43: phase-details.md 信頼度テーブルの陳腐化 — FIXED
+
+- **Phase**: docs
+- **優先度**: 低
+- **概要**: `references/phase-details.md` の Phase 4 信頼度テーブルに以下の問題:
+  1. Issue 18 で追加された `exact` 信頼度（enriched layoutMode 由来）が未記載
+  2. `low` 信頼度（Gap ばらつき大）が文書化されていたが、コードでは未実装
+- **修正内容**: テーブルを実装に合わせて更新。`exact` を追加、`low` を削除。enriched metadata からの
+  直接取得に関する説明を追記。
+- **修正日**: 2026-03-04
+- **ファイル**: `references/phase-details.md`
+
+## Issue 44: 未使用 import 削除 — FIXED
+
+- **Phase**: 2, 3
+- **優先度**: 低
+- **概要**: 以下のスクリプトに未使用の Python import が残存:
+  - `generate-rename-map.sh`: `unicodedata` — `to_kebab()` のリファクタ時に不要になった
+  - `detect-grouping-candidates.sh`: `re` — `UNNAMED_RE` を `figma_utils` から import に切り替え後に不要に
+- **修正内容**: 不要な import を削除。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `scripts/detect-grouping-candidates.sh`

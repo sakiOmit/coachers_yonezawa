@@ -101,7 +101,13 @@ def count_nodes(node, depth=0, section_depth=None):
     return stats
 
 def detect_grouping_candidates(node):
-    \"\"\"Detect sibling elements that could be grouped (proximity-based, simplified).\"\"\"
+    \"\"\"Detect sibling elements that could be grouped (simplified heuristic for scoring).
+
+    Note (Issue 40): This is an intentionally simplified version for Phase 1 scoring.
+    Phase 2 (detect-grouping-candidates.sh) uses full Union-Find proximity + pattern hash.
+    The simplification is acceptable because ungrouped_candidates has the lowest
+    weight in scoring (cap=10, weight=1).
+    \"\"\"
     candidates = 0
     children = node.get('children', [])
 

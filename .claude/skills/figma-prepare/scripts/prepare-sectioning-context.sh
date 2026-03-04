@@ -43,14 +43,15 @@ def has_text_children(node):
     return any(c.get('type') == 'TEXT' for c in children)
 
 def get_text_children_preview(node, max_items=5):
-    \"\"\"Get preview of text content from direct TEXT children.\"\"\"
+    \"\"\"Get preview of text content from direct TEXT children.
+    Prefer enriched characters over name (Issue 38).\"\"\"
     children = node.get('children', [])
     texts = []
     for c in children:
         if c.get('type') == 'TEXT':
-            name = c.get('name', '')
-            chars = c.get('characters', '')
-            texts.append(chars if chars else name)
+            content = c.get('characters', '') or c.get('name', '')
+            if content:
+                texts.append(content)
     return texts[:max_items]
 
 def detect_heuristic_hints(children, page_bbox):
@@ -82,14 +83,15 @@ def detect_heuristic_hints(children, page_bbox):
         node_type = child.get('type', '')
         node_id = child.get('id', '')
 
-        # Header: top area, wide frame
+        # Header: top area, wide container-like node
+        # Include INSTANCE/COMPONENT/SECTION as headers/footers may be component instances
         if bb['y'] < page_y + page_h * 0.05:
-            if node_type in ('FRAME', 'GROUP') and bb['w'] > page_w * 0.8:
+            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * 0.8:
                 header_candidates.append(node_id)
 
-        # Footer: bottom area, wide frame
+        # Footer: bottom area, wide container-like node
         if bb['y'] + bb['h'] > page_y + page_h * 0.9:
-            if node_type in ('FRAME', 'GROUP') and bb['w'] > page_w * 0.8:
+            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * 0.8:
                 footer_candidates.append(node_id)
 
         # Background candidates: RECTANGLE with significant height

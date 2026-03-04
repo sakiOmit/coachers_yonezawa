@@ -695,7 +695,7 @@ print(f'  PASS: resolve_absolute_coords — no negative padding values ({len(d.g
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Negative padding detected (coordinate resolution bug)"; ((FAIL++)) || true; }
     fi
 
-    # --- Phase 3 Stage B: prepare-sectioning-context ---
+    # --- Phase 2 Stage B: prepare-sectioning-context ---
     echo ""
     bold "  --- Phase 2 Stage B: prepare-sectioning-context.sh ---"
 
@@ -996,6 +996,181 @@ try:
 finally:
     os.unlink(tmp_path)
 " 2>/dev/null && { green "  PASS: Issue 32 — fills=[] edge case no crash"; ((PASS++)) || true; } || { red "  FAIL: Issue 32 — fills=[] caused crash"; ((FAIL++)) || true; }
+
+echo ""
+
+# ================================================================
+bold "=== Unit: INSTANCE header detection (Issue 37) ==="
+
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Minimal fixture: INSTANCE node at top (header) + INSTANCE at bottom (footer)
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 5000},
+    'children': [
+        {
+            'id': '1:1', 'name': 'Header Instance', 'type': 'INSTANCE',
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 80},
+            'children': []
+        },
+        {
+            'id': '1:2', 'name': 'Main Content', 'type': 'FRAME',
+            'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 1440, 'height': 4700},
+            'children': []
+        },
+        {
+            'id': '1:3', 'name': 'Footer Component', 'type': 'COMPONENT',
+            'absoluteBoundingBox': {'x': 0, 'y': 4850, 'width': 1440, 'height': 150},
+            'children': []
+        },
+    ]
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'prepare-sectioning-context.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    data = json.loads(result.stdout)
+    hints = data['heuristic_hints']
+
+    # INSTANCE header at top should be detected
+    assert '1:1' in hints['header_candidates'], f'INSTANCE header not detected: {hints[\"header_candidates\"]}'
+    # COMPONENT footer at bottom should be detected
+    assert '1:3' in hints['footer_candidates'], f'COMPONENT footer not detected: {hints[\"footer_candidates\"]}'
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: Issue 37 — INSTANCE header + COMPONENT footer detected"; ((PASS++)) || true; } || { red "  FAIL: Issue 37 — INSTANCE/COMPONENT type not detected"; ((FAIL++)) || true; }
+
+echo ""
+
+# ================================================================
+bold "=== Unit: characters field preference (Issue 38) ==="
+
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Fixture: TEXT node with characters field (enriched) differing from name
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 1000},
+    'children': [{
+        'id': '1:1', 'name': 'Text 1', 'type': 'TEXT',
+        'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 30},
+        'characters': 'お問い合わせ',
+        'children': []
+    }, {
+        'id': '1:2', 'name': 'Frame 1', 'type': 'FRAME',
+        'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 400, 'height': 200},
+        'children': [
+            {
+                'id': '1:3', 'name': 'Text 2', 'type': 'TEXT',
+                'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 30},
+                'characters': '募集要項',
+                'children': []
+            },
+            {
+                'id': '1:4', 'name': 'Text 3', 'type': 'TEXT',
+                'absoluteBoundingBox': {'x': 0, 'y': 40, 'width': 200, 'height': 30},
+                'characters': 'REASON',
+                'children': []
+            }
+        ]
+    }]
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'generate-rename-map.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    data = json.loads(result.stdout)
+    renames = data.get('renames', {})
+
+    # 1:1 is unnamed TEXT with characters='お問い合わせ' → should use characters, not name
+    r1 = renames.get('1:1', {})
+    assert 'contact' in r1.get('new_name', ''), f'1:1 should use characters field, got: {r1.get(\"new_name\", \"\")}'
+
+    # 1:2 is unnamed FRAME with enriched TEXT children
+    # get_text_children_content should prefer characters over name
+    r2 = renames.get('1:2', {})
+    new_name = r2.get('new_name', '')
+    assert 'requirements' in new_name or 'heading' in new_name, f'1:2 should use children characters, got: {new_name}'
+
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: Issue 38 — characters field preferred over name"; ((PASS++)) || true; } || { red "  FAIL: Issue 38 — characters field not used"; ((FAIL++)) || true; }
+
+echo ""
+
+# ================================================================
+bold "=== Unit: YAML output structure_hash key (Issue 41) ==="
+
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Fixture: 3+ children with same structure → pattern detection → YAML output should contain structure_hash
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 2000},
+    'children': [
+        {'id': '1:1', 'name': 'Frame 1', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 300, 'height': 200},
+         'children': [
+             {'id': '1:10', 'name': 'Text 1', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 30}, 'children': []}
+         ]},
+        {'id': '1:2', 'name': 'Frame 2', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 300, 'width': 300, 'height': 200},
+         'children': [
+             {'id': '1:20', 'name': 'Text 2', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 30}, 'children': []}
+         ]},
+        {'id': '1:3', 'name': 'Frame 3', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 600, 'width': 300, 'height': 200},
+         'children': [
+             {'id': '1:30', 'name': 'Text 3', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 30}, 'children': []}
+         ]},
+    ]
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+yaml_path = tmp_path + '.yaml'
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'detect-grouping-candidates.sh')
+    result = subprocess.run(['bash', script, tmp_path, '--output', yaml_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    with open(yaml_path, 'r') as yf:
+        yaml_content = yf.read()
+    # YAML output should contain 'structure_hash:' (not 'pattern:')
+    assert 'structure_hash:' in yaml_content, f'YAML should contain structure_hash key, got: {yaml_content[:200]}'
+    assert 'pattern:' not in yaml_content, f'YAML should NOT contain old pattern key'
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+    if os.path.exists(yaml_path):
+        os.unlink(yaml_path)
+" 2>/dev/null && { green "  PASS: Issue 41 — YAML output uses structure_hash key"; ((PASS++)) || true; } || { red "  FAIL: Issue 41 — YAML output key mismatch"; ((FAIL++)) || true; }
 
 echo ""
 
