@@ -18,33 +18,16 @@ if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
   OUTPUT_FILE="$3"
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 python3 -c "
 import json, sys, math, re
 from collections import defaultdict
+sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
-
-def resolve_absolute_coords(node, parent_x=0, parent_y=0):
-    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    abs_x = parent_x + bbox.get('x', 0)
-    abs_y = parent_y + bbox.get('y', 0)
-    bbox['x'] = abs_x
-    bbox['y'] = abs_y
-    node['absoluteBoundingBox'] = bbox
-    for child in node.get('children', []):
-        resolve_absolute_coords(child, abs_x, abs_y)
-
-def get_bbox(node):
-    \"\"\"Get bounding box from node.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    return {
-        'x': bbox.get('x', 0),
-        'y': bbox.get('y', 0),
-        'w': bbox.get('width', 0),
-        'h': bbox.get('height', 0),
-    }
 
 def distance_between(a, b):
     \"\"\"Calculate minimum distance between two bounding boxes.\"\"\"
@@ -281,11 +264,6 @@ def walk_and_detect(node, all_candidates=None):
 
     return all_candidates
 
-UNNAMED_RE = re.compile(
-    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
-    re.IGNORECASE
-)
-
 def deduplicate_candidates(candidates, root_id=''):
     \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
 
@@ -337,12 +315,7 @@ try:
     with open(sys.argv[1], 'r') as f:
         data = json.load(f)
 
-    root = data
-    if 'document' in data:
-        root = data['document']
-    elif 'node' in data:
-        root = data['node']
-
+    root = get_root_node(data)
     resolve_absolute_coords(root)
     candidates = walk_and_detect(root)
     candidates = deduplicate_candidates(candidates, root_id=root.get('id', ''))

@@ -18,13 +18,12 @@ if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
   OUTPUT_FILE="$3"
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 python3 -c "
 import json, re, sys, unicodedata
-
-UNNAMED_RE = re.compile(
-    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
-    re.IGNORECASE
-)
+sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
 
 # Prefix mapping by context
 SHAPE_PREFIXES = {
@@ -50,17 +49,6 @@ JP_KEYWORD_MAP = {
     'カテゴリー': 'category', 'イベント': 'event',
     '要項': 'requirements',
 }
-
-def resolve_absolute_coords(node, parent_x=0, parent_y=0):
-    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    abs_x = parent_x + bbox.get('x', 0)
-    abs_y = parent_y + bbox.get('y', 0)
-    bbox['x'] = abs_x
-    bbox['y'] = abs_y
-    node['absoluteBoundingBox'] = bbox
-    for child in node.get('children', []):
-        resolve_absolute_coords(child, abs_x, abs_y)
 
 def to_kebab(text):
     \"\"\"Convert text to kebab-case safe name. Supports Japanese via keyword map.\"\"\"
@@ -286,12 +274,7 @@ try:
     with open(sys.argv[1], 'r') as f:
         data = json.load(f)
 
-    root = data
-    if 'document' in data:
-        root = data['document']
-    elif 'node' in data:
-        root = data['node']
-
+    root = get_root_node(data)
     resolve_absolute_coords(root)
     renames = collect_renames(root)
 

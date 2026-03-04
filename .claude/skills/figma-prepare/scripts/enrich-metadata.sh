@@ -34,8 +34,12 @@ if [[ "${3:-}" == "--output" ]] && [[ -n "${4:-}" ]]; then
   OUTPUT_FILE="$4"
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 python3 -c "
 import json, sys
+sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+from figma_utils import get_root_node
 
 # Properties to merge from enrichment into metadata nodes
 ENRICHMENT_KEYS = [
@@ -71,12 +75,7 @@ try:
     with open(sys.argv[2], 'r') as f:
         enrichment = json.load(f)
 
-    # Handle wrapped metadata formats
-    root = metadata
-    if 'document' in metadata:
-        root = metadata['document']
-    elif 'node' in metadata:
-        root = metadata['node']
+    root = get_root_node(metadata)
 
     stats = {'enriched_nodes': 0, 'merged_keys': 0}
     enrich_node(root, enrichment, stats)

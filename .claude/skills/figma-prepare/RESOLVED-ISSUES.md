@@ -224,3 +224,40 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
   - `references/figma-plugin-api.md` に構造検証パターンを追加
 - **修正日**: 2026-03-04
 - **ファイル**: `scripts/verify-structure.js` (新規), `SKILL.md`, `references/figma-plugin-api.md`, `KNOWN-ISSUES.md`
+
+## Issue 21: Phase 2（リネーム）と Phase 3（グルーピング）の実行順序を入れ替える — FIXED
+
+- **Phase**: 2, 3
+- **優先度**: 高
+- **概要**: グルーピングを先に行い、確定した構造に対してリネームする順序に変更
+- **修正内容**:
+  - Phase 番号を振り直し: Phase 2 = グルーピング + セクショニング、Phase 3 = セマンティックリネーム
+  - SKILL.md: フロー図、Phase 2/3 セクション全体を入れ替え、ステップ番号を更新
+  - references/phase-details.md: Phase 2/3 セクション入れ替え、依存関係セクション更新
+  - references/figma-plugin-api.md: Phase 番号参照を更新
+  - scripts/: 4スクリプトのコメントヘッダーとYAML出力のPhase番号を更新
+  - tests/run-tests.sh: Phase ラベル更新（Phase 3 = rename, Phase 2 = grouping）
+  - analyze-structure.sh: recommendation メッセージを更新
+- **修正日**: 2026-03-04
+- **テスト**: 全57件パス（回帰なし）
+
+## Issue 24: 共通関数の Python ライブラリ化 — FIXED
+
+- **Phase**: 全体
+- **優先度**: 低
+- **概要**: `resolve_absolute_coords`, `get_bbox`, `UNNAMED_RE`, `get_root_node` が
+  最大6スクリプトに重複定義されていた。共通 Python ライブラリに切り出し。
+- **修正内容**:
+  - `lib/figma_utils.py` を新設。以下の共通関数を定義:
+    - `resolve_absolute_coords(node, parent_x, parent_y)` — 5スクリプトから統合
+    - `get_bbox(node)` → `{x, y, w, h}` — 2スクリプトから統合
+    - `get_root_node(data)` — 6スクリプトから統合
+    - `UNNAMED_RE` — 4スクリプトから統合
+    - `is_unnamed(name)` — 便利ラッパー
+  - 6スクリプトを更新: `SCRIPT_DIR` + `sys.path.insert` でインポート
+  - `prepare-sectioning-context.sh` のみローカル `get_bbox` を残す
+    （出力フォーマットが `width`/`height` キーを使用するため — Issue 25 として起票）
+- **修正日**: 2026-03-04
+- **ファイル**: `lib/figma_utils.py` (新規), 全6スクリプト更新
+- **テスト**: 全60件パス（回帰なし）
+- **削減効果**: 約85行の重複コードを解消

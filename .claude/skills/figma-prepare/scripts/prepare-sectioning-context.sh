@@ -19,26 +19,15 @@ if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
   OUTPUT_FILE="$3"
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 python3 -c "
 import json, sys, re
-
-UNNAMED_RE = re.compile(
-    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
-    re.IGNORECASE
-)
-
-def resolve_absolute_coords(node, parent_x=0, parent_y=0):
-    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    abs_x = parent_x + bbox.get('x', 0)
-    abs_y = parent_y + bbox.get('y', 0)
-    bbox['x'] = abs_x
-    bbox['y'] = abs_y
-    node['absoluteBoundingBox'] = bbox
-    for child in node.get('children', []):
-        resolve_absolute_coords(child, abs_x, abs_y)
+sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
 
 def get_bbox(node):
+    \"\"\"Get bounding box with full key names (width/height) for output compatibility.\"\"\"
     bbox = node.get('absoluteBoundingBox', {})
     return {
         'x': bbox.get('x', 0),
@@ -148,12 +137,7 @@ try:
     with open(sys.argv[1], 'r') as f:
         data = json.load(f)
 
-    root = data
-    if 'document' in data:
-        root = data['document']
-    elif 'node' in data:
-        root = data['node']
-
+    root = get_root_node(data)
     resolve_absolute_coords(root)
 
     page_bbox = get_bbox(root)

@@ -18,35 +18,19 @@ if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
   OUTPUT_FILE="$3"
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 python3 -c "
 import json, sys, statistics
+sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node
 
 GRID_SNAP = 4  # px
 VARIANCE_RATIO = 1.5
 
-def resolve_absolute_coords(node, parent_x=0, parent_y=0):
-    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    abs_x = parent_x + bbox.get('x', 0)
-    abs_y = parent_y + bbox.get('y', 0)
-    bbox['x'] = abs_x
-    bbox['y'] = abs_y
-    node['absoluteBoundingBox'] = bbox
-    for child in node.get('children', []):
-        resolve_absolute_coords(child, abs_x, abs_y)
-
 def snap(value):
     \"\"\"Snap value to grid.\"\"\"
     return round(value / GRID_SNAP) * GRID_SNAP
-
-def get_bbox(node):
-    bbox = node.get('absoluteBoundingBox', {})
-    return {
-        'x': bbox.get('x', 0),
-        'y': bbox.get('y', 0),
-        'w': bbox.get('width', 0),
-        'h': bbox.get('height', 0),
-    }
 
 def infer_layout(frame):
     \"\"\"Infer Auto Layout settings for a frame.\"\"\"
@@ -199,12 +183,7 @@ try:
     with open(sys.argv[1], 'r') as f:
         data = json.load(f)
 
-    root = data
-    if 'document' in data:
-        root = data['document']
-    elif 'node' in data:
-        root = data['node']
-
+    root = get_root_node(data)
     resolve_absolute_coords(root)
     results = walk_and_infer(root)
 
