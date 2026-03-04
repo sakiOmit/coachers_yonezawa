@@ -24,7 +24,8 @@ python3 -c "
 import json, sys, statistics, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP,
+    infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency)
 
 VARIANCE_RATIO = 1.5
 
@@ -48,30 +49,58 @@ def infer_layout(frame):
     if len(set(xs)) <= 1 and len(set(ys)) <= 1:
         return None  # All at same position, can't infer
 
-    x_var = statistics.variance(xs) if len(xs) > 1 else 0
-    y_var = statistics.variance(ys) if len(ys) > 1 else 0
+    # Use specialized 2-element direction inference
+    if len(children) == 2:
+        direction = infer_direction_two_elements(child_bboxes[0], child_bboxes[1])
+    else:
+        x_var = statistics.variance(xs) if len(xs) > 1 else 0
+        y_var = statistics.variance(ys) if len(ys) > 1 else 0
 
-    if x_var > y_var * VARIANCE_RATIO:
-        direction = 'HORIZONTAL'
-        # Sort by X position
+        if x_var > y_var * VARIANCE_RATIO:
+            direction = 'HORIZONTAL'
+        else:
+            direction = 'VERTICAL'
+
+    # Sort by primary axis
+    if direction == 'HORIZONTAL':
         sorted_bboxes = sorted(child_bboxes, key=lambda b: b['x'])
     else:
-        direction = 'VERTICAL'
-        # Sort by Y position
         sorted_bboxes = sorted(child_bboxes, key=lambda b: b['y'])
 
+    # Check for WRAP (before gap calculation)
+    is_wrap = detect_wrap(child_bboxes, direction)
+    if is_wrap:
+        direction = 'WRAP'
+
     # Gap inference
-    gaps = []
-    for i in range(len(sorted_bboxes) - 1):
-        curr = sorted_bboxes[i]
-        nxt = sorted_bboxes[i + 1]
-        if direction == 'HORIZONTAL':
-            gap = nxt['x'] - (curr['x'] + curr['w'])
-        else:
-            gap = nxt['y'] - (curr['y'] + curr['h'])
-        gaps.append(max(0, gap))
+    if is_wrap:
+        # For WRAP, calculate gap within rows only
+        row_tolerance = 20
+        rows = {}
+        for bb in child_bboxes:
+            row_key = round(bb['y'] / row_tolerance)
+            rows.setdefault(row_key, []).append(bb)
+        gaps = []
+        for row_bbs in rows.values():
+            row_sorted = sorted(row_bbs, key=lambda b: b['x'])
+            for i in range(len(row_sorted) - 1):
+                g = row_sorted[i+1]['x'] - (row_sorted[i]['x'] + row_sorted[i]['w'])
+                gaps.append(max(0, g))
+    else:
+        gaps = []
+        for i in range(len(sorted_bboxes) - 1):
+            curr = sorted_bboxes[i]
+            nxt = sorted_bboxes[i + 1]
+            if direction == 'HORIZONTAL':
+                gap = nxt['x'] - (curr['x'] + curr['w'])
+            else:
+                gap = nxt['y'] - (curr['y'] + curr['h'])
+            gaps.append(max(0, gap))
 
     item_gap = snap(statistics.median(gaps)) if gaps else 0
+
+    # Gap consistency for confidence
+    gap_cov = compute_gap_consistency(gaps)
 
     # Padding inference
     min_child_x = min(bb['x'] for bb in child_bboxes)
@@ -85,23 +114,43 @@ def infer_layout(frame):
     padding_right = snap(max(0, (frame_bb['x'] + frame_bb['w']) - max_child_x))
 
     # Primary axis alignment
-    if direction == 'HORIZONTAL':
-        # Check if children are vertically centered
+    primary_align = 'MIN'  # default
+    if detect_space_between(child_bboxes, direction, frame_bb):
+        primary_align = 'SPACE_BETWEEN'
+
+    # Counter axis alignment
+    if direction in ('HORIZONTAL', 'WRAP'):
         centers = [bb['y'] + bb['h'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
-        primary_align = 'MIN'  # default
-        counter_align = 'CENTER' if center_var < 4 else 'MIN'
+        if center_var < 4:
+            counter_align = 'CENTER'
+        elif all(abs((bb['y'] + bb['h']) - (child_bboxes[0]['y'] + child_bboxes[0]['h'])) < 2 for bb in child_bboxes):
+            counter_align = 'END'
+        elif all(abs(bb['y'] - child_bboxes[0]['y']) < 2 for bb in child_bboxes):
+            counter_align = 'MIN'
+        else:
+            counter_align = 'MIN'
     else:
         centers = [bb['x'] + bb['w'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
-        primary_align = 'MIN'
-        # Check horizontal alignment
         if center_var < 4:
             counter_align = 'CENTER'
+        elif all(abs((bb['x'] + bb['w']) - (child_bboxes[0]['x'] + child_bboxes[0]['w'])) < 2 for bb in child_bboxes):
+            counter_align = 'END'
         elif all(abs(bb['x'] - child_bboxes[0]['x']) < 2 for bb in child_bboxes):
             counter_align = 'MIN'
         else:
             counter_align = 'MIN'
+
+    # Confidence based on gap consistency
+    if len(children) == 2:
+        confidence = 'medium'
+    elif gap_cov < 0.15:
+        confidence = 'high'
+    elif gap_cov < 0.35:
+        confidence = 'medium'
+    else:
+        confidence = 'low'
 
     return {
         'direction': direction,
@@ -114,7 +163,7 @@ def infer_layout(frame):
         },
         'primary_axis_align': primary_align,
         'counter_axis_align': counter_align,
-        'confidence': 'high' if len(children) >= 3 else 'medium',
+        'confidence': confidence,
     }
 
 def layout_from_enrichment(frame):

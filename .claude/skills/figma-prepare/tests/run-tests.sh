@@ -269,7 +269,7 @@ frames = d.get('frames',[])
 valid = 0
 for f in frames:
     layout = f.get('layout',{})
-    assert layout['direction'] in ('HORIZONTAL','VERTICAL'), f'Bad direction'
+    assert layout['direction'] in ('HORIZONTAL','VERTICAL','WRAP'), f'Bad direction'
     assert isinstance(layout['gap'], (int, float)), 'Gap not numeric'
     assert all(k in layout['padding'] for k in ('top','right','bottom','left')), 'Missing padding'
     valid += 1
@@ -639,14 +639,17 @@ for c in d.get('candidates', []):
 print('  PASS: Stage A — 1:5 grouping is proximity only (semantic deferred to Stage B)')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage A — 1:5 in unexpected group type"; ((FAIL++)) || true; }
 
-      # Stage A methods: only proximity and pattern (no page-kv or semantic)
+      # Stage A methods: proximity, pattern, spacing, semantic (no page-kv)
       echo "$REAL_P3" | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
 methods = set(c.get('method', '') for c in d.get('candidates', []))
-forbidden = methods & {'page-kv', 'semantic'}
+forbidden = methods & {'page-kv'}
 assert not forbidden, f'Unexpected methods in Stage A: {forbidden}'
-print(f'  PASS: Stage A — methods = {methods} (proximity/pattern only)')
+allowed = {'proximity', 'pattern', 'spacing', 'semantic'}
+unknown = methods - allowed
+assert not unknown, f'Unknown methods in Stage A: {unknown}'
+print(f'  PASS: Stage A — methods = {methods}')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage A — unexpected methods found"; ((FAIL++)) || true; }
     fi
 
@@ -1583,6 +1586,283 @@ try:
 finally:
     os.unlink(tmp_path)
 " 2>/dev/null && { green "  PASS: Issue 59 — childless root handled gracefully"; ((PASS++)) || true; } || { red "  FAIL: Issue 59 — childless root crash"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: compute_grouping_score (Area 1) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import alignment_bonus, size_similarity_bonus, compute_grouping_score, _raw_distance
+
+# 1. Identical boxes → score = 1.0
+a = {'x': 0, 'y': 0, 'w': 100, 'h': 50}
+assert compute_grouping_score(a, a) == 1.0, 'identical should be 1.0'
+
+# 2. Boxes within 24px → score >= 0.5 (backward compatible)
+b = {'x': 110, 'y': 0, 'w': 100, 'h': 50}
+score = compute_grouping_score(a, b, gap=24)
+assert score >= 0.5, f'10px apart should score >= 0.5, got {score}'
+
+# 3. Boxes far apart → score close to 0
+far = {'x': 500, 'y': 0, 'w': 100, 'h': 50}
+assert compute_grouping_score(a, far) < 0.1, 'far apart should be near 0'
+
+# 4. Aligned boxes get bonus (score higher than unaligned at same distance)
+aligned = {'x': 0, 'y': 70, 'w': 100, 'h': 50}  # left-aligned, 20px gap
+unaligned = {'x': 30, 'y': 70, 'w': 60, 'h': 50}  # not aligned, similar gap
+s_aligned = compute_grouping_score(a, aligned)
+s_unaligned = compute_grouping_score(a, unaligned)
+assert s_aligned >= s_unaligned, f'aligned {s_aligned} should >= unaligned {s_unaligned}'
+
+# 5. Similar-sized boxes get bonus
+same_size = {'x': 130, 'y': 0, 'w': 100, 'h': 50}
+diff_size = {'x': 130, 'y': 0, 'w': 200, 'h': 100}
+s_same = compute_grouping_score(a, same_size)
+s_diff = compute_grouping_score(a, diff_size)
+assert s_same >= s_diff, f'same-size {s_same} should >= diff-size {s_diff}'
+
+# 6. alignment_bonus returns 0.5 for aligned edges
+assert alignment_bonus(a, aligned) == 0.5, 'left-aligned should be 0.5'
+assert alignment_bonus(a, {'x': 50, 'y': 200, 'w': 30, 'h': 20}) == 1.0, 'no alignment should be 1.0'
+
+# 7. size_similarity_bonus returns 0.7 for similar sizes
+assert size_similarity_bonus(a, same_size) == 0.7, 'same size should be 0.7'
+assert size_similarity_bonus(a, diff_size) == 1.0, 'different size should be 1.0'
+
+# 8. Zero-size box handling
+zero = {'x': 0, 'y': 0, 'w': 0, 'h': 0}
+assert size_similarity_bonus(a, zero) == 1.0, 'zero-size should return 1.0'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: compute_grouping_score — identity, proximity, far, aligned, sized, bonus, zero"; ((PASS++)) || true; } || { red "  FAIL: compute_grouping_score unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: structure_similarity / detect_regular_spacing (Area 2) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import structure_similarity, detect_regular_spacing
+
+# 1. Identical hashes → 1.0
+assert structure_similarity('FRAME:[TEXT,TEXT]', 'FRAME:[TEXT,TEXT]') == 1.0
+
+# 2. Completely different → 0.0
+assert structure_similarity('FRAME:[TEXT]', 'FRAME:[IMAGE]') == 0.0
+
+# 3. Partial overlap → between 0 and 1
+s = structure_similarity('FRAME:[IMAGE,TEXT,TEXT]', 'FRAME:[IMAGE,TEXT,RECTANGLE]')
+assert 0.3 < s < 0.9, f'partial overlap should be mid-range, got {s}'
+
+# 4. Leaf nodes (no brackets) — same
+assert structure_similarity('TEXT', 'TEXT') == 1.0
+
+# 5. Leaf nodes — different
+assert structure_similarity('TEXT', 'IMAGE') == 0.0
+
+# 6. Card-like vs slightly different card
+card1 = 'FRAME:[IMAGE,TEXT,TEXT,FRAME]'
+card2 = 'FRAME:[RECTANGLE,TEXT,TEXT,FRAME]'  # IMAGE → RECTANGLE
+s2 = structure_similarity(card1, card2)
+assert s2 >= 0.5, f'card variants should be >= 0.5, got {s2}'
+
+# 7. Empty children
+assert structure_similarity('FRAME:[]', 'FRAME:[]') == 1.0
+
+# 8. Regular spacing — evenly spaced
+boxes = [{'x': i*120, 'y': 0, 'w': 100, 'h': 50} for i in range(5)]
+assert detect_regular_spacing(boxes) == True, 'even spacing should be True'
+
+# 9. Regular spacing — too few elements
+assert detect_regular_spacing(boxes[:2]) == False, '2 elements should be False'
+
+# 10. Irregular spacing
+irregular = [
+    {'x': 0, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 110, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 500, 'y': 0, 'w': 100, 'h': 50},
+]
+assert detect_regular_spacing(irregular) == False, 'irregular should be False'
+
+# 11. Vertical regular spacing
+vboxes = [{'x': 0, 'y': i*80, 'w': 100, 'h': 60} for i in range(4)]
+assert detect_regular_spacing(vboxes) == True, 'vertical even spacing should be True'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: structure_similarity / detect_regular_spacing — identical, diff, partial, leaf, card, empty, regular, irregular"; ((PASS++)) || true; } || { red "  FAIL: structure_similarity / detect_regular_spacing unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: semantic_detection (Area 3) ==="
+python3 -c "
+import json, sys, os, tempfile, subprocess
+
+# Build a fixture with card-like, nav-like, and grid-like structures
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 2000},
+    'children': [
+        # Section with 3 cards
+        {
+            'id': '1:1', 'name': 'Cards Section', 'type': 'FRAME',
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 600},
+            'children': [
+                {
+                    'id': f'1:{10+i}', 'name': f'Card {i}', 'type': 'FRAME',
+                    'absoluteBoundingBox': {'x': i*400, 'y': 0, 'width': 350, 'height': 400},
+                    'children': [
+                        {'id': f'1:{20+i}', 'name': f'img {i}', 'type': 'RECTANGLE',
+                         'absoluteBoundingBox': {'x': i*400, 'y': 0, 'width': 350, 'height': 200}},
+                        {'id': f'1:{30+i}', 'name': f'text {i}', 'type': 'TEXT',
+                         'absoluteBoundingBox': {'x': i*400, 'y': 210, 'width': 350, 'height': 40},
+                         'characters': f'Card Title {i}'},
+                    ]
+                }
+                for i in range(3)
+            ]
+        },
+        # Navigation-like section
+        {
+            'id': '2:1', 'name': 'Nav Section', 'type': 'FRAME',
+            'absoluteBoundingBox': {'x': 0, 'y': 700, 'width': 1440, 'height': 60},
+            'children': [
+                {'id': f'2:{10+i}', 'name': f'Link {i}', 'type': 'TEXT',
+                 'absoluteBoundingBox': {'x': i*150, 'y': 700, 'width': 120, 'height': 40},
+                 'characters': f'Menu {i}'}
+                for i in range(5)
+            ]
+        },
+    ]
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SKILLS_DIR}', 'scripts', 'detect-grouping-candidates.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    assert result.returncode == 0, f'Script failed: {result.stderr}'
+    data = json.loads(result.stdout)
+
+    methods = set(c.get('method', '') for c in data.get('candidates', []))
+
+    # 1. Card detection should find semantic candidates
+    card_candidates = [c for c in data['candidates'] if c.get('method') == 'semantic' and c.get('semantic_type') == 'card-list']
+    assert len(card_candidates) >= 1, f'Expected card-list detection, found {len(card_candidates)}'
+
+    # 2. Navigation detection
+    nav_candidates = [c for c in data['candidates'] if c.get('method') == 'semantic' and c.get('semantic_type') == 'navigation']
+    assert len(nav_candidates) >= 1, f'Expected navigation detection, found {len(nav_candidates)}'
+
+    # 3. semantic method is present
+    assert 'semantic' in methods, f'Expected semantic in methods: {methods}'
+
+    # 4. No page-kv method
+    assert 'page-kv' not in methods, f'page-kv should not be in methods: {methods}'
+
+    # 5. Dedup: semantic should suppress proximity for same nodes
+    card_node_ids = set()
+    for c in card_candidates:
+        card_node_ids.update(c.get('node_ids', []))
+    prox_with_card_ids = [c for c in data['candidates']
+        if c.get('method') == 'proximity' and set(c.get('node_ids', [])) & card_node_ids]
+    assert len(prox_with_card_ids) == 0, 'proximity should be deduplicated when semantic exists'
+
+    # 6. Total candidates >= 2
+    assert data['total'] >= 2, f'Expected >= 2 candidates, got {data[\"total\"]}'
+
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: semantic_detection — card, nav, method, no-page-kv, dedup, total"; ((PASS++)) || true; } || { red "  FAIL: semantic_detection unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: infer_direction_two / wrap / space_between (Area 4) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import (infer_direction_two_elements, detect_wrap, detect_space_between,
+    compute_gap_consistency)
+
+# 1. Two elements side by side → HORIZONTAL
+a = {'x': 0, 'y': 0, 'w': 100, 'h': 50}
+b = {'x': 120, 'y': 0, 'w': 100, 'h': 50}
+assert infer_direction_two_elements(a, b) == 'HORIZONTAL'
+
+# 2. Two elements stacked → VERTICAL
+c = {'x': 0, 'y': 0, 'w': 100, 'h': 50}
+d = {'x': 0, 'y': 70, 'w': 100, 'h': 50}
+assert infer_direction_two_elements(c, d) == 'VERTICAL'
+
+# 3. Diagonal more horizontal → HORIZONTAL
+e = {'x': 0, 'y': 0, 'w': 50, 'h': 50}
+f = {'x': 200, 'y': 30, 'w': 50, 'h': 50}
+assert infer_direction_two_elements(e, f) == 'HORIZONTAL'
+
+# 4. Diagonal more vertical → VERTICAL
+g = {'x': 0, 'y': 0, 'w': 50, 'h': 50}
+h = {'x': 30, 'y': 200, 'w': 50, 'h': 50}
+assert infer_direction_two_elements(g, h) == 'VERTICAL'
+
+# 5. Same position → VERTICAL (dx == dy == 0, dy not > dx)
+same = {'x': 0, 'y': 0, 'w': 50, 'h': 50}
+assert infer_direction_two_elements(same, same) == 'VERTICAL'
+
+# 6. WRAP detection: 4+ horizontal elements in 2+ rows
+wrap_boxes = [
+    {'x': 0, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 120, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 0, 'y': 70, 'w': 100, 'h': 50},
+    {'x': 120, 'y': 70, 'w': 100, 'h': 50},
+]
+assert detect_wrap(wrap_boxes, 'HORIZONTAL') == True
+
+# 7. WRAP: not enough elements
+assert detect_wrap(wrap_boxes[:3], 'HORIZONTAL') == False  # only 3
+
+# 8. WRAP: single row → False
+single_row = [{'x': i*120, 'y': 0, 'w': 100, 'h': 50} for i in range(5)]
+assert detect_wrap(single_row, 'HORIZONTAL') == False
+
+# 9. WRAP: VERTICAL direction → always False
+assert detect_wrap(wrap_boxes, 'VERTICAL') == False
+
+# 10. SPACE_BETWEEN: elements touching both edges
+frame = {'x': 0, 'y': 0, 'w': 400, 'h': 50}
+sb_boxes = [
+    {'x': 0, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 150, 'y': 0, 'w': 100, 'h': 50},
+    {'x': 300, 'y': 0, 'w': 100, 'h': 50},
+]
+assert detect_space_between(sb_boxes, 'HORIZONTAL', frame) == True
+
+# 11. SPACE_BETWEEN: not touching end → False
+frame2 = {'x': 0, 'y': 0, 'w': 500, 'h': 50}
+assert detect_space_between(sb_boxes, 'HORIZONTAL', frame2) == False
+
+# 12. SPACE_BETWEEN: vertical
+v_frame = {'x': 0, 'y': 0, 'w': 100, 'h': 300}
+v_boxes = [
+    {'x': 0, 'y': 0, 'w': 100, 'h': 80},
+    {'x': 0, 'y': 110, 'w': 100, 'h': 80},
+    {'x': 0, 'y': 220, 'w': 100, 'h': 80},
+]
+assert detect_space_between(v_boxes, 'VERTICAL', v_frame) == True
+
+# 13. gap_consistency: uniform gaps → low CoV
+assert compute_gap_consistency([20, 20, 20]) < 0.01
+
+# 14. gap_consistency: varied gaps → high CoV
+cov = compute_gap_consistency([10, 50, 20])
+assert cov > 0.3, f'varied gaps should have high CoV, got {cov}'
+
+# 15. gap_consistency: single gap → 0.0
+assert compute_gap_consistency([20]) == 0.0
+
+# 16. gap_consistency: empty → 1.0
+assert compute_gap_consistency([]) == 1.0
+
+print('OK')
+" 2>/dev/null && { green "  PASS: direction_two, wrap, space_between, gap_consistency — 16 cases"; ((PASS++)) || true; } || { red "  FAIL: infer_direction_two / wrap / space_between unit tests"; ((FAIL++)) || true; }
 
 echo ""
 

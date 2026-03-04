@@ -21,37 +21,16 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, sys, math, os
+import json, sys, os
 from collections import defaultdict
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
+    compute_grouping_score, structure_similarity, detect_regular_spacing)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
-
-def distance_between(a, b):
-    \"\"\"Calculate minimum distance between two bounding boxes.\"\"\"
-    a_bb = get_bbox(a)
-    b_bb = get_bbox(b)
-
-    # Horizontal distance
-    if a_bb['x'] + a_bb['w'] < b_bb['x']:
-        dx = b_bb['x'] - (a_bb['x'] + a_bb['w'])
-    elif b_bb['x'] + b_bb['w'] < a_bb['x']:
-        dx = a_bb['x'] - (b_bb['x'] + b_bb['w'])
-    else:
-        dx = 0
-
-    # Vertical distance
-    if a_bb['y'] + a_bb['h'] < b_bb['y']:
-        dy = b_bb['y'] - (a_bb['y'] + a_bb['h'])
-    elif b_bb['y'] + b_bb['h'] < a_bb['y']:
-        dy = a_bb['y'] - (b_bb['y'] + b_bb['h'])
-    else:
-        dy = 0
-
-    return math.sqrt(dx * dx + dy * dy)
+JACCARD_THRESHOLD = 0.7
 
 def structure_hash(node):
     \"\"\"Calculate structure hash from child types and count.\"\"\"
@@ -88,16 +67,17 @@ class UnionFind:
         return {k: v for k, v in groups.items() if len(v) >= 2}
 
 def detect_proximity_groups(children):
-    \"\"\"Detect groups of nearby elements using Union-Find.\"\"\"
+    \"\"\"Detect groups of nearby elements using Union-Find with scoring.\"\"\"
     n = len(children)
     if n < 2:
         return []
 
+    bboxes = [get_bbox(c) for c in children]
     uf = UnionFind(n)
     for i in range(n):
         for j in range(i + 1, n):
-            dist = distance_between(children[i], children[j])
-            if dist <= PROXIMITY_GAP:
+            score = compute_grouping_score(bboxes[i], bboxes[j], PROXIMITY_GAP)
+            if score > 0.5:
                 uf.union(i, j)
 
     result = []
@@ -114,24 +94,161 @@ def detect_proximity_groups(children):
     return result
 
 def detect_pattern_groups(children):
-    \"\"\"Detect repeated patterns (same structure hash).\"\"\"
-    hash_map = defaultdict(list)
-    for child in children:
-        h = structure_hash(child)
-        hash_map[h].append(child)
+    \"\"\"Detect repeated patterns using fuzzy structure hash matching.\"\"\"
+    hashes = [(structure_hash(c), c) for c in children]
+
+    # Greedy clustering by Jaccard similarity
+    clusters = []  # list of (representative_hash, [nodes])
+    for h, child in hashes:
+        matched = False
+        for cluster in clusters:
+            if structure_similarity(cluster[0], h) >= JACCARD_THRESHOLD:
+                cluster[1].append(child)
+                matched = True
+                break
+        if not matched:
+            clusters.append((h, [child]))
 
     result = []
-    for h, nodes in hash_map.items():
+    for rep_hash, nodes in clusters:
         if len(nodes) >= REPEATED_PATTERN_MIN:
+            # Check if all hashes are identical (exact match) or fuzzy
+            node_hashes = set(structure_hash(n) for n in nodes)
+            is_fuzzy = len(node_hashes) > 1
             result.append({
                 'method': 'pattern',
-                'structure_hash': h,
+                'structure_hash': rep_hash,
                 'node_ids': [n.get('id', '') for n in nodes],
                 'node_names': [n.get('name', '') for n in nodes],
                 'count': len(nodes),
                 'suggested_name': 'list-items',
                 'suggested_wrapper': 'list-container',
+                'fuzzy_match': is_fuzzy,
             })
+    return result
+
+def detect_spacing_groups(children):
+    \"\"\"Detect groups of regularly-spaced elements.\"\"\"
+    if len(children) < 3:
+        return []
+
+    bboxes = [get_bbox(c) for c in children]
+    if not detect_regular_spacing(bboxes):
+        return []
+
+    return [{
+        'method': 'spacing',
+        'node_ids': [c.get('id', '') for c in children],
+        'node_names': [c.get('name', '') for c in children],
+        'count': len(children),
+        'suggested_name': 'list-regular',
+        'suggested_wrapper': 'list-container',
+    }]
+
+def is_card_like(node):
+    \"\"\"Detect card-like structure: FRAME/COMPONENT/INSTANCE with 2-6 children including IMAGE+TEXT.\"\"\"
+    if node.get('type') not in ('FRAME', 'COMPONENT', 'INSTANCE'):
+        return False
+    children = node.get('children', [])
+    if not (2 <= len(children) <= 6):
+        return False
+    types = [c.get('type', '') for c in children]
+    has_image = 'RECTANGLE' in types or 'IMAGE' in types
+    has_text = 'TEXT' in types
+    # Also check one level down for text
+    if not has_text:
+        for c in children:
+            if c.get('type') in ('FRAME', 'GROUP'):
+                sub_types = [sc.get('type', '') for sc in c.get('children', [])]
+                if 'TEXT' in sub_types:
+                    has_text = True
+                    break
+    return has_image and has_text
+
+def is_navigation_like(children):
+    \"\"\"Detect navigation-like pattern: 4+ horizontal text-sized elements.\"\"\"
+    if len(children) < 4:
+        return False
+    bboxes = [get_bbox(c) for c in children]
+    xs = [b['x'] for b in bboxes]
+    ys = [b['y'] for b in bboxes]
+    x_range = max(xs) - min(xs) if xs else 0
+    y_range = max(ys) - min(ys) if ys else 0
+    if x_range <= y_range:
+        return False  # not horizontal
+    # Check all elements are narrow (text-like)
+    return all(b['w'] < 200 for b in bboxes)
+
+def is_grid_like(children):
+    \"\"\"Detect grid-like pattern: 2+ rows x 2+ columns of similar-sized elements.\"\"\"
+    if len(children) < 4:
+        return False
+    bboxes = [get_bbox(c) for c in children]
+
+    # Group by Y position (row detection)
+    row_tolerance = 20
+    rows = defaultdict(list)
+    for b in bboxes:
+        row_key = round(b['y'] / row_tolerance)
+        rows[row_key].append(b)
+
+    if len(rows) < 2:
+        return False
+
+    # Check each row has 2+ elements
+    if not all(len(r) >= 2 for r in rows.values()):
+        return False
+
+    # Check size similarity (20% threshold)
+    widths = [b['w'] for b in bboxes]
+    heights = [b['h'] for b in bboxes]
+    if max(widths) <= 0 or max(heights) <= 0:
+        return False
+    w_ratio = (max(widths) - min(widths)) / max(widths)
+    h_ratio = (max(heights) - min(heights)) / max(heights)
+    return w_ratio <= 0.20 and h_ratio <= 0.20
+
+def detect_semantic_groups(children):
+    \"\"\"Structural semantic detection (fills-independent, Issue 29/30 safe).\"\"\"
+    result = []
+
+    # Card detection: find 3+ card-like siblings
+    cards = [c for c in children if is_card_like(c)]
+    if len(cards) >= 3:
+        result.append({
+            'method': 'semantic',
+            'semantic_type': 'card-list',
+            'node_ids': [c.get('id', '') for c in cards],
+            'node_names': [c.get('name', '') for c in cards],
+            'count': len(cards),
+            'suggested_name': 'card-list',
+            'suggested_wrapper': 'card-container',
+        })
+
+    # Navigation detection
+    if is_navigation_like(children):
+        result.append({
+            'method': 'semantic',
+            'semantic_type': 'navigation',
+            'node_ids': [c.get('id', '') for c in children],
+            'node_names': [c.get('name', '') for c in children],
+            'count': len(children),
+            'suggested_name': 'nav-items',
+            'suggested_wrapper': 'nav-container',
+        })
+
+    # Grid detection
+    if is_grid_like(children):
+        result.append({
+            'method': 'semantic',
+            'semantic_type': 'grid',
+            'node_ids': [c.get('id', '') for c in children],
+            'node_names': [c.get('name', '') for c in children],
+            'count': len(children),
+            'suggested_name': 'grid-items',
+            'suggested_wrapper': 'grid-container',
+        })
+
     return result
 
 def walk_and_detect(node, all_candidates=None):
@@ -146,11 +263,13 @@ def walk_and_detect(node, all_candidates=None):
     parent_id = node.get('id', '')
     parent_name = node.get('name', '')
 
-    # Detect at this level (proximity + pattern only; semantic understanding delegated to Stage B)
-    proximity = detect_proximity_groups(children)
+    # Detect at this level (all Stage A methods)
+    semantic = detect_semantic_groups(children)
     patterns = detect_pattern_groups(children)
+    spacing = detect_spacing_groups(children)
+    proximity = detect_proximity_groups(children)
 
-    for g in proximity + patterns:
+    for g in semantic + patterns + spacing + proximity:
         g['parent_id'] = parent_id
         g['parent_name'] = parent_name
         all_candidates.append(g)
@@ -161,16 +280,19 @@ def walk_and_detect(node, all_candidates=None):
 
     return all_candidates
 
+# Method priority for deduplication: higher = better quality
+METHOD_PRIORITY = {'semantic': 3, 'pattern': 2, 'spacing': 1, 'proximity': 0}
+
 def deduplicate_candidates(candidates, root_id=''):
     \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
 
     Rules:
-    - If same node_ids appear in both proximity and higher-quality method, keep higher-quality
+    - If same node_ids appear in both lower and higher-quality method, keep higher-quality
     - If a parent node already has a semantic (non-auto-generated) name, skip proximity
       (exception: root-level parents are exempt)
     - Merge candidates that share >50% of their node_ids
     \"\"\"
-    # Index: node_id → list of candidate indices
+    # Index: node_id -> list of candidate indices
     node_to_candidates = defaultdict(list)
     for i, c in enumerate(candidates):
         for nid in c.get('node_ids', []):
@@ -179,29 +301,24 @@ def deduplicate_candidates(candidates, root_id=''):
     # Mark candidates for removal
     remove = set()
 
-    # Rule 1: higher-quality methods > proximity when same nodes overlap
-    PRIORITY_METHODS = {'pattern'}
+    # Rule 1: higher-quality methods > lower-quality when same nodes overlap
     for nid, indices in node_to_candidates.items():
         if len(indices) < 2:
             continue
         methods = {i: candidates[i].get('method', '') for i in indices}
-        has_priority = any(m in PRIORITY_METHODS for m in methods.values())
-        if has_priority:
-            for i, m in methods.items():
-                if m == 'proximity':
-                    remove.add(i)
+        max_priority = max(METHOD_PRIORITY.get(m, 0) for m in methods.values())
+        for i, m in methods.items():
+            if METHOD_PRIORITY.get(m, 0) < max_priority:
+                remove.add(i)
 
-    # Rule 2: skip proximity candidates where parent already has semantic name
-    # Exception: root-level (artboard) parents are exempt — their children
-    # still need grouping even though the artboard itself is named
+    # Rule 2: skip proximity/spacing candidates where parent already has semantic name
+    # Exception: root-level (artboard) parents are exempt
     for i, c in enumerate(candidates):
         if c.get('parent_id') == root_id:
             continue  # exempt root-level candidates
         parent_name = c.get('parent_name', '')
         if parent_name and not UNNAMED_RE.match(parent_name):
-            # Parent is already semantically named — lower priority
-            # Only remove if it's a proximity candidate (less reliable)
-            if c.get('method') == 'proximity':
+            if c.get('method') in ('proximity', 'spacing'):
                 remove.add(i)
 
     return [c for i, c in enumerate(candidates) if i not in remove]
@@ -237,6 +354,10 @@ try:
                     f.write(f'    structure_hash: {yaml_str(c[\"structure_hash\"])}\\n')
                 if 'suggested_wrapper' in c:
                     f.write(f'    suggested_wrapper: {yaml_str(c[\"suggested_wrapper\"])}\\n')
+                if c.get('fuzzy_match'):
+                    f.write(f'    fuzzy_match: true\\n')
+                if 'semantic_type' in c:
+                    f.write(f'    semantic_type: {yaml_str(c[\"semantic_type\"])}\\n')
         print(json.dumps({
             'total': len(candidates),
             'output': output_file,
