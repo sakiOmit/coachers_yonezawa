@@ -19,18 +19,10 @@ python3 -c "
 import json, re, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, is_section_root
 
 FLAT_THRESHOLD = 15
 DEEP_NESTING_THRESHOLD = 6
-
-SECTION_ROOT_WIDTH = 1440  # Figma page-level frame width
-
-def is_section_root(node):
-    \"\"\"Detect section-level frames (width ~1440, direct children of page).\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    width = bbox.get('width', 0)
-    return node.get('type') == 'FRAME' and abs(width - SECTION_ROOT_WIDTH) < 10
 
 def count_nodes(node, depth=0, section_depth=None):
     \"\"\"Recursively count nodes and collect metrics.

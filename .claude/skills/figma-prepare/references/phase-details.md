@@ -254,8 +254,11 @@ Chrome DevTools MCP (`evaluate_script`)
 | 優先度 | 手法 | 判定条件 | 結果例 |
 |-------|------|---------|-------|
 | 1 | テキスト内容 | TEXT ノード | heading-about-us |
-| 2 | シェイプ分析 | 幅/高さ比率、サイズ | divider-0, bg-1 |
-| 3 | 位置分析 | ページ内 Y 座標 | section-header, section-footer |
+| 2 | シェイプ分析 | 幅/高さ比率、サイズ、fills | divider-0, bg-1, img-0 |
+| 3 | 位置分析 | PAGE/CANVAS 直下の Y 座標 | section-header, section-footer |
+| 3.1 | ヘッダー/フッター | 上端+幅広+ナビ子要素 / 下端+コンパクト+テキスト多 | header, footer |
+| 3.2 | 小アイコン | 子なし、48x48以下 | icon-0 |
+| 3.5 | ナビゲーション | 4+短テキスト子要素 | nav-0 |
 | 4 | 子構造分析 | 子要素のタイプ構成 | card-0, text-block-1 |
 | 5 | フォールバック | 上記全て不可 | frame-3, rectangle-5 |
 

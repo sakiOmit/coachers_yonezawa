@@ -26,7 +26,7 @@ import json, sys, os
 from collections import Counter
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, get_text_children_content
 
 def count_children(node):
     return len(node.get('children', []))
@@ -45,15 +45,8 @@ def has_text_children(node):
 
 def get_text_children_preview(node, max_items=5):
     \"\"\"Get preview of text content from direct TEXT children.
-    Prefer enriched characters over name (Issue 38).\"\"\"
-    children = node.get('children', [])
-    texts = []
-    for c in children:
-        if c.get('type') == 'TEXT':
-            content = c.get('characters', '') or c.get('name', '')
-            if content:
-                texts.append(content)
-    return texts[:max_items]
+    Delegates to shared util (Issue 49).\"\"\"
+    return get_text_children_content(node.get('children', []), max_items=max_items)
 
 def detect_heuristic_hints(children, page_bbox):
     \"\"\"Detect header/footer candidates, gap analysis, and background candidates.

@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children
 
 # Prefix mapping by context
 SHAPE_PREFIXES = {
@@ -36,15 +36,8 @@ SHAPE_PREFIXES = {
 }
 
 def get_text_children_content(children):
-    \"\"\"Collect TEXT children's content. Prefer enriched characters over name.\"\"\"
-    texts = []
-    for c in children:
-        if c.get('type') == 'TEXT':
-            # Prefer characters (from enrichment) over name (Issue 38)
-            content = c.get('characters', '') or c.get('name', '')
-            if content and not UNNAMED_RE.match(content):
-                texts.append(content)
-    return texts
+    \"\"\"Collect TEXT children's content, filtering unnamed. Delegates to shared util (Issue 49).\"\"\"
+    return _get_text_children(children, filter_unnamed=True)
 
 def infer_text_role(text_content, font_size=None):
     \"\"\"Infer role from text content.\"\"\"

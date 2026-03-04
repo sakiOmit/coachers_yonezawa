@@ -622,3 +622,137 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **ファイル**: `scripts/analyze-structure.sh`, `scripts/detect-grouping-candidates.sh`,
   `scripts/generate-rename-map.sh`, `scripts/infer-autolayout.sh`,
   `scripts/prepare-sectioning-context.sh`, `scripts/enrich-metadata.sh`
+
+## Issue 49: `get_text_children_content` / `get_text_children_preview` コード重複 — FIXED
+
+- **Phase**: 全体
+- **優先度**: 低
+- **概要**: `generate-rename-map.sh` の `get_text_children_content` と `prepare-sectioning-context.sh` の
+  `get_text_children_preview` がほぼ同一のロジック（TEXT子要素のテキスト抽出、characters優先）を持っていた。
+  差異は `max_items` 制限と `UNNAMED_RE` フィルタの有無のみ。
+- **修正内容**: `figma_utils.py` に統合版 `get_text_children_content(children, max_items=None, filter_unnamed=False)`
+  を追加。両スクリプトはこの共有関数に委譲するよう変更。ユニットテスト追加。
+- **修正日**: 2026-03-05
+- **ファイル**: `lib/figma_utils.py`, `scripts/generate-rename-map.sh`, `scripts/prepare-sectioning-context.sh`, `tests/run-tests.sh`
+
+## Issue 50: `figma_utils.py` テストカバレッジ不足 — FIXED
+
+- **Phase**: テスト
+- **優先度**: 中
+- **概要**: `figma_utils.py` の `yaml_str`, `get_bbox`, `get_root_node` に直接的なユニットテストがなかった。
+  スクリプト経由の間接テストはあったが、関数単体の動作保証がなかった。
+- **修正内容**: 3関数のユニットテストを追加:
+  - `yaml_str`: 基本文字列、クォート、バックスラッシュ、特殊文字、非ASCII、空文字列、整数入力
+  - `get_bbox`: 通常ノード、bbox未設定、部分的bbox
+  - `get_root_node`: document/node/bareの3パターン + 優先度テスト
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 51: `to_kebab` エッジケーステスト不足 — FIXED
+
+- **Phase**: テスト
+- **優先度**: 低
+- **概要**: `to_kebab` のテストに空文字列、空白のみ、日本語のみ、特殊文字のみ、長文字列截切等の
+  エッジケースが含まれていなかった。
+- **修正内容**: 8パターンのエッジケーステストを追加:
+  空文字列、空白のみ、日本語のみ→'content'、CamelCase、アクロニム、特殊文字のみ→'content'、
+  40文字截切、日本語+ASCII混合
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 52: `snap()` 関数コード重複 — FIXED
+
+- **Phase**: 全体（コード重複）
+- **優先度**: 中
+- **概要**: `infer-autolayout.sh` 内にインラインで定義されていた `snap()` 関数は、
+  `GRID_SNAP` (4px) 定数と共に `figma_utils.py` に統合すべき共通ロジックだった。
+  他のスクリプトやテストからも参照可能にすることで保守性が向上する。
+- **修正内容**: `snap(value, grid=GRID_SNAP)` を `figma_utils.py` に抽出。
+  `GRID_SNAP` と `SECTION_ROOT_WIDTH` を定数として公開。
+  `infer-autolayout.sh` から共有版を import するよう変更。
+  ユニットテスト追加（12ケース: 正確倍数、切り捨て、切り上げ、負値、カスタムグリッド、浮動小数点）。
+- **修正日**: 2026-03-05
+- **ファイル**: `lib/figma_utils.py`, `scripts/infer-autolayout.sh`, `tests/run-tests.sh`
+
+## Issue 53: `is_section_root()` 関数コード重複 — FIXED
+
+- **Phase**: 全体（コード重複）
+- **優先度**: 中
+- **概要**: `analyze-structure.sh` 内にインラインで定義されていた `is_section_root()` 関数と
+  `SECTION_ROOT_WIDTH` 定数は、`figma_utils.py` に統合すべき共通概念だった。
+  セクションルートの検出ロジックは SKILL.md やルールファイルでも参照される基本概念である。
+- **修正内容**: `is_section_root(node)` を `figma_utils.py` に抽出。
+  `analyze-structure.sh` から共有版を import するよう変更。
+  ユニットテスト追加（9ケース: 正常検出、型不一致、幅不一致、bbox欠損）。
+- **修正日**: 2026-03-05
+- **ファイル**: `lib/figma_utils.py`, `scripts/analyze-structure.sh`, `tests/run-tests.sh`
+
+## Issue 54: phase-details.md リネームロジック優先順テーブルに Sub-priority 未記載 — FIXED
+
+- **Phase**: docs
+- **優先度**: 低
+- **概要**: `phase-details.md` のリネームロジック優先順テーブルが5行のみで、
+  実コード（`generate-rename-map.sh`）に存在する Priority 3.1（ヘッダー/フッター）、
+  3.2（小アイコン）、3.5（ナビゲーション）が記載されていなかった。
+- **修正内容**: テーブルに Priority 3.1, 3.2, 3.5 の行を追加。
+  Priority 2 の結果例に `img-0` を追加（fills ベース判定の反映）。
+- **修正日**: 2026-03-05
+- **ファイル**: `references/phase-details.md`
+
+## Issue 55: `is_unnamed()` ユニットテスト未カバー — FIXED
+
+- **Phase**: テスト
+- **優先度**: 低
+- **概要**: `figma_utils.py` の `is_unnamed()` 関数は間接的にテストされていたが、
+  直接的なユニットテストが存在しなかった。パターンの網羅性確認ができていなかった。
+- **修正内容**: 18パターンのユニットテスト追加:
+  未命名パターン12種（Frame/Rectangle/Text/Group/image(小文字)/Instance/Component/Vector/Ellipse/Polygon/Star/Line）、
+  非マッチ6種（hero-section/Header/Frame Header/My Frame 1/card-feature/空文字列）
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 56: `resolve_absolute_coords()` ユニットテスト未カバー — FIXED
+
+- **Phase**: テスト
+- **優先度**: 中
+- **概要**: `figma_utils.py` の `resolve_absolute_coords()` は座標変換の中核ロジックであるにもかかわらず、
+  直接的なユニットテストがなかった（Phase 4 の negative padding テストで間接的にのみ検証）。
+- **修正内容**: 3パターンのユニットテスト追加:
+  (1) parent→child→grandchild の3階層座標累積（10+5=15, 15+2=17 等の確認）
+  (2) parent_x/parent_y 引数によるリーフノードのオフセット
+  (3) absoluteBoundingBox 欠損時のデフォルト値での動作確認
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 57: `to_kebab` タブ・改行文字のテスト未カバー — FIXED
+
+- **Phase**: テスト
+- **優先度**: 低
+- **概要**: Figma のテキストコンテンツにはタブ文字や改行文字が含まれる場合がある。
+  `to_kebab` がこれらを正しくハイフン区切りに変換できるかテストされていなかった。
+- **修正内容**: 5パターンのテスト追加:
+  タブ文字(chr(9))、改行(chr(10))、CRLF(chr(13)+chr(10))、前後空白、複数スペース
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 58: `enrich-metadata.sh` 空エンリッチメント JSON のエッジケーステスト未カバー — FIXED
+
+- **Phase**: テスト
+- **優先度**: 低
+- **概要**: `enrich-metadata.sh` に空の enrichment JSON (`{}`) を渡した場合の動作が
+  テストされていなかった。実運用では get_design_context が情報を返さないケースがありうる。
+- **修正内容**: 空エンリッチメントのテスト追加:
+  enriched_nodes=0、total_enrichment_entries=0、出力ファイルが有効な JSON であることを確認
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`
+
+## Issue 59: `prepare-sectioning-context.sh` 子要素なしルートのエッジケーステスト未カバー — FIXED
+
+- **Phase**: テスト
+- **優先度**: 低
+- **概要**: `prepare-sectioning-context.sh` に子要素のないルートノードを渡した場合の
+  動作がテストされていなかった。空のアートボードでも正常に JSON を出力すべきである。
+- **修正内容**: 子要素なしルートのテスト追加:
+  total_children=0、top_level_children=[]、全 heuristic_hints が空配列であることを確認
+- **修正日**: 2026-03-05
+- **ファイル**: `tests/run-tests.sh`

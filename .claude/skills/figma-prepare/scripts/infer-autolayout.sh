@@ -24,14 +24,9 @@ python3 -c "
 import json, sys, statistics, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, yaml_str
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP
 
-GRID_SNAP = 4  # px
 VARIANCE_RATIO = 1.5
-
-def snap(value):
-    \"\"\"Snap value to grid.\"\"\"
-    return round(value / GRID_SNAP) * GRID_SNAP
 
 def infer_layout(frame):
     \"\"\"Infer Auto Layout settings for a frame.\"\"\"

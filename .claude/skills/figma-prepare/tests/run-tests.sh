@@ -1156,6 +1156,415 @@ finally:
 echo ""
 
 # ================================================================
+bold "=== Unit: figma_utils.py — yaml_str ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import yaml_str
+
+# Basic string
+assert yaml_str('hello') == '\"hello\"', f'Expected \"hello\", got {yaml_str(\"hello\")}'
+
+# String with double quotes
+result = yaml_str('say \"hi\"')
+assert '\"' not in result.strip('\"').replace('\\\\\"', ''), f'Unescaped quotes in: {result}'
+
+# String with backslash
+result = yaml_str('path\\\\to\\\\file')
+assert '\\\\\\\\' in result, f'Backslash not escaped: {result}'
+
+# String with special chars
+result = yaml_str('line1\\nline2')
+assert isinstance(result, str), 'Should return string'
+
+# Non-ASCII (Japanese)
+result = yaml_str('日本語テスト')
+assert '日本語テスト' in result, f'Non-ASCII lost: {result}'
+
+# Empty string
+result = yaml_str('')
+assert result == '\"\"', f'Empty string: {result}'
+
+# Integer input (should be coerced to string)
+result = yaml_str(123)
+assert result == '\"123\"', f'Integer coercion: {result}'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: yaml_str — basic, quotes, backslash, special, non-ASCII, empty, int"; ((PASS++)) || true; } || { red "  FAIL: yaml_str unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — get_bbox ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import get_bbox
+
+# Normal node
+node = {'absoluteBoundingBox': {'x': 10, 'y': 20, 'width': 100, 'height': 50}}
+bb = get_bbox(node)
+assert bb == {'x': 10, 'y': 20, 'w': 100, 'h': 50}, f'Normal: {bb}'
+
+# Missing absoluteBoundingBox
+bb = get_bbox({})
+assert bb == {'x': 0, 'y': 0, 'w': 0, 'h': 0}, f'Missing bbox: {bb}'
+
+# Partial bbox
+bb = get_bbox({'absoluteBoundingBox': {'x': 5}})
+assert bb['x'] == 5 and bb['y'] == 0 and bb['w'] == 0 and bb['h'] == 0, f'Partial: {bb}'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: get_bbox — normal, missing, partial"; ((PASS++)) || true; } || { red "  FAIL: get_bbox unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — get_root_node ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import get_root_node
+
+# With 'document' key
+data = {'document': {'id': 'root', 'children': []}}
+assert get_root_node(data)['id'] == 'root', 'document key'
+
+# With 'node' key
+data = {'node': {'id': 'n1', 'children': []}}
+assert get_root_node(data)['id'] == 'n1', 'node key'
+
+# Bare node (no wrapper)
+data = {'id': 'bare', 'children': []}
+assert get_root_node(data)['id'] == 'bare', 'bare node'
+
+# Both keys — document takes priority
+data = {'document': {'id': 'doc'}, 'node': {'id': 'n'}}
+assert get_root_node(data)['id'] == 'doc', 'document priority'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: get_root_node — document, node, bare, priority"; ((PASS++)) || true; } || { red "  FAIL: get_root_node unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — get_text_children_content ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import get_text_children_content
+
+children = [
+    {'type': 'TEXT', 'characters': 'Hello', 'name': 'Text 1'},
+    {'type': 'TEXT', 'characters': '', 'name': 'Fallback Name'},
+    {'type': 'FRAME', 'name': 'Frame 1'},
+    {'type': 'TEXT', 'characters': 'World', 'name': 'Text 3'},
+    {'type': 'TEXT', 'name': 'Frame 5'},  # unnamed pattern
+]
+
+# Basic: returns all text content
+result = get_text_children_content(children)
+assert result == ['Hello', 'Fallback Name', 'World', 'Frame 5'], f'basic: {result}'
+
+# max_items
+result = get_text_children_content(children, max_items=2)
+assert len(result) == 2, f'max_items: {result}'
+
+# filter_unnamed: should exclude 'Frame 5' (matches UNNAMED_RE)
+result = get_text_children_content(children, filter_unnamed=True)
+assert 'Frame 5' not in result, f'filter_unnamed: {result}'
+assert len(result) == 3, f'filter_unnamed len: {result}'
+
+# Empty children
+result = get_text_children_content([])
+assert result == [], f'empty: {result}'
+
+# Characters preferred over name
+children2 = [{'type': 'TEXT', 'characters': 'From characters', 'name': 'From name'}]
+result = get_text_children_content(children2)
+assert result == ['From characters'], f'prefer chars: {result}'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: get_text_children_content — basic, max_items, filter_unnamed, empty, prefer chars"; ((PASS++)) || true; } || { red "  FAIL: get_text_children_content unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — to_kebab edge cases ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import to_kebab
+
+# Empty / whitespace
+assert to_kebab('') == '', f'empty: {to_kebab(\"\")}'
+assert to_kebab('   ') == '', f'whitespace: {to_kebab(\"   \")}'
+
+# Japanese only → 'content'
+assert to_kebab('日本語テスト') == 'content', f'jp: {to_kebab(\"日本語テスト\")}'
+
+# CamelCase
+assert to_kebab('CamelCase') == 'camel-case', f'camel: {to_kebab(\"CamelCase\")}'
+
+# Acronym
+assert to_kebab('HTMLParser') == 'html-parser', f'acronym: {to_kebab(\"HTMLParser\")}'
+
+# Special chars only
+assert to_kebab('@#\$%!') == 'content', f'special: {to_kebab(\"@#\$%!\")}'
+
+# Long string truncation (>40 chars)
+result = to_kebab('a' * 100)
+assert len(result) <= 40, f'truncation: len={len(result)}'
+
+# Mixed Japanese + ASCII
+assert to_kebab('日本語test混合') == 'test', f'mixed: {to_kebab(\"日本語test混合\")}'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: to_kebab — empty, whitespace, jp, camel, acronym, special, truncation, mixed"; ((PASS++)) || true; } || { red "  FAIL: to_kebab edge case tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — is_unnamed (Issue 55) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import is_unnamed
+
+# Unnamed patterns (auto-generated)
+assert is_unnamed('Frame 1') == True, 'Frame 1'
+assert is_unnamed('Rectangle 23') == True, 'Rectangle 23'
+assert is_unnamed('Text 5') == True, 'Text 5'
+assert is_unnamed('Group 100') == True, 'Group 100'
+assert is_unnamed('image 1254') == True, 'image lowercase'
+assert is_unnamed('Instance 3') == True, 'Instance'
+assert is_unnamed('Component 7') == True, 'Component'
+assert is_unnamed('Vector') == True, 'Vector no number'
+assert is_unnamed('Ellipse') == True, 'Ellipse no number'
+assert is_unnamed('Polygon 2') == True, 'Polygon'
+assert is_unnamed('Star 1') == True, 'Star'
+assert is_unnamed('Line') == True, 'Line no number'
+
+# Named patterns (should NOT be unnamed)
+assert is_unnamed('hero-section') == False, 'hero-section'
+assert is_unnamed('Header') == False, 'Header'
+assert is_unnamed('Frame Header') == False, 'Frame Header'
+assert is_unnamed('My Frame 1') == False, 'My Frame 1'
+assert is_unnamed('card-feature') == False, 'card-feature'
+assert is_unnamed('') == False, 'empty string'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: is_unnamed — unnamed patterns, named patterns, empty"; ((PASS++)) || true; } || { red "  FAIL: is_unnamed unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — resolve_absolute_coords (Issue 56) ==="
+python3 -c "
+import sys, os, copy
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import resolve_absolute_coords
+
+# Test 1: Simple parent-child offset accumulation
+node = {
+    'absoluteBoundingBox': {'x': 10, 'y': 20, 'width': 100, 'height': 100},
+    'children': [{
+        'absoluteBoundingBox': {'x': 5, 'y': 5, 'width': 50, 'height': 50},
+        'children': [{
+            'absoluteBoundingBox': {'x': 2, 'y': 3, 'width': 10, 'height': 10},
+            'children': []
+        }]
+    }]
+}
+resolve_absolute_coords(node)
+assert node['absoluteBoundingBox']['x'] == 10, f'root x: {node[\"absoluteBoundingBox\"][\"x\"]}'
+assert node['absoluteBoundingBox']['y'] == 20, f'root y: {node[\"absoluteBoundingBox\"][\"y\"]}'
+child = node['children'][0]
+assert child['absoluteBoundingBox']['x'] == 15, f'child x: {child[\"absoluteBoundingBox\"][\"x\"]}'
+assert child['absoluteBoundingBox']['y'] == 25, f'child y: {child[\"absoluteBoundingBox\"][\"y\"]}'
+grandchild = child['children'][0]
+assert grandchild['absoluteBoundingBox']['x'] == 17, f'grandchild x: {grandchild[\"absoluteBoundingBox\"][\"x\"]}'
+assert grandchild['absoluteBoundingBox']['y'] == 28, f'grandchild y: {grandchild[\"absoluteBoundingBox\"][\"y\"]}'
+
+# Test 2: No children (leaf node)
+leaf = {'absoluteBoundingBox': {'x': 5, 'y': 10, 'width': 20, 'height': 30}}
+resolve_absolute_coords(leaf, parent_x=100, parent_y=200)
+assert leaf['absoluteBoundingBox']['x'] == 105, f'leaf x: {leaf[\"absoluteBoundingBox\"][\"x\"]}'
+assert leaf['absoluteBoundingBox']['y'] == 210, f'leaf y: {leaf[\"absoluteBoundingBox\"][\"y\"]}'
+
+# Test 3: Missing absoluteBoundingBox
+empty_node = {'children': []}
+resolve_absolute_coords(empty_node, parent_x=50, parent_y=60)
+assert empty_node['absoluteBoundingBox']['x'] == 50, f'empty x'
+assert empty_node['absoluteBoundingBox']['y'] == 60, f'empty y'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: resolve_absolute_coords — accumulation, leaf, missing bbox"; ((PASS++)) || true; } || { red "  FAIL: resolve_absolute_coords unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — snap (Issue 52) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import snap
+
+# Exact multiples of 4
+assert snap(0) == 0, f'0: {snap(0)}'
+assert snap(4) == 4, f'4: {snap(4)}'
+assert snap(8) == 8, f'8: {snap(8)}'
+assert snap(16) == 16, f'16: {snap(16)}'
+
+# Rounding down
+assert snap(1) == 0, f'1: {snap(1)}'
+assert snap(5) == 4, f'5: {snap(5)}'
+assert snap(13) == 12, f'13: {snap(13)}'
+
+# Rounding up
+assert snap(3) == 4, f'3: {snap(3)}'
+assert snap(6) == 8, f'6: {snap(6)}'
+assert snap(7) == 8, f'7: {snap(7)}'
+assert snap(14) == 16, f'14: {snap(14)}'
+assert snap(15) == 16, f'15: {snap(15)}'
+
+# Exact midpoint (2 → rounds to 0 with Python banker's rounding, but round(2/4)*4=0)
+assert snap(2) == 0, f'2: {snap(2)}'
+
+# Negative values (padding can be 0 via max(0,...) but snap itself should handle negatives)
+assert snap(-1) == 0, f'-1: {snap(-1)}'
+assert snap(-3) == -4, f'-3: {snap(-3)}'
+
+# Custom grid
+assert snap(7, grid=8) == 8, f'7 grid=8: {snap(7, grid=8)}'
+assert snap(3, grid=8) == 0, f'3 grid=8: {snap(3, grid=8)}'
+
+# Float input
+assert snap(5.7) == 4, f'5.7: {snap(5.7)}'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: snap — exact, round down, round up, negative, custom grid, float"; ((PASS++)) || true; } || { red "  FAIL: snap unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: figma_utils.py — is_section_root (Issue 53) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+from figma_utils import is_section_root
+
+# Section root: FRAME with width ~1440
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {'width': 1440}}) == True, '1440'
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {'width': 1438}}) == True, '1438'
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {'width': 1442}}) == True, '1442'
+
+# Not section root: wrong type
+assert is_section_root({'type': 'GROUP', 'absoluteBoundingBox': {'width': 1440}}) == False, 'GROUP'
+assert is_section_root({'type': 'TEXT', 'absoluteBoundingBox': {'width': 1440}}) == False, 'TEXT'
+
+# Not section root: wrong width
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {'width': 800}}) == False, '800'
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {'width': 1460}}) == False, '1460'
+
+# Edge case: missing absoluteBoundingBox
+assert is_section_root({'type': 'FRAME'}) == False, 'missing bbox'
+
+# Edge case: missing width
+assert is_section_root({'type': 'FRAME', 'absoluteBoundingBox': {}}) == False, 'missing width'
+
+print('OK')
+" 2>/dev/null && { green "  PASS: is_section_root — valid, wrong type, wrong width, missing bbox"; ((PASS++)) || true; } || { red "  FAIL: is_section_root unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: to_kebab — whitespace characters (Issue 57) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+from figma_utils import to_kebab
+
+# Tab and newline should be treated as whitespace separators
+tab_input = 'hello' + chr(9) + 'world'
+nl_input = 'hello' + chr(10) + 'world'
+crlf_input = 'hello' + chr(13) + chr(10) + 'world'
+
+assert to_kebab(tab_input) == 'hello-world', 'tab failed: ' + to_kebab(tab_input)
+assert to_kebab(nl_input) == 'hello-world', 'newline failed: ' + to_kebab(nl_input)
+assert to_kebab(crlf_input) == 'hello-world', 'crlf failed: ' + to_kebab(crlf_input)
+assert to_kebab('  hello  ') == 'hello', 'leading/trailing failed'
+assert to_kebab('multi   space') == 'multi-space', 'multi-space failed'
+
+print('OK')
+" "${SKILLS_DIR}" 2>/dev/null && { green "  PASS: to_kebab — tab, newline, crlf, multi-space"; ((PASS++)) || true; } || { red "  FAIL: to_kebab whitespace tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: enrich-metadata.sh — empty enrichment (Issue 58) ==="
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Create minimal metadata
+metadata = {
+    'id': '0:1', 'name': 'Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 1000},
+    'children': [{'id': '1:1', 'name': 'Child', 'type': 'FRAME',
+                  'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 100, 'height': 100},
+                  'children': []}]
+}
+# Empty enrichment
+enrichment = {}
+
+meta_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+json.dump(metadata, meta_file)
+meta_file.close()
+
+enrich_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+json.dump(enrichment, enrich_file)
+enrich_file.close()
+
+out_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+out_file.close()
+
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'enrich-metadata.sh')
+    result = subprocess.run(['bash', script, meta_file.name, enrich_file.name, '--output', out_file.name],
+                           capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    data = json.loads(result.stdout)
+    assert data['enriched_nodes'] == 0, f'Expected 0 enriched, got {data[\"enriched_nodes\"]}'
+    assert data['total_enrichment_entries'] == 0, f'Expected 0 entries'
+    # Output file should be valid JSON
+    with open(out_file.name) as f:
+        output_data = json.load(f)
+    assert output_data['id'] == '0:1', 'Metadata preserved'
+    print('OK')
+finally:
+    os.unlink(meta_file.name)
+    os.unlink(enrich_file.name)
+    os.unlink(out_file.name)
+" 2>/dev/null && { green "  PASS: Issue 58 — empty enrichment handled gracefully"; ((PASS++)) || true; } || { red "  FAIL: Issue 58 — empty enrichment crash"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: prepare-sectioning-context.sh — childless root (Issue 59) ==="
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Root with no children
+fixture = {
+    'id': '0:1', 'name': 'Empty Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 0},
+    'children': []
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'prepare-sectioning-context.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    data = json.loads(result.stdout)
+    assert data['total_children'] == 0, f'Expected 0, got {data[\"total_children\"]}'
+    assert data['top_level_children'] == [], 'Expected empty list'
+    assert data['heuristic_hints']['header_candidates'] == [], 'Expected no headers'
+    assert data['heuristic_hints']['footer_candidates'] == [], 'Expected no footers'
+    assert data['heuristic_hints']['gap_analysis'] == [], 'Expected no gaps'
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: Issue 59 — childless root handled gracefully"; ((PASS++)) || true; } || { red "  FAIL: Issue 59 — childless root crash"; ((FAIL++)) || true; }
+
+echo ""
+
+# ================================================================
 bold "========================================"
 bold "  Results: $PASS passed, $FAIL failed, $SKIP skipped"
 bold "========================================"
