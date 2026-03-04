@@ -289,6 +289,67 @@ Phase 2-4 のスクリプト生成時に参照する。
 }
 ```
 
+## 構造検証
+
+### ツリー読み戻し + 名前一致検証
+
+`apply-renames.js` や Phase 3 グルーピング後に、クローンのツリーを読み戻して期待名と比較する。
+
+```javascript
+() => {
+  const cloneNodeId = "23:128";   // クローンアートボードのID
+  const expectedNames = {         // クローン側nodeId → 期待名
+    "23:130": "hero-background",
+    "23:131": "hero-title",
+    "23:132": "hero-description",
+  };
+
+  const cloneRoot = figma.getNodeById(cloneNodeId);
+  if (!cloneRoot) return { success: false, error: "clone not found" };
+
+  // DFS でクローン内の全ノードIDを収集
+  const cloneNodeIds = new Set();
+  function collectIds(node) {
+    cloneNodeIds.add(node.id);
+    if ("children" in node) {
+      for (const child of node.children) collectIds(child);
+    }
+  }
+  collectIds(cloneRoot);
+
+  // 期待名と実名を比較
+  let matched = 0;
+  const mismatched = [];
+  const missing = [];
+
+  for (const [nodeId, expectedName] of Object.entries(expectedNames)) {
+    if (!cloneNodeIds.has(nodeId)) { missing.push(nodeId); continue; }
+    const node = figma.getNodeById(nodeId);
+    if (!node) { missing.push(nodeId); continue; }
+    if (node.name === expectedName) { matched++; }
+    else { mismatched.push({ nodeId, expected: expectedName, actual: node.name }); }
+  }
+
+  const total = Object.keys(expectedNames).length;
+  return {
+    success: true,
+    total,
+    matched,
+    mismatched,
+    missing,
+    matchRate: total > 0 ? matched / total : 0,
+  };
+}
+```
+
+**判定基準**: `matchRate >= 0.98` → 成功、`< 0.98` → 警告 + mismatch 一覧
+
+**用途**:
+- Phase 2: リネーム後の名前一致検証（primary）
+- Phase 3: グルーピング後のフレーム名・子構造検証
+
+**テンプレート**: `scripts/verify-structure.js` にプレースホルダー版あり
+
 ## ユーティリティ
 
 ### 存在チェック

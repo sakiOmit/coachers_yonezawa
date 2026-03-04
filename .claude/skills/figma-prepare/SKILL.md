@@ -170,7 +170,7 @@ Phase 2: セマンティックリネーム
         │     2-B. ID マッピングテーブル生成
         │     2-C. リネームマップを複製 ID に変換
         │     2-D. apply-renames.js → バッチリネーム実行
-        │     2-E. Before/After スクリーンショット表示
+        │     2-E. verify-structure.js → 構造 diff 検証
         │
         ├─ [--phase 2] → 終了
         │
@@ -410,16 +410,26 @@ rename-map.yaml の各 nodeId を mapping テーブルで変換:
 パターン: references/figma-plugin-api.md「Phase 2: リネーム」参照
 ```
 
-#### 2-3e. Before/After スクリーンショット
+#### 2-3e. 構造 diff 検証
 
 ```
-mcp__plugin_figma_figma__get_screenshot
-  fileKey: "{fileKey}"
-  nodeId: "{originalNodeId}"    # Before（元アートボード）
+1. verify-structure.js でクローンのツリーを読み戻し
+   - __CLONE_NODE_ID__ にクローンID、__EXPECTED_NAMES__ にリネームマップ（クローン側ID→期待名）を埋め込み
+   - mcp__chrome-devtools__evaluate_script で実行
 
-mcp__plugin_figma_figma__get_screenshot
-  fileKey: "{fileKey}"
-  nodeId: "{cloneId}"           # After（複製、リネーム済み）
+2. リネームマップの期待名と actual name を比較
+   結果: { total, matched, mismatched, missing, matchRate }
+
+3. 判定:
+   - matchRate >= 0.98 → 成功
+   - matchRate < 0.98 → 警告 + mismatch 一覧表示
+
+4. 補助: スクリーンショットでビジュアル崩れがないか確認（任意）
+   mcp__plugin_figma_figma__get_screenshot
+     fileKey: "{fileKey}"
+     nodeId: "{cloneId}"
+
+パターン: references/figma-plugin-api.md「構造検証」参照
 ```
 
 #### 2-3f. 結果サマリー
@@ -438,6 +448,11 @@ Results:
   Renamed: {renamed} layers
   Skipped: {skipped} layers
   Errors:  {errorCount}
+
+Verification:
+  Structure diff: {matched}/{total} matched ({matchRate}%)
+  Mismatches: {mismatchCount}
+  Visual check: screenshot available (supplementary)
 
 Original artboard: unchanged ✓
 
@@ -525,6 +540,20 @@ Stage A の page-kv 候補と Stage B のセクション分割で重複する no
 dry-run: grouping-plan.yaml + sectioning-plan.yaml を表示
 --apply: evaluate_script で Frame 作成 + 子要素移動
 
+### 3-5. --apply 後の構造 diff 検証
+
+`--apply` 実行後、verify-structure.js でクローンのツリーを読み戻し、計画との整合性を検証する。
+
+```
+1. グルーピング計画の name と実際のフレーム名を比較
+   - __EXPECTED_NAMES__: { "cloneChildId": "planName", ... }（グルーピング/セクショニング計画のフレーム名）
+2. 子ノードの移動先が正しいか確認
+   - 新フレーム内の子ノード数が計画と一致するか
+3. matchRate >= 0.98 → 成功、< 0.98 → 警告 + mismatch 一覧
+
+パターン: references/figma-plugin-api.md「構造検証」参照
+```
+
 ## Phase 4: Auto Layout 適用
 
 **詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 4」セクション
@@ -586,6 +615,7 @@ Next steps:
 | `scripts/start-chrome-debug.sh` | Chrome 起動 + SSH トンネル + 接続確認 | Figma URL (optional) | stdout (接続状態) |
 | `scripts/clone-artboard.js` | アートボード複製 + IDマッピング | `() => { ... }` 形式、`__SOURCE_NODE_ID__` 置換 | object (clone info, mapping) |
 | `scripts/apply-renames.js` | バッチリネーム実行 | `() => { ... }` 形式、`__RENAME_MAP__` / `__BATCH_INFO__` 置換 | object (renamed, errors) |
+| `scripts/verify-structure.js` | 構造 diff 検証 | `() => { ... }` 形式、`__CLONE_NODE_ID__` / `__EXPECTED_NAMES__` 置換 | object (matched, mismatched, matchRate) |
 
 ## Related Files
 

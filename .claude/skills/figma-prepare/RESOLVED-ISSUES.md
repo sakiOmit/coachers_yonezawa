@@ -212,3 +212,15 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正日**: 2026-03-04
 - **ファイル**: `scripts/infer-autolayout.sh`
 - **テスト**: 2フレームが exact confidence で出力されることを検証（46件中1件）
+
+## Issue 20: Before/After 検証を構造 diff ベースに変更 — FIXED
+
+- **Phase**: 2, 3
+- **現象**: Phase 2 Step 2-3e のスクショ比較は、リネーム/グルーピングでビジュアルが変わらないため差分が見えない
+- **修正内容**:
+  - `verify-structure.js` を新設。クローンアートボードの DFS 走査で期待名と actual name を比較
+  - SKILL.md Phase 2 Step 2-3e を「構造 diff 検証（primary）+ 補助スクリーンショット（secondary）」に変更
+  - Phase 3 --apply 後にもツリー読み戻し検証を追加
+  - `references/figma-plugin-api.md` に構造検証パターンを追加
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/verify-structure.js` (新規), `SKILL.md`, `references/figma-plugin-api.md`, `KNOWN-ISSUES.md`
