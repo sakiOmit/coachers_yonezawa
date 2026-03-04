@@ -1,0 +1,39 @@
+version: "1.0"
+updated_at: "2026-03-04"
+
+scoring_parameters:
+  unnamed: { weight: 0.5, cap: 30 }
+  flat: { weight: 5, cap: 20 }
+  ungrouped: { weight: 1, cap: 10 }
+  nesting: { weight: 3, cap: 15 }
+  autolayout: { weight: 0, cap: 0, note: "get_metadataに情報なし" }
+  last_tuned: "2026-03-04"
+
+cases:
+  - id: fixture-metadata
+    source: .claude/skills/figma-prepare/tests/fixture-metadata.json
+    expected_grade: B
+    expected_score_range: [60, 80]
+    tags: [fixture, regression]
+    notes: "合成フィクスチャ。未命名71.9%だがフラット/ネスト問題なし"
+
+  - id: fixture-dirty
+    source: .claude/skills/figma-prepare/tests/fixture-dirty.json
+    expected_grade: null
+    expected_score_range: [50, 80]
+    tags: [fixture, unnamed-heavy]
+    notes: "未命名98.5%。フラット/ネスト問題なく68/B。グレード議論あり"
+
+  - id: real-dirty
+    source: .claude/cache/figma/prepare-metadata-2-2.json
+    expected_grade: D
+    expected_score_range: [15, 35]
+    tags: [real-data, anchor-bad]
+    notes: "実データ13,157ノード。25/D。全フェーズ推奨"
+
+  - id: real-clean
+    source: .claude/cache/figma/prepare-metadata-2-43365.json
+    expected_grade: B
+    expected_score_range: [55, 70]
+    tags: [real-data, anchor-good]
+    notes: "実データ1,545ノード。61.8/B。構造整理済み"

@@ -89,7 +89,7 @@ ls -la .claude/cache/figma/{page-name}/
 
 ### ルール参照
 
-- `.claude/rules/figma-workflow.md` を必ず確認
+- `.claude/rules/figma.md` を必ず確認
 - RULE-001〜003 を遵守
 
 ## 5-Step Workflow
@@ -388,7 +388,7 @@ prompt: |
 
 ## 関連ファイル
 
-- `.claude/rules/figma-workflow.md` - Figmaワークフロールール（RULE-001〜003）
+- `.claude/rules/figma.md` - Figmaワークフロールール（RULE-001〜003）
 - `.claude/skills/figma-implement/SKILL.md` - Figma実装スキル
 - `.claude/skills/figma-design-diff-checker/SKILL.md` - 視覚差分検証スキル
 - `.claude/catalogs/component-catalog.yaml` - コンポーネントカタログ

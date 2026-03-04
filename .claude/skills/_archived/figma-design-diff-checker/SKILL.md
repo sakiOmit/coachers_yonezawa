@@ -145,7 +145,7 @@ ls -la .claude/cache/figma/{page-name}/
 
 ### ルール参照
 
-- `.claude/rules/figma-workflow.md` を必ず確認
+- `.claude/rules/figma.md` を必ず確認
 - RULE-001〜003 を遵守
 
 ## Workflow
@@ -434,7 +434,7 @@ production-reviewer から呼び出し可能:
 
 ## 関連ファイル
 
-- `.claude/rules/figma-workflow.md` - Figmaワークフロールール（RULE-001〜003）
+- `.claude/rules/figma.md` - Figmaワークフロールール（RULE-001〜003）
 - `.claude/skills/figma-implement/SKILL.md` - Figma実装スキル
 - `.claude/skills/figma-implementation-verifier/SKILL.md` - コード値検証スキル
 - `.claude/catalogs/component-catalog.yaml` - コンポーネントカタログ

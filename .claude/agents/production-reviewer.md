@@ -90,7 +90,7 @@ This agent handles **all review types**. Determine scope from user input:
 
 **Load based on review type:**
 - **SCSS**: `docs/coding-guidelines/02-scss-design.md`, `docs/coding-guidelines/scss/naming.md`
-- **PHP/WordPress**: `docs/coding-guidelines/03-wordpress-integration.md`
+- **PHP/WordPress**: `docs/coding-guidelines/03-html-structure.md`, `03-template-parts.md`, `03-image-handling.md`, `03-sanitization.md`
 - **Build/JS**: `docs/coding-guidelines/04-build-configuration.md`
 
 ## Serena MCP Integration

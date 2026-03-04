@@ -277,7 +277,7 @@ playwright_status:
 |------|---------|
 | `.claude/cache/figma/sections/` | Section-level cache |
 | `.claude/data/component-catalog.yaml` | Component catalog |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma workflow rules |
 | `.claude/rules/scss.md` | SCSS naming rules |
 
 ---

@@ -112,7 +112,7 @@ Load only animation-related portions of guidelines:
 REFERENCE: docs/coding-guidelines/02-scss-design.md
 → Section on BEM naming for animation classes
 
-OPTIONAL: docs/coding-guidelines/03-wordpress-integration.md
+OPTIONAL: docs/coding-guidelines/03-html-structure.md, 03-template-parts.md
 → Only if integrating animations with WordPress components
 ```
 

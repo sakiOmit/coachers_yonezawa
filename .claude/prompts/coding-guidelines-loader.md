@@ -44,7 +44,10 @@ docs/coding-guidelines/02-scss-design.md
 
 **読み込むファイル:**
 ```
-docs/coding-guidelines/03-wordpress-integration.md
+docs/coding-guidelines/03-html-structure.md        # HTML構造・セマンティック
+docs/coding-guidelines/03-template-parts.md        # テンプレートパーツ設計
+docs/coding-guidelines/03-image-handling.md        # 画像出力規約
+docs/coding-guidelines/03-sanitization.md          # サニタイズ規約
 ```
 
 **用途:**
@@ -89,7 +92,7 @@ docs/coding-guidelines/05-checklist.md
 
 **ステップ2: 必要に応じて詳細規約を読み込み**
 - SCSS実装 → `02-scss-design.md`
-- WordPress実装 → `03-wordpress-integration.md`
+- WordPress実装 → `03-html-structure.md` + `03-template-parts.md`
 - ビルド設定 → `04-build-configuration.md`
 
 **フロー:**
@@ -122,14 +125,14 @@ docs/coding-guidelines/06-faq.md
 
 **基本セット:**
 ```
-1. docs/coding-guidelines/03-wordpress-integration.md（必須）
+1. docs/coding-guidelines/03-html-structure.md + 03-template-parts.md（必須）
 2. docs/coding-guidelines/02-scss-design.md（SCSS実装時）
 3. docs/coding-guidelines/04-build-configuration.md（vite.config.js更新時）
 ```
 
 **タスク別:**
 - 新規ページ作成 → `05-checklist.md` → 詳細規約
-- 画像実装 → `03-wordpress-integration.md` 2.4節のみ
+- 画像実装 → `03-image-handling.md`
 - レビュー → `06-faq.md` → 該当規約
 
 ---
@@ -144,7 +147,7 @@ docs/coding-guidelines/06-faq.md
 
 **レビュー観点別:**
 - SCSS規約 → `02-scss-design.md`
-- WordPress規約 → `03-wordpress-integration.md`
+- WordPress規約 → `03-html-structure.md` + `03-template-parts.md` + `03-sanitization.md`
 - ビルド設定 → `04-build-configuration.md`
 
 ---
@@ -184,7 +187,7 @@ docs/coding-guidelines/06-faq.md
 **ステップ別読み込み:**
 
 1. **初期フェーズ**: なし（Figma解析のみ）
-2. **WordPress実装**: `03-wordpress-integration.md`
+2. **WordPress実装**: `03-html-structure.md` + `03-template-parts.md`
 3. **SCSS実装**: `02-scss-design.md`
 4. **ビルド設定**: `04-build-configuration.md`
 5. **最終レビュー**: `06-faq.md` + `05-checklist.md`
@@ -201,7 +204,7 @@ docs/coding-guidelines/06-faq.md
 
 **例:** 画像出力実装
 ```
-docs/coding-guidelines/03-wordpress-integration.md の 2.4節のみ
+docs/coding-guidelines/03-image-handling.md
 ```
 
 ---
@@ -216,7 +219,7 @@ docs/coding-guidelines/03-wordpress-integration.md の 2.4節のみ
 ```
 1. 05-checklist.md で全体把握
 2. SCSS不明点 → 02-scss-design.md 参照
-3. WordPress不明点 → 03-wordpress-integration.md 参照
+3. WordPress不明点 → 03-html-structure.md / 03-template-parts.md 参照
 ```
 
 ---
@@ -243,7 +246,10 @@ FAQ → アンチパターン確認 → 該当規約で詳細確認
 # これは非効率
 01-project-structure.md
 02-scss-design.md
-03-wordpress-integration.md
+03-html-structure.md
+03-template-parts.md
+03-image-handling.md
+03-sanitization.md
 04-build-configuration.md
 05-checklist.md
 06-faq.md
@@ -285,7 +291,7 @@ graph TD
     A[タスク確認] --> B{タスク種類}
     B -->|新規ページ| C[05-checklist.md]
     B -->|SCSS実装| D[02-scss-design.md]
-    B -->|WordPress実装| E[03-wordpress-integration.md]
+    B -->|WordPress実装| E[03-html-structure.md + 03-template-parts.md]
     B -->|ビルド設定| F[04-build-configuration.md]
     C --> G{不明点?}
     G -->|あり| H[該当詳細規約]

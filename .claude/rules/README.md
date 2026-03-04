@@ -15,6 +15,8 @@
 | `coding-style.md` | 一般コーディング | 命名, 構成, エラー処理 |
 | `skill.md` | スキル作成規約 | SKILL.md形式, フロントマター |
 | `astro.md` | Astroワークフロー | 静的コーディング, 変換規約 |
+| `figma.md` | Figma実装規約 | キャッシュ, 分割, Code Connect, 再利用 |
+| `agents.md` | エージェント規約 | MCP参照, ツール名 |
 
 ## 使い方
 
@@ -27,6 +29,7 @@
 - **JavaScript実装時**: `security.md` + `coding-style.md`
 - **スキル作成時**: `skill.md`
 - **Astro実装時**: `astro.md` + `scss.md` + `coding-style.md`
+- **Figma実装時**: `figma.md` + `scss.md` + `wordpress.md`
 
 ### 手動参照
 

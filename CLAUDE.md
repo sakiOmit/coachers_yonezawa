@@ -19,6 +19,7 @@ npm run check:all      # リンク・画像チェック一括実行
 
 ```bash
 # --- 実装系 ---
+/figma-prepare             # Figma構造整理（リネーム・グループ化・AutoLayout）
 /figma-analyze             # Figma複数ページ分析・戦略策定
 /figma-implement           # Figma → WordPress完全実装
 /figma-to-code             # Figmaデザイン調査・コード確認
@@ -191,7 +192,7 @@ wordpress-template/
 | ----------------- | ---------------------------------------------------- |
 | 初回セットアップ  | `docs/setup/initial-setup.md`                        |
 | SCSS規約          | `docs/coding-guidelines/02-scss-design.md`           |
-| WordPress規約     | `docs/coding-guidelines/03-wordpress-integration.md` |
+| WordPress規約     | `docs/coding-guidelines/03-wordpress-integration.md`（インデックス） |
 | 新規ページ        | `docs/coding-guidelines/05-checklist.md`             |
 | Docker            | `docs/coding-guidelines/09-docker-scripting.md`      |
 | エージェント      | `.claude/agents/README.md`                           |

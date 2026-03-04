@@ -85,7 +85,7 @@
 ```
 1. wordpress-professional-engineer
    ├─ 読み込み: docs/coding-guidelines/05-checklist.md
-   ├─ 読み込み: docs/coding-guidelines/03-wordpress-integration.md
+   ├─ 読み込み: docs/coding-guidelines/03-html-structure.md + 03-template-parts.md
    └─ 実装: PHP + SCSS + vite.config.js
 
 2. production-reviewer

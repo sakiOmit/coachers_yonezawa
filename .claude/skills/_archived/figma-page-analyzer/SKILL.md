@@ -244,7 +244,7 @@ elif overall_risk == "HIGH":
 |------|---------|
 | `.claude/cache/figma/` | Cache storage |
 | `.claude/rules/figma.md` | Figma rules (cache strategy) |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma workflow rules |
 | `.claude/skills/figma-component-analyzer/` | Related skill (component analysis) |
 
 ## Examples

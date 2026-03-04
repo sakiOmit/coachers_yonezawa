@@ -486,8 +486,7 @@ Task tool:
 |------|---------|
 | `.claude/data/component-catalog.yaml` | コンポーネントカタログ |
 | `.claude/cache/figma/analysis-report.yaml` | 分析レポート出力先 |
-| `.claude/rules/figma-workflow.md` | Figmaワークフロールール |
-| `.claude/rules/figma.md` | Figma統合ルール |
+| `.claude/rules/figma.md` | Figma実装規約（統合） |
 | `.claude/skills/figma-implement/SKILL.md` | 実装スキル（後続） |
 | `.claude/skills/scripts-standard.md` | スクリプト標準規約 |
 

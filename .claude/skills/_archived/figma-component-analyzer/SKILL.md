@@ -158,7 +158,7 @@ score = (detection_rate * 0.6) + (complexity * 0.2) + (reuse_potential * 0.2)
 |------|---------|
 | `.claude/cache/figma/` | キャッシュ保存先 |
 | `.claude/reports/figma-component-analysis-report.md` | 最新解析レポート |
-| `.claude/rules/figma-workflow.md` | Figmaワークフロールール |
+| `.claude/rules/figma.md` | Figmaワークフロールール |
 
 ---
 

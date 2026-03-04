@@ -269,7 +269,7 @@ def fetch_with_retry(node_id, file_key):
 |------|---------|
 | `.claude/cache/figma/` | Cache storage |
 | `.claude/rules/figma.md` | Figma rules |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma workflow rules |
 
 ---
 

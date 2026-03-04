@@ -138,7 +138,7 @@ Or with explicit parameters:
 
 ## Tolerance Settings
 
-Per `.claude/rules/figma-workflow.md`:
+Per `.claude/rules/figma.md`:
 
 | Item | Tolerance | pixelmatch Option |
 |------|-----------|-------------------|
@@ -209,7 +209,7 @@ if (iteration >= max_iterations) {
 
 | File | Purpose |
 |------|---------|
-| `.claude/rules/figma-workflow.md` | Tolerance settings, Playwright conflict prevention |
+| `.claude/rules/figma.md` | Tolerance settings, Playwright conflict prevention |
 | `.claude/reports/visual-diff/` | Diff report storage |
 | `.claude/cache/figma/` | Figma screenshot cache |
 | `package.json` | pixelmatch/pngjs dependencies |

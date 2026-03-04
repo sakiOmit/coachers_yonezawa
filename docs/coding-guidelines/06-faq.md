@@ -161,7 +161,7 @@ get_header();
 ?>
 ```
 
-**参照:** `03-wordpress-integration.md` の「ページテンプレートの基本構造」
+**参照:** `03-template-parts.md`
 
 ---
 
@@ -192,7 +192,7 @@ render_responsive_image([
 ?>
 ```
 
-**参照:** `03-wordpress-integration.md` の「画像出力の規約」
+**参照:** `03-image-handling.md` の「画像出力規約」
 
 ---
 
@@ -337,7 +337,7 @@ render_responsive_image([
 
 **迷ったら切り出さない**を基本とし、明確な再利用性がある場合のみ切り出す。
 
-**参照:** `03-wordpress-integration.md` の「template-parts切り分けルール」
+**参照:** `03-template-parts.md` の「切り出し基準」
 
 ---
 
@@ -376,7 +376,7 @@ render_responsive_image([
 | **ギャラリー画像** | `lazy` | 必要時に読み込み |
 | **ロゴ** | `eager` | すぐに表示が必要 |
 
-**参照:** `03-wordpress-integration.md` の「loading属性の使い分け」
+**参照:** `03-image-handling.md` の「loading属性の使い分け」
 
 ---
 

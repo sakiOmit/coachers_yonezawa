@@ -628,7 +628,7 @@ Figma要素と既存コンポーネントの自動マッチングを行う。
     - "Pattern/*"
 ```
 
-**詳細ルール:** `.claude/rules/figma-workflow.md` - コンポーネントカタログ維持ルール
+**詳細ルール:** `.claude/rules/figma.md` - コンポーネントカタログ維持ルール
 
 ### 5-3. Figma Node仕様の構造化
 

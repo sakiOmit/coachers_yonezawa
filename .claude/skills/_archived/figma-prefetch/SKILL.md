@@ -735,7 +735,7 @@ For detailed technical documentation, see:
 | `.claude/cache/figma/` | Cache storage directory |
 | `.claude/tools/figma-mcp-downloader/` | CLI tool location |
 | `.claude/data/component-catalog.yaml` | Component catalog |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma workflow rules |
 | `.claude/skills/INDEX.md` | Skill usage index |
 | `.shogun/queue/tasks/page-{slug}.yaml` | **Task file output** (Step 7) |
 | `config/wordpress-pages.yaml` | Page definitions (for slug resolution) |

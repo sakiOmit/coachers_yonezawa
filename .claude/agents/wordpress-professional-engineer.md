@@ -169,12 +169,13 @@ Before starting any task, determine which guideline files you need:
 
 **WordPress Template Implementation:**
 ```
-MUST READ: docs/coding-guidelines/03-wordpress-integration.md
+MUST READ: docs/coding-guidelines/03-html-structure.md
   → 特に重要: HTMLセマンティック規約セクション
     - section要素には必ず見出しを含める
     - 繰り返し要素はリストにする
     - 記事/カードは article を使用
     - ボタンとリンクの使い分け
+MUST READ: docs/coding-guidelines/03-template-parts.md
 OPTIONAL: docs/coding-guidelines/05-checklist.md (if new page)
 ```
 
@@ -196,7 +197,7 @@ MUST READ: docs/coding-guidelines/04-build-configuration.md
 **New Page Creation:**
 ```
 STEP 1: docs/coding-guidelines/05-checklist.md (overview)
-STEP 2: docs/coding-guidelines/03-wordpress-integration.md
+STEP 2: docs/coding-guidelines/03-html-structure.md + 03-template-parts.md
   → HTMLセマンティック規約を確認（section/article/list使用）
 STEP 3: docs/coding-guidelines/scss/naming.md
   → BEM命名規則・ネスト規約を確認
@@ -213,13 +214,13 @@ STEP 2: Load relevant detailed guidelines if issues found
 
 ```
 # Image implementation task
-→ Read: docs/coding-guidelines/03-wordpress-integration.md section 2.4 only
+→ Read: docs/coding-guidelines/03-image-handling.md
 
 # SCSS container width issue
 → Read: docs/coding-guidelines/02-scss-design.md "コンテナ幅の設定" section only
 
 # HTML structure implementation
-→ Read: docs/coding-guidelines/03-wordpress-integration.md "HTMLセマンティック規約" section
+→ Read: docs/coding-guidelines/03-html-structure.md
 → Check: section要素の見出し、リスト構造、article使用
 
 # SCSS BEM naming
@@ -228,7 +229,7 @@ STEP 2: Load relevant detailed guidelines if issues found
 
 # Complete new page
 → Read: docs/coding-guidelines/05-checklist.md
-→ Then: 03 (HTML semantic), scss/naming.md (BEM), 02, 04 as you progress
+→ Then: 03-html-structure.md (HTML semantic), scss/naming.md (BEM), 02, 04 as you progress
 ```
 
 **DO NOT load:**
@@ -561,7 +562,7 @@ Task: Add new WordPress page template
 
 3. LOAD RELEVANT GUIDELINES
    → Read: docs/coding-guidelines/05-checklist.md
-   → Read: docs/coding-guidelines/03-wordpress-integration.md
+   → Read: docs/coding-guidelines/03-html-structure.md + 03-template-parts.md
 
 4. DETERMINE FILE STRUCTURE
    → If estimated page > 200 lines → Plan template-parts separation

@@ -234,7 +234,7 @@ Or extract from existing cache:
 | File | Purpose |
 |------|---------|
 | `.claude/cache/figma/` | Figma design context cache directory |
-| `.claude/rules/figma-workflow.md` | Figma implementation workflow rules |
+| `.claude/rules/figma.md` | Figma implementation workflow rules |
 | `figma-implement.md` | Figma implementation command |
 
 ## Examples

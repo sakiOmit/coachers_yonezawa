@@ -298,7 +298,7 @@ Status:
 
 | File | Purpose |
 |------|---------|
-| `.claude/rules/figma-workflow.md` | Workflow rules definition |
+| `.claude/rules/figma.md` | Workflow rules definition |
 | `.claude/catalogs/component-catalog.yaml` | Component catalog |
 | `.claude/cache/figma/` | Figma cache storage |
 | `.shogun/queue/reports/` | Task reports |

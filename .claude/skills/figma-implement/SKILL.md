@@ -86,7 +86,7 @@ ls -la .claude/cache/figma/{page-name}/
 
 2. **Container Width Calculation**
    - Manually apply the artboard margin-based formula (see below)
-   - Refer to `.claude/rules/figma-workflow.md` for container width calculation rules
+   - Refer to `.claude/rules/figma.md` for container width calculation rules
 
 **Container Width Calculation Methods:**
 
@@ -110,7 +110,7 @@ Priority order (default: Method 1):
 
 **See Also:**
 - `/figma-container-width-calculator` - Automated calculation skill
-- `.claude/rules/figma-workflow.md` - Detailed calculation rules
+- `.claude/rules/figma.md` - Detailed calculation rules
 
 ## Usage
 
@@ -613,7 +613,7 @@ For detailed information, see the following reference documents:
 | `.claude/cache/figma-implement-report-*.yaml` | Completion reports |
 | `.claude/cache/figma/` | Figma cache directory |
 | `.claude/cache/visual-diff/` | Diff validation images |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma implementation rules |
 | `.claude/catalogs/component-catalog.yaml` | Component catalog |
 
 ## Examples

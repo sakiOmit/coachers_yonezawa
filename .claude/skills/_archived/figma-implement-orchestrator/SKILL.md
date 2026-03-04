@@ -229,7 +229,7 @@ The orchestrator automatically pauses at the following points and waits for huma
 | `.claude/cache/figma/` | Figma cache directory |
 | `.claude/cache/visual-diff/` | Diff validation images |
 | `.claude/skills/figma-implement/SKILL.md` | Original workflow definition |
-| `.claude/rules/figma-workflow.md` | Figma workflow rules |
+| `.claude/rules/figma.md` | Figma workflow rules |
 | `.claude/data/component-catalog.yaml` | Component catalog |
 
 ## Examples

@@ -169,7 +169,7 @@ This skill is referenced in `/figma-implement` workflow:
 
 ## Related Rules
 
-See `.claude/rules/figma-workflow.md` for container width calculation priority rules.
+See `.claude/rules/figma.md` for container width calculation priority rules.
 
 ## Examples
 
@@ -251,5 +251,5 @@ For asymmetric designs:
 ## See Also
 
 - `/figma-implement` - Main Figma implementation workflow
-- `.claude/rules/figma-workflow.md` - Container width calculation rules
+- `.claude/rules/figma.md` - Container width calculation rules
 - `.claude/cache/figma/` - Figma cache directory structure

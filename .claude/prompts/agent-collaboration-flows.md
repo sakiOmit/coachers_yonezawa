@@ -45,7 +45,7 @@ Task tool: wordpress-professional-engineer (page B)
 ステップ1: WordPress実装
 └─ Agent: wordpress-professional-engineer
    ├─ 読み込み: docs/coding-guidelines/05-checklist.md
-   ├─ 読み込み: docs/coding-guidelines/03-wordpress-integration.md
+   ├─ 読み込み: docs/coding-guidelines/03-html-structure.md + 03-template-parts.md
    ├─ 読み込み: docs/coding-guidelines/02-scss-design.md
    └─ 実装: PHP + SCSS + vite.config.js更新
 
@@ -138,7 +138,7 @@ Task tool: wordpress-professional-engineer (page B)
 ステップ1: Figma解析 + WordPress実装
 └─ Agent: wordpress-professional-engineer
    ├─ Figma MCP: get_design_context (セクション別)
-   ├─ 読み込み: docs/coding-guidelines/03-wordpress-integration.md
+   ├─ 読み込み: docs/coding-guidelines/03-html-structure.md + 03-template-parts.md
    └─ 実装: セクション1, 2, 3...
 
 ステップ2: セクション別レビュー (並列実行可能)
