@@ -57,9 +57,9 @@ metrics:
 score_breakdown:
   unnamed_penalty: 15.9
   flat_penalty: 10
-  ungrouped_penalty: 10
+  ungrouped_penalty: 5
   nesting_penalty: 9
-  autolayout_penalty: 12
+  autolayout_penalty: 0  # unmeasurable via get_metadata — excluded from score
 
 phases_executed: [1]
 phases_recommended: [2]
@@ -92,7 +92,7 @@ Score: 65 / 100  [Grade: B]
 │ Flat structure penalty    │ -10.0            │
 │ Ungrouped penalty         │ -10.0            │
 │ Nesting penalty           │ -9.0             │
-│ Auto Layout penalty       │ -12.0            │
+│ Auto Layout penalty       │ 0 (excluded)     │
 └───────────────────────────┴──────────────────┘
 
 Recommendation: Phase 2 (grouping) recommended

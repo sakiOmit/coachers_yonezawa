@@ -16,8 +16,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, re, sys
-sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+import json, re, sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
 
 FLAT_THRESHOLD = 15
@@ -124,7 +124,7 @@ def detect_grouping_candidates(node):
     return candidates
 
 try:
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[2], 'r') as f:
         data = json.load(f)
 
     root = get_root_node(data)
@@ -194,4 +194,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1"
+" "${SCRIPT_DIR}/.." "$1"

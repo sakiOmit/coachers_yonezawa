@@ -408,3 +408,48 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
   5. 結果統合セクションを Stage A/B 独立適用に書き直し
 - **修正日**: 2026-03-04
 - **ファイル**: `references/phase-details.md`
+
+## Issue 34: `SCRIPT_DIR` シェル変数インジェクション — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: 全6スクリプトで `sys.path.insert(0, '${SCRIPT_DIR}/../lib')` と、bash の `SCRIPT_DIR`
+  変数を Python ヒアドキュメント内に直接展開していた。Issue 28 で `OUTPUT_FILE` の同種の問題は
+  `sys.argv` 経由に修正済みだったが、`SCRIPT_DIR` には同じ修正が適用されていなかった。
+- **リスク**: `SCRIPT_DIR` のパスにシングルクォートが含まれると Python 構文エラー。
+- **修正内容**:
+  - 全6スクリプトで `${SCRIPT_DIR}/..` を bash 側の最初の引数として渡し、
+    Python 側で `sys.argv[1]` から lib パスを取得する方式に変更
+  - 既存の `sys.argv` インデックスを全て +1 にシフト
+  - `os` モジュールの import を追加
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/analyze-structure.sh`, `scripts/generate-rename-map.sh`,
+  `scripts/detect-grouping-candidates.sh`, `scripts/infer-autolayout.sh`,
+  `scripts/prepare-sectioning-context.sh`, `scripts/enrich-metadata.sh`
+- **テスト**: 全65件パス（回帰なし）
+
+## Issue 35: `infer_name()` 内の `text_contents` 二重計算 — FIXED
+
+- **Phase**: 3
+- **優先度**: 低
+- **概要**: `generate-rename-map.sh` の `infer_name()` 関数で、`get_text_children_content(children)`
+  が Priority 3.5（ナビゲーション検出）と Priority 4（子構造分析）の両方で呼び出されていた。
+  同じ `children` に対する同一の計算であり冗長。
+- **修正内容**: Priority 3.5 と Priority 4 を1つの `if children:` ブロックに統合し、
+  `text_contents` を1回だけ計算して両方の Priority で共有。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`
+- **テスト**: 全65件パス（回帰なし）
+
+## Issue 36: phase-details.md の `autolayout_penalty` 出力例が非ゼロ — FIXED
+
+- **Phase**: ドキュメント
+- **優先度**: 低
+- **概要**: Issue 2 で `autolayout_penalty` を計測不能として 0 固定にしたが、
+  `references/phase-details.md` の YAML 出力例（`autolayout_penalty: 12`）と
+  コンソール出力例（`Auto Layout penalty │ -12.0`）が更新されていなかった。
+  Issue 33 のドキュメント陳腐化修正でもこの箇所は見落とされていた。
+- **修正内容**: YAML 出力例を `autolayout_penalty: 0` + コメント付きに、
+  コンソール出力例を `0 (excluded)` に修正。
+- **修正日**: 2026-03-04
+- **ファイル**: `references/phase-details.md`

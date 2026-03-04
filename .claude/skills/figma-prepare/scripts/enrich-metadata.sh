@@ -37,8 +37,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, sys
-sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+import json, sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import get_root_node
 
 # Properties to merge from enrichment into metadata nodes
@@ -69,10 +69,10 @@ def enrich_node(node, enrichment_map, stats):
         enrich_node(child, enrichment_map, stats)
 
 try:
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[2], 'r') as f:
         metadata = json.load(f)
 
-    with open(sys.argv[2], 'r') as f:
+    with open(sys.argv[3], 'r') as f:
         enrichment = json.load(f)
 
     root = get_root_node(metadata)
@@ -80,7 +80,7 @@ try:
     stats = {'enriched_nodes': 0, 'merged_keys': 0}
     enrich_node(root, enrichment, stats)
 
-    output_file = sys.argv[3] if len(sys.argv) > 3 else ''
+    output_file = sys.argv[4] if len(sys.argv) > 4 else ''
 
     if output_file:
         # Write enriched metadata to file
@@ -100,4 +100,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1" "$2" "$OUTPUT_FILE"
+" "${SCRIPT_DIR}/.." "$1" "$2" "$OUTPUT_FILE"

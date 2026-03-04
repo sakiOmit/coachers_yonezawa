@@ -21,8 +21,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, re, sys, unicodedata
-sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+import json, re, sys, unicodedata, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str
 
 # Prefix mapping by context
@@ -176,18 +176,18 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     if not children and w > 0 and w <= 48 and h > 0 and h <= 48:
         return f'icon-{sibling_index}'
 
-    # Priority 3.5: Navigation detection
+    # Priority 3.5+ and 4: Requires children
     if children:
         text_contents = get_text_children_content(children)
+
+        # Priority 3.5: Navigation detection
         text_count = len(text_contents)
         # Navigation: 4+ short text children → nav
         if text_count >= 4 and all(len(t) <= 20 for t in text_contents):
             return f'nav-{sibling_index}'
 
-    # Priority 4: Child structure analysis
-    if children:
+        # Priority 4: Child structure analysis
         child_types = [c.get('type', '') for c in children]
-        text_contents = get_text_children_content(children)
         has_image = 'IMAGE' in child_types or any(
             c.get('type') == 'RECTANGLE'
             and c.get('fills') and isinstance(c.get('fills'), list)
@@ -273,14 +273,14 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
     return renames
 
 try:
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[2], 'r') as f:
         data = json.load(f)
 
     root = get_root_node(data)
     resolve_absolute_coords(root)
     renames = collect_renames(root)
 
-    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
+    output_file = sys.argv[3] if len(sys.argv) > 3 else ''
 
     if output_file:
         # YAML output
@@ -311,4 +311,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1" "$OUTPUT_FILE"
+" "${SCRIPT_DIR}/.." "$1" "$OUTPUT_FILE"

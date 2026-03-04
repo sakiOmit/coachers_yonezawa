@@ -21,8 +21,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, sys, statistics
-sys.path.insert(0, '${SCRIPT_DIR}/../lib')
+import json, sys, statistics, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, yaml_str
 
 GRID_SNAP = 4  # px
@@ -180,14 +180,14 @@ def walk_and_infer(node, results=None):
     return results
 
 try:
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[2], 'r') as f:
         data = json.load(f)
 
     root = get_root_node(data)
     resolve_absolute_coords(root)
     results = walk_and_infer(root)
 
-    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
+    output_file = sys.argv[3] if len(sys.argv) > 3 else ''
 
     if output_file:
         with open(output_file, 'w') as f:
@@ -221,4 +221,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1" "$OUTPUT_FILE"
+" "${SCRIPT_DIR}/.." "$1" "$OUTPUT_FILE"
