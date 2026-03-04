@@ -37,3 +37,24 @@ cases:
     expected_score_range: [55, 70]
     tags: [real-data, anchor-good]
     notes: "実データ1,545ノード。61.8/B。構造整理済み"
+
+  - id: news-article
+    source: .claude/cache/figma/prepare-metadata-1-306.json
+    expected_grade: B
+    expected_score_range: [60, 72]
+    tags: [real-data, deep-nesting, article-content]
+    notes: "お知らせ記事。130ノード、65.3/B。記事コンテンツ（リスト・テーブル・引用）で深いネスト。unnamed 25.4%"
+
+  - id: job-listing
+    source: .claude/cache/figma/prepare-metadata-1-4.json
+    expected_grade: B
+    expected_score_range: [74, 85]
+    tags: [real-data, well-named, cards]
+    notes: "募集一覧。106ノード、79.2/B。セマンティック命名が良好。unnamed 5.7%"
+
+  - id: news-list
+    source: .claude/cache/figma/prepare-metadata-1-125.json
+    expected_grade: B
+    expected_score_range: [70, 82]
+    tags: [real-data, card-grid, tabs]
+    notes: "お知らせ一覧。141ノード、76.4/B。カードグリッド＋タブ。タブのFrame名が汚い"
