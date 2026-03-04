@@ -636,6 +636,7 @@ Next steps:
 | `references/figma-plugin-api.md` | Figma Plugin API パターン集 |
 | `references/phase-details.md` | 各フェーズ詳細ロジック |
 | `references/sectioning-prompt-template.md` | Stage B Claude プロンプトテンプレート |
+| `lib/figma_utils.py` | 共通ユーティリティ（座標変換・bbox・ルートノード・未命名判定） |
 | `.claude/skills/figma-analyze/SKILL.md` | 後続スキル |
 
 ---

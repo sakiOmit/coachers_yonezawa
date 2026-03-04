@@ -255,9 +255,43 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
     - `UNNAMED_RE` — 4スクリプトから統合
     - `is_unnamed(name)` — 便利ラッパー
   - 6スクリプトを更新: `SCRIPT_DIR` + `sys.path.insert` でインポート
-  - `prepare-sectioning-context.sh` のみローカル `get_bbox` を残す
-    （出力フォーマットが `width`/`height` キーを使用するため — Issue 25 として起票）
+  - `prepare-sectioning-context.sh` のローカル `get_bbox` は Issue 25 で共有版に統合済み
 - **修正日**: 2026-03-04
 - **ファイル**: `lib/figma_utils.py` (新規), 全6スクリプト更新
 - **テスト**: 全60件パス（回帰なし）
 - **削減効果**: 約85行の重複コードを解消
+
+## Issue 25: `get_bbox` 返却キー名統一 — FIXED
+
+- **Phase**: 全体
+- **優先度**: 低
+- **概要**: `prepare-sectioning-context.sh` のみローカル `get_bbox` を使用し `{x, y, width, height}`
+  キーを返していた。共有 `get_bbox` は `{x, y, w, h}` を返すため不整合。
+- **修正内容**:
+  - `prepare-sectioning-context.sh` のローカル `get_bbox` を削除し、共有版を使用
+  - 内部参照を `bb['width']`→`bb['w']`, `bb['height']`→`bb['h']` に更新
+  - 出力 JSON の `page_size` は意味的フィールドとして `width`/`height` を維持（bbox形式と異なる）
+  - Issue 24 の RESOLVED-ISSUES エントリの「prepare-sectioning-context.sh のみローカル定義を残す」記述を更新
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/prepare-sectioning-context.sh`
+- **テスト**: 全60件パス（回帰なし）
+
+## Issue 26: ドキュメント Phase 番号不整合 + デッドコード除去 — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: Issue 21 で Phase 2/3 の実行順序を入れ替えた際、一部ドキュメントの更新が漏れていた。
+  また `prepare-sectioning-context.sh` に未使用コード・インポートが残存していた。
+- **修正内容**:
+  - `.claude/rules/figma-prepare.md`: グレード判定表の Phase 2/3 説明を修正
+    - `Phase 2（リネーム）` → `Phase 2（グループ化）`
+    - `Phase 2 + 3（リネーム + グループ化）` → `Phase 2 + 3（グループ化 + リネーム）`
+  - `references/phase-details.md` line 150: クロスリファレンスを修正
+    - `「Phase 3: グループ化」` → `「Phase 2: グループ化」`
+  - `SKILL.md` Related Files: `lib/figma_utils.py` を追加
+  - `prepare-sectioning-context.sh`: 未使用 `re` インポート削除、デッド関数 `collect_all_text()` 削除、
+    `Counter` インポートを関数内からモジュール先頭に移動
+- **修正日**: 2026-03-04
+- **ファイル**: `.claude/rules/figma-prepare.md`, `references/phase-details.md`, `SKILL.md`,
+  `scripts/prepare-sectioning-context.sh`
+- **テスト**: 全60件パス（回帰なし）

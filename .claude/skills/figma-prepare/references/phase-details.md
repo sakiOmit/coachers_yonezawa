@@ -147,7 +147,7 @@ Chrome DevTools MCP (`evaluate_script`)
 
 #### 実行スクリプト (evaluate_script)
 
-→ `figma-plugin-api.md` の「Phase 3: グループ化」セクション参照
+→ `figma-plugin-api.md` の「Phase 2: グループ化」セクション参照
 
 #### 注意事項
 
@@ -186,7 +186,7 @@ Stage A のヒューリスティックではカバーできない「セクショ
   "top_level_children": [
     {
       "id": "1:106", "name": "Group 46165", "type": "FRAME",
-      "bbox": {"x": 10, "y": 10, "width": 1420, "height": 60},
+      "bbox": {"x": 10, "y": 10, "w": 1420, "h": 60},
       "child_count": 4,
       "child_types_summary": "RECTANGLE:2, FRAME:2",
       "has_text_children": true,

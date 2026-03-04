@@ -22,19 +22,10 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, sys, re
+import json, sys
+from collections import Counter
 sys.path.insert(0, '${SCRIPT_DIR}/../lib')
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
-
-def get_bbox(node):
-    \"\"\"Get bounding box with full key names (width/height) for output compatibility.\"\"\"
-    bbox = node.get('absoluteBoundingBox', {})
-    return {
-        'x': bbox.get('x', 0),
-        'y': bbox.get('y', 0),
-        'width': bbox.get('width', 0),
-        'height': bbox.get('height', 0),
-    }
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE
 
 def count_children(node):
     return len(node.get('children', []))
@@ -44,7 +35,6 @@ def get_child_types_summary(node):
     children = node.get('children', [])
     if not children:
         return ''
-    from collections import Counter
     types = Counter(c.get('type', 'UNKNOWN') for c in children)
     return ', '.join(f'{t}:{n}' for t, n in sorted(types.items()))
 
@@ -63,25 +53,11 @@ def get_text_children_preview(node, max_items=5):
             texts.append(chars if chars else name)
     return texts[:max_items]
 
-def collect_all_text(node, depth=0, max_depth=3):
-    \"\"\"Recursively collect text from children up to max_depth.\"\"\"
-    texts = []
-    if depth > max_depth:
-        return texts
-    for c in node.get('children', []):
-        if c.get('type') == 'TEXT':
-            name = c.get('name', '')
-            chars = c.get('characters', '')
-            texts.append(chars if chars else name)
-        else:
-            texts.extend(collect_all_text(c, depth + 1, max_depth))
-    return texts
-
 def detect_heuristic_hints(children, page_bbox):
     \"\"\"Detect header/footer/page-kv candidates from top-level children.\"\"\"
-    page_h = page_bbox.get('height', 0)
-    page_y = page_bbox.get('y', 0)
-    page_w = page_bbox.get('width', 0)
+    page_h = page_bbox['h']
+    page_y = page_bbox['y']
+    page_w = page_bbox['w']
     if page_h <= 0:
         return {'header_candidates': [], 'footer_candidates': [], 'page_kv_candidates': []}
 
@@ -102,12 +78,12 @@ def detect_heuristic_hints(children, page_bbox):
 
         # Header: top area, wide frame
         if bb['y'] < page_y + page_h * 0.05:
-            if node_type in ('FRAME', 'GROUP') and bb['width'] > page_w * 0.8:
+            if node_type in ('FRAME', 'GROUP') and bb['w'] > page_w * 0.8:
                 header_candidates.append(node_id)
 
         # Footer: bottom area, wide frame
-        if bb['y'] + bb['height'] > page_y + page_h * 0.9:
-            if node_type in ('FRAME', 'GROUP') and bb['width'] > page_w * 0.8:
+        if bb['y'] + bb['h'] > page_y + page_h * 0.9:
+            if node_type in ('FRAME', 'GROUP') and bb['w'] > page_w * 0.8:
                 footer_candidates.append(node_id)
 
         # Page KV: upper 30%, breadcrumb or heading
@@ -170,8 +146,8 @@ try:
         'page_name': root.get('name', ''),
         'page_id': root.get('id', ''),
         'page_size': {
-            'width': page_bbox.get('width', 0),
-            'height': page_bbox.get('height', 0),
+            'width': page_bbox['w'],
+            'height': page_bbox['h'],
         },
         'top_level_children': top_level,
         'total_children': len(sorted_children),
