@@ -21,9 +21,10 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, re, sys, os
+import json, sys, os
+sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab
 
 # Prefix mapping by context
 SHAPE_PREFIXES = {
@@ -33,41 +34,6 @@ SHAPE_PREFIXES = {
     'VECTOR': 'icon',
     'IMAGE': 'img',
 }
-
-# Japanese keyword → English slug mapping
-JP_KEYWORD_MAP = {
-    '募集詳細を見る': 'view-detail',
-    '募集要項': 'requirements',
-    'すべて': 'all', 'お知らせ': 'news', '一覧': 'list',
-    '詳しく': 'more', '詳細': 'detail', '見る': 'view',
-    '採用': 'recruit', '新卒': 'new-grad', '中途': 'mid-career',
-    '募集': 'jobs', '事業': 'business', '仕事': 'work',
-    'について': 'about', '環境': 'environment', '社員': 'staff',
-    'インタビュー': 'interview', 'お問い合わせ': 'contact',
-    '送信': 'submit', '申し込': 'apply', '戻る': 'back',
-    'トップ': 'top', 'ホーム': 'home', '検索': 'search',
-    'カテゴリー': 'category', 'イベント': 'event',
-    '要項': 'requirements',
-}
-
-def to_kebab(text):
-    \"\"\"Convert text to kebab-case safe name. Supports Japanese via keyword map.\"\"\"
-    text = text.strip()
-    if not text:
-        return ''
-    # Check JP keyword map first (longest match first, with ratio check)
-    for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
-        if jp in text:
-            ratio = len(jp) / len(text)
-            if ratio >= 0.5:  # keyword must be >= 50% of text length
-                return en
-    # Strip non-ASCII characters first (Issue 13)
-    text = re.sub(r'[^\x00-\x7f]', ' ', text)
-    # ASCII logic
-    text = re.sub(r'[^\w\s-]', '', text.lower())
-    text = re.sub(r'[\s_]+', '-', text)
-    text = re.sub(r'-+', '-', text).strip('-')
-    return text[:40] if text else ''
 
 def get_text_children_content(children):
     \"\"\"Collect TEXT children's content. Prefer enriched characters over name.\"\"\"

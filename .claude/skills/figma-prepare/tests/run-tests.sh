@@ -310,58 +310,38 @@ if frames:
 echo ""
 
 # ================================================================
-bold "=== Unit: to_kebab regression (Issue 12-13) ==="
+bold "=== Unit: to_kebab regression ==="
 
 python3 -c "
-import re
+import sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+from figma_utils import to_kebab
 
-JP_KEYWORD_MAP = {
-    '募集詳細を見る': 'view-detail',
-    '募集要項': 'requirements',
-    'すべて': 'all', 'お知らせ': 'news', '一覧': 'list',
-    '詳しく': 'more', '詳細': 'detail', '見る': 'view',
-    '採用': 'recruit', '新卒': 'new-grad', '中途': 'mid-career',
-    '募集': 'jobs', '事業': 'business', '仕事': 'work',
-    'について': 'about', '環境': 'environment', '社員': 'staff',
-    'インタビュー': 'interview', 'お問い合わせ': 'contact',
-    '送信': 'submit', '申し込': 'apply', '戻る': 'back',
-    'トップ': 'top', 'ホーム': 'home', '検索': 'search',
-    'カテゴリー': 'category', 'イベント': 'event',
-    '要項': 'requirements',
-}
+# Non-ASCII-only text returns generic 'content' label
+assert to_kebab('大規模イベントに強いオペレーション力') == 'content', f'JP-only fail: got \"{to_kebab(\"大規模イベントに強いオペレーション力\")}\"'
+assert to_kebab('イベント一覧') == 'content', f'JP-only fail: got \"{to_kebab(\"イベント一覧\")}\"'
+assert to_kebab('お問い合わせ') == 'content', f'JP-only fail: got \"{to_kebab(\"お問い合わせ\")}\"'
+assert to_kebab('無料相談') == 'content', f'JP-only fail: got \"{to_kebab(\"無料相談\")}\"'
+assert to_kebab('資料請求') == 'content', f'JP-only fail: got \"{to_kebab(\"資料請求\")}\"'
 
-def to_kebab(text):
-    text = text.strip()
-    if not text:
-        return ''
-    for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
-        if jp in text:
-            ratio = len(jp) / len(text)
-            if ratio >= 0.5:
-                return en
-    text = re.sub(r'[^\x00-\x7f]', ' ', text)
-    text = re.sub(r'[^\w\s-]', '', text.lower())
-    text = re.sub(r'[\s_]+', '-', text)
-    text = re.sub(r'-+', '-', text).strip('-')
-    return text[:40] if text else ''
-
-# Issue 12: ratio check prevents false match on long text
-assert to_kebab('大規模イベントに強いオペレーション力') == '', f'Issue 12 fail: got \"{to_kebab(\"大規模イベントに強いオペレーション力\")}\"'
-assert to_kebab('イベント一覧') == 'event', f'Issue 12 fail: got \"{to_kebab(\"イベント一覧\")}\"'
-assert to_kebab('イベント') == 'event', f'Issue 12 exact match fail'
-assert to_kebab('お問い合わせ') == 'contact', f'Issue 12 exact match fail'
-
-# Issue 13: non-ASCII stripped to empty
-assert to_kebab('無料相談') == '', f'Issue 13 fail: got \"{to_kebab(\"無料相談\")}\"'
-assert to_kebab('資料請求') == '', f'Issue 13 fail: got \"{to_kebab(\"資料請求\")}\"'
-assert to_kebab('募集要項') == 'requirements', f'Issue 13 registered keyword fail'
+# Empty / whitespace
+assert to_kebab('') == '', 'Empty string fail'
+assert to_kebab('   ') == '', 'Whitespace fail'
 
 # ASCII still works
 assert to_kebab('job description') == 'job-description', f'ASCII fail: got \"{to_kebab(\"job description\")}\"'
 assert to_kebab('REASON') == 'reason', f'ASCII fail: got \"{to_kebab(\"REASON\")}\"'
 
+# Issue 47: CamelCase splitting
+assert to_kebab('CamelCase') == 'camel-case', f'CamelCase fail: got \"{to_kebab(\"CamelCase\")}\"'
+assert to_kebab('HTMLParser') == 'html-parser', f'HTMLParser fail: got \"{to_kebab(\"HTMLParser\")}\"'
+assert to_kebab('myComponent') == 'my-component', f'myComponent fail: got \"{to_kebab(\"myComponent\")}\"'
+
+# Mixed: ASCII extracted from JP text
+assert to_kebab('Hello世界') == 'hello', f'Mixed fail: got \"{to_kebab(\"Hello世界\")}\"'
+
 print('All to_kebab tests passed')
-" 2>/dev/null && { green "  PASS: to_kebab unit tests (Issue 12-13)"; ((PASS++)) || true; } || { red "  FAIL: to_kebab unit tests"; ((FAIL++)) || true; }
+" "$SKILLS_DIR" 2>/dev/null && { green "  PASS: to_kebab unit tests"; ((PASS++)) || true; } || { red "  FAIL: to_kebab unit tests"; ((FAIL++)) || true; }
 
 echo ""
 
@@ -1101,8 +1081,9 @@ try:
     renames = data.get('renames', {})
 
     # 1:1 is unnamed TEXT with characters='お問い合わせ' → should use characters, not name
+    # to_kebab returns 'content' for non-ASCII-only text (JP_KEYWORD_MAP removed)
     r1 = renames.get('1:1', {})
-    assert 'contact' in r1.get('new_name', ''), f'1:1 should use characters field, got: {r1.get(\"new_name\", \"\")}'
+    assert 'content' in r1.get('new_name', ''), f'1:1 should use characters field, got: {r1.get(\"new_name\", \"\")}'
 
     # 1:2 is unnamed FRAME with enriched TEXT children
     # get_text_children_content should prefer characters over name

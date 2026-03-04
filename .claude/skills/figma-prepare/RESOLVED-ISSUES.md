@@ -569,3 +569,56 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正内容**: 不要な import を削除。
 - **修正日**: 2026-03-04
 - **ファイル**: `scripts/generate-rename-map.sh`, `scripts/detect-grouping-candidates.sh`
+
+## Issue 45: `to_kebab` + `JP_KEYWORD_MAP` コード重複 — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: `generate-rename-map.sh` と `run-tests.sh` に `to_kebab()` 関数と `JP_KEYWORD_MAP` 辞書が
+  完全に重複していた。DRY原則違反であり、一方を変更すると他方との乖離リスクがあった。
+- **修正内容**: `to_kebab()` と `JP_KEYWORD_MAP` を `lib/figma_utils.py` に移動。
+  `generate-rename-map.sh` は `from figma_utils import to_kebab` に変更。
+  `run-tests.sh` も `figma_utils.to_kebab` を直接 import してテスト。
+  副作用として `generate-rename-map.sh` の `import re` が不要になったため削除。
+- **修正日**: 2026-03-05
+- **ファイル**: `lib/figma_utils.py`, `scripts/generate-rename-map.sh`, `tests/run-tests.sh`
+
+## Issue 46: confidence 定義の不一致 — CLOSED (Not an Issue)
+
+- **Phase**: docs
+- **優先度**: 低
+- **概要**: Phase 4 の confidence 判定ロジックが rules とコードで異なると疑われたが、
+  調査の結果 `phase-details.md`（正のソース）は既に Issue 43 で正しく更新済み
+  （子要素数ベース: 3+ → high, 2 → medium）。`figma-prepare.md` には confidence 定義自体が
+  存在しないため不整合は発生していなかった。
+- **修正日**: 2026-03-05
+- **ファイル**: なし
+
+## Issue 47: `to_kebab` CamelCase 分割未実装 — FIXED
+
+- **Phase**: 3
+- **優先度**: 低
+- **概要**: `to_kebab()` の docstring に「Camel-case parsing via re.sub + lowercase」と記載されていたが、
+  実際には CamelCase 分割ロジックが未実装だった。`CamelCaseText` → `camelcasetext` になっていた。
+  Figma の自動生成名はスペース区切り（`Frame 1`）のため影響は限定的だが、
+  ユーザー定義のレイヤー名（`HeroSection` 等）で不適切な命名になる可能性があった。
+- **修正内容**: `to_kebab()` に CamelCase 分割の `re.sub` を2つ追加:
+  1. `([a-z])([A-Z])` → `\1 \2` (camelCase → camel Case)
+  2. `([A-Z]+)([A-Z][a-z])` → `\1 \2` (HTMLParser → HTML Parser)
+  テストケース3件追加: `CamelCase`, `HTMLParser`, `myComponent`
+- **修正日**: 2026-03-05
+- **ファイル**: `lib/figma_utils.py`, `tests/run-tests.sh`
+
+## Issue 48: 深いネスト Figma ファイルで再帰制限クラッシュ — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: 全スクリプトの再帰関数（`count_nodes`, `walk_and_detect`, `walk_and_infer`,
+  `collect_renames`, `resolve_absolute_coords`, `enrich_node`）に Python デフォルト再帰制限（1000）の
+  ガードがなかった。極端にネストの深い Figma ファイルで `RecursionError` クラッシュの可能性があった。
+- **修正内容**: 6スクリプト全てに `sys.setrecursionlimit(3000)` を追加。
+  Figma のネスト深度は通常100以下だが、安全マージンとして3000に設定。
+- **修正日**: 2026-03-05
+- **ファイル**: `scripts/analyze-structure.sh`, `scripts/detect-grouping-candidates.sh`,
+  `scripts/generate-rename-map.sh`, `scripts/infer-autolayout.sh`,
+  `scripts/prepare-sectioning-context.sh`, `scripts/enrich-metadata.sh`

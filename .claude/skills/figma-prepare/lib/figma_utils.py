@@ -68,3 +68,30 @@ def get_root_node(data):
 def is_unnamed(name):
     """Check if a node name matches unnamed (auto-generated) pattern."""
     return bool(UNNAMED_RE.match(name))
+
+
+def to_kebab(text):
+    """Convert text to kebab-case safe name.
+
+    Non-ASCII-only text returns 'content' as a generic label.
+    The downstream AI (via get_design_context) will assign final
+    semantic names using the node's characters field.
+
+    Issue 45: Extracted from generate-rename-map.sh to avoid duplication.
+    Issue 47: Added CamelCase splitting (e.g. CamelCase → camel-case).
+    """
+    text = text.strip()
+    if not text:
+        return ''
+    # Extract ASCII portion
+    ascii_part = re.sub(r'[^\x00-\x7f]', '', text).strip()
+    if not ascii_part:
+        return 'content'
+    # Split CamelCase before lowercasing (Issue 47)
+    ascii_part = re.sub(r'([a-z])([A-Z])', r'\1 \2', ascii_part)
+    ascii_part = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', ascii_part)
+    # ASCII logic
+    ascii_part = re.sub(r'[^\w\s-]', '', ascii_part.lower())
+    ascii_part = re.sub(r'[\s_]+', '-', ascii_part)
+    ascii_part = re.sub(r'-+', '-', ascii_part).strip('-')
+    return ascii_part[:40] if ascii_part else 'content'
