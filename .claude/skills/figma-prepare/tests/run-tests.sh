@@ -390,6 +390,141 @@ fi
 echo ""
 
 # ================================================================
+# ================================================================
+bold "=== Realistic Fixture: fixture-realistic.json ==="
+
+REALISTIC_FIXTURE="$SCRIPT_DIR/fixture-realistic.json"
+if [[ -f "$REALISTIC_FIXTURE" ]]; then
+  # --- Phase 1: analyze-structure ---
+  REAL_P1=$(bash "$SKILLS_DIR/scripts/analyze-structure.sh" "$REALISTIC_FIXTURE" 2>&1) || {
+    red "  FATAL: analyze-structure.sh crashed on realistic fixture"
+    echo "$REAL_P1"
+    ((FAIL++)) || true
+  }
+
+  if [[ -n "${REAL_P1:-}" ]] && echo "$REAL_P1" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+    # 1. is_section_root: root FRAME (1440 width) recognized as section root
+    echo "$REAL_P1" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+# Root is FRAME with 1440 width — deep_nesting should be relative to section roots
+# If section root detection works, deep_nesting_count should be low (< total/2)
+total = d['metrics']['total_nodes']
+deep = d['metrics']['deep_nesting_count']
+assert deep < total // 2, f'deep_nesting={deep} >= total/2={total//2}'
+print(f'  PASS: is_section_root — deep_nesting={deep} < total/2={total//2}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: is_section_root detection"; ((FAIL++)) || true; }
+
+    # 2. Unnamed detection: lowercase 'image' nodes detected
+    REAL_UNNAMED=$(echo "$REAL_P1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['unnamed_nodes'])" 2>/dev/null || echo "0")
+    if python3 -c "assert int('$REAL_UNNAMED') >= 5" 2>/dev/null; then
+      green "  PASS: Unnamed detection — $REAL_UNNAMED unnamed nodes detected (>= 5, includes lowercase image)"
+      ((PASS++)) || true
+    else
+      red "  FAIL: Unnamed detection — only $REAL_UNNAMED detected (expected >= 5)"
+      ((FAIL++)) || true
+    fi
+
+    # 3. Lowercase 'image' in sample_unnamed
+    echo "$REAL_P1" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+samples = d.get('sample_unnamed', [])
+has_lowercase = any('image' in s.lower() for s in samples)
+assert has_lowercase, f'No lowercase image in samples: {samples}'
+print('  PASS: Lowercase image detected in sample_unnamed')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Lowercase image not in sample_unnamed"; ((FAIL++)) || true; }
+
+    # 4. Score validation (85-95 range for well-named fixture)
+    assert_json_range "$REAL_P1" "['score']" 85 95 "Realistic fixture score in 85-95"
+
+    echo ""
+    echo "  [Detail] $(echo "$REAL_P1" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+m=d['metrics']
+print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed={m['unnamed_nodes']}({m['unnamed_rate_pct']}%), flat={m['flat_sections']}, deep={m['deep_nesting_count']}\")
+" 2>/dev/null)"
+    echo ""
+
+    # --- Phase 2: generate-rename-map ---
+    REAL_P2=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$REALISTIC_FIXTURE" 2>&1) || {
+      red "  FATAL: generate-rename-map.sh crashed on realistic fixture"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${REAL_P2:-}" ]]; then
+      REAL_RENAME_COUNT=$(echo "$REAL_P2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
+      # Cross-script consistency: Phase 1 unnamed ≈ Phase 2 renames (±5)
+      if python3 -c "assert abs($REAL_UNNAMED - $REAL_RENAME_COUNT) <= 5" 2>/dev/null; then
+        green "  PASS: Cross-script — Phase1 unnamed ($REAL_UNNAMED) ≈ Phase2 renames ($REAL_RENAME_COUNT)"
+        ((PASS++)) || true
+      else
+        red "  FAIL: Cross-script — Phase1 unnamed ($REAL_UNNAMED) vs Phase2 renames ($REAL_RENAME_COUNT) gap > 5"
+        ((FAIL++)) || true
+      fi
+    fi
+
+    # --- Phase 3: detect-grouping-candidates ---
+    REAL_P3=$(bash "$SKILLS_DIR/scripts/detect-grouping-candidates.sh" "$REALISTIC_FIXTURE" 2>&1) || {
+      red "  FATAL: detect-grouping-candidates.sh crashed on realistic fixture"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${REAL_P3:-}" ]]; then
+      # Pattern group detection (cards should be detected)
+      REAL_CANDIDATES=$(echo "$REAL_P3" | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('candidates',[])))" 2>/dev/null || echo "0")
+      if python3 -c "assert int('$REAL_CANDIDATES') >= 1" 2>/dev/null; then
+        green "  PASS: Grouping — $REAL_CANDIDATES candidates detected (>= 1)"
+        ((PASS++)) || true
+      else
+        red "  FAIL: Grouping — no candidates detected"
+        ((FAIL++)) || true
+      fi
+
+      # Dedup check: candidates < 50% of total nodes
+      REAL_TOTAL=$(echo "$REAL_P1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['total_nodes'])" 2>/dev/null || echo "100")
+      if python3 -c "assert int('$REAL_CANDIDATES') < int('$REAL_TOTAL') * 0.5" 2>/dev/null; then
+        green "  PASS: Dedup — candidates ($REAL_CANDIDATES) < 50% of nodes ($REAL_TOTAL)"
+        ((PASS++)) || true
+      else
+        red "  FAIL: Dedup — candidates ($REAL_CANDIDATES) >= 50% of nodes ($REAL_TOTAL)"
+        ((FAIL++)) || true
+      fi
+    fi
+
+    # --- Phase 4: infer-autolayout ---
+    REAL_P4=$(bash "$SKILLS_DIR/scripts/infer-autolayout.sh" "$REALISTIC_FIXTURE" 2>&1) || {
+      red "  FATAL: infer-autolayout.sh crashed on realistic fixture"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${REAL_P4:-}" ]]; then
+      # resolve_absolute_coords: leaf-level padding values should not have negative values
+      # (negative padding indicates coordinate resolution failure)
+      echo "$REAL_P4" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+negative_padding = []
+for f in d.get('frames',[]):
+    p = f['layout']['padding']
+    for k,v in p.items():
+        if v < 0:
+            negative_padding.append(f'{f[\"node_name\"]}.{k}={v}')
+if negative_padding:
+    print(f'  FAIL: Negative padding (coord resolution bug): {negative_padding[:3]}')
+    sys.exit(1)
+print(f'  PASS: resolve_absolute_coords — no negative padding values ({len(d.get(\"frames\",[]))} frames checked)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Negative padding detected (coordinate resolution bug)"; ((FAIL++)) || true; }
+    fi
+  fi
+else
+  skip_test "Realistic fixture not found"
+fi
+
+echo ""
+
+# ================================================================
 bold "========================================"
 bold "  Results: $PASS passed, $FAIL failed, $SKIP skipped"
 bold "========================================"

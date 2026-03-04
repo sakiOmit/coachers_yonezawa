@@ -47,10 +47,10 @@ cases:
 
   - id: job-listing
     source: .claude/cache/figma/prepare-metadata-1-4.json
-    expected_grade: B
-    expected_score_range: [74, 85]
+    expected_grade: A
+    expected_score_range: [88, 97]
     tags: [real-data, well-named, cards]
-    notes: "募集一覧。106ノード、79.2/B。セマンティック命名が良好。unnamed 5.7%"
+    notes: "募集一覧。106ノード、93.2/A。セマンティック命名が良好。unnamed 5.7%。Issue 7修正後にスコア上昇"
 
   - id: news-list
     source: .claude/cache/figma/prepare-metadata-1-125.json
@@ -58,3 +58,10 @@ cases:
     expected_score_range: [70, 82]
     tags: [real-data, card-grid, tabs]
     notes: "お知らせ一覧。141ノード、76.4/B。カードグリッド＋タブ。タブのFrame名が汚い"
+
+  - id: fixture-realistic
+    source: .claude/skills/figma-prepare/tests/fixture-realistic.json
+    expected_grade: A
+    expected_score_range: [85, 95]
+    tags: [fixture, realistic, regression]
+    notes: "実データベースフィクスチャ。募集一覧(1-4)から67ノードサブセット。FRAME主体、低unnamed率、深度8"
