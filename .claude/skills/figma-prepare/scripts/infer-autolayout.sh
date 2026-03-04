@@ -137,6 +137,33 @@ def infer_layout(frame):
         'confidence': 'high' if len(children) >= 3 else 'medium',
     }
 
+def layout_from_enrichment(frame):
+    \"\"\"Extract Auto Layout settings from enriched metadata (Issue 18).
+    Returns layout dict if layoutMode is present, None otherwise.\"\"\"
+    layout_mode = frame.get('layoutMode')
+    if not layout_mode:
+        return None
+
+    direction = layout_mode  # HORIZONTAL or VERTICAL
+    item_gap = snap(frame.get('itemSpacing', 0))
+    padding = {
+        'top': snap(frame.get('paddingTop', 0)),
+        'right': snap(frame.get('paddingRight', 0)),
+        'bottom': snap(frame.get('paddingBottom', 0)),
+        'left': snap(frame.get('paddingLeft', 0)),
+    }
+    primary_align = frame.get('primaryAxisAlignItems', 'MIN')
+    counter_align = frame.get('counterAxisAlignItems', 'MIN')
+
+    return {
+        'direction': direction,
+        'gap': item_gap,
+        'padding': padding,
+        'primary_axis_align': primary_align,
+        'counter_axis_align': counter_align,
+        'confidence': 'exact',  # from actual Figma data, not inferred
+    }
+
 def walk_and_infer(node, results=None):
     \"\"\"Walk tree and infer Auto Layout for eligible frames.\"\"\"
     if results is None:
@@ -145,15 +172,22 @@ def walk_and_infer(node, results=None):
     node_type = node.get('type', '')
     children = node.get('children', [])
 
-    # Only process frames without existing Auto Layout
-    if node_type == 'FRAME' and not node.get('layoutMode') and len(children) >= 2:
-        layout = infer_layout(node)
+    if node_type == 'FRAME' and len(children) >= 2:
+        # Issue 18: Use enriched layoutMode if available
+        layout = layout_from_enrichment(node)
+        source = 'enriched'
+        if not layout and not node.get('layoutMode'):
+            # Fallback to inference
+            layout = infer_layout(node)
+            source = 'inferred'
+
         if layout:
             results.append({
                 'node_id': node.get('id', ''),
                 'node_name': node.get('name', ''),
                 'child_count': len(children),
                 'layout': layout,
+                'source': source,
             })
 
     for child in children:

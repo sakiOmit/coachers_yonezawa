@@ -130,6 +130,11 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     # Priority 2: Shape analysis
     if node_type in SHAPE_PREFIXES and not children:
         prefix = SHAPE_PREFIXES[node_type]
+        # Issue 17: fills-based IMAGE detection (enriched metadata)
+        fills = node.get('fills', [])
+        if fills and isinstance(fills, list):
+            if any(f.get('type') == 'IMAGE' for f in fills if isinstance(f, dict)):
+                return f'img-{sibling_index}'
         # Thin wide rectangle → divider
         if node_type == 'RECTANGLE' and w > 0 and h > 0:
             if w / max(h, 1) > 10 and h < 5:
@@ -144,6 +149,40 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         if sibling_index == total_siblings - 1:
             return f'section-footer'
         return f'section-{sibling_index}'
+
+    # Priority 3.1: Header/Footer heuristic (Issue 16)
+    # Detects headers/footers within section roots (not just PAGE/CANVAS children)
+    if node_type in ('FRAME', 'GROUP') and parent and children:
+        parent_bbox = parent.get('absoluteBoundingBox', {})
+        parent_y = parent_bbox.get('y', 0)
+        parent_h = parent_bbox.get('height', 0)
+        parent_w = parent_bbox.get('width', 0)
+        node_y = abs_bbox.get('y', 0)
+        relative_y = node_y - parent_y
+        is_wide = w > max(parent_w * 0.7, 500)
+
+        if is_wide:
+            # Header: near top + has nav child (frame with 4+ text grandchildren)
+            if relative_y < 100:
+                has_nav = False
+                for c in children:
+                    if c.get('type') in ('FRAME', 'GROUP'):
+                        text_gchildren = [gc for gc in c.get('children', [])
+                                          if gc.get('type') == 'TEXT']
+                        if len(text_gchildren) >= 4:
+                            has_nav = True
+                            break
+                if has_nav:
+                    return 'header'
+
+            # Footer: near bottom + compact + text-heavy
+            if parent_h > 0:
+                node_bottom = node_y + h
+                parent_bottom = parent_y + parent_h
+                if abs(node_bottom - parent_bottom) < 100 and h < 200:
+                    text_count = sum(1 for c in children if c.get('type') == 'TEXT')
+                    if text_count >= max(len(children) * 0.3, 1):
+                        return 'footer'
 
     # Priority 3.2: Tiny empty frame → icon
     if not children and w > 0 and w <= 48 and h > 0 and h <= 48:

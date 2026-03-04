@@ -864,6 +864,55 @@
           ]
         }
       ]
+    },
+    {
+      "id": "1:300",
+      "name": "Group 50001",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+        "x": 0.0,
+        "y": 3758.0,
+        "width": 1440.0,
+        "height": 100.0
+      },
+      "children": [
+        {
+          "id": "1:301",
+          "name": "© 2024 Yonezawa Koki",
+          "type": "TEXT",
+          "absoluteBoundingBox": {
+            "x": 500.0,
+            "y": 40.0,
+            "width": 300.0,
+            "height": 20.0
+          },
+          "children": []
+        },
+        {
+          "id": "1:302",
+          "name": "Privacy Policy",
+          "type": "TEXT",
+          "absoluteBoundingBox": {
+            "x": 900.0,
+            "y": 40.0,
+            "width": 100.0,
+            "height": 20.0
+          },
+          "children": []
+        },
+        {
+          "id": "1:303",
+          "name": "お問い合わせ",
+          "type": "TEXT",
+          "absoluteBoundingBox": {
+            "x": 1050.0,
+            "y": 40.0,
+            "width": 80.0,
+            "height": 20.0
+          },
+          "children": []
+        }
+      ]
     }
   ]
 }

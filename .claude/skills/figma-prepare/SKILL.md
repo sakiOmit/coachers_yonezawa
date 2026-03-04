@@ -156,6 +156,12 @@ Phase 1: 構造分析レポート（Figma MCP、読み取り専用）
         │
         ├─ [--phase 1] → 終了 + 次ステップ提案
         │
+        ▼ [--phase >= 2, --enrich 指定時]
+Phase 1.5: メタデータ補完（オプション）
+        │ → get_design_context でセクション別に fills/layoutMode/characters 取得
+        │ → enrich-metadata.sh でメタデータにマージ
+        │ → enriched metadata を後続 Phase に使用
+        │
         ▼ [--phase >= 2]
 Phase 2: セマンティックリネーム
         │ → dry-run: rename-map.yaml 出力
@@ -208,6 +214,11 @@ Phase 1: Figma MCP のみ必要（常に利用可能）
 Phase 2+: Chrome DevTools MCP が必要
   → .mcp.json に "chrome-devtools" が存在するか確認
   → 未登録の場合: Phase 1 のみ実行 + セットアップ案内表示
+
+Phase 2+ の自動セットアップ:
+  bash .claude/skills/figma-prepare/scripts/start-chrome-debug.sh "{figma-url}"
+  → Chrome 起動 + SSH トンネル + 接続確認を一括実行
+  → 既に起動済みならスキップ（冪等）
 ```
 
 ### 0-3. キャッシュ確認
@@ -273,6 +284,48 @@ Next steps:
   /figma-prepare {url} --phase 2 --apply   # Rename + apply
   /figma-analyze {url}                     # Skip to analysis
 ```
+
+## Phase 1.5: メタデータ補完（オプション）
+
+`--enrich` フラグ指定時、`get_design_context` を使用してメタデータを補完する。
+fills（画像判定）、layoutMode（AutoLayout実値）、characters（テキスト内容）が追加される。
+
+### 1.5-1. セクションルート特定
+
+Phase 1 のメタデータからセクションルート（width ~1440 のフレーム）の nodeId を抽出。
+
+### 1.5-2. get_design_context 呼び出し
+
+各セクションルートに対して：
+```
+mcp__figma__get_design_context
+  fileKey: "{fileKey}"
+  nodeId: "{sectionNodeId}"
+```
+
+### 1.5-3. エンリッチメントデータ抽出
+
+レスポンスから fills, layoutMode, itemSpacing, padding*, characters を抽出し、
+フラットマップ（`{ nodeId: { fills, layoutMode, ... } }`）を構築。
+
+### 1.5-4. メタデータマージ
+
+```bash
+bash .claude/skills/figma-prepare/scripts/enrich-metadata.sh \
+  .claude/cache/figma/prepare-metadata-{nodeId}.json \
+  .claude/cache/figma/enrichment-{nodeId}.json \
+  --output .claude/cache/figma/prepare-metadata-{nodeId}.json
+```
+
+マージ後のメタデータは Phase 2-4 で自動的に使用される。
+
+### 1.5-5. 補完の効果
+
+| Phase | 補完なし | 補完あり |
+|-------|---------|---------|
+| Phase 2 | RECTANGLE → bg-* | IMAGE fill → img-*, SOLID fill → bg-* |
+| Phase 2 | GROUP → group-* (フォールバック) | 位置+構造 → header/footer |
+| Phase 4 | 座標推論 (medium confidence) | layoutMode 実値 (exact confidence) |
 
 ## Phase 2: セマンティックリネーム
 
@@ -467,9 +520,11 @@ Next steps:
 | スクリプト | 目的 | 入力 | 出力 |
 |-----------|------|------|------|
 | `scripts/analyze-structure.sh` | 構造品質分析 | metadata JSON | JSON (score, grade, metrics) |
+| `scripts/enrich-metadata.sh` | メタデータ補完 | metadata JSON + enrichment JSON | enriched metadata JSON |
 | `scripts/generate-rename-map.sh` | リネームマップ生成 | metadata JSON | JSON/YAML (rename map) |
 | `scripts/detect-grouping-candidates.sh` | グルーピング候補検出 | metadata JSON | JSON/YAML (grouping plan) |
 | `scripts/infer-autolayout.sh` | Auto Layout推論 | metadata JSON | JSON/YAML (autolayout plan) |
+| `scripts/start-chrome-debug.sh` | Chrome 起動 + SSH トンネル + 接続確認 | Figma URL (optional) | stdout (接続状態) |
 | `scripts/clone-artboard.js` | アートボード複製 + IDマッピング | `() => { ... }` 形式、`__SOURCE_NODE_ID__` 置換 | object (clone info, mapping) |
 | `scripts/apply-renames.js` | バッチリネーム実行 | `() => { ... }` 形式、`__RENAME_MAP__` / `__BATCH_INFO__` 置換 | object (renamed, errors) |
 

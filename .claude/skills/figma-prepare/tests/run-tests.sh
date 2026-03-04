@@ -582,6 +582,26 @@ new_name = r.get('new_name','')
 assert new_name.startswith('content-'), f'Frame 99001 (heading+body) should be content-*, got: {new_name}'
 print(f'  PASS: Issue 14 — heading+body frame → {new_name}')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 14 — heading+body frame not content-*"; ((FAIL++)) || true; }
+
+      # 7. Issue 16: Header detection — Group 46165 (top, wide, has nav child) → header
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:106',{})
+new_name = r.get('new_name','')
+assert new_name == 'header', f'Group 46165 should be header, got: {new_name}'
+print(f'  PASS: Issue 16 — header detection → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 16 — header not detected"; ((FAIL++)) || true; }
+
+      # 8. Issue 16: Footer detection — Group 50001 (bottom, wide, text children) → footer
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:300',{})
+new_name = r.get('new_name','')
+assert new_name == 'footer', f'Group 50001 should be footer, got: {new_name}'
+print(f'  PASS: Issue 16 — footer detection → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 16 — footer not detected"; ((FAIL++)) || true; }
     fi
 
     # --- Phase 3: detect-grouping-candidates ---
@@ -639,6 +659,99 @@ print(f'  PASS: resolve_absolute_coords — no negative padding values ({len(d.g
   fi
 else
   skip_test "Realistic fixture not found"
+fi
+
+echo ""
+
+# ================================================================
+bold "=== Enrichment Pipeline: Issues 15, 17, 18 ==="
+
+ENRICHMENT_FIXTURE="$SCRIPT_DIR/fixture-enrichment.json"
+if [[ -f "$REALISTIC_FIXTURE" ]] && [[ -f "$ENRICHMENT_FIXTURE" ]]; then
+  # Phase 1.5: enrich-metadata.sh
+  ENRICHED_TMP="/tmp/figma-prepare-enriched-$$.json"
+  ENRICH_RESULT=$(bash "$SKILLS_DIR/scripts/enrich-metadata.sh" "$REALISTIC_FIXTURE" "$ENRICHMENT_FIXTURE" --output "$ENRICHED_TMP" 2>&1) || {
+    red "  FATAL: enrich-metadata.sh crashed"
+    echo "$ENRICH_RESULT"
+    ((FAIL++)) || true
+  }
+
+  if [[ -f "$ENRICHED_TMP" ]]; then
+    # 1. Enrichment merge count
+    ENRICHED_COUNT=$(echo "$ENRICH_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['enriched_nodes'])" 2>/dev/null || echo "0")
+    if python3 -c "assert int('$ENRICHED_COUNT') >= 5" 2>/dev/null; then
+      green "  PASS: enrich-metadata — $ENRICHED_COUNT nodes enriched (>= 5)"
+      ((PASS++)) || true
+    else
+      red "  FAIL: enrich-metadata — only $ENRICHED_COUNT nodes enriched (expected >= 5)"
+      ((FAIL++)) || true
+    fi
+
+    # 2. Issue 17: fills-based IMAGE detection (enriched rename)
+    ENRICHED_P2=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$ENRICHED_TMP" 2>&1) || {
+      red "  FATAL: generate-rename-map.sh crashed on enriched data"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${ENRICHED_P2:-}" ]]; then
+      # Node 1:101 (RECTANGLE with IMAGE fill) → img-*
+      echo "$ENRICHED_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:101',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('img-'), f'1:101 (IMAGE fill) should be img-*, got: {new_name}'
+print(f'  PASS: Issue 17 — IMAGE fill → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 17 — IMAGE fill not detected"; ((FAIL++)) || true; }
+
+      # Node 1:113 (RECTANGLE with IMAGE fill) → img-*
+      echo "$ENRICHED_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:113',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('img-'), f'1:113 (IMAGE fill) should be img-*, got: {new_name}'
+print(f'  PASS: Issue 17 — logo IMAGE fill → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 17 — logo IMAGE fill not detected"; ((FAIL++)) || true; }
+
+      # Node 1:107 (RECTANGLE with SOLID fill) → bg-* (not img-*)
+      echo "$ENRICHED_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:107',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('bg-'), f'1:107 (SOLID fill) should be bg-*, got: {new_name}'
+print(f'  PASS: Issue 17 — SOLID fill stays bg-* → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 17 — SOLID fill incorrectly classified"; ((FAIL++)) || true; }
+    fi
+
+    # 3. Issue 18: layoutMode complement (enriched autolayout)
+    ENRICHED_P4=$(bash "$SKILLS_DIR/scripts/infer-autolayout.sh" "$ENRICHED_TMP" 2>&1) || {
+      red "  FATAL: infer-autolayout.sh crashed on enriched data"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${ENRICHED_P4:-}" ]]; then
+      echo "$ENRICHED_P4" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+frames = d.get('frames',[])
+exact = [f for f in frames if f.get('source') == 'enriched']
+assert len(exact) >= 2, f'Expected >= 2 exact (enriched) frames, got {len(exact)}'
+# Verify enriched frame has correct direction
+for f in exact:
+    if f['node_id'] == '1:106':
+        assert f['layout']['direction'] == 'HORIZONTAL', f'1:106 should be HORIZONTAL'
+        assert f['layout']['gap'] == 24, f'1:106 gap should be 24'
+        assert f['layout']['confidence'] == 'exact', f'1:106 confidence should be exact'
+print(f'  PASS: Issue 18 — {len(exact)} frames with exact layoutMode')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 18 — enriched layoutMode not used"; ((FAIL++)) || true; }
+    fi
+
+    rm -f "$ENRICHED_TMP"
+  fi
+else
+  skip_test "Enrichment fixtures not found"
 fi
 
 echo ""

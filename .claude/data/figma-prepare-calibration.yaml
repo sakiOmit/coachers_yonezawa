@@ -64,4 +64,4 @@ cases:
     expected_grade: A
     expected_score_range: [85, 95]
     tags: [fixture, realistic, regression]
-    notes: "実データベースフィクスチャ。募集一覧(1-4)から67ノードサブセット。FRAME主体、低unnamed率、深度8"
+    notes: "実データベースフィクスチャ。募集一覧(1-4)から74ノードサブセット+footer追加。FRAME主体、低unnamed率。Issue 16テスト用header/footer含む"

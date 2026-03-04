@@ -171,3 +171,44 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - `strokes`, `effects`, `constraints` 等
 
 座標値は**親相対座標**（Issue 8 の `resolve_absolute_coords()` で対処済み）。
+
+## Issue 15: `get_design_context` 補完パイプライン — FIXED
+
+- **Phase**: 新規 Phase 1.5
+- **現象**: `get_metadata` のみでは fills, layoutMode, characters が取得できず、リネーム・AutoLayout精度に限界
+- **修正内容**: `enrich-metadata.sh` スクリプトを新設。`get_design_context` から抽出した fills/layoutMode/characters をフラットマップ形式で受け取り、metadata ツリーにマージ
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/enrich-metadata.sh` (新規), `tests/fixture-enrichment.json` (新規)
+- **テスト**: 7ノード×複数プロパティのマージを検証（46件中1件）
+
+## Issue 16: ヘッダー/フッターのセマンティック推論強化 — FIXED
+
+- **Phase**: 2
+- **現象**: `Group 46165`（ヘッダー: ロゴ + ナビ10リンク）が `group-7` にフォールバック
+- **原因**: Priority 3 が PAGE/CANVAS 直子のみ対応。セクションルート子の GROUP/FRAME は未対応
+- **修正内容**: Priority 3.1 を追加。位置 + 幅 + 子構造ヒューリスティックで header/footer を検出:
+  - Header: relative_y < 100 + 幅 > 70% + ナビ子（4+ TEXT孫）→ `header`
+  - Footer: ページ下部 + コンパクト + テキスト主体 → `footer`
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/fixture-realistic.json` (footer追加)
+- **テスト**: `Group 46165` → `header`, `Group 50001` → `footer` を検証（46件中2件）
+
+## Issue 17: fills ベースの IMAGE 判定 — FIXED
+
+- **Phase**: 2
+- **現象**: `RECTANGLE` に IMAGE fill がある要素が `bg-*` にリネーム（`img-*` が適切）
+- **修正内容**: Priority 2 (Shape analysis) で enriched metadata の fills をチェック。`fills[].type === 'IMAGE'` なら `img-*` プレフィックスを使用
+- **依存**: Issue 15 (enrich-metadata.sh)
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`
+- **テスト**: `image 1347` → `img-3`, `image 1254` → `img-2`, SOLID fill は `bg-0` 維持（46件中3件）
+
+## Issue 18: layoutMode 補完による Phase 4 精度向上 — FIXED
+
+- **Phase**: 4
+- **現象**: Auto Layout の方向・gap・padding が全て座標推論に依存（medium confidence）
+- **修正内容**: `infer-autolayout.sh` に `layout_from_enrichment()` を追加。enriched metadata に layoutMode がある場合は推論をスキップし、実値を使用（exact confidence）
+- **依存**: Issue 15 (enrich-metadata.sh)
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/infer-autolayout.sh`
+- **テスト**: 2フレームが exact confidence で出力されることを検証（46件中1件）
