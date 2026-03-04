@@ -178,8 +178,10 @@ Phase 2: セマンティックリネーム
 Gate: リネーム結果をFigmaで確認
         │
         ▼
-Phase 3: グループ化
-        │ → dry-run: grouping-plan.yaml / --apply: evaluate_script
+Phase 3: グループ化 + セクショニング
+        │ → Stage A: detect-grouping-candidates.sh（ネストレベル）
+        │ → Stage B: prepare-sectioning-context.sh + Claude推論（トップレベル）
+        │ → dry-run: grouping-plan.yaml + sectioning-plan.yaml / --apply: evaluate_script
         │
         ├─ [--phase 3] → 終了
         │
@@ -450,11 +452,27 @@ Next:
 
 "Figmaで Before/After を確認してください。複製アートボードが不要な場合は Ctrl+Z または手動削除で復元できます。"
 
-## Phase 3: グループ化
+## Phase 3: グループ化 + セクショニング
 
 **詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 3」セクション
 
-### 3-1. グルーピング候補検出
+Phase 3 は2段階構成:
+- **Stage A**: 既存ヒューリスティック（ネストレベルのグルーピング検出）
+- **Stage B**: Claude セクショニング（トップレベル children をセクション単位に分割）
+
+```
+Phase 3: グループ化 + セクショニング
+├── 3-1. Stage A: ヒューリスティック（既存、変更なし）
+├── 3-2. Stage B: Claude セクショニング
+│   ├── 3-2a. prepare-sectioning-context.sh でコンテキスト生成
+│   ├── 3-2b. get_screenshot でスクリーンショット取得
+│   ├── 3-2c. プロンプトテンプレート + コンテキストで Claude 推論
+│   └── 3-2d. sectioning-plan.yaml 保存
+├── 3-3. 結果統合（Stage A page-kv と Stage B の重複解決）
+└── 3-4. dry-run / --apply
+```
+
+### 3-1. Stage A: ヒューリスティック（グルーピング候補検出）
 
 ```bash
 bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
@@ -462,9 +480,49 @@ bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
   --output .claude/cache/figma/grouping-plan.yaml
 ```
 
-### 3-2. dry-run / --apply
+既存のプロキシミティ/パターン/セマンティック/ページKV検出。ネストレベルのグルーピングを行う。
 
-dry-run: grouping-plan.yaml を表示
+### 3-2. Stage B: Claude セクショニング
+
+トップレベル children をセクション単位に分割する。bash スクリプトは Claude を呼ばず、SKILL 実行レベルで推論する。
+
+#### 3-2a. セクショニングコンテキスト生成
+
+```bash
+bash .claude/skills/figma-prepare/scripts/prepare-sectioning-context.sh \
+  .claude/cache/figma/prepare-metadata-{nodeId}.json \
+  --output .claude/cache/figma/sectioning-context.json
+```
+
+トップレベル children のサマリー（Y座標昇順、ヒューリスティックヒント付き）を JSON 出力。
+
+#### 3-2b. スクリーンショット取得
+
+```
+mcp__plugin_figma_figma__get_screenshot
+  fileKey: "{fileKey}"
+  nodeId: "{nodeId}"
+```
+
+スクリーンショット取得失敗時は Stage B をスキップし、Stage A のみで進行。
+
+#### 3-2c. Claude 推論
+
+プロンプトテンプレート（`references/sectioning-prompt-template.md`）にコンテキスト JSON とスクリーンショットを組み合わせて Claude に送信。ヒューリスティックヒントでアンカリングし、YAML 形式の出力を制約。
+
+#### 3-2d. セクショニング計画保存
+
+```
+.claude/cache/figma/sectioning-plan.yaml
+```
+
+### 3-3. 結果統合
+
+Stage A の page-kv 候補と Stage B のセクション分割で重複する node_ids がある場合、Stage B を優先する（Claude のセクション境界推論のほうが正確なため）。
+
+### 3-4. dry-run / --apply
+
+dry-run: grouping-plan.yaml + sectioning-plan.yaml を表示
 --apply: evaluate_script で Frame 作成 + 子要素移動
 
 ## Phase 4: Auto Layout 適用
@@ -522,7 +580,8 @@ Next steps:
 | `scripts/analyze-structure.sh` | 構造品質分析 | metadata JSON | JSON (score, grade, metrics) |
 | `scripts/enrich-metadata.sh` | メタデータ補完 | metadata JSON + enrichment JSON | enriched metadata JSON |
 | `scripts/generate-rename-map.sh` | リネームマップ生成 | metadata JSON | JSON/YAML (rename map) |
-| `scripts/detect-grouping-candidates.sh` | グルーピング候補検出 | metadata JSON | JSON/YAML (grouping plan) |
+| `scripts/detect-grouping-candidates.sh` | Stage A: グルーピング候補検出 | metadata JSON | JSON/YAML (grouping plan) |
+| `scripts/prepare-sectioning-context.sh` | Stage B: セクショニングコンテキスト生成 | metadata JSON | JSON (top-level children summary + hints) |
 | `scripts/infer-autolayout.sh` | Auto Layout推論 | metadata JSON | JSON/YAML (autolayout plan) |
 | `scripts/start-chrome-debug.sh` | Chrome 起動 + SSH トンネル + 接続確認 | Figma URL (optional) | stdout (接続状態) |
 | `scripts/clone-artboard.js` | アートボード複製 + IDマッピング | `() => { ... }` 形式、`__SOURCE_NODE_ID__` 置換 | object (clone info, mapping) |
@@ -535,11 +594,14 @@ Next steps:
 | `.claude/rules/figma-prepare.md` | 命名規約・閾値・品質スコア計算式 |
 | `.claude/cache/figma/prepare-report.yaml` | 分析レポート出力先 |
 | `.claude/cache/figma/rename-map.yaml` | Phase 2 リネームマップ |
-| `.claude/cache/figma/grouping-plan.yaml` | Phase 3 グルーピング計画 |
+| `.claude/cache/figma/grouping-plan.yaml` | Phase 3 Stage A グルーピング計画 |
+| `.claude/cache/figma/sectioning-context.json` | Phase 3 Stage B コンテキスト |
+| `.claude/cache/figma/sectioning-plan.yaml` | Phase 3 Stage B セクショニング計画 |
 | `.claude/cache/figma/autolayout-plan.yaml` | Phase 4 AutoLayout計画 |
 | `references/chrome-devtools-setup.md` | Chrome DevTools MCP セットアップ |
 | `references/figma-plugin-api.md` | Figma Plugin API パターン集 |
 | `references/phase-details.md` | 各フェーズ詳細ロジック |
+| `references/sectioning-prompt-template.md` | Stage B Claude プロンプトテンプレート |
 | `.claude/skills/figma-analyze/SKILL.md` | 後続スキル |
 
 ---

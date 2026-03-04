@@ -656,6 +656,109 @@ if negative_padding:
 print(f'  PASS: resolve_absolute_coords — no negative padding values ({len(d.get(\"frames\",[]))} frames checked)')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Negative padding detected (coordinate resolution bug)"; ((FAIL++)) || true; }
     fi
+
+    # --- Phase 3 Stage B: prepare-sectioning-context ---
+    echo ""
+    bold "  --- Phase 3 Stage B: prepare-sectioning-context.sh ---"
+
+    REAL_SEC=$(bash "$SKILLS_DIR/scripts/prepare-sectioning-context.sh" "$REALISTIC_FIXTURE" 2>&1) || {
+      red "  FATAL: prepare-sectioning-context.sh crashed on realistic fixture"
+      echo "$REAL_SEC"
+      ((FAIL++)) || true
+    }
+
+    if [[ -n "${REAL_SEC:-}" ]]; then
+      # Test 1: JSON parse success (no error)
+      echo "$REAL_SEC" | python3 -c "import json,sys; d=json.load(sys.stdin); assert 'error' not in d" 2>/dev/null \
+        && { green "  PASS: Stage B — no error in output"; ((PASS++)) || true; } \
+        || { red "  FAIL: Stage B — script returned error"; echo "$REAL_SEC"; ((FAIL++)) || true; }
+
+      # Test 2: total_children = 9
+      assert_json_field "$REAL_SEC" "['total_children']" "9" "Stage B — total_children = 9"
+
+      # Test 3: Y-coordinate ascending sort
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+children = d['top_level_children']
+y_values = [c['bbox']['y'] for c in children]
+assert y_values == sorted(y_values), f'Not Y-sorted: {y_values}'
+print('  PASS: Stage B — children sorted by Y ascending')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — Y sort broken"; ((FAIL++)) || true; }
+
+      # Test 4: page_name = "募集一覧"
+      assert_json_field "$REAL_SEC" "['page_name']" "募集一覧" "Stage B — page_name = 募集一覧"
+
+      # Test 5: page_size = 1440x3858
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+ps = d['page_size']
+assert ps['width'] == 1440.0, f'width={ps[\"width\"]}'
+assert ps['height'] == 3858.0, f'height={ps[\"height\"]}'
+print('  PASS: Stage B — page_size = 1440x3858')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — page_size mismatch"; ((FAIL++)) || true; }
+
+      # Test 6: All children have required fields
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+required = ['id', 'name', 'type', 'bbox', 'child_count', 'is_unnamed']
+for c in d['top_level_children']:
+    for field in required:
+        assert field in c, f'Missing field {field} in {c.get(\"id\",\"?\")}'
+print(f'  PASS: Stage B — all {len(d[\"top_level_children\"])} children have required fields')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — missing required fields"; ((FAIL++)) || true; }
+
+      # Test 7: header_candidates includes 1:106
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+hc = d['heuristic_hints']['header_candidates']
+assert '1:106' in hc, f'1:106 not in header_candidates: {hc}'
+print(f'  PASS: Stage B — header_candidates contains 1:106')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:106 not in header_candidates"; ((FAIL++)) || true; }
+
+      # Test 8: footer_candidates includes 1:300
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+fc = d['heuristic_hints']['footer_candidates']
+assert '1:300' in fc, f'1:300 not in footer_candidates: {fc}'
+print(f'  PASS: Stage B — footer_candidates contains 1:300')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:300 not in footer_candidates"; ((FAIL++)) || true; }
+
+      # Test 9: page_kv_candidates includes 1:105
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+pkv = d['heuristic_hints']['page_kv_candidates']
+assert '1:105' in pkv, f'1:105 not in page_kv_candidates: {pkv}'
+print(f'  PASS: Stage B — page_kv_candidates contains 1:105')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:105 not in page_kv_candidates"; ((FAIL++)) || true; }
+
+      # Test 10: is_unnamed judgment (1:106=true, 1:5=false)
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+children_map = {c['id']: c for c in d['top_level_children']}
+assert children_map['1:106']['is_unnamed'] == True, '1:106 should be unnamed'
+assert children_map['1:5']['is_unnamed'] == False, '1:5 should not be unnamed'
+print('  PASS: Stage B — is_unnamed: 1:106=True, 1:5=False')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — is_unnamed judgment wrong"; ((FAIL++)) || true; }
+
+      # Test 11: --output file generation + JSON validation
+      SEC_OUT="/tmp/figma-prepare-test-sectioning-$$.json"
+      bash "$SKILLS_DIR/scripts/prepare-sectioning-context.sh" "$REALISTIC_FIXTURE" --output "$SEC_OUT" >/dev/null 2>&1
+      if [[ -f "$SEC_OUT" ]] && python3 -c "import json; json.load(open('$SEC_OUT'))" 2>/dev/null; then
+        green "  PASS: Stage B — --output file generated + valid JSON"
+        ((PASS++)) || true
+      else
+        red "  FAIL: Stage B — --output file not generated or invalid JSON"
+        ((FAIL++)) || true
+      fi
+      rm -f "$SEC_OUT"
+    fi
   fi
 else
   skip_test "Realistic fixture not found"

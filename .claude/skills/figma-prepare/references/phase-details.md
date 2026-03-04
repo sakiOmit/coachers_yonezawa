@@ -151,34 +151,40 @@ Phase 2 完了後、ユーザーに以下を確認:
 - 問題があれば Ctrl+Z で Undo 可能
 - 確認後に Phase 3 に進行
 
-## Phase 3: グループ化
+## Phase 3: グループ化 + セクショニング
 
-### 実行ツール
+Phase 3 は2段階構成:
+- **Stage A**: 既存ヒューリスティック（ネストレベルのグルーピング）
+- **Stage B**: Claude セクショニング（トップレベル children のセクション分割）
+
+### Stage A: ヒューリスティック（グルーピング候補検出）
+
+#### 実行ツール
 
 Chrome DevTools MCP (`evaluate_script`)
 
-### 手順
+#### 手順
 
 1. Phase 1 のメタデータ JSON を読み込み
 2. `detect-grouping-candidates.sh` でグルーピング候補検出
 3. **dry-run (デフォルト)**: `grouping-plan.yaml` を出力
 4. **--apply**: Chrome DevTools MCP で Frame 作成 + 子要素移動
 
-### 検出アルゴリズム
+#### 検出アルゴリズム
 
-#### 近接性ベース (Union-Find)
+##### 近接性ベース (Union-Find)
 
 1. 兄弟要素の全ペアの距離を計算
 2. 距離 ≤ 24px のペアを Union-Find で結合
 3. 2 要素以上のグループ → 候補
 
-#### パターン検出
+##### パターン検出
 
 1. 各要素の「構造ハッシュ」を計算
    - `TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]`
 2. 同一ハッシュが 3 回以上 → リストアイテム候補
 
-#### セマンティック検出
+##### セマンティック検出
 
 | 子要素構成 | 推論名 |
 |-----------|-------|
@@ -187,15 +193,89 @@ Chrome DevTools MCP (`evaluate_script`)
 | TEXT(large) + TEXT(small) | text-block |
 | FRAME × N (同構造) | list |
 
-### 実行スクリプト (evaluate_script)
+#### 実行スクリプト (evaluate_script)
 
 → `figma-plugin-api.md` の「Phase 3: グループ化」セクション参照
 
-### 注意事項
+#### 注意事項
 
 - グループ化は子要素の位置をフレーム内相対座標に変換する
 - 視覚的な変更が生じないよう、フレームの fills を空配列に設定
 - コンポーネントインスタンスは対象外（detach 禁止）
+
+### Stage B: Claude セクショニング
+
+#### 目的
+
+ページ直下（トップレベル）の children を意味的なセクションに分割する。
+Stage A のヒューリスティックではカバーできない「セクション境界の推論」を Claude が担当。
+
+#### 実行ツール
+
+- `prepare-sectioning-context.sh`（bash、Claude を呼ばない）
+- `get_screenshot`（Figma MCP）
+- Claude 推論（SKILL 実行レベル）
+
+#### 手順
+
+1. `prepare-sectioning-context.sh` でトップレベル children のサマリーを JSON 生成
+2. `get_screenshot` でページ全体のスクリーンショット取得
+3. プロンプトテンプレート（`references/sectioning-prompt-template.md`）に展開
+4. Claude に送信（テキスト + スクリーンショット画像）
+5. YAML レスポンスをパース → `sectioning-plan.yaml` に保存
+
+#### prepare-sectioning-context.sh の出力
+
+```json
+{
+  "page_name": "募集一覧",
+  "page_id": "1:4",
+  "page_size": {"width": 1440, "height": 3858},
+  "top_level_children": [
+    {
+      "id": "1:106", "name": "Group 46165", "type": "FRAME",
+      "bbox": {"x": 10, "y": 10, "width": 1420, "height": 60},
+      "child_count": 4,
+      "child_types_summary": "RECTANGLE:2, FRAME:2",
+      "has_text_children": true,
+      "text_children_preview": ["米沢工機について", "事業紹介"],
+      "is_unnamed": true
+    }
+  ],
+  "total_children": 9,
+  "heuristic_hints": {
+    "header_candidates": ["1:106"],
+    "footer_candidates": ["1:300"],
+    "page_kv_candidates": ["1:102", "1:105"]
+  }
+}
+```
+
+#### ヒューリスティックヒント
+
+スクリプトが事前に推定したアンカーポイント:
+
+| ヒント | 検出条件 |
+|--------|---------|
+| header_candidates | 上部5%、幅>80%のフレーム |
+| footer_candidates | 下部10%、幅>80%のフレーム |
+| page_kv_candidates | 上部30%のパンくず（TEXT with '>'）または見出し（FRAME with 2+ TEXT） |
+
+Claude はこれらを参考にしつつ、スクリーンショットの視覚情報を優先して最終判断する。
+
+#### Fallback
+
+| 条件 | 対応 |
+|------|------|
+| スクリーンショット取得失敗 | テキストのみで推論（精度低下を警告） |
+| Claude レスポンスパース失敗 | Stage B スキップ → Stage A のみで進行 |
+| node_ids の合計 ≠ total_children | 警告 + ユーザー確認 |
+
+### 結果統合
+
+Stage A の `page-kv` 候補と Stage B のセクション分割で重複する node_ids がある場合:
+- Stage B を優先（Claude のセクション境界推論のほうが正確）
+- Stage A の proximity / pattern / semantic 結果はそのまま維持
 
 ## Phase 4: Auto Layout 適用
 
