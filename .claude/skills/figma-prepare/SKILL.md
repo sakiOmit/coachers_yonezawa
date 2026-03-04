@@ -386,6 +386,15 @@ mcp__plugin_figma_figma__get_screenshot
 ```
 
 スクリーンショット取得失敗時は Stage B をスキップし、Stage A のみで進行。
+その場合、以下の警告をユーザーに表示すること:
+
+```
+⚠️ Stage B (Claude sectioning) をスキップしました。
+   原因: スクリーンショットの取得に失敗
+   影響: トップレベルのセクション分割は行われません。
+         proximity + pattern によるネストレベルのグルーピングのみ適用されます。
+   推奨: Figma上で手動でセクショニングを行うか、スクリーンショット取得の問題を解決して再実行してください。
+```
 
 #### 2-2c. Claude 推論
 
@@ -600,6 +609,7 @@ Next steps:
 | get_metadata failure | MCP exception | 3回リトライ → エラー表示 |
 | Chrome DevTools MCP 未登録 | .mcp.json チェック | Phase 1のみ実行 + セットアップ案内 |
 | `figma` グローバル未初期化 | `typeof figma !== 'object'` | プラグイン開閉を案内 |
+| Stage B スクリーンショット失敗 | get_screenshot MCP exception | Stage B スキップ + 警告表示 + 手動セクショニング推奨 |
 | Node ID not found | evaluate_script 結果 | 個別スキップ + 警告 |
 | バッチタイムアウト | evaluate_script タイムアウト | バッチサイズ縮小して再試行 |
 | clone() 失敗 | evaluate_script 結果 success=false | エラー表示 + 中止 |

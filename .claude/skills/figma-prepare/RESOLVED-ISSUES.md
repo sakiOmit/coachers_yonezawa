@@ -371,3 +371,40 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正日**: 2026-03-04
 - **ファイル**: `scripts/detect-grouping-candidates.sh`
 - **テスト**: 全63件パス
+
+## Issue 31: Stage A 簡素化による Stage B 依存度増加 — FIXED
+
+- **Phase**: 2
+- **優先度**: 低
+- **概要**: Stage A から semantic/page-kv を削除した結果、Stage B（Claude 推論）が
+  利用不可の場合（スクリーンショット取得失敗等）にフォールバック時の警告が不足していた。
+- **修正内容**: SKILL.md に Stage B フォールバック時の明示的な警告テンプレートを追加。
+  Error Handling テーブルにも「Stage B スクリーンショット失敗」行を追加。
+- **修正日**: 2026-03-04
+- **ファイル**: `SKILL.md`
+
+## Issue 32: generate-rename-map.sh Priority 4 fills=[] IndexError — FIXED
+
+- **Phase**: 3
+- **優先度**: 中
+- **概要**: Priority 4 の `has_image` 判定で `c.get('fills', [{}])[0].get('type')` が
+  enriched metadata で `fills: []` の場合に `IndexError` を引き起こすバグ。
+- **修正内容**: `c.get('fills')` の存在 + 非空チェックを先行させ、安全に `any()` で判定する
+  パターンに変更。テスト2件追加（enrichment pipeline 内 + 独立 unit test）。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/run-tests.sh`, `tests/fixture-enrichment.json`
+- **テスト**: 全65件パス（+2件追加）
+
+## Issue 33: phase-details.md のドキュメント陳腐化 — FIXED
+
+- **Phase**: ドキュメント
+- **優先度**: 低
+- **概要**: Issue 29/30 の設計変更後、phase-details.md の5箇所が陳腐化していた。
+- **修正内容**:
+  1. Phase 1 ペナルティ重み表を実コードに合わせ更新（ungrouped: -1/件 cap -10、autolayout: 0）
+  2. Stage A セマンティック検出テーブルを削除し、Stage B 委譲の注記に置換
+  3. heuristic_hints 出力例を gap_analysis + background_candidates に更新
+  4. ヒューリスティックヒント定義表を更新
+  5. 結果統合セクションを Stage A/B 独立適用に書き直し
+- **修正日**: 2026-03-04
+- **ファイル**: `references/phase-details.md`

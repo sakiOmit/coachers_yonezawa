@@ -189,7 +189,9 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         child_types = [c.get('type', '') for c in children]
         text_contents = get_text_children_content(children)
         has_image = 'IMAGE' in child_types or any(
-            c.get('type') == 'RECTANGLE' and c.get('fills', [{}])[0].get('type') == 'IMAGE'
+            c.get('type') == 'RECTANGLE'
+            and c.get('fills') and isinstance(c.get('fills'), list)
+            and any(f.get('type') == 'IMAGE' for f in c['fills'] if isinstance(f, dict))
             for c in children if isinstance(c, dict)
         )
         has_text = 'TEXT' in child_types

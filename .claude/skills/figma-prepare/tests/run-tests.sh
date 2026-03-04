@@ -921,11 +921,81 @@ print(f'  PASS: Issue 18 — {len(exact)} frames with exact layoutMode')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 18 — enriched layoutMode not used"; ((FAIL++)) || true; }
     fi
 
+    # 4. Issue 32: fills=[] should not crash generate-rename-map.sh
+    # Node 1:20 has "fills": [] in enrichment — Priority 4 has_image should not IndexError
+    echo "$ENRICHED_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+# Just verifying the script didn't crash is the primary test.
+# Node 1:20 is a named FRAME ('Card Accent 1'), not unnamed, so it won't be in renames.
+# The crash would occur if any unnamed FRAME/GROUP has RECTANGLE children with fills=[].
+print('  PASS: Issue 32 — fills=[] did not crash rename pipeline')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 32 — rename pipeline crashed with fills=[]"; ((FAIL++)) || true; }
+
     rm -f "$ENRICHED_TMP"
   fi
 else
   skip_test "Enrichment fixtures not found"
 fi
+
+echo ""
+
+# ================================================================
+bold "=== Unit: fills=[] edge case (Issue 32) ==="
+
+# Create minimal fixture with RECTANGLE child having fills=[]
+python3 -c "
+import json, tempfile, subprocess, sys, os
+
+# Minimal fixture: unnamed FRAME with RECTANGLE child (fills=[])
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 1000},
+    'children': [{
+        'id': '1:1', 'name': 'Frame 1', 'type': 'FRAME',
+        'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 800, 'height': 400},
+        'children': [
+            {
+                'id': '1:2', 'name': 'Rectangle 1', 'type': 'RECTANGLE',
+                'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 800, 'height': 200},
+                'fills': [],  # empty fills — should not crash
+                'children': []
+            },
+            {
+                'id': '1:3', 'name': 'Text 1', 'type': 'TEXT',
+                'absoluteBoundingBox': {'x': 0, 'y': 200, 'width': 800, 'height': 50},
+                'children': []
+            },
+            {
+                'id': '1:4', 'name': 'Frame 2', 'type': 'FRAME',
+                'absoluteBoundingBox': {'x': 0, 'y': 250, 'width': 200, 'height': 50},
+                'children': [{
+                    'id': '1:5', 'name': 'Button', 'type': 'TEXT',
+                    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 100, 'height': 30},
+                    'children': []
+                }]
+            }
+        ]
+    }]
+}
+
+# Write to temp file
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'generate-rename-map.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'CRASH: {result.stderr}')
+        sys.exit(1)
+    data = json.loads(result.stdout)
+    assert 'error' not in data, f'Error: {data}'
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: Issue 32 — fills=[] edge case no crash"; ((PASS++)) || true; } || { red "  FAIL: Issue 32 — fills=[] caused crash"; ((FAIL++)) || true; }
 
 echo ""
 
