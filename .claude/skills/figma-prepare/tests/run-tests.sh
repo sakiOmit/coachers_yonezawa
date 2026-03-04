@@ -631,12 +631,12 @@ print('  PASS: Issue 22 — Tab + Card list grouped (proximity at root)')
       echo "$REAL_P3" | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
-# Verify that any grouping with 1:5 is only proximity (not semantic/page-kv)
+# Verify that any grouping with 1:5 is proximity or zone (not semantic/page-kv)
 for c in d.get('candidates', []):
     ids = set(c.get('node_ids', []))
     if '1:5' in ids:
-        assert c.get('method') == 'proximity', f'1:5 in non-proximity group: {c[\"method\"]}'
-print('  PASS: Stage A — 1:5 grouping is proximity only (semantic deferred to Stage B)')
+        assert c.get('method') in ('proximity', 'zone'), f'1:5 in unexpected group: {c[\"method\"]}'
+print('  PASS: Stage A — 1:5 grouping is proximity/zone only (fine-grained deferred to Stage B)')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage A — 1:5 in unexpected group type"; ((FAIL++)) || true; }
 
       # Stage A methods: proximity, pattern, spacing, semantic (no page-kv)
@@ -646,7 +646,7 @@ d = json.load(sys.stdin)
 methods = set(c.get('method', '') for c in d.get('candidates', []))
 forbidden = methods & {'page-kv'}
 assert not forbidden, f'Unexpected methods in Stage A: {forbidden}'
-allowed = {'proximity', 'pattern', 'spacing', 'semantic'}
+allowed = {'proximity', 'pattern', 'spacing', 'semantic', 'zone'}
 unknown = methods - allowed
 assert not unknown, f'Unknown methods in Stage A: {unknown}'
 print(f'  PASS: Stage A — methods = {methods}')
@@ -1774,6 +1774,112 @@ try:
 finally:
     os.unlink(tmp_path)
 " 2>/dev/null && { green "  PASS: semantic_detection — card, nav, method, no-page-kv, dedup, total"; ((PASS++)) || true; } || { red "  FAIL: semantic_detection unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: detect_header_footer_groups (Issue 85) ==="
+python3 -c "
+import json, sys, os, tempfile, subprocess
+
+# Build a fixture with flat header elements + content + footer
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 5000},
+    'children': [
+        # Logo (VECTOR, small, top)
+        {'id': '1:1', 'name': 'Vector', 'type': 'VECTOR',
+         'absoluteBoundingBox': {'x': 50, 'y': 20, 'width': 100, 'height': 30}},
+        # Nav texts (6 items, horizontal, top)
+        *[{'id': f'1:{10+i}', 'name': f'Nav {i}', 'type': 'TEXT',
+           'absoluteBoundingBox': {'x': 300+i*150, 'y': 25, 'width': 120, 'height': 20},
+           'characters': f'Menu {i}'}
+          for i in range(6)],
+        # Nav wrapper frame
+        {'id': '1:20', 'name': 'Frame 1', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 80},
+         'children': [
+             {'id': '1:21', 'name': 'Sub 1', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 200, 'y': 10, 'width': 100, 'height': 20}},
+             {'id': '1:22', 'name': 'Sub 2', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 400, 'y': 10, 'width': 100, 'height': 20}},
+         ]},
+        # Content section (middle)
+        {'id': '2:1', 'name': 'Main Content', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 400, 'width': 1440, 'height': 3000},
+         'children': [
+             {'id': '2:2', 'name': 'Text 1', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 50, 'y': 400, 'width': 500, 'height': 40}},
+         ]},
+        # Footer elements (bottom)
+        {'id': '3:1', 'name': 'Line 1', 'type': 'LINE',
+         'absoluteBoundingBox': {'x': 0, 'y': 4800, 'width': 1440, 'height': 1}},
+        {'id': '3:2', 'name': 'Footer Text', 'type': 'TEXT',
+         'absoluteBoundingBox': {'x': 50, 'y': 4850, 'width': 300, 'height': 20},
+         'characters': 'Copyright 2024'},
+        {'id': '3:3', 'name': 'Footer Links', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 0, 'y': 4900, 'width': 1440, 'height': 80},
+         'children': [
+             {'id': '3:4', 'name': 'Link 1', 'type': 'TEXT',
+              'absoluteBoundingBox': {'x': 50, 'y': 4900, 'width': 100, 'height': 20}},
+         ]},
+    ]
+}
+
+with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    json.dump(fixture, f)
+    tmp_path = f.name
+
+try:
+    script = os.path.join('${SKILLS_DIR}', 'scripts', 'detect-grouping-candidates.sh')
+    result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
+    assert result.returncode == 0, f'Script failed: {result.stderr}'
+    data = json.loads(result.stdout)
+
+    # 1. Header detection: should find semantic/header candidate
+    header = [c for c in data['candidates'] if c.get('semantic_type') == 'header']
+    assert len(header) >= 1, f'No header detected, candidates: {[c.get(\"semantic_type\",c.get(\"method\")) for c in data[\"candidates\"]]}'
+    h = header[0]
+    assert '1:1' in h['node_ids'], 'Logo (1:1) should be in header group'
+    assert h['count'] >= 2, f'Header should have 2+ elements, got {h[\"count\"]}'
+
+    # 2. Footer detection: should find semantic/footer candidate
+    footer = [c for c in data['candidates'] if c.get('semantic_type') == 'footer']
+    assert len(footer) >= 1, f'No footer detected'
+    ft = footer[0]
+    assert ft['count'] >= 2, f'Footer should have 2+ elements, got {ft[\"count\"]}'
+
+    # 3. Content should NOT be in header or footer
+    for c in header + footer:
+        assert '2:1' not in c.get('node_ids', []), 'Content (2:1) should not be in header/footer'
+
+    # 4. Already-named HEADER/FOOTER should be excluded
+    fixture2 = {
+        'id': '0:1', 'name': 'Test', 'type': 'FRAME',
+        'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 3000},
+        'children': [
+            {'id': '1:1', 'name': 'HEADER', 'type': 'FRAME',
+             'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 80},
+             'children': []},
+            {'id': '2:1', 'name': 'Content', 'type': 'FRAME',
+             'absoluteBoundingBox': {'x': 0, 'y': 80, 'width': 1440, 'height': 2800},
+             'children': []},
+            {'id': '3:1', 'name': 'FOOTER', 'type': 'FRAME',
+             'absoluteBoundingBox': {'x': 0, 'y': 2880, 'width': 1440, 'height': 120},
+             'children': []},
+        ]
+    }
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f2:
+        json.dump(fixture2, f2)
+        tmp2 = f2.name
+    result2 = subprocess.run(['bash', script, tmp2], capture_output=True, text=True)
+    data2 = json.loads(result2.stdout)
+    hf2 = [c for c in data2['candidates'] if c.get('semantic_type') in ('header', 'footer')]
+    assert len(hf2) == 0, f'Already-named HEADER/FOOTER should not be re-grouped: {hf2}'
+    os.unlink(tmp2)
+
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: detect_header_footer — header, footer, exclusion, already-named"; ((PASS++)) || true; } || { red "  FAIL: detect_header_footer unit tests"; ((FAIL++)) || true; }
 
 # ================================================================
 bold "=== Unit: infer_direction_two / wrap / space_between (Area 4) ==="

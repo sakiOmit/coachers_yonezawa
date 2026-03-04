@@ -34,6 +34,7 @@ def count_nodes(node, depth=0, section_depth=None):
         'total': 0,
         'unnamed': 0,
         'flat_sections': 0,
+        'flat_excess': 0,  # Issue 89: sum of (child_count - threshold) for flat sections
         'deep_nesting': 0,
         'no_autolayout': 0,
         'max_depth': depth,
@@ -64,6 +65,7 @@ def count_nodes(node, depth=0, section_depth=None):
     # Issue 72: Include INSTANCE nodes as they can have children and create flat structures
     if node_type in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION') and len(children) > FLAT_THRESHOLD:
         stats['flat_sections'] += 1
+        stats['flat_excess'] += len(children) - FLAT_THRESHOLD  # Issue 89
 
     # Check deep nesting — only count container nodes at deep levels.
     # Leaf nodes (TEXT, RECTANGLE, etc.) inside deep structures are not counted
@@ -88,6 +90,7 @@ def count_nodes(node, depth=0, section_depth=None):
         stats['total'] += child_stats['total']
         stats['unnamed'] += child_stats['unnamed']
         stats['flat_sections'] += child_stats['flat_sections']
+        stats['flat_excess'] += child_stats['flat_excess']  # Issue 89
         stats['deep_nesting'] += child_stats['deep_nesting']
         stats['no_autolayout'] += child_stats['no_autolayout']
         stats['frames'] += child_stats['frames']
@@ -144,7 +147,9 @@ try:
     # so no_autolayout is always inaccurate. Kept as reference only.
     score = 100.0
     score -= min(30, unnamed_rate * 0.5)
-    score -= min(20, stats['flat_sections'] * 5)
+    # Issue 89: flat_penalty accounts for both count and severity (excess children)
+    # flat_sections × 5 (count-based) + flat_excess × 0.5 (severity-based)
+    score -= min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5)
     score -= min(10, ungrouped * 1)  # cap=10, weight=1 (grouping is least reliable metric)
     score -= min(15, stats['deep_nesting'] * 3)
     # autolayout_penalty removed — unmeasurable via get_metadata
@@ -185,7 +190,7 @@ try:
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),
-            'flat_penalty': min(20, stats['flat_sections'] * 5),
+            'flat_penalty': min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5),
             'ungrouped_penalty': min(10, ungrouped * 1),
             'nesting_penalty': min(15, stats['deep_nesting'] * 3),
             'autolayout_penalty': 0,  # unmeasurable via get_metadata — excluded from score

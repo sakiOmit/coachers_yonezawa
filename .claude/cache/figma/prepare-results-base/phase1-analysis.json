@@ -1,0 +1,36 @@
+{
+  "score": 44.0,
+  "grade": "C",
+  "recommendation": "Phase 2 + 3 (grouping + rename) recommended",
+  "metrics": {
+    "total_nodes": 219,
+    "unnamed_nodes": 125,
+    "unnamed_rate_pct": 57.1,
+    "flat_sections": 1,
+    "ungrouped_candidates": 24,
+    "deep_nesting_count": 0,
+    "no_autolayout_frames": 1,
+    "total_frames": 57,
+    "max_depth": 5,
+    "max_section_depth": 0
+  },
+  "score_breakdown": {
+    "unnamed_penalty": 28.5,
+    "flat_penalty": 17.5,
+    "ungrouped_penalty": 10,
+    "nesting_penalty": 0,
+    "autolayout_penalty": 0
+  },
+  "sample_unnamed": [
+    "Frame 22",
+    "Vector",
+    "Frame 1",
+    "Line 24",
+    "Frame 23",
+    "Rectangle 16",
+    "Frame 22",
+    "Rectangle 14",
+    "Rectangle 15",
+    "Frame 13"
+  ]
+}

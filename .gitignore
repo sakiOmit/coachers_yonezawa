@@ -56,10 +56,12 @@ temp/
 .claude/reviews/
 .claude/checkpoints/
 
-# Figma cache (generated, do not commit)
+# Figma cache — node.json等をセッション間で保持する
 .claude/cache/*
 !.claude/cache/figma/
 .claude/cache/figma/*
+!.claude/cache/figma/*.json
+!.claude/cache/figma/prepare-results-base/
 !.claude/cache/figma/analysis-report.yaml
 
 # Serena temporary files (keep memories)

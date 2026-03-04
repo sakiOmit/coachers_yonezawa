@@ -112,20 +112,79 @@ def detect_pattern_groups(children):
     result = []
     for rep_hash, nodes in clusters:
         if len(nodes) >= REPEATED_PATTERN_MIN:
-            # Check if all hashes are identical (exact match) or fuzzy
-            node_hashes = set(structure_hash(n) for n in nodes)
-            is_fuzzy = len(node_hashes) > 1
-            result.append({
-                'method': 'pattern',
-                'structure_hash': rep_hash,
-                'node_ids': [n.get('id', '') for n in nodes],
-                'node_names': [n.get('name', '') for n in nodes],
-                'count': len(nodes),
-                'suggested_name': 'list-items',
-                'suggested_wrapper': 'list-container',
-                'fuzzy_match': is_fuzzy,
-            })
+            # Issue 87: For leaf nodes (no children), split by spatial proximity
+            # to avoid grouping distant TEXT elements (e.g. nav labels + content text)
+            sub_groups = _split_by_spatial_gap(nodes)
+            for sg in sub_groups:
+                if len(sg) < REPEATED_PATTERN_MIN:
+                    continue
+                node_hashes = set(structure_hash(n) for n in sg)
+                is_fuzzy = len(node_hashes) > 1
+                result.append({
+                    'method': 'pattern',
+                    'structure_hash': rep_hash,
+                    'node_ids': [n.get('id', '') for n in sg],
+                    'node_names': [n.get('name', '') for n in sg],
+                    'count': len(sg),
+                    'suggested_name': 'list-items',
+                    'suggested_wrapper': 'list-container',
+                    'fuzzy_match': is_fuzzy,
+                })
     return result
+
+def _split_by_spatial_gap(nodes, gap_threshold=100):
+    \"\"\"Split a group of nodes into sub-groups by large spatial gaps (Issue 87, 88).
+
+    Sorts by primary axis (Y for vertical spread, X for horizontal) and
+    splits where consecutive gap exceeds threshold.
+
+    For leaf nodes: always attempt splitting (Issue 87).
+    For non-leaf nodes: only split if group is large (6+) to catch
+    multi-section card grids (Issue 88).
+    \"\"\"
+    if len(nodes) <= REPEATED_PATTERN_MIN:
+        return [nodes]
+    all_leaf = all(len(n.get('children', [])) == 0 for n in nodes)
+    # Issue 88: For non-leaf, only split large groups (6+)
+    if not all_leaf and len(nodes) < 6:
+        return [nodes]
+
+    bboxes = [get_bbox(n) for n in nodes]
+    # Determine primary axis for splitting
+    # For grid-like layouts (multiple rows of items), use Y to split by rows
+    xs = [b['x'] for b in bboxes]
+    ys = [b['y'] for b in bboxes]
+
+    # Detect rows by Y coordinate (Issue 88: grid-aware splitting)
+    row_tolerance = 20
+    y_rows = set(round(y / row_tolerance) for y in ys)
+    is_grid = len(y_rows) >= 2  # multiple Y rows → grid layout
+
+    if is_grid:
+        # Grid: sort by Y (row), then X within row → split by row gaps
+        sorted_pairs = sorted(zip(bboxes, nodes), key=lambda p: (round(p[0]['y'] / row_tolerance), p[0]['x']))
+        def gap_fn(a, b):
+            # Only count gap when moving to a new row
+            if round(a['y'] / row_tolerance) == round(b['y'] / row_tolerance):
+                return 0  # same row
+            return b['y'] - (a['y'] + a['h'])
+    else:
+        x_range = max(xs) - min(xs) if xs else 0
+        y_range = max(ys) - min(ys) if ys else 0
+        if y_range >= x_range:
+            sorted_pairs = sorted(zip(bboxes, nodes), key=lambda p: p[0]['y'])
+            def gap_fn(a, b): return b['y'] - (a['y'] + a['h'])
+        else:
+            sorted_pairs = sorted(zip(bboxes, nodes), key=lambda p: p[0]['x'])
+            def gap_fn(a, b): return b['x'] - (a['x'] + a['w'])
+
+    groups = [[sorted_pairs[0][1]]]
+    for i in range(1, len(sorted_pairs)):
+        g = gap_fn(sorted_pairs[i-1][0], sorted_pairs[i][0])
+        if g > gap_threshold:
+            groups.append([])
+        groups[-1].append(sorted_pairs[i][1])
+    return groups
 
 def detect_spacing_groups(children):
     \"\"\"Detect groups of regularly-spaced elements.\"\"\"
@@ -251,7 +310,174 @@ def detect_semantic_groups(children):
 
     return result
 
-def walk_and_detect(node, all_candidates=None):
+def detect_header_footer_groups(root_children, page_bb):
+    \"\"\"Detect header/footer grouping at the page root level (Issue 85).
+
+    Identifies flat elements near the top/bottom of the page that should be
+    grouped into HEADER/FOOTER wrappers. Works by:
+    1. Finding elements in the header zone (top 120px of page)
+    2. Checking if they contain nav-like TEXT elements + logo (VECTOR/IMAGE)
+    3. Finding elements in the footer zone (bottom 250px of page)
+    4. Only suggests grouping if 2+ elements are found in a zone
+
+    Only runs on root-level children (not recursive).
+    \"\"\"
+    if len(root_children) < 3:
+        return []
+
+    result = []
+    page_top = page_bb['y']
+    page_bottom = page_bb['y'] + page_bb['h']
+    header_zone_max = page_top + 120  # elements within 120px of page top
+    footer_zone_min = page_bottom - 300  # elements within 300px of page bottom
+
+    # Classify elements by zone
+    header_candidates = []
+    footer_candidates = []
+    for c in root_children:
+        bb = get_bbox(c)
+        el_top = bb['y']
+        el_bottom = bb['y'] + bb['h']
+
+        # Skip elements that are already named HEADER/FOOTER (already grouped)
+        name_upper = c.get('name', '').upper()
+        if name_upper in ('HEADER', 'FOOTER', 'NAV', 'NAVIGATION'):
+            continue
+
+        # Header zone: element starts within header zone
+        if el_top < header_zone_max and bb['h'] < 200:
+            header_candidates.append(c)
+
+        # Footer zone: element bottom is near or past footer zone
+        if el_bottom > footer_zone_min and el_top > footer_zone_min - 50:
+            footer_candidates.append(c)
+
+    # Header grouping: need 2+ elements, at least one nav-like TEXT or VECTOR/IMAGE
+    if len(header_candidates) >= 2:
+        has_nav_text = False
+        has_logo = False
+        nav_texts = []
+        for c in header_candidates:
+            t = c.get('type', '')
+            if t == 'TEXT':
+                bb = get_bbox(c)
+                if bb['w'] < 200:  # text-like width
+                    nav_texts.append(c)
+            elif t in ('VECTOR', 'IMAGE', 'RECTANGLE'):
+                bb = get_bbox(c)
+                if bb['w'] < 300 and bb['h'] < 100:  # logo-like size
+                    has_logo = True
+            elif t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
+                # Check if it contains nav-like elements
+                sub_children = c.get('children', [])
+                sub_texts = [sc for sc in sub_children if sc.get('type') == 'TEXT']
+                if len(sub_texts) >= 3:
+                    has_nav_text = True
+                # Could be a logo wrapper
+                if len(sub_children) <= 2:
+                    has_logo = True
+
+        if len(nav_texts) >= 3:
+            has_nav_text = True
+
+        # Require either nav texts or logo for header detection
+        if has_nav_text or (has_logo and len(header_candidates) >= 2):
+            result.append({
+                'method': 'semantic',
+                'semantic_type': 'header',
+                'node_ids': [c.get('id', '') for c in header_candidates],
+                'node_names': [c.get('name', '') for c in header_candidates],
+                'count': len(header_candidates),
+                'suggested_name': 'header',
+                'suggested_wrapper': 'header',
+            })
+
+    # Footer grouping: need 2+ elements
+    if len(footer_candidates) >= 2:
+        result.append({
+            'method': 'semantic',
+            'semantic_type': 'footer',
+            'node_ids': [c.get('id', '') for c in footer_candidates],
+            'node_names': [c.get('name', '') for c in footer_candidates],
+            'count': len(footer_candidates),
+            'suggested_name': 'footer',
+            'suggested_wrapper': 'footer',
+        })
+
+    return result
+
+def detect_vertical_zone_groups(root_children, page_bb):
+    \"\"\"Detect groups of elements occupying the same vertical zone (Issue 86).
+
+    Groups elements whose Y ranges overlap significantly, suggesting they
+    belong to the same visual section. Works by:
+    1. For each element, compute its Y range [top, bottom]
+    2. Greedily merge elements whose Y ranges overlap by >= 50%
+    3. Only report groups of 2+ elements that are not already detected
+
+    Skip elements already named with semantic names (HEADER, FOOTER, CTA, etc.)
+    Only runs on root-level children.
+    \"\"\"
+    if len(root_children) < 4:
+        return []
+
+    # Build list of (index, y_top, y_bottom, node)
+    items = []
+    skip_names = {'HEADER', 'FOOTER', 'NAV', 'NAVIGATION'}
+    for i, c in enumerate(root_children):
+        name_upper = c.get('name', '').upper()
+        if name_upper in skip_names:
+            continue
+        bb = get_bbox(c)
+        if bb['h'] <= 0:
+            continue
+        items.append((i, bb['y'], bb['y'] + bb['h'], c))
+
+    if len(items) < 2:
+        return []
+
+    # Sort by Y top
+    items.sort(key=lambda x: x[1])
+
+    # Greedy zone merging
+    zones = []  # list of (zone_top, zone_bottom, [nodes])
+    for idx, y_top, y_bot, node in items:
+        merged = False
+        for z in zones:
+            z_top, z_bot = z[0], z[1]
+            # Compute overlap
+            overlap_top = max(y_top, z_top)
+            overlap_bot = min(y_bot, z_bot)
+            overlap = max(0, overlap_bot - overlap_top)
+            item_height = y_bot - y_top
+            # Merge if element overlaps >= 50% with zone, or zone overlaps >= 50% with element
+            if item_height > 0 and (overlap / item_height >= 0.5 or overlap / (z_bot - z_top) >= 0.3):
+                z[0] = min(z_top, y_top)
+                z[1] = max(z_bot, y_bot)
+                z[2].append(node)
+                merged = True
+                break
+        if not merged:
+            zones.append([y_top, y_bot, [node]])
+
+    # Filter: only zones with 2+ elements that aren't already a single frame
+    result = []
+    for z_top, z_bot, nodes in zones:
+        if len(nodes) < 2:
+            continue
+        result.append({
+            'method': 'zone',
+            'semantic_type': 'vertical-zone',
+            'node_ids': [n.get('id', '') for n in nodes],
+            'node_names': [n.get('name', '') for n in nodes],
+            'count': len(nodes),
+            'suggested_name': 'section',
+            'suggested_wrapper': 'section',
+        })
+
+    return result
+
+def walk_and_detect(node, all_candidates=None, is_root=True):
     \"\"\"Walk tree and detect grouping candidates at each level.\"\"\"
     if all_candidates is None:
         all_candidates = []
@@ -262,6 +488,22 @@ def walk_and_detect(node, all_candidates=None):
 
     parent_id = node.get('id', '')
     parent_name = node.get('name', '')
+
+    # Issue 85, 86: Root-level-only detectors
+    if is_root:
+        page_bb = get_bbox(node)
+        # Issue 85: Header/footer detection
+        header_footer = detect_header_footer_groups(children, page_bb)
+        for g in header_footer:
+            g['parent_id'] = parent_id
+            g['parent_name'] = parent_name
+            all_candidates.append(g)
+        # Issue 86: Vertical zone detection (mixed-type sections)
+        vertical_zones = detect_vertical_zone_groups(children, page_bb)
+        for g in vertical_zones:
+            g['parent_id'] = parent_id
+            g['parent_name'] = parent_name
+            all_candidates.append(g)
 
     # Detect at this level (all Stage A methods)
     semantic = detect_semantic_groups(children)
@@ -276,12 +518,12 @@ def walk_and_detect(node, all_candidates=None):
 
     # Recurse
     for child in children:
-        walk_and_detect(child, all_candidates)
+        walk_and_detect(child, all_candidates, is_root=False)
 
     return all_candidates
 
 # Method priority for deduplication: higher = better quality
-METHOD_PRIORITY = {'semantic': 3, 'pattern': 2, 'spacing': 1, 'proximity': 0}
+METHOD_PRIORITY = {'semantic': 4, 'zone': 3, 'pattern': 2, 'spacing': 1, 'proximity': 0}
 
 def deduplicate_candidates(candidates, root_id=''):
     \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
