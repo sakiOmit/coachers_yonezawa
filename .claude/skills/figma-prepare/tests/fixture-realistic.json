@@ -622,6 +622,43 @@
       ]
     },
     {
+      "id": "1:200",
+      "name": "Frame 99001",
+      "type": "FRAME",
+      "absoluteBoundingBox": {
+        "x": 100.0,
+        "y": 2800.0,
+        "width": 808.0,
+        "height": 300.0
+      },
+      "children": [
+        {
+          "id": "1:201",
+          "name": "REASON",
+          "type": "TEXT",
+          "absoluteBoundingBox": {
+            "x": 0.0,
+            "y": 0.0,
+            "width": 200.0,
+            "height": 36.0
+          },
+          "children": []
+        },
+        {
+          "id": "1:202",
+          "name": "ケータリングにとどまらず企画段階からご担当者様をサポートする総合プロデュース力が当社の強みです。大規模イベントに強いオペレーション力。",
+          "type": "TEXT",
+          "absoluteBoundingBox": {
+            "x": 0.0,
+            "y": 50.0,
+            "width": 808.0,
+            "height": 250.0
+          },
+          "children": []
+        }
+      ]
+    },
+    {
       "id": "1:105",
       "name": "TOP > job description",
       "type": "TEXT",

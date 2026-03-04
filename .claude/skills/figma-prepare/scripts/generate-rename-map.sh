@@ -67,11 +67,15 @@ def to_kebab(text):
     text = text.strip()
     if not text:
         return ''
-    # Check JP keyword map first (longest match first)
+    # Check JP keyword map first (longest match first, with ratio check)
     for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
         if jp in text:
-            return en
-    # Existing ASCII logic
+            ratio = len(jp) / len(text)
+            if ratio >= 0.5:  # keyword must be >= 50% of text length
+                return en
+    # Strip non-ASCII characters first (Issue 13)
+    text = re.sub(r'[^\x00-\x7f]', ' ', text)
+    # ASCII logic
     text = re.sub(r'[^\w\s-]', '', text.lower())
     text = re.sub(r'[\s_]+', '-', text)
     text = re.sub(r'-+', '-', text).strip('-')
@@ -186,9 +190,15 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
                     return f'btn-{slug}'
             return f'btn-{sibling_index}'
 
-        # Heading: 1-2 text children, both named, no image
+        # Heading vs Content: check TEXT children length (Issue 14)
         if text_type_count <= 2 and len(text_contents) >= 1 and not has_image and len(children) <= 3:
+            max_text_len = max(len(t) for t in text_contents)
             slug = to_kebab(text_contents[0][:30])
+            if max_text_len > 50:
+                # Long text = body content, not heading
+                if slug:
+                    return f'content-{slug}'
+                return f'content-{sibling_index}'
             if slug:
                 return f'heading-{slug}'
             return f'heading-{sibling_index}'

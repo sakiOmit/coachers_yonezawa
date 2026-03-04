@@ -310,6 +310,62 @@ if frames:
 echo ""
 
 # ================================================================
+bold "=== Unit: to_kebab regression (Issue 12-13) ==="
+
+python3 -c "
+import re
+
+JP_KEYWORD_MAP = {
+    '募集詳細を見る': 'view-detail',
+    '募集要項': 'requirements',
+    'すべて': 'all', 'お知らせ': 'news', '一覧': 'list',
+    '詳しく': 'more', '詳細': 'detail', '見る': 'view',
+    '採用': 'recruit', '新卒': 'new-grad', '中途': 'mid-career',
+    '募集': 'jobs', '事業': 'business', '仕事': 'work',
+    'について': 'about', '環境': 'environment', '社員': 'staff',
+    'インタビュー': 'interview', 'お問い合わせ': 'contact',
+    '送信': 'submit', '申し込': 'apply', '戻る': 'back',
+    'トップ': 'top', 'ホーム': 'home', '検索': 'search',
+    'カテゴリー': 'category', 'イベント': 'event',
+    '要項': 'requirements',
+}
+
+def to_kebab(text):
+    text = text.strip()
+    if not text:
+        return ''
+    for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
+        if jp in text:
+            ratio = len(jp) / len(text)
+            if ratio >= 0.5:
+                return en
+    text = re.sub(r'[^\x00-\x7f]', ' ', text)
+    text = re.sub(r'[^\w\s-]', '', text.lower())
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'-+', '-', text).strip('-')
+    return text[:40] if text else ''
+
+# Issue 12: ratio check prevents false match on long text
+assert to_kebab('大規模イベントに強いオペレーション力') == '', f'Issue 12 fail: got \"{to_kebab(\"大規模イベントに強いオペレーション力\")}\"'
+assert to_kebab('イベント一覧') == 'event', f'Issue 12 fail: got \"{to_kebab(\"イベント一覧\")}\"'
+assert to_kebab('イベント') == 'event', f'Issue 12 exact match fail'
+assert to_kebab('お問い合わせ') == 'contact', f'Issue 12 exact match fail'
+
+# Issue 13: non-ASCII stripped to empty
+assert to_kebab('無料相談') == '', f'Issue 13 fail: got \"{to_kebab(\"無料相談\")}\"'
+assert to_kebab('資料請求') == '', f'Issue 13 fail: got \"{to_kebab(\"資料請求\")}\"'
+assert to_kebab('募集要項') == 'requirements', f'Issue 13 registered keyword fail'
+
+# ASCII still works
+assert to_kebab('job description') == 'job-description', f'ASCII fail: got \"{to_kebab(\"job description\")}\"'
+assert to_kebab('REASON') == 'reason', f'ASCII fail: got \"{to_kebab(\"REASON\")}\"'
+
+print('All to_kebab tests passed')
+" 2>/dev/null && { green "  PASS: to_kebab unit tests (Issue 12-13)"; ((PASS++)) || true; } || { red "  FAIL: to_kebab unit tests"; ((FAIL++)) || true; }
+
+echo ""
+
+# ================================================================
 bold "=== Cross-script: consistency ==="
 
 P1_UNNAMED=$(echo "$RESULT1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['unnamed_nodes'])" 2>/dev/null || echo "0")
@@ -516,6 +572,16 @@ rate = 100*fallback/max(total,1)
 assert rate < 50, f'Fallback rate {rate:.1f}% >= 50%'
 print(f'  PASS: Fallback rate = {rate:.1f}% < 50% ({fallback}/{total})')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Fallback rate >= 50%"; ((FAIL++)) || true; }
+
+      # 6. Issue 14: heading+body frame → content-* (not heading-*)
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:200',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('content-'), f'Frame 99001 (heading+body) should be content-*, got: {new_name}'
+print(f'  PASS: Issue 14 — heading+body frame → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 14 — heading+body frame not content-*"; ((FAIL++)) || true; }
     fi
 
     # --- Phase 3: detect-grouping-candidates ---

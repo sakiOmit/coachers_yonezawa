@@ -105,6 +105,33 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正日**: 2026-03-04
 - **ファイル**: `tests/fixture-realistic.json`, `tests/run-tests.sh`, `.claude/data/figma-prepare-calibration.yaml`
 
+## Issue 12: `to_kebab()` の日本語部分マッチが誤ヒットする — FIXED
+
+- **Phase**: 2
+- **現象**: `"大規模イベントに強いオペレーション力"` → `"イベント"` が部分マッチ → `heading-event` を返す
+- **原因**: `JP_KEYWORD_MAP` は `if jp in text` で部分一致検索しており、長文テキストの一部にキーワードが含まれると誤マッチ
+- **修正内容**: `to_kebab()` にキーワード長/テキスト長の比率チェックを追加。比率 0.5 未満（キーワードがテキストの半分未満）の場合はスキップ
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/run-tests.sh`（unit test追加）
+
+## Issue 13: JP_KEYWORD_MAP 未登録の日本語がそのまま出力される — FIXED
+
+- **Phase**: 2
+- **現象**: `"無料相談"` → `btn-無料相談`。kebab-case名に日本語が混入
+- **原因**: `\w` が Unicode 文字（日本語含む）にマッチし、ASCII ロジックで除去されない
+- **修正内容**: `to_kebab()` の ASCII ロジック前に `re.sub(r'[^\x00-\x7f]', ' ', text)` で非ASCII文字を除去するステップを追加
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/run-tests.sh`（unit test追加）
+
+## Issue 14: heading vs body テキストの誤判定 — FIXED
+
+- **Phase**: 2
+- **現象**: 見出し＋本文テキストのフレーム（2 TEXT子）が `heading-*` に分類される
+- **原因**: Priority 4 の heading 判定が TEXT 子の長さを考慮しない
+- **修正内容**: TEXT 子の最長文字数をチェック。50文字超の TEXT 子がある場合は `content-*` に分類
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/fixture-realistic.json`（テストフレーム追加）, `tests/run-tests.sh`（fixture test追加）
+
 ## テスト履歴
 
 ### テストフィクスチャ対応 — 2026-03-04
