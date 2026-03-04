@@ -71,6 +71,33 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **修正日**: 2026-03-04
 - **ファイル**: `scripts/infer-autolayout.sh`
 
+## Issue 3: リネーム推論の精度不足 — FIXED
+
+- **Phase**: 2
+- **現象**: `group-6`, `frame-0` 等のフォールバック名が多い（大半がPriority 4-5）。Priority 1（テキスト内容ベース推論）が全く効かない
+- **原因**: `node.get('characters', '')` は常に空文字（`get_metadata` に `characters` フィールドがない）。しかし TEXT ノードは `name` フィールドにテキスト内容を保持している
+- **修正内容**:
+  1. Priority 1: TEXT ノードの `name` をテキスト内容として使用（`characters` → `name`）
+  2. `to_kebab()` に `JP_KEYWORD_MAP` 追加（日本語テキスト → 英語slug変換）
+  3. `get_text_children_content()` ヘルパー追加（子TEXTノードの名前を収集）
+  4. Priority 3.2: 小さい空フレーム（48x48以下）→ `icon-*`
+  5. Priority 3.5: ナビゲーション検出（4+短テキスト子 → `nav-*`）
+  6. Priority 4: ボタン/アイコン/見出し検出を分化（`text-block` catch-all を改善）
+  7. `infer_text_role()` にボタンキーワード追加（`見る`, `戻る`, `詳細` 等）
+- **効果**: 実データ3件でフォールバック率 95% → 20-38%（目標50%以下を達成）
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`, `tests/run-tests.sh`（5テスト追加）
+
+## Issue 6: タブ/ボタンが text-block にリネームされる — FIXED
+
+- **Phase**: 2
+- **現象**: お知らせ一覧のタブ (Frame 94-98) → `text-block-0~4`。1テキスト子を持つフレームがすべて `text-block-*` に分類
+- **原因**: Priority 4 の `text-block` catch-all がサイズや文脈を考慮せずに適用されていた
+- **修正内容**: Issue 3 と統合対応。サイズヒューリスティック（h≤70 & w<300 & children≤2 → `btn-*`）を追加。TEXT子の名前からスラグ生成
+- **効果**: Frame 94-98 → `btn-all`, `btn-news`, `btn-event`, `btn-category`
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/generate-rename-map.sh`
+
 ## Issue 11: テストフィクスチャが実データの特徴を反映していない — FIXED
 
 - **Phase**: 全フェーズ
@@ -85,7 +112,7 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - `fixture-metadata.json`: `layoutMode`, `characters`, `fills` を削除し、実API形式に統一
 - `fixture-dirty.json`: 未命名レイヤー大量の汚いファイルを追加
 - 座標を親相対座標に変換（実APIと統一）
-- テストは全24件パス
+- テストは全24件パス（Issue 3+6 修正後37件）
 
 ### 3デザイン追加テスト — 2026-03-04
 
@@ -112,7 +139,7 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 
 以下は**含まれない**:
 - `layoutMode` (AutoLayout設定)
-- `characters` (テキスト内容)
+- `characters` (テキスト内容) — ただしTEXTノードの `name` がテキスト内容を保持（Issue 3 で発見）
 - `fills` (塗り)
 - `strokes`, `effects`, `constraints` 等
 

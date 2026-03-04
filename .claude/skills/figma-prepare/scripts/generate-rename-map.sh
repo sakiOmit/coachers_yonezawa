@@ -35,6 +35,22 @@ SHAPE_PREFIXES = {
     'IMAGE': 'img',
 }
 
+# Japanese keyword → English slug mapping
+JP_KEYWORD_MAP = {
+    '募集詳細を見る': 'view-detail',
+    '募集要項': 'requirements',
+    'すべて': 'all', 'お知らせ': 'news', '一覧': 'list',
+    '詳しく': 'more', '詳細': 'detail', '見る': 'view',
+    '採用': 'recruit', '新卒': 'new-grad', '中途': 'mid-career',
+    '募集': 'jobs', '事業': 'business', '仕事': 'work',
+    'について': 'about', '環境': 'environment', '社員': 'staff',
+    'インタビュー': 'interview', 'お問い合わせ': 'contact',
+    '送信': 'submit', '申し込': 'apply', '戻る': 'back',
+    'トップ': 'top', 'ホーム': 'home', '検索': 'search',
+    'カテゴリー': 'category', 'イベント': 'event',
+    '要項': 'requirements',
+}
+
 def resolve_absolute_coords(node, parent_x=0, parent_y=0):
     \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
     bbox = node.get('absoluteBoundingBox', {})
@@ -47,16 +63,29 @@ def resolve_absolute_coords(node, parent_x=0, parent_y=0):
         resolve_absolute_coords(child, abs_x, abs_y)
 
 def to_kebab(text):
-    \"\"\"Convert text to kebab-case safe name.\"\"\"
-    # Remove non-ASCII (except common JP chars for context)
+    \"\"\"Convert text to kebab-case safe name. Supports Japanese via keyword map.\"\"\"
     text = text.strip()
     if not text:
         return ''
-    # ASCII transliteration for simple cases
+    # Check JP keyword map first (longest match first)
+    for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
+        if jp in text:
+            return en
+    # Existing ASCII logic
     text = re.sub(r'[^\w\s-]', '', text.lower())
     text = re.sub(r'[\s_]+', '-', text)
     text = re.sub(r'-+', '-', text).strip('-')
     return text[:40] if text else ''
+
+def get_text_children_content(children):
+    \"\"\"Collect named TEXT children's name as text content proxy.\"\"\"
+    texts = []
+    for c in children:
+        if c.get('type') == 'TEXT':
+            name = c.get('name', '')
+            if name and not UNNAMED_RE.match(name):
+                texts.append(name)
+    return texts
 
 def infer_text_role(text_content, font_size=None):
     \"\"\"Infer role from text content.\"\"\"
@@ -65,7 +94,8 @@ def infer_text_role(text_content, font_size=None):
         return None
     # Short button-like text
     if len(content) <= 15 and any(kw in content.lower() for kw in [
-        'more', '詳しく', '一覧', 'submit', '送信', '申し込', 'contact', 'click'
+        'more', '詳しく', '一覧', 'submit', '送信', '申し込', 'contact', 'click',
+        '見る', '戻る', '申込', '詳細',
     ]):
         return 'btn-text'
     # Labels
@@ -82,11 +112,11 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     w = abs_bbox.get('width', 0)
     h = abs_bbox.get('height', 0)
 
-    # Priority 1: Text content
+    # Priority 1: Text content (TEXT nodes have content as name in get_metadata)
     if node_type == 'TEXT':
-        chars = node.get('characters', '')
-        role = infer_text_role(chars)
-        slug = to_kebab(chars[:30])
+        text_content = name  # TEXT nodes store content in name field
+        role = infer_text_role(text_content)
+        slug = to_kebab(text_content[:30])
         if role and slug:
             return f'{role}-{slug}'
         if slug:
@@ -111,14 +141,28 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             return f'section-footer'
         return f'section-{sibling_index}'
 
+    # Priority 3.2: Tiny empty frame → icon
+    if not children and w > 0 and w <= 48 and h > 0 and h <= 48:
+        return f'icon-{sibling_index}'
+
+    # Priority 3.5: Navigation detection
+    if children:
+        text_contents = get_text_children_content(children)
+        text_count = len(text_contents)
+        # Navigation: 4+ short text children → nav
+        if text_count >= 4 and all(len(t) <= 20 for t in text_contents):
+            return f'nav-{sibling_index}'
+
     # Priority 4: Child structure analysis
     if children:
         child_types = [c.get('type', '') for c in children]
+        text_contents = get_text_children_content(children)
         has_image = 'IMAGE' in child_types or any(
             c.get('type') == 'RECTANGLE' and c.get('fills', [{}])[0].get('type') == 'IMAGE'
             for c in children if isinstance(c, dict)
         )
         has_text = 'TEXT' in child_types
+        text_type_count = len([ct for ct in child_types if ct == 'TEXT'])
         has_button = any(
             c.get('type') == 'FRAME' and len(c.get('children', [])) <= 2
             and any(gc.get('type') == 'TEXT' for gc in c.get('children', []))
@@ -129,8 +173,34 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             return f'card-{sibling_index}'
         if has_image and has_text:
             return f'media-{sibling_index}'
+
+        # Small icon-like: tiny frame with 0-1 children
+        if w > 0 and w <= 48 and h > 0 and h <= 48 and len(children) <= 1:
+            return f'icon-{sibling_index}'
+
+        # Button/Tab: small frame with 1-2 children, short text
+        if h > 0 and h <= 70 and w > 0 and w < 300 and len(children) <= 2:
+            if text_contents:
+                slug = to_kebab(text_contents[0][:20])
+                if slug:
+                    return f'btn-{slug}'
+            return f'btn-{sibling_index}'
+
+        # Heading: 1-2 text children, both named, no image
+        if text_type_count <= 2 and len(text_contents) >= 1 and not has_image and len(children) <= 3:
+            slug = to_kebab(text_contents[0][:30])
+            if slug:
+                return f'heading-{slug}'
+            return f'heading-{sibling_index}'
+
+        # text-block with slug (improved from generic index)
         if has_text and len(children) <= 3:
+            if text_contents:
+                slug = to_kebab(text_contents[0][:30])
+                if slug:
+                    return f'text-block-{slug}'
             return f'text-block-{sibling_index}'
+
         if len(children) > 5:
             return f'container-{sibling_index}'
         return f'group-{sibling_index}'

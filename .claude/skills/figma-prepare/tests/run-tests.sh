@@ -463,6 +463,59 @@ print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed
         red "  FAIL: Cross-script — Phase1 unnamed ($REAL_UNNAMED) vs Phase2 renames ($REAL_RENAME_COUNT) gap > 5"
         ((FAIL++)) || true
       fi
+
+      # --- Rename quality tests (Issue 3+6 regression) ---
+      # 1. Navigation detection: Frame 93 (10 TEXT children) → nav-*
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:114',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('nav-'), f'Frame 93 should be nav-*, got: {new_name}'
+print(f'  PASS: Nav detection — Frame 93 → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Nav detection — Frame 93 not renamed to nav-*"; ((FAIL++)) || true; }
+
+      # 2. Icon detection: Frame 1009 (40x40, 1 child) → icon-*
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:108',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('icon-'), f'Frame 1009 should be icon-*, got: {new_name}'
+print(f'  PASS: Icon detection — Frame 1009 → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Icon detection — Frame 1009 not renamed to icon-*"; ((FAIL++)) || true; }
+
+      # 3. Heading detection: Frame 46405 (2 TEXT children) → heading-*
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:102',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('heading-'), f'Frame 46405 should be heading-*, got: {new_name}'
+print(f'  PASS: Heading detection — Frame 46405 → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Heading detection — Frame 46405 not renamed to heading-*"; ((FAIL++)) || true; }
+
+      # 4. Tiny empty frame → icon: Group 45950 (14.67x12.2, empty) → icon-*
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+r = d.get('renames',{}).get('1:109',{})
+new_name = r.get('new_name','')
+assert new_name.startswith('icon-'), f'Group 45950 should be icon-*, got: {new_name}'
+print(f'  PASS: Tiny frame → icon — Group 45950 → {new_name}')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Tiny frame not renamed to icon-*"; ((FAIL++)) || true; }
+
+      # 5. Fallback rate < 50% (group-*/frame-*/container-* should be minority)
+      echo "$REAL_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+renames = d.get('renames',{})
+total = len(renames)
+fallback = sum(1 for r in renames.values() if any(r['new_name'].startswith(p) for p in ['group-', 'frame-', 'container-']))
+rate = 100*fallback/max(total,1)
+assert rate < 50, f'Fallback rate {rate:.1f}% >= 50%'
+print(f'  PASS: Fallback rate = {rate:.1f}% < 50% ({fallback}/{total})')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Fallback rate >= 50%"; ((FAIL++)) || true; }
     fi
 
     # --- Phase 3: detect-grouping-candidates ---
