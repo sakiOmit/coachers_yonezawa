@@ -146,7 +146,7 @@ print(f\"nodes={m['total_nodes']}, unnamed={m['unnamed_nodes']}({m['unnamed_rate
 echo ""
 
 # ================================================================
-bold "=== Phase 2: generate-rename-map.sh ==="
+bold "=== Phase 3: generate-rename-map.sh ==="
 
 RESULT2=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$FIXTURE" 2>&1) || {
   red "  FATAL: generate-rename-map.sh crashed"
@@ -211,7 +211,7 @@ if items:
 echo ""
 
 # ================================================================
-bold "=== Phase 3: detect-grouping-candidates.sh ==="
+bold "=== Phase 2: detect-grouping-candidates.sh ==="
 
 RESULT3=$(bash "$SKILLS_DIR/scripts/detect-grouping-candidates.sh" "$FIXTURE" 2>&1) || {
   red "  FATAL: detect-grouping-candidates.sh crashed"
@@ -373,7 +373,7 @@ P2_TOTAL=$(echo "$RESULT2" | python3 -c "import json,sys; print(json.load(sys.st
 
 # Phase 1の未命名数とPhase 2のリネーム数が一致（許容差±5）
 if python3 -c "assert abs($P1_UNNAMED - $P2_TOTAL) <= 5" 2>/dev/null; then
-  green "  PASS: Phase1 unnamed ($P1_UNNAMED) ≈ Phase2 renames ($P2_TOTAL)"
+  green "  PASS: Phase1 unnamed ($P1_UNNAMED) ≈ Phase3 renames ($P2_TOTAL)"
   ((PASS++)) || true
 else
   red "  FAIL: Phase1 unnamed ($P1_UNNAMED) vs Phase2 renames ($P2_TOTAL) — gap > 5"
@@ -513,7 +513,7 @@ print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed
       REAL_RENAME_COUNT=$(echo "$REAL_P2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
       # Cross-script consistency: Phase 1 unnamed ≈ Phase 2 renames (±5)
       if python3 -c "assert abs($REAL_UNNAMED - $REAL_RENAME_COUNT) <= 5" 2>/dev/null; then
-        green "  PASS: Cross-script — Phase1 unnamed ($REAL_UNNAMED) ≈ Phase2 renames ($REAL_RENAME_COUNT)"
+        green "  PASS: Cross-script — Phase1 unnamed ($REAL_UNNAMED) ≈ Phase3 renames ($REAL_RENAME_COUNT)"
         ((PASS++)) || true
       else
         red "  FAIL: Cross-script — Phase1 unnamed ($REAL_UNNAMED) vs Phase2 renames ($REAL_RENAME_COUNT) gap > 5"
@@ -630,6 +630,48 @@ print(f'  PASS: Issue 16 — footer detection → {new_name}')
         red "  FAIL: Dedup — candidates ($REAL_CANDIDATES) >= 50% of nodes ($REAL_TOTAL)"
         ((FAIL++)) || true
       fi
+
+      # Issue 22: Tab + Card list proximity group at root level
+      echo "$REAL_P3" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+found = False
+for c in d.get('candidates', []):
+    if c.get('method') == 'proximity' and c.get('parent_name') == '募集一覧':
+        ids = set(c.get('node_ids', []))
+        if '1:6' in ids and '1:15' in ids:
+            found = True
+            break
+assert found, 'Tab + Card list proximity group not found at root level'
+print('  PASS: Issue 22 — Tab + Card list grouped (proximity at root)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — Tab + Card list NOT grouped at root level"; ((FAIL++)) || true; }
+
+      # Issue 22: Lead text (1:5) must NOT be in page-kv or proximity with hero
+      echo "$REAL_P3" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+for c in d.get('candidates', []):
+    ids = set(c.get('node_ids', []))
+    if '1:5' in ids and ('1:101' in ids or '1:102' in ids):
+        print(f'  FAIL: Lead text (1:5) incorrectly grouped with hero: {c[\"method\"]}')
+        sys.exit(1)
+print('  PASS: Issue 22 — Lead text (1:5) not mixed with hero group')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — Lead text incorrectly grouped with hero"; ((FAIL++)) || true; }
+
+      # Issue 22: page-kv detected with correct components
+      echo "$REAL_P3" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+found = False
+for c in d.get('candidates', []):
+    if c.get('method') == 'page-kv':
+        ids = set(c.get('node_ids', []))
+        if '1:102' in ids and '1:105' in ids and '1:101' in ids:
+            found = True
+            break
+assert found, 'page-kv group not found'
+print('  PASS: Issue 22 — page-kv hero group (heading + breadcrumb + bg)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — page-kv hero group missing"; ((FAIL++)) || true; }
     fi
 
     # --- Phase 4: infer-autolayout ---
@@ -659,7 +701,7 @@ print(f'  PASS: resolve_absolute_coords — no negative padding values ({len(d.g
 
     # --- Phase 3 Stage B: prepare-sectioning-context ---
     echo ""
-    bold "  --- Phase 3 Stage B: prepare-sectioning-context.sh ---"
+    bold "  --- Phase 2 Stage B: prepare-sectioning-context.sh ---"
 
     REAL_SEC=$(bash "$SKILLS_DIR/scripts/prepare-sectioning-context.sh" "$REALISTIC_FIXTURE" 2>&1) || {
       red "  FATAL: prepare-sectioning-context.sh crashed on realistic fixture"

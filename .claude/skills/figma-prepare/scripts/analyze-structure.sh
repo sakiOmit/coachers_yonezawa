@@ -180,10 +180,10 @@ try:
         recommendation = 'Proceed to /figma-analyze directly'
     elif score >= 60:
         grade = 'B'
-        recommendation = 'Phase 2 (rename) recommended'
+        recommendation = 'Phase 2 (grouping) recommended'
     elif score >= 40:
         grade = 'C'
-        recommendation = 'Phase 2 + 3 (rename + group) recommended'
+        recommendation = 'Phase 2 + 3 (grouping + rename) recommended'
     elif score >= 20:
         grade = 'D'
         recommendation = 'All phases recommended'

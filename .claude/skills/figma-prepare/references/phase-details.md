@@ -41,7 +41,7 @@ meta:
 quality:
   score: 65
   grade: "B"
-  recommendation: "Phase 2 (rename) recommended"
+  recommendation: "Phase 2 (grouping) recommended"
 
 metrics:
   total_nodes: 245
@@ -95,65 +95,17 @@ Score: 65 / 100  [Grade: B]
 │ Auto Layout penalty       │ -12.0            │
 └───────────────────────────┴──────────────────┘
 
-Recommendation: Phase 2 (rename) recommended
+Recommendation: Phase 2 (grouping) recommended
 
 Next steps:
-  /figma-prepare {url} --phase 2          # Rename layers
-  /figma-prepare {url} --phase 2 --apply  # Rename + apply
+  /figma-prepare {url} --phase 2          # Grouping (dry-run)
+  /figma-prepare {url} --phase 3          # Grouping + Rename (dry-run)
+  /figma-prepare {url} --phase 3 --apply  # Grouping + Rename + apply
 ```
 
-## Phase 2: セマンティックリネーム
+## Phase 2: グループ化 + セクショニング
 
-### 実行ツール
-
-Chrome DevTools MCP (`evaluate_script`)
-
-### 前提条件
-
-- Figma ブランチ上であること（ユーザー確認）
-- Chrome DevTools MCP が接続済みであること
-- `typeof figma === 'object'` であること
-
-### 手順
-
-1. Phase 1 のメタデータ JSON を読み込み
-2. `generate-rename-map.sh` でリネームマップ生成
-3. **dry-run (デフォルト)**: `rename-map.yaml` を出力して終了
-4. **--apply**: Chrome DevTools MCP でバッチ実行
-
-### リネームロジック（優先順）
-
-| 優先度 | 手法 | 判定条件 | 結果例 |
-|-------|------|---------|-------|
-| 1 | テキスト内容 | TEXT ノード | heading-about-us |
-| 2 | シェイプ分析 | 幅/高さ比率、サイズ | divider-0, bg-1 |
-| 3 | 位置分析 | ページ内 Y 座標 | section-header, section-footer |
-| 4 | 子構造分析 | 子要素のタイプ構成 | card-0, text-block-1 |
-| 5 | フォールバック | 上記全て不可 | frame-3, rectangle-5 |
-
-### バッチ実行
-
-```
-リネーム対象: N 件
-バッチサイズ: 50 件/回
-バッチ数: ceil(N / 50)
-
-各バッチ:
-  1. evaluate_script で 50 件のリネームを実行
-  2. 結果を確認（renamed / errors）
-  3. エラーがあればスキップして次へ
-```
-
-### ヒューマンゲート
-
-Phase 2 完了後、ユーザーに以下を確認:
-- Figma デスクトップ/Web でリネーム結果を確認
-- 問題があれば Ctrl+Z で Undo 可能
-- 確認後に Phase 3 に進行
-
-## Phase 3: グループ化 + セクショニング
-
-Phase 3 は2段階構成:
+Phase 2 は2段階構成:
 - **Stage A**: 既存ヒューリスティック（ネストレベルのグルーピング）
 - **Stage B**: Claude セクショニング（トップレベル children のセクション分割）
 
@@ -277,6 +229,55 @@ Stage A の `page-kv` 候補と Stage B のセクション分割で重複する 
 - Stage B を優先（Claude のセクション境界推論のほうが正確）
 - Stage A の proximity / pattern / semantic 結果はそのまま維持
 
+## Phase 3: セマンティックリネーム
+
+### 実行ツール
+
+Chrome DevTools MCP (`evaluate_script`)
+
+### 前提条件
+
+- Figma ブランチ上であること（ユーザー確認）
+- Chrome DevTools MCP が接続済みであること
+- `typeof figma === 'object'` であること
+
+### 手順
+
+1. Phase 1 のメタデータ JSON を読み込み（Phase 2 のグルーピング後のメタデータがあればそちらを使用）
+2. `generate-rename-map.sh` でリネームマップ生成
+3. **dry-run (デフォルト)**: `rename-map.yaml` を出力して終了
+4. **--apply**: Chrome DevTools MCP でバッチ実行
+
+### リネームロジック（優先順）
+
+| 優先度 | 手法 | 判定条件 | 結果例 |
+|-------|------|---------|-------|
+| 1 | テキスト内容 | TEXT ノード | heading-about-us |
+| 2 | シェイプ分析 | 幅/高さ比率、サイズ | divider-0, bg-1 |
+| 3 | 位置分析 | ページ内 Y 座標 | section-header, section-footer |
+| 4 | 子構造分析 | 子要素のタイプ構成 | card-0, text-block-1 |
+| 5 | フォールバック | 上記全て不可 | frame-3, rectangle-5 |
+
+### バッチ実行
+
+```
+リネーム対象: N 件
+バッチサイズ: 50 件/回
+バッチ数: ceil(N / 50)
+
+各バッチ:
+  1. evaluate_script で 50 件のリネームを実行
+  2. 結果を確認（renamed / errors）
+  3. エラーがあればスキップして次へ
+```
+
+### ヒューマンゲート
+
+Phase 3 完了後、ユーザーに以下を確認:
+- Figma デスクトップ/Web でリネーム結果を確認
+- 問題があれば Ctrl+Z で Undo 可能
+- 確認後に Phase 4 に進行
+
 ## Phase 4: Auto Layout 適用
 
 ### 実行ツール
@@ -348,12 +349,13 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4
   (必須)    (任意)     (任意)     (任意)
 
 Phase 1: メタデータ取得（全フェーズの基盤）
-Phase 2: リネーム（Phase 3, 4 の前に実行推奨）
-Phase 3: グループ化（Phase 4 の前に実行推奨）
-Phase 4: Auto Layout（グループ化済みフレームに最も効果的）
+Phase 2: グループ化（構造確定。Phase 3 の前に実行推奨）
+Phase 3: リネーム（確定構造に対してセマンティック命名）
+Phase 4: Auto Layout（グループ化+リネーム済みフレームに最も効果的）
 ```
 
 - Phase 1 は常に実行（必須）
 - Phase 2-4 は `--phase` オプションで指定
-- Phase 3 はリネーム後に実行すると、グループ名がセマンティックになる
-- Phase 4 はグループ化後に実行すると、適用対象が適切になる
+- Phase 2 のグルーピングはノード名に依存しないため、リネーム前でも動作する
+- Phase 3 のリネームはグループ化後のコンテキスト（子構造）を利用でき、精度が向上する
+- Phase 4 はグループ化+リネーム後に実行すると、適用対象が適切になる

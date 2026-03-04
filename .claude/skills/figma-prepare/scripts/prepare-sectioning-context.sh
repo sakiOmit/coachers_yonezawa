@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Phase 3 Stage B: Prepare Sectioning Context
+# Phase 2 Stage B: Prepare Sectioning Context
 #
 # Extracts top-level children summary from metadata JSON for Claude sectioning.
 # Output: JSON with page info, sorted children (Y ascending), and heuristic hints.

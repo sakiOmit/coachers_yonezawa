@@ -113,7 +113,54 @@ Phase 2-4 のスクリプト生成時に参照する。
 
 **注意**: `nameMatchRate` が 95% 未満の場合、マッピングが不正確な可能性あり。
 
-## Phase 2: リネーム
+## Phase 2: グループ化
+
+### Frame でグループ化
+
+```javascript
+() => {
+  const group = {
+    parentId: "1:5",
+    childIds: ["1:10", "1:11", "1:12"],
+    name: "card-feature",
+  };
+
+  const parent = figma.getNodeById(group.parentId);
+  if (!parent) return { error: "parent not found" };
+
+  const children = group.childIds
+    .map(id => figma.getNodeById(id))
+    .filter(Boolean);
+
+  if (children.length === 0) return { error: "no children found" };
+
+  // 子要素の境界を計算
+  const minX = Math.min(...children.map(c => c.x));
+  const minY = Math.min(...children.map(c => c.y));
+  const maxX = Math.max(...children.map(c => c.x + c.width));
+  const maxY = Math.max(...children.map(c => c.y + c.height));
+
+  // 新しい Frame を作成
+  const frame = figma.createFrame();
+  frame.name = group.name;
+  frame.x = minX;
+  frame.y = minY;
+  frame.resize(maxX - minX, maxY - minY);
+  frame.fills = []; // 透明
+
+  // 親に追加してから子要素を移動
+  parent.appendChild(frame);
+  for (const child of children) {
+    child.x -= minX;
+    child.y -= minY;
+    frame.appendChild(child);
+  }
+
+  return { created: frame.id, name: frame.name, children: children.length };
+}
+```
+
+## Phase 3: リネーム
 
 ### 一括リネーム
 
@@ -160,53 +207,6 @@ Phase 2-4 のスクリプト生成時に参照する。
   }
 
   return { renamed, batch: "N/M" };
-}
-```
-
-## Phase 3: グループ化
-
-### Frame でグループ化
-
-```javascript
-() => {
-  const group = {
-    parentId: "1:5",
-    childIds: ["1:10", "1:11", "1:12"],
-    name: "card-feature",
-  };
-
-  const parent = figma.getNodeById(group.parentId);
-  if (!parent) return { error: "parent not found" };
-
-  const children = group.childIds
-    .map(id => figma.getNodeById(id))
-    .filter(Boolean);
-
-  if (children.length === 0) return { error: "no children found" };
-
-  // 子要素の境界を計算
-  const minX = Math.min(...children.map(c => c.x));
-  const minY = Math.min(...children.map(c => c.y));
-  const maxX = Math.max(...children.map(c => c.x + c.width));
-  const maxY = Math.max(...children.map(c => c.y + c.height));
-
-  // 新しい Frame を作成
-  const frame = figma.createFrame();
-  frame.name = group.name;
-  frame.x = minX;
-  frame.y = minY;
-  frame.resize(maxX - minX, maxY - minY);
-  frame.fills = []; // 透明
-
-  // 親に追加してから子要素を移動
-  parent.appendChild(frame);
-  for (const child of children) {
-    child.x -= minX;
-    child.y -= minY;
-    frame.appendChild(child);
-  }
-
-  return { created: frame.id, name: frame.name, children: children.length };
 }
 ```
 
@@ -293,7 +293,7 @@ Phase 2-4 のスクリプト生成時に参照する。
 
 ### ツリー読み戻し + 名前一致検証
 
-`apply-renames.js` や Phase 3 グルーピング後に、クローンのツリーを読み戻して期待名と比較する。
+`apply-renames.js` や Phase 2 グルーピング後に、クローンのツリーを読み戻して期待名と比較する。
 
 ```javascript
 () => {
@@ -345,8 +345,8 @@ Phase 2-4 のスクリプト生成時に参照する。
 **判定基準**: `matchRate >= 0.98` → 成功、`< 0.98` → 警告 + mismatch 一覧
 
 **用途**:
-- Phase 2: リネーム後の名前一致検証（primary）
-- Phase 3: グルーピング後のフレーム名・子構造検証
+- Phase 2: グルーピング後のフレーム名・子構造検証
+- Phase 3: リネーム後の名前一致検証（primary）
 
 **テンプレート**: `scripts/verify-structure.js` にプレースホルダー版あり
 

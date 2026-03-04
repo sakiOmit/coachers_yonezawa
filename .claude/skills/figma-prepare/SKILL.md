@@ -48,13 +48,13 @@ Figmaデザインファイルの構造品質を分析し、レイヤー名整理
 ### Key Features
 
 - **Phase 1**: 構造品質スコア（100点満点）で問題箇所を定量化（読み取り専用、リスクゼロ）
-- **Phase 2**: 未命名レイヤーのセマンティックリネーム（Chrome DevTools MCP経由）
-- **Phase 3**: 近接要素のグループ化・Frame化
+- **Phase 2**: 近接要素のグループ化・セクショニング
+- **Phase 3**: 未命名レイヤーのセマンティックリネーム（Chrome DevTools MCP経由）
 - **Phase 4**: Auto Layout設定の自動推論・適用
 
 ### MVP
 
-Phase 1 + 2 を先に完成・検証。Phase 3, 4 は2-3案件で検証後に本格利用。
+Phase 1 + 2 + 3 を先に完成・検証。Phase 4 は2-3案件で検証後に本格利用。
 
 ### Adjacent Artboard 方式（--apply）
 
@@ -96,11 +96,14 @@ Options:
 # Phase 1 only: Structure analysis (safe, read-only)
 /figma-prepare https://figma.com/design/abc/t?node-id=0-1
 
-# Phase 1 + 2: Analyze + generate rename map (dry-run)
+# Phase 1 + 2: Analyze + grouping plan (dry-run)
 /figma-prepare https://figma.com/design/abc/t?node-id=0-1 --phase 2
 
-# Phase 1 + 2: Analyze + apply renames
-/figma-prepare https://figma.com/design/abc/t?node-id=0-1 --phase 2 --apply
+# Phase 1 + 2 + 3: Analyze + grouping + rename (dry-run)
+/figma-prepare https://figma.com/design/abc/t?node-id=0-1 --phase 3
+
+# Phase 1 + 2 + 3: Analyze + grouping + rename + apply
+/figma-prepare https://figma.com/design/abc/t?node-id=0-1 --phase 3 --apply
 
 # All phases with apply
 /figma-prepare https://figma.com/design/abc/t?node-id=0-1 --phase 4 --apply
@@ -163,30 +166,30 @@ Phase 1.5: メタデータ補完（オプション）
         │ → enriched metadata を後続 Phase に使用
         │
         ▼ [--phase >= 2]
-Phase 2: セマンティックリネーム
-        │ → dry-run: rename-map.yaml 出力
-        │ → --apply:
-        │     2-A. clone-artboard.js → 複製アートボード作成
-        │     2-B. ID マッピングテーブル生成
-        │     2-C. リネームマップを複製 ID に変換
-        │     2-D. apply-renames.js → バッチリネーム実行
-        │     2-E. verify-structure.js → 構造 diff 検証
-        │
-        ├─ [--phase 2] → 終了
-        │
-        ▼ [--phase >= 3]
-Gate: リネーム結果をFigmaで確認
-        │
-        ▼
-Phase 3: グループ化 + セクショニング
+Phase 2: グループ化 + セクショニング
         │ → Stage A: detect-grouping-candidates.sh（ネストレベル）
         │ → Stage B: prepare-sectioning-context.sh + Claude推論（トップレベル）
         │ → dry-run: grouping-plan.yaml + sectioning-plan.yaml / --apply: evaluate_script
         │
+        ├─ [--phase 2] → 終了
+        │
+        ▼ [--phase >= 3]
+Gate: グルーピング結果をFigmaで確認
+        │
+        ▼
+Phase 3: セマンティックリネーム
+        │ → dry-run: rename-map.yaml 出力
+        │ → --apply:
+        │     3-A. clone-artboard.js → 複製アートボード作成
+        │     3-B. ID マッピングテーブル生成
+        │     3-C. リネームマップを複製 ID に変換
+        │     3-D. apply-renames.js → バッチリネーム実行
+        │     3-E. verify-structure.js → 構造 diff 検証
+        │
         ├─ [--phase 3] → 終了
         │
         ▼ [--phase >= 4]
-Gate: グループ化結果をFigmaで確認
+Gate: リネーム結果をFigmaで確認
         │
         ▼
 Phase 4: Auto Layout適用
@@ -282,8 +285,9 @@ Score: {score} / 100  [Grade: {grade}]
 Recommendation: {recommendation}
 
 Next steps:
-  /figma-prepare {url} --phase 2           # Rename (dry-run)
-  /figma-prepare {url} --phase 2 --apply   # Rename + apply
+  /figma-prepare {url} --phase 2           # Grouping (dry-run)
+  /figma-prepare {url} --phase 3           # Grouping + Rename (dry-run)
+  /figma-prepare {url} --phase 3 --apply   # Grouping + Rename + apply
   /figma-analyze {url}                     # Skip to analysis
 ```
 
@@ -325,16 +329,103 @@ bash .claude/skills/figma-prepare/scripts/enrich-metadata.sh \
 
 | Phase | 補完なし | 補完あり |
 |-------|---------|---------|
-| Phase 2 | RECTANGLE → bg-* | IMAGE fill → img-*, SOLID fill → bg-* |
-| Phase 2 | GROUP → group-* (フォールバック) | 位置+構造 → header/footer |
+| Phase 3 | RECTANGLE → bg-* | IMAGE fill → img-*, SOLID fill → bg-* |
+| Phase 3 | GROUP → group-* (フォールバック) | 位置+構造 → header/footer |
 | Phase 4 | 座標推論 (medium confidence) | layoutMode 実値 (exact confidence) |
 
-## Phase 2: セマンティックリネーム
+## Phase 2: グループ化 + セクショニング
 
 **詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 2」セクション
+
+Phase 2 は2段階構成:
+- **Stage A**: 既存ヒューリスティック（ネストレベルのグルーピング検出）
+- **Stage B**: Claude セクショニング（トップレベル children をセクション単位に分割）
+
+```
+Phase 2: グループ化 + セクショニング
+├── 2-1. Stage A: ヒューリスティック（既存、変更なし）
+├── 2-2. Stage B: Claude セクショニング
+│   ├── 2-2a. prepare-sectioning-context.sh でコンテキスト生成
+│   ├── 2-2b. get_screenshot でスクリーンショット取得
+│   ├── 2-2c. プロンプトテンプレート + コンテキストで Claude 推論
+│   └── 2-2d. sectioning-plan.yaml 保存
+├── 2-3. 結果統合（Stage A page-kv と Stage B の重複解決）
+└── 2-4. dry-run / --apply
+```
+
+### 2-1. Stage A: ヒューリスティック（グルーピング候補検出）
+
+```bash
+bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
+  .claude/cache/figma/prepare-metadata-{nodeId}.json \
+  --output .claude/cache/figma/grouping-plan.yaml
+```
+
+既存のプロキシミティ/パターン/セマンティック/ページKV検出。ネストレベルのグルーピングを行う。
+
+### 2-2. Stage B: Claude セクショニング
+
+トップレベル children をセクション単位に分割する。bash スクリプトは Claude を呼ばず、SKILL 実行レベルで推論する。
+
+#### 2-2a. セクショニングコンテキスト生成
+
+```bash
+bash .claude/skills/figma-prepare/scripts/prepare-sectioning-context.sh \
+  .claude/cache/figma/prepare-metadata-{nodeId}.json \
+  --output .claude/cache/figma/sectioning-context.json
+```
+
+トップレベル children のサマリー（Y座標昇順、ヒューリスティックヒント付き）を JSON 出力。
+
+#### 2-2b. スクリーンショット取得
+
+```
+mcp__plugin_figma_figma__get_screenshot
+  fileKey: "{fileKey}"
+  nodeId: "{nodeId}"
+```
+
+スクリーンショット取得失敗時は Stage B をスキップし、Stage A のみで進行。
+
+#### 2-2c. Claude 推論
+
+プロンプトテンプレート（`references/sectioning-prompt-template.md`）にコンテキスト JSON とスクリーンショットを組み合わせて Claude に送信。ヒューリスティックヒントでアンカリングし、YAML 形式の出力を制約。
+
+#### 2-2d. セクショニング計画保存
+
+```
+.claude/cache/figma/sectioning-plan.yaml
+```
+
+### 2-3. 結果統合
+
+Stage A の page-kv 候補と Stage B のセクション分割で重複する node_ids がある場合、Stage B を優先する（Claude のセクション境界推論のほうが正確なため）。
+
+### 2-4. dry-run / --apply
+
+dry-run: grouping-plan.yaml + sectioning-plan.yaml を表示
+--apply: evaluate_script で Frame 作成 + 子要素移動
+
+### 2-5. --apply 後の構造 diff 検証
+
+`--apply` 実行後、verify-structure.js でクローンのツリーを読み戻し、計画との整合性を検証する。
+
+```
+1. グルーピング計画の name と実際のフレーム名を比較
+   - __EXPECTED_NAMES__: { "cloneChildId": "planName", ... }（グルーピング/セクショニング計画のフレーム名）
+2. 子ノードの移動先が正しいか確認
+   - 新フレーム内の子ノード数が計画と一致するか
+3. matchRate >= 0.98 → 成功、< 0.98 → 警告 + mismatch 一覧
+
+パターン: references/figma-plugin-api.md「構造検証」参照
+```
+
+## Phase 3: セマンティックリネーム
+
+**詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 3」セクション
 **API パターン**: → [references/figma-plugin-api.md](references/figma-plugin-api.md)
 
-### 2-1. リネームマップ生成
+### 3-1. リネームマップ生成
 
 ```bash
 bash .claude/skills/figma-prepare/scripts/generate-rename-map.sh \
@@ -342,7 +433,7 @@ bash .claude/skills/figma-prepare/scripts/generate-rename-map.sh \
   --output .claude/cache/figma/rename-map.yaml
 ```
 
-### 2-2. dry-run 出力（デフォルト）
+### 3-2. dry-run 出力（デフォルト）
 
 rename-map.yaml の内容をサマリー表示:
 
@@ -358,11 +449,11 @@ Sample (first 10):
 Full map: .claude/cache/figma/rename-map.yaml
 ```
 
-### 2-3. --apply 実行（Adjacent Artboard 方式）
+### 3-3. --apply 実行（Adjacent Artboard 方式）
 
 `--apply` 指定時、元アートボードの複製を作成し、複製側にリネームを適用する。
 
-#### 2-3a. Chrome DevTools MCP 接続確認
+#### 3-3a. Chrome DevTools MCP 接続確認
 
 ```
 mcp__chrome-devtools__evaluate_script
@@ -372,7 +463,7 @@ mcp__chrome-devtools__evaluate_script
 セットアップ: references/chrome-devtools-setup.md 参照
 ```
 
-#### 2-3b. アートボード複製
+#### 3-3b. アートボード複製
 
 ```
 mcp__chrome-devtools__evaluate_script の function パラメータにインラインで渡す:
@@ -387,7 +478,7 @@ nameMatchRate < 0.95 の場合: 警告表示 + 続行確認
 パターン: references/figma-plugin-api.md「Adjacent Artboard」参照
 ```
 
-#### 2-3c. リネームマップの ID 変換
+#### 3-3c. リネームマップの ID 変換
 
 ```
 rename-map.yaml の各 nodeId を mapping テーブルで変換:
@@ -396,7 +487,7 @@ rename-map.yaml の各 nodeId を mapping テーブルで変換:
 変換できない ID は警告としてスキップ。
 ```
 
-#### 2-3d. バッチリネーム実行
+#### 3-3d. バッチリネーム実行
 
 ```
 1. 変換済みリネームマップを 50件/バッチ に分割
@@ -407,10 +498,10 @@ rename-map.yaml の各 nodeId を mapping テーブルで変換:
    結果: { renamed: N, skipped: N, errors: [...] }
 3. 全バッチの結果を集計
 
-パターン: references/figma-plugin-api.md「Phase 2: リネーム」参照
+パターン: references/figma-plugin-api.md「Phase 3: リネーム」参照
 ```
 
-#### 2-3e. 構造 diff 検証
+#### 3-3e. 構造 diff 検証
 
 ```
 1. verify-structure.js でクローンのツリーを読み戻し
@@ -432,11 +523,11 @@ rename-map.yaml の各 nodeId を mapping テーブルで変換:
 パターン: references/figma-plugin-api.md「構造検証」参照
 ```
 
-#### 2-3f. 結果サマリー
+#### 3-3f. 結果サマリー
 
 ```
 ╔══════════════════════════════════════════════╗
-║         Phase 2: Rename Applied             ║
+║         Phase 3: Rename Applied             ║
 ╠══════════════════════════════════════════════╣
 
 Method: Adjacent Artboard (clone + rename)
@@ -463,96 +554,9 @@ Next:
 ╚══════════════════════════════════════════════╝
 ```
 
-### 2-4. ヒューマンゲート
+### 3-4. ヒューマンゲート
 
 "Figmaで Before/After を確認してください。複製アートボードが不要な場合は Ctrl+Z または手動削除で復元できます。"
-
-## Phase 3: グループ化 + セクショニング
-
-**詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 3」セクション
-
-Phase 3 は2段階構成:
-- **Stage A**: 既存ヒューリスティック（ネストレベルのグルーピング検出）
-- **Stage B**: Claude セクショニング（トップレベル children をセクション単位に分割）
-
-```
-Phase 3: グループ化 + セクショニング
-├── 3-1. Stage A: ヒューリスティック（既存、変更なし）
-├── 3-2. Stage B: Claude セクショニング
-│   ├── 3-2a. prepare-sectioning-context.sh でコンテキスト生成
-│   ├── 3-2b. get_screenshot でスクリーンショット取得
-│   ├── 3-2c. プロンプトテンプレート + コンテキストで Claude 推論
-│   └── 3-2d. sectioning-plan.yaml 保存
-├── 3-3. 結果統合（Stage A page-kv と Stage B の重複解決）
-└── 3-4. dry-run / --apply
-```
-
-### 3-1. Stage A: ヒューリスティック（グルーピング候補検出）
-
-```bash
-bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
-  .claude/cache/figma/prepare-metadata-{nodeId}.json \
-  --output .claude/cache/figma/grouping-plan.yaml
-```
-
-既存のプロキシミティ/パターン/セマンティック/ページKV検出。ネストレベルのグルーピングを行う。
-
-### 3-2. Stage B: Claude セクショニング
-
-トップレベル children をセクション単位に分割する。bash スクリプトは Claude を呼ばず、SKILL 実行レベルで推論する。
-
-#### 3-2a. セクショニングコンテキスト生成
-
-```bash
-bash .claude/skills/figma-prepare/scripts/prepare-sectioning-context.sh \
-  .claude/cache/figma/prepare-metadata-{nodeId}.json \
-  --output .claude/cache/figma/sectioning-context.json
-```
-
-トップレベル children のサマリー（Y座標昇順、ヒューリスティックヒント付き）を JSON 出力。
-
-#### 3-2b. スクリーンショット取得
-
-```
-mcp__plugin_figma_figma__get_screenshot
-  fileKey: "{fileKey}"
-  nodeId: "{nodeId}"
-```
-
-スクリーンショット取得失敗時は Stage B をスキップし、Stage A のみで進行。
-
-#### 3-2c. Claude 推論
-
-プロンプトテンプレート（`references/sectioning-prompt-template.md`）にコンテキスト JSON とスクリーンショットを組み合わせて Claude に送信。ヒューリスティックヒントでアンカリングし、YAML 形式の出力を制約。
-
-#### 3-2d. セクショニング計画保存
-
-```
-.claude/cache/figma/sectioning-plan.yaml
-```
-
-### 3-3. 結果統合
-
-Stage A の page-kv 候補と Stage B のセクション分割で重複する node_ids がある場合、Stage B を優先する（Claude のセクション境界推論のほうが正確なため）。
-
-### 3-4. dry-run / --apply
-
-dry-run: grouping-plan.yaml + sectioning-plan.yaml を表示
---apply: evaluate_script で Frame 作成 + 子要素移動
-
-### 3-5. --apply 後の構造 diff 検証
-
-`--apply` 実行後、verify-structure.js でクローンのツリーを読み戻し、計画との整合性を検証する。
-
-```
-1. グルーピング計画の name と実際のフレーム名を比較
-   - __EXPECTED_NAMES__: { "cloneChildId": "planName", ... }（グルーピング/セクショニング計画のフレーム名）
-2. 子ノードの移動先が正しいか確認
-   - 新フレーム内の子ノード数が計画と一致するか
-3. matchRate >= 0.98 → 成功、< 0.98 → 警告 + mismatch 一覧
-
-パターン: references/figma-plugin-api.md「構造検証」参照
-```
 
 ## Phase 4: Auto Layout 適用
 
@@ -581,7 +585,7 @@ dry-run: autolayout-plan.yaml を表示
 ```
 Preparation complete!
 
-Executed phases: 1, 2
+Executed phases: 1, 2, 3
 Quality score: 65 → 82 (improved)
 
 Next steps:
@@ -623,10 +627,10 @@ Next steps:
 |------|---------|
 | `.claude/rules/figma-prepare.md` | 命名規約・閾値・品質スコア計算式 |
 | `.claude/cache/figma/prepare-report.yaml` | 分析レポート出力先 |
-| `.claude/cache/figma/rename-map.yaml` | Phase 2 リネームマップ |
-| `.claude/cache/figma/grouping-plan.yaml` | Phase 3 Stage A グルーピング計画 |
-| `.claude/cache/figma/sectioning-context.json` | Phase 3 Stage B コンテキスト |
-| `.claude/cache/figma/sectioning-plan.yaml` | Phase 3 Stage B セクショニング計画 |
+| `.claude/cache/figma/grouping-plan.yaml` | Phase 2 Stage A グルーピング計画 |
+| `.claude/cache/figma/sectioning-context.json` | Phase 2 Stage B コンテキスト |
+| `.claude/cache/figma/sectioning-plan.yaml` | Phase 2 Stage B セクショニング計画 |
+| `.claude/cache/figma/rename-map.yaml` | Phase 3 リネームマップ |
 | `.claude/cache/figma/autolayout-plan.yaml` | Phase 4 AutoLayout計画 |
 | `references/chrome-devtools-setup.md` | Chrome DevTools MCP セットアップ |
 | `references/figma-plugin-api.md` | Figma Plugin API パターン集 |
