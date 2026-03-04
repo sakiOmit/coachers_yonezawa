@@ -1386,8 +1386,30 @@ resolve_absolute_coords(empty_node, parent_x=50, parent_y=60)
 assert empty_node['absoluteBoundingBox']['x'] == 50, f'empty x'
 assert empty_node['absoluteBoundingBox']['y'] == 60, f'empty y'
 
+## Test 4: Double-call guard (Issue 67)
+node2 = {
+    'absoluteBoundingBox': {'x': 10, 'y': 20, 'width': 100, 'height': 100},
+    'children': [{
+        'absoluteBoundingBox': {'x': 5, 'y': 5, 'width': 50, 'height': 50},
+        'children': []
+    }]
+}
+resolve_absolute_coords(node2)
+child2 = node2['children'][0]
+assert child2['absoluteBoundingBox']['x'] == 15, f'first call child x'
+# Second call should be a no-op (guard prevents double accumulation)
+resolve_absolute_coords(node2)
+assert child2['absoluteBoundingBox']['x'] == 15, f'double-call child x: {child2[\"absoluteBoundingBox\"][\"x\"]}'
+assert child2['absoluteBoundingBox']['y'] == 25, f'double-call child y: {child2[\"absoluteBoundingBox\"][\"y\"]}'
+
+## Test 5: absoluteBoundingBox is None (Issue 60)
+null_bbox_node = {'absoluteBoundingBox': None, 'children': []}
+resolve_absolute_coords(null_bbox_node, parent_x=10, parent_y=20)
+assert null_bbox_node['absoluteBoundingBox']['x'] == 10, f'null bbox x'
+assert null_bbox_node['absoluteBoundingBox']['y'] == 20, f'null bbox y'
+
 print('OK')
-" 2>/dev/null && { green "  PASS: resolve_absolute_coords — accumulation, leaf, missing bbox"; ((PASS++)) || true; } || { red "  FAIL: resolve_absolute_coords unit tests"; ((FAIL++)) || true; }
+" 2>/dev/null && { green "  PASS: resolve_absolute_coords — accumulation, leaf, missing bbox, double-call, null bbox"; ((PASS++)) || true; } || { red "  FAIL: resolve_absolute_coords unit tests"; ((FAIL++)) || true; }
 
 # ================================================================
 bold "=== Unit: figma_utils.py — snap (Issue 52) ==="
@@ -1572,7 +1594,7 @@ bold "========================================"
 if [[ $FAIL -gt 0 ]]; then
   echo ""
   red "Failed tests:"
-  printf "$ERRORS"
+  printf '%s' "$ERRORS"
   exit 1
 fi
 

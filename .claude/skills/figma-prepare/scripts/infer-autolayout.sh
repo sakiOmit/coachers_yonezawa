@@ -125,12 +125,13 @@ def layout_from_enrichment(frame):
         return None
 
     direction = layout_mode  # HORIZONTAL or VERTICAL
-    item_gap = snap(frame.get('itemSpacing', 0))
+    # Issue 63: Do not snap exact Figma values — preserve original design intent
+    item_gap = int(frame.get('itemSpacing', 0))
     padding = {
-        'top': snap(frame.get('paddingTop', 0)),
-        'right': snap(frame.get('paddingRight', 0)),
-        'bottom': snap(frame.get('paddingBottom', 0)),
-        'left': snap(frame.get('paddingLeft', 0)),
+        'top': int(frame.get('paddingTop', 0)),
+        'right': int(frame.get('paddingRight', 0)),
+        'bottom': int(frame.get('paddingBottom', 0)),
+        'left': int(frame.get('paddingLeft', 0)),
     }
     primary_align = frame.get('primaryAxisAlignItems', 'MIN')
     counter_align = frame.get('counterAxisAlignItems', 'MIN')

@@ -43,69 +43,7 @@ bold()  { printf "\033[1m%s\033[0m\n" "$1"; }
 check_unused_imports() {
   bold "=== Check: unused-import ==="
 
-  for script in "$SCRIPTS_DIR"/*.sh; do
-    local basename
-    basename=$(basename "$script")
-
-    # Python コードブロックを抽出してimportチェック
-    python3 -c "
-import re, sys
-
-with open(sys.argv[1], 'r') as f:
-    content = f.read()
-
-# python3 -c \"...\" ブロック内のコードを抽出
-# 簡易的に import 行を探す
-lines = content.split('\n')
-imports = []
-for line in lines:
-    stripped = line.strip()
-    if stripped.startswith('import ') and not stripped.startswith('import json'):
-        # parse 'import a, b, c, d'
-        mods = stripped.replace('import ', '').split(',')
-        for m in mods:
-            m = m.strip().split(' as ')[0].strip()
-            if m:
-                imports.append(m)
-    elif stripped.startswith('from ') and 'import' in stripped:
-        # from X import a, b — X は使用されないのでスキップ
-        pass
-
-# 各importがコード内で module.xxx として使われているかチェック
-# (from X import Y は Y の使用を確認する必要があるが、ここでは標準ライブラリのみ)
-stdlib_modules = {'json', 're', 'sys', 'os', 'math', 'statistics', 'unicodedata', 'tempfile', 'subprocess'}
-unused = []
-for mod in imports:
-    if mod not in stdlib_modules:
-        continue
-    # module. パターンで使用チェック
-    pattern = mod + r'\.'
-    # import行自体を除外して検索
-    code_without_imports = re.sub(r'^(import |from ).*$', '', content, flags=re.MULTILINE)
-    if not re.search(pattern, code_without_imports):
-        # sys は sys.argv, sys.path, sys.stdin, sys.exit で使用
-        if mod == 'sys':
-            if 'sys.' in code_without_imports:
-                continue
-        # os は os.path, os.unlink 等で使用
-        if mod == 'os':
-            if 'os.' in code_without_imports:
-                continue
-        unused.append(mod)
-
-if unused:
-    print(f'UNUSED:{sys.argv[2]}:{\"|\".join(unused)}')
-" "$script" "$basename" 2>/dev/null || true
-  done | while IFS= read -r line; do
-    if [[ "$line" == UNUSED:* ]]; then
-      local info="${line#UNUSED:}"
-      local file="${info%%:*}"
-      local mods="${info#*:}"
-      issue "unused-import: $file has unused import(s): ${mods//|/, }"
-    fi
-  done
-
-  # 結果をISSUES配列から読み出し（サブシェル問題を回避）
+  # Issue 65: Removed dead first loop (subshell issue made issue() calls invisible)
   local found=0
   for script in "$SCRIPTS_DIR"/*.sh; do
     local basename
@@ -338,12 +276,21 @@ else
   bold "========================================"
 
   if $JSON_MODE; then
+    # Issue 64: Use temp files to avoid shell injection in Python string literals
+    local tmp_issues tmp_warnings
+    tmp_issues=$(mktemp)
+    tmp_warnings=$(mktemp)
+    printf '%s\n' "${ISSUES[@]}" > "$tmp_issues"
+    printf '%s\n' "${WARNINGS[@]}" > "$tmp_warnings"
     python3 -c "
-import json
-issues = $(printf '%s\n' "${ISSUES[@]}" | python3 -c "import sys,json; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))" 2>/dev/null || echo '[]')
-warnings = $(printf '%s\n' "${WARNINGS[@]}" | python3 -c "import sys,json; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))" 2>/dev/null || echo '[]')
+import json, sys
+with open(sys.argv[1]) as f:
+    issues = [l.strip() for l in f if l.strip()]
+with open(sys.argv[2]) as f:
+    warnings = [l.strip() for l in f if l.strip()]
 print(json.dumps({'status': 'issues_found', 'issues': issues, 'warnings': warnings}, indent=2))
-"
+" "$tmp_issues" "$tmp_warnings"
+    rm -f "$tmp_issues" "$tmp_warnings"
   fi
 
   # issues があれば exit 1, warnings のみなら exit 0

@@ -38,13 +38,19 @@ def resolve_absolute_coords(node, parent_x=0, parent_y=0):
 
     get_metadata returns parent-relative x/y in absoluteBoundingBox.
     This function accumulates parent offsets to compute true absolute coords.
+
+    Issue 67: Mutates in-place. A marker '_abs_resolved' prevents
+    double-call from corrupting coordinates.
     """
-    bbox = node.get('absoluteBoundingBox', {})
+    if node.get('_abs_resolved'):
+        return
+    bbox = node.get('absoluteBoundingBox') or {}
     abs_x = parent_x + bbox.get('x', 0)
     abs_y = parent_y + bbox.get('y', 0)
     bbox['x'] = abs_x
     bbox['y'] = abs_y
     node['absoluteBoundingBox'] = bbox
+    node['_abs_resolved'] = True
     for child in node.get('children', []):
         resolve_absolute_coords(child, abs_x, abs_y)
 
@@ -54,7 +60,7 @@ def get_bbox(node):
 
     Returns dict with short keys: x, y, w, h.
     """
-    bbox = node.get('absoluteBoundingBox', {})
+    bbox = node.get('absoluteBoundingBox') or {}
     return {
         'x': bbox.get('x', 0),
         'y': bbox.get('y', 0),
@@ -96,7 +102,12 @@ def get_text_children_content(children, max_items=None, filter_unnamed=False):
             content = c.get('characters', '') or c.get('name', '')
             if not content:
                 continue
-            if filter_unnamed and UNNAMED_RE.match(content):
+            # Issue 62: filter_unnamed skips nodes where the *resolved content*
+            # (characters or name) matches an auto-generated pattern, but only
+            # when characters is absent (i.e., we fell back to name).
+            # If characters is present, the text is real content even if the
+            # node name is auto-generated (e.g., name="Text 2", characters="お問い合わせ").
+            if filter_unnamed and not c.get('characters', '') and UNNAMED_RE.match(content):
                 continue
             texts.append(content)
     if max_items is not None:
@@ -132,7 +143,7 @@ def is_section_root(node):
     Returns:
         bool: True if node is a section root frame.
     """
-    bbox = node.get('absoluteBoundingBox', {})
+    bbox = node.get('absoluteBoundingBox') or {}
     width = bbox.get('width', 0)
     return node.get('type') == 'FRAME' and abs(width - SECTION_ROOT_WIDTH) < 10
 

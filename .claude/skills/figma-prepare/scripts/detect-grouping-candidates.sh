@@ -235,6 +235,8 @@ try:
                     f.write(f'    suggested_name: {yaml_str(c[\"suggested_name\"])}\\n')
                 if 'structure_hash' in c:
                     f.write(f'    structure_hash: {yaml_str(c[\"structure_hash\"])}\\n')
+                if 'suggested_wrapper' in c:
+                    f.write(f'    suggested_wrapper: {yaml_str(c[\"suggested_wrapper\"])}\\n')
         print(json.dumps({
             'total': len(candidates),
             'output': output_file,
