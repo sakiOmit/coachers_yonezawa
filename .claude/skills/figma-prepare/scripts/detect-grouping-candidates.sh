@@ -175,6 +175,72 @@ def detect_semantic_groups(children):
             })
     return result
 
+def detect_page_kv_groups(children, parent_bbox):
+    \"\"\"Detect page-kv pattern: breadcrumb + heading + optional bg image.
+
+    Heuristics:
+    - Breadcrumb: TEXT node containing '>' separator
+    - Heading: FRAME with 2+ TEXT children (en + ja pattern)
+    - Background: RECTANGLE in the same upper area (h > 100)
+    - All in upper 30% of parent
+    \"\"\"
+    result = []
+    parent_h = parent_bbox.get('h', 0)
+    parent_y = parent_bbox.get('y', 0)
+    if parent_h <= 0:
+        return result
+
+    upper_threshold = parent_y + parent_h * 0.3
+
+    breadcrumbs = []
+    headings = []
+    bg_rects = []
+
+    for child in children:
+        bb = get_bbox(child)
+        if bb['y'] > upper_threshold:
+            continue
+
+        node_type = child.get('type', '')
+        node_name = child.get('name', '')
+
+        # Breadcrumb: TEXT with '>' or right-angle quote
+        if node_type == 'TEXT':
+            characters = child.get('characters', '')
+            check_text = characters if characters else node_name
+            if '>' in check_text or '\\u203a' in check_text:
+                breadcrumbs.append(child)
+                continue
+
+        # Heading: FRAME/GROUP with 2+ TEXT children (multi-language heading)
+        if node_type in ('FRAME', 'GROUP'):
+            sub = child.get('children', [])
+            text_children = [c for c in sub if c.get('type') == 'TEXT']
+            if len(text_children) >= 2:
+                headings.append(child)
+                continue
+
+        # Background: RECTANGLE in upper area with significant height
+        if node_type == 'RECTANGLE' and bb['h'] > 100:
+            bg_rects.append(child)
+
+    # Need at least breadcrumb + heading
+    if breadcrumbs and headings:
+        group_nodes = headings + breadcrumbs + bg_rects
+        result.append({
+            'method': 'page-kv',
+            'node_ids': [n.get('id', '') for n in group_nodes],
+            'node_names': [n.get('name', '') for n in group_nodes],
+            'count': len(group_nodes),
+            'suggested_name': 'section-page-kv',
+            'components': {
+                'breadcrumbs': [n.get('id', '') for n in breadcrumbs],
+                'headings': [n.get('id', '') for n in headings],
+                'backgrounds': [n.get('id', '') for n in bg_rects],
+            },
+        })
+    return result
+
 def walk_and_detect(node, all_candidates=None):
     \"\"\"Walk tree and detect grouping candidates at each level.\"\"\"
     if all_candidates is None:
@@ -191,6 +257,8 @@ def walk_and_detect(node, all_candidates=None):
     proximity = detect_proximity_groups(children)
     patterns = detect_pattern_groups(children)
     semantic = detect_semantic_groups(children)
+    parent_bb = get_bbox(node)
+    page_kv = detect_page_kv_groups(children, parent_bb)
 
     for g in proximity + patterns:
         g['parent_id'] = parent_id
@@ -201,6 +269,11 @@ def walk_and_detect(node, all_candidates=None):
         s['parent_id'] = parent_id
         s['parent_name'] = parent_name
         all_candidates.append(s)
+
+    for p in page_kv:
+        p['parent_id'] = parent_id
+        p['parent_name'] = parent_name
+        all_candidates.append(p)
 
     # Recurse
     for child in children:
