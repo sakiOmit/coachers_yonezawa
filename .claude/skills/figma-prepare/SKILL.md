@@ -56,6 +56,15 @@ Figmaデザインファイルの構造品質を分析し、レイヤー名整理
 
 Phase 1 + 2 を先に完成・検証。Phase 3, 4 は2-3案件で検証後に本格利用。
 
+### Adjacent Artboard 方式（--apply）
+
+`--apply` 実行時、元のアートボードを直接変更するのではなく、**隣に複製アートボードを作成**し、そこに変更を適用する。
+
+- ブランチ不要（複製が独立に存在）
+- Before/After を並べて視覚比較可能
+- フィードバックループ（修正→再適用）が容易
+- Ctrl+Z または複製削除で即座に復元可能
+
 ## Pipeline Position
 
 | Position | Skill |
@@ -116,7 +125,7 @@ Options:
 
 | 禁止項目 | 理由 | 代替手段 |
 |---------|------|---------|
-| メインブランチでの Phase 2-4 実行 | 復元不能のリスク | Figma ブランチ上でのみ実行 |
+| 元アートボードの直接変更 | 復元不能のリスク | Adjacent Artboard 方式（複製に適用） |
 | レイヤーの削除 | デザイン情報の損失 | リネームまたはグループ化のみ |
 | ビジュアルプロパティの変更 | デザイン崩れ | 構造変更のみ |
 | コンポーネント Instance の detach | コンポーネント関係の破壊 | Instance はスキップ |
@@ -148,16 +157,19 @@ Phase 1: 構造分析レポート（Figma MCP、読み取り専用）
         ├─ [--phase 1] → 終了 + 次ステップ提案
         │
         ▼ [--phase >= 2]
-Gate 1: ブランチ確認 [ユーザーがFigmaブランチ上であることを確認]
-        │
-        ▼
 Phase 2: セマンティックリネーム
-        │ → dry-run: rename-map.yaml / --apply: evaluate_script
+        │ → dry-run: rename-map.yaml 出力
+        │ → --apply:
+        │     2-A. clone-artboard.js → 複製アートボード作成
+        │     2-B. ID マッピングテーブル生成
+        │     2-C. リネームマップを複製 ID に変換
+        │     2-D. apply-renames.js → バッチリネーム実行
+        │     2-E. Before/After スクリーンショット表示
         │
         ├─ [--phase 2] → 終了
         │
         ▼ [--phase >= 3]
-Gate 2: リネーム結果をFigmaで確認
+Gate: リネーム結果をFigmaで確認
         │
         ▼
 Phase 3: グループ化
@@ -166,7 +178,7 @@ Phase 3: グループ化
         ├─ [--phase 3] → 終了
         │
         ▼ [--phase >= 4]
-Gate 3: グループ化結果をFigmaで確認
+Gate: グループ化結果をFigmaで確認
         │
         ▼
 Phase 4: Auto Layout適用
@@ -267,12 +279,6 @@ Next steps:
 **詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 2」セクション
 **API パターン**: → [references/figma-plugin-api.md](references/figma-plugin-api.md)
 
-### 2-0. ブランチ確認（ヒューマンゲート）
-
-AskUserQuestion で以下を確認:
-- "Figmaブランチ上で作業していますか？Phase 2 はレイヤー名を変更します。"
-- 選択肢: "はい、ブランチ上です" / "ブランチを作成してから戻ります"
-
 ### 2-1. リネームマップ生成
 
 ```bash
@@ -281,7 +287,7 @@ bash .claude/skills/figma-prepare/scripts/generate-rename-map.sh \
   --output .claude/cache/figma/rename-map.yaml
 ```
 
-### 2-2. dry-run 出力
+### 2-2. dry-run 出力（デフォルト）
 
 rename-map.yaml の内容をサマリー表示:
 
@@ -297,25 +303,99 @@ Sample (first 10):
 Full map: .claude/cache/figma/rename-map.yaml
 ```
 
-### 2-3. --apply 実行
+### 2-3. --apply 実行（Adjacent Artboard 方式）
+
+`--apply` 指定時、元アートボードの複製を作成し、複製側にリネームを適用する。
+
+#### 2-3a. Chrome DevTools MCP 接続確認
 
 ```
-1. Chrome DevTools MCP 接続確認
-   evaluate_script: typeof figma === 'object'
+mcp__chrome-devtools__evaluate_script
+  function: () => typeof figma
+→ "object" 以外の場合: プラグイン開閉を案内して中止
 
-2. nodeId 存在チェック（バッチ）
-   evaluate_script: 全 nodeId の存在確認
+セットアップ: references/chrome-devtools-setup.md 参照
+```
 
-3. バッチ実行（50件/回）
-   evaluate_script: リネーム実行スクリプト
-   → 結果: { renamed: N, errors: [...] }
+#### 2-3b. アートボード複製
 
-4. 結果サマリー表示
+```
+mcp__chrome-devtools__evaluate_script の function パラメータにインラインで渡す:
+  - figma.getNodeById(sourceNodeId) でソース取得
+  - source.clone() で深い複製
+  - clone.x = source.x + source.width + 100 で右隣に配置
+  - buildMapping() で並行DFS → IDマッピング生成
+
+結果: { clone: { id, name }, mapping: {...}, total: N, nameMatchRate }
+nameMatchRate < 0.95 の場合: 警告表示 + 続行確認
+
+パターン: references/figma-plugin-api.md「Adjacent Artboard」参照
+```
+
+#### 2-3c. リネームマップの ID 変換
+
+```
+rename-map.yaml の各 nodeId を mapping テーブルで変換:
+  元 ID (例: "1:10") → 複製 ID (例: "23:55")
+
+変換できない ID は警告としてスキップ。
+```
+
+#### 2-3d. バッチリネーム実行
+
+```
+1. 変換済みリネームマップを 50件/バッチ に分割
+2. 各バッチごとに:
+   mcp__chrome-devtools__evaluate_script の function パラメータで実行:
+     - renameMap オブジェクトをインライン埋め込み
+     - figma.getNodeById() → node.name = newName
+   結果: { renamed: N, skipped: N, errors: [...] }
+3. 全バッチの結果を集計
+
+パターン: references/figma-plugin-api.md「Phase 2: リネーム」参照
+```
+
+#### 2-3e. Before/After スクリーンショット
+
+```
+mcp__plugin_figma_figma__get_screenshot
+  fileKey: "{fileKey}"
+  nodeId: "{originalNodeId}"    # Before（元アートボード）
+
+mcp__plugin_figma_figma__get_screenshot
+  fileKey: "{fileKey}"
+  nodeId: "{cloneId}"           # After（複製、リネーム済み）
+```
+
+#### 2-3f. 結果サマリー
+
+```
+╔══════════════════════════════════════════════╗
+║         Phase 2: Rename Applied             ║
+╠══════════════════════════════════════════════╣
+
+Method: Adjacent Artboard (clone + rename)
+
+Clone: "{cloneName}" (ID: {cloneId})
+  Position: x={x}, y={y}
+
+Results:
+  Renamed: {renamed} layers
+  Skipped: {skipped} layers
+  Errors:  {errorCount}
+
+Original artboard: unchanged ✓
+
+Next:
+  - Figma で Before/After を並べて確認
+  - 問題なければ元アートボードを削除し複製を採用
+  - 修正が必要な場合は複製を削除して再実行
+╚══════════════════════════════════════════════╝
 ```
 
 ### 2-4. ヒューマンゲート
 
-"Figmaでリネーム結果を確認してください。問題があればCtrl+Zで復元できます。"
+"Figmaで Before/After を確認してください。複製アートボードが不要な場合は Ctrl+Z または手動削除で復元できます。"
 
 ## Phase 3: グループ化
 
@@ -378,7 +458,9 @@ Next steps:
 | `figma` グローバル未初期化 | `typeof figma !== 'object'` | プラグイン開閉を案内 |
 | Node ID not found | evaluate_script 結果 | 個別スキップ + 警告 |
 | バッチタイムアウト | evaluate_script タイムアウト | バッチサイズ縮小して再試行 |
-| メインブランチでの実行 | ユーザー回答 | Phase 2+ を中止 |
+| clone() 失敗 | evaluate_script 結果 success=false | エラー表示 + 中止 |
+| IDマッピング不整合 | nameMatchRate < 0.95 | 警告表示 + 続行確認（AskUserQuestion） |
+| リネームマップ ID 変換失敗 | mapping に存在しない ID | 個別スキップ + 警告 |
 
 ## Scripts
 
@@ -388,6 +470,8 @@ Next steps:
 | `scripts/generate-rename-map.sh` | リネームマップ生成 | metadata JSON | JSON/YAML (rename map) |
 | `scripts/detect-grouping-candidates.sh` | グルーピング候補検出 | metadata JSON | JSON/YAML (grouping plan) |
 | `scripts/infer-autolayout.sh` | Auto Layout推論 | metadata JSON | JSON/YAML (autolayout plan) |
+| `scripts/clone-artboard.js` | アートボード複製 + IDマッピング | `() => { ... }` 形式、`__SOURCE_NODE_ID__` 置換 | object (clone info, mapping) |
+| `scripts/apply-renames.js` | バッチリネーム実行 | `() => { ... }` 形式、`__RENAME_MAP__` / `__BATCH_INFO__` 置換 | object (renamed, errors) |
 
 ## Related Files
 

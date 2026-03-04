@@ -5,49 +5,120 @@
 Chrome DevTools MCP の `evaluate_script` で使用する Figma Plugin API パターン集。
 Phase 2-4 のスクリプト生成時に参照する。
 
+**全コード例は `() => { ... }` アロー関数形式**。
+`mcp__chrome-devtools__evaluate_script` の `function` パラメータにそのまま渡せる。
+
 ## 基本操作
 
 ### ノード取得
 
 ```javascript
-// ID でノード取得
-const node = figma.getNodeById("1:10");
+() => {
+  // ID でノード取得
+  const node = figma.getNodeById("1:10");
 
-// 現在のページ
-const page = figma.currentPage;
+  // 現在のページ
+  const page = figma.currentPage;
 
-// ページ内の全子要素
-const children = figma.currentPage.children;
+  // ページ内の全子要素
+  return page.children.map(c => ({ id: c.id, name: c.name, type: c.type }));
+}
 ```
 
 ### ノードプロパティ
 
 ```javascript
-// 名前変更
-node.name = "new-name";
+() => {
+  const node = figma.getNodeById("1:10");
+  if (!node) return { error: "not found" };
 
-// タイプ確認
-node.type; // "FRAME", "TEXT", "RECTANGLE", etc.
-
-// 位置・サイズ
-node.x;
-node.y;
-node.width;
-node.height;
-
-// 親ノード
-node.parent;
-
-// 子ノード（FRAME, GROUP等）
-node.children;
+  return {
+    name: node.name,
+    type: node.type,    // "FRAME", "TEXT", "RECTANGLE", etc.
+    x: node.x,
+    y: node.y,
+    width: node.width,
+    height: node.height,
+    parentId: node.parent?.id,
+    childCount: "children" in node ? node.children.length : 0,
+  };
+}
 ```
+
+## Adjacent Artboard（複製 + IDマッピング）
+
+### アートボード複製
+
+```javascript
+() => {
+  const sourceNodeId = "1:4";  // 複製元のアートボードID
+  const GAP = 100;             // 元と複製の間隔 (px)
+
+  const source = figma.getNodeById(sourceNodeId);
+  if (!source || source.type !== "FRAME") {
+    return { success: false, error: "not a frame or not found" };
+  }
+
+  // 深い複製（全子要素を含む）
+  const clone = source.clone();
+  clone.name = `${source.name} [prepared]`;
+  clone.x = source.x + source.width + GAP;
+  clone.y = source.y;
+  figma.currentPage.appendChild(clone);
+
+  return {
+    success: true,
+    clone: { id: clone.id, name: clone.name, x: clone.x, y: clone.y },
+  };
+}
+```
+
+### IDマッピングテーブル生成
+
+`clone()` は子要素の順序を保持するため、インデックスベースの並行DFS走査で正確にマッピングできる。
+
+```javascript
+() => {
+  const originalId = "1:4";
+  const cloneId = "2:100";  // clone() の戻り値から取得
+
+  const mapping = {};
+  let total = 0;
+  let nameMatches = 0;
+
+  function buildMapping(origNode, cloneNode) {
+    mapping[origNode.id] = cloneNode.id;
+    total++;
+    if (origNode.name === cloneNode.name) nameMatches++;
+
+    if ("children" in origNode && "children" in cloneNode) {
+      const len = Math.min(origNode.children.length, cloneNode.children.length);
+      for (let i = 0; i < len; i++) {
+        buildMapping(origNode.children[i], cloneNode.children[i]);
+      }
+    }
+  }
+
+  const orig = figma.getNodeById(originalId);
+  const clone = figma.getNodeById(cloneId);
+  buildMapping(orig, clone);
+
+  return {
+    mapping,
+    total,
+    nameMatchRate: total > 0 ? nameMatches / total : 0,
+  };
+}
+```
+
+**注意**: `nameMatchRate` が 95% 未満の場合、マッピングが不正確な可能性あり。
 
 ## Phase 2: リネーム
 
 ### 一括リネーム
 
 ```javascript
-(async () => {
+() => {
   const renameMap = {
     "1:10": "hero-background",
     "1:11": "hero-title",
@@ -55,7 +126,7 @@ node.children;
   };
 
   let renamed = 0;
-  let errors = [];
+  const errors = [];
 
   for (const [nodeId, newName] of Object.entries(renameMap)) {
     try {
@@ -71,14 +142,14 @@ node.children;
     }
   }
 
-  return JSON.stringify({ renamed, errors, total: Object.keys(renameMap).length });
-})();
+  return { renamed, errors, total: Object.keys(renameMap).length };
+}
 ```
 
 ### バッチ実行（50件/回）
 
 ```javascript
-(async () => {
+() => {
   // バッチ N of M
   const batch = {/* 50件分のrenameMap */};
   let renamed = 0;
@@ -88,8 +159,8 @@ node.children;
     if (node) { node.name = newName; renamed++; }
   }
 
-  return JSON.stringify({ renamed, batch: "N/M" });
-})();
+  return { renamed, batch: "N/M" };
+}
 ```
 
 ## Phase 3: グループ化
@@ -97,7 +168,7 @@ node.children;
 ### Frame でグループ化
 
 ```javascript
-(async () => {
+() => {
   const group = {
     parentId: "1:5",
     childIds: ["1:10", "1:11", "1:12"],
@@ -105,13 +176,13 @@ node.children;
   };
 
   const parent = figma.getNodeById(group.parentId);
-  if (!parent) return JSON.stringify({ error: "parent not found" });
+  if (!parent) return { error: "parent not found" };
 
   const children = group.childIds
     .map(id => figma.getNodeById(id))
     .filter(Boolean);
 
-  if (children.length === 0) return JSON.stringify({ error: "no children found" });
+  if (children.length === 0) return { error: "no children found" };
 
   // 子要素の境界を計算
   const minX = Math.min(...children.map(c => c.x));
@@ -135,8 +206,8 @@ node.children;
     frame.appendChild(child);
   }
 
-  return JSON.stringify({ created: frame.id, name: frame.name, children: children.length });
-})();
+  return { created: frame.id, name: frame.name, children: children.length };
+}
 ```
 
 ## Phase 4: Auto Layout
@@ -144,7 +215,7 @@ node.children;
 ### Auto Layout 適用
 
 ```javascript
-(async () => {
+() => {
   const settings = {
     nodeId: "1:20",
     direction: "VERTICAL",   // "HORIZONTAL" | "VERTICAL"
@@ -156,10 +227,9 @@ node.children;
 
   const node = figma.getNodeById(settings.nodeId);
   if (!node || node.type !== "FRAME") {
-    return JSON.stringify({ error: "not a frame or not found" });
+    return { error: "not a frame or not found" };
   }
 
-  // Auto Layout を適用
   node.layoutMode = settings.direction;
   node.itemSpacing = settings.gap;
   node.paddingTop = settings.padding.top;
@@ -168,31 +238,29 @@ node.children;
   node.paddingLeft = settings.padding.left;
   node.primaryAxisAlignItems = settings.primaryAlign;
   node.counterAxisAlignItems = settings.counterAlign;
-
-  // サイズモード
   node.primaryAxisSizingMode = "AUTO";
   node.counterAxisSizingMode = "AUTO";
 
-  return JSON.stringify({
+  return {
     applied: node.id,
     name: node.name,
     layout: settings.direction,
     gap: settings.gap,
-  });
-})();
+  };
+}
 ```
 
 ### 一括 Auto Layout
 
 ```javascript
-(async () => {
+() => {
   const frames = [
     { nodeId: "1:20", direction: "VERTICAL", gap: 16, padding: [24, 24, 24, 24] },
     { nodeId: "1:30", direction: "HORIZONTAL", gap: 12, padding: [0, 0, 0, 0] },
   ];
 
   let applied = 0;
-  let errors = [];
+  const errors = [];
 
   for (const f of frames) {
     try {
@@ -217,8 +285,8 @@ node.children;
     }
   }
 
-  return JSON.stringify({ applied, errors, total: frames.length });
-})();
+  return { applied, errors, total: frames.length };
+}
 ```
 
 ## ユーティリティ
@@ -226,8 +294,7 @@ node.children;
 ### 存在チェック
 
 ```javascript
-// 実行前に全 nodeId の存在を確認
-(async () => {
+() => {
   const ids = ["1:10", "1:11", "1:12"];
   const found = [];
   const missing = [];
@@ -237,16 +304,16 @@ node.children;
     if (node) { found.push(id); } else { missing.push(id); }
   }
 
-  return JSON.stringify({ found: found.length, missing });
-})();
+  return { found: found.length, missing };
+}
 ```
 
 ### ページ情報取得
 
 ```javascript
-(async () => {
+() => {
   const page = figma.currentPage;
-  return JSON.stringify({
+  return {
     name: page.name,
     childCount: page.children.length,
     children: page.children.map(c => ({
@@ -258,8 +325,20 @@ node.children;
       width: c.width,
       height: c.height,
     })),
-  });
-})();
+  };
+}
+```
+
+### 複製アートボード削除
+
+```javascript
+() => {
+  const cloneId = "23:128";
+  const clone = figma.getNodeById(cloneId);
+  if (!clone) return { error: "not found" };
+  clone.remove();
+  return { success: true, removed: cloneId };
+}
 ```
 
 ## 制限事項
@@ -271,3 +350,4 @@ node.children;
 | タイムアウト | 長時間実行は避ける（バッチ分割で対処） |
 | 読み取り専用プロパティ | `id`, `type`, `parent` 等は変更不可 |
 | コンポーネント制約 | Instance の detach は禁止（ルール参照） |
+| 戻り値 | MCP が自動シリアライズ。`JSON.stringify()` 不要 |
