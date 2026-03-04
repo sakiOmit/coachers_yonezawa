@@ -49,7 +49,9 @@ score -= min(15, deep_nesting_count * 3)      # 深すぎるネスト数 × 3、
 score = max(0, score)
 ```
 
-**注意**: deep_nesting_count はセクションルート（width≈1440のフレーム）からの相対深度で計算。
+**注意**:
+- `deep_nesting_count` はセクションルート（width≈1440のフレーム）からの相対深度（`section_depth`）で計算。
+- `max_depth` は絶対深度（ルートからの距離）。`max_section_depth` は最大相対深度（セクションルートからの距離）。スコア計算には `section_depth` を使用する。
 
 ### グレード判定
 

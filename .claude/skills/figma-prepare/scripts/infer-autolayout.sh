@@ -153,12 +153,17 @@ def walk_and_infer(node, results=None):
     node_type = node.get('type', '')
     children = node.get('children', [])
 
-    if node_type == 'FRAME' and len(children) >= 2:
+    # Issue 69: Include INSTANCE/COMPONENT nodes for Auto Layout inference
+    if node_type in ('FRAME', 'INSTANCE', 'COMPONENT') and len(children) >= 2:
         # Issue 18: Use enriched layoutMode if available
         layout = layout_from_enrichment(node)
-        source = 'enriched'
-        if not layout and not node.get('layoutMode'):
-            # Fallback to inference
+        # Issue 70, 75: Set source based on actual data origin
+        # 'exact' = from Figma layoutMode (base or enriched metadata)
+        # 'inferred' = calculated from child positions
+        if layout:
+            source = 'exact'
+        elif not node.get('layoutMode'):
+            # No layoutMode in metadata — fallback to inference
             layout = infer_layout(node)
             source = 'inferred'
 
@@ -203,6 +208,7 @@ try:
                 f.write(f'    padding: [{p[\"top\"]}, {p[\"right\"]}, {p[\"bottom\"]}, {p[\"left\"]}]\\n')
                 f.write(f'    counter_align: {r[\"layout\"][\"counter_axis_align\"]}\\n')
                 f.write(f'    confidence: {r[\"layout\"][\"confidence\"]}\\n')
+                f.write(f'    source: {r[\"source\"]}\\n')  # Issue 74: include source in YAML output
         print(json.dumps({
             'total': len(results),
             'output': output_file,

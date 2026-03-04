@@ -37,6 +37,7 @@ def count_nodes(node, depth=0, section_depth=None):
         'deep_nesting': 0,
         'no_autolayout': 0,
         'max_depth': depth,
+        'max_section_depth': section_depth if section_depth is not None else 0,  # Issue 71: track relative depth separately
         'frames': 0,
         'unnamed_names': [],
     }
@@ -60,15 +61,17 @@ def count_nodes(node, depth=0, section_depth=None):
         stats['unnamed_names'].append(name)
 
     # Check flat structure (direct children > threshold)
-    if node_type in ('FRAME', 'GROUP', 'COMPONENT', 'SECTION') and len(children) > FLAT_THRESHOLD:
+    # Issue 72: Include INSTANCE nodes as they can have children and create flat structures
+    if node_type in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION') and len(children) > FLAT_THRESHOLD:
         stats['flat_sections'] += 1
 
-    # Check deep nesting — only count container nodes (FRAME/GROUP/COMPONENT) at deep levels.
+    # Check deep nesting — only count container nodes at deep levels.
     # Leaf nodes (TEXT, RECTANGLE, etc.) inside deep structures are not counted
     # to avoid inflating the metric (Issue 5).
+    # Issue 72: Include INSTANCE nodes as they can create deep nesting
     if (section_depth is not None
         and section_depth > DEEP_NESTING_THRESHOLD
-        and node_type in ('FRAME', 'GROUP', 'COMPONENT', 'SECTION')):
+        and node_type in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION')):
         stats['deep_nesting'] += 1
 
     # Check Auto Layout (frames without layoutMode)
@@ -89,6 +92,7 @@ def count_nodes(node, depth=0, section_depth=None):
         stats['no_autolayout'] += child_stats['no_autolayout']
         stats['frames'] += child_stats['frames']
         stats['max_depth'] = max(stats['max_depth'], child_stats['max_depth'])
+        stats['max_section_depth'] = max(stats['max_section_depth'], child_stats['max_section_depth'])  # Issue 71
         stats['unnamed_names'].extend(child_stats['unnamed_names'])
 
     return stats
@@ -177,6 +181,7 @@ try:
             'no_autolayout_frames': stats['no_autolayout'],
             'total_frames': stats['frames'],
             'max_depth': stats['max_depth'],
+            'max_section_depth': stats['max_section_depth'],  # Issue 71: relative depth used for nesting scoring
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),

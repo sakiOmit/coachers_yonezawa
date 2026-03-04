@@ -889,8 +889,8 @@ print(f'  PASS: Issue 17 — SOLID fill stays bg-* → {new_name}')
 import json,sys
 d=json.load(sys.stdin)
 frames = d.get('frames',[])
-exact = [f for f in frames if f.get('source') == 'enriched']
-assert len(exact) >= 2, f'Expected >= 2 exact (enriched) frames, got {len(exact)}'
+exact = [f for f in frames if f.get('source') == 'exact']
+assert len(exact) >= 2, f'Expected >= 2 exact frames, got {len(exact)}'
 # Verify enriched frame has correct direction
 for f in exact:
     if f['node_id'] == '1:106':

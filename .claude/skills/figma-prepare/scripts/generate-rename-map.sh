@@ -119,7 +119,8 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             if relative_y < 100:
                 has_nav = False
                 for c in children:
-                    if c.get('type') in ('FRAME', 'GROUP'):
+                    # Issue 77: Include INSTANCE/COMPONENT for nav detection
+                    if c.get('type') in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                         text_gchildren = [gc for gc in c.get('children', [])
                                           if gc.get('type') == 'TEXT']
                         if len(text_gchildren) >= 4:
