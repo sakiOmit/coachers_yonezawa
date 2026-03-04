@@ -17,7 +17,8 @@ python3 -c "
 import json, re, sys
 
 UNNAMED_RE = re.compile(
-    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$'
+    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
+    re.IGNORECASE
 )
 FLAT_THRESHOLD = 15
 DEEP_NESTING_THRESHOLD = 6
@@ -27,6 +28,21 @@ def parse_metadata(data):
     if isinstance(data, str):
         data = json.loads(data)
     return data
+
+def resolve_absolute_coords(node, parent_x=0, parent_y=0):
+    \"\"\"Convert parent-relative coordinates to absolute coordinates.
+
+    get_metadata returns parent-relative x/y in absoluteBoundingBox.
+    This function accumulates parent offsets to compute true absolute coords.
+    \"\"\"
+    bbox = node.get('absoluteBoundingBox', {})
+    abs_x = parent_x + bbox.get('x', 0)
+    abs_y = parent_y + bbox.get('y', 0)
+    bbox['x'] = abs_x
+    bbox['y'] = abs_y
+    node['absoluteBoundingBox'] = bbox
+    for child in node.get('children', []):
+        resolve_absolute_coords(child, abs_x, abs_y)
 
 SECTION_ROOT_WIDTH = 1440  # Figma page-level frame width
 
@@ -75,8 +91,12 @@ def count_nodes(node, depth=0, section_depth=None):
     if node_type in ('FRAME', 'GROUP', 'COMPONENT', 'SECTION') and len(children) > FLAT_THRESHOLD:
         stats['flat_sections'] += 1
 
-    # Check deep nesting — relative to section root, not absolute from page root
-    if section_depth is not None and section_depth > DEEP_NESTING_THRESHOLD:
+    # Check deep nesting — only count container nodes (FRAME/GROUP/COMPONENT) at deep levels.
+    # Leaf nodes (TEXT, RECTANGLE, etc.) inside deep structures are not counted
+    # to avoid inflating the metric (Issue 5).
+    if (section_depth is not None
+        and section_depth > DEEP_NESTING_THRESHOLD
+        and node_type in ('FRAME', 'GROUP', 'COMPONENT', 'SECTION')):
         stats['deep_nesting'] += 1
 
     # Check Auto Layout (frames without layoutMode)
@@ -135,6 +155,7 @@ try:
     elif 'node' in data:
         root = data['node']
 
+    resolve_absolute_coords(root)
     stats = count_nodes(root)
     ungrouped = detect_grouping_candidates(root)
 

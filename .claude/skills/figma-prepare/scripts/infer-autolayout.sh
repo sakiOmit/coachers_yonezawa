@@ -24,6 +24,17 @@ import json, sys, statistics
 GRID_SNAP = 4  # px
 VARIANCE_RATIO = 1.5
 
+def resolve_absolute_coords(node, parent_x=0, parent_y=0):
+    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
+    bbox = node.get('absoluteBoundingBox', {})
+    abs_x = parent_x + bbox.get('x', 0)
+    abs_y = parent_y + bbox.get('y', 0)
+    bbox['x'] = abs_x
+    bbox['y'] = abs_y
+    node['absoluteBoundingBox'] = bbox
+    for child in node.get('children', []):
+        resolve_absolute_coords(child, abs_x, abs_y)
+
 def snap(value):
     \"\"\"Snap value to grid.\"\"\"
     return round(value / GRID_SNAP) * GRID_SNAP
@@ -160,6 +171,7 @@ try:
     elif 'node' in data:
         root = data['node']
 
+    resolve_absolute_coords(root)
     results = walk_and_infer(root)
 
     output_file = '${OUTPUT_FILE}'

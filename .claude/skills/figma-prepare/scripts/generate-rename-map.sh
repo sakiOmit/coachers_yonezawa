@@ -22,7 +22,8 @@ python3 -c "
 import json, re, sys, unicodedata
 
 UNNAMED_RE = re.compile(
-    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$'
+    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
+    re.IGNORECASE
 )
 
 # Prefix mapping by context
@@ -33,6 +34,17 @@ SHAPE_PREFIXES = {
     'VECTOR': 'icon',
     'IMAGE': 'img',
 }
+
+def resolve_absolute_coords(node, parent_x=0, parent_y=0):
+    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
+    bbox = node.get('absoluteBoundingBox', {})
+    abs_x = parent_x + bbox.get('x', 0)
+    abs_y = parent_y + bbox.get('y', 0)
+    bbox['x'] = abs_x
+    bbox['y'] = abs_y
+    node['absoluteBoundingBox'] = bbox
+    for child in node.get('children', []):
+        resolve_absolute_coords(child, abs_x, abs_y)
 
 def to_kebab(text):
     \"\"\"Convert text to kebab-case safe name.\"\"\"
@@ -161,6 +173,7 @@ try:
     elif 'node' in data:
         root = data['node']
 
+    resolve_absolute_coords(root)
     renames = collect_renames(root)
 
     output_file = '${OUTPUT_FILE}'

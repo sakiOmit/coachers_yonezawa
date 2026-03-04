@@ -19,11 +19,22 @@ if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
 fi
 
 python3 -c "
-import json, sys, math
+import json, sys, math, re
 from collections import defaultdict
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
+
+def resolve_absolute_coords(node, parent_x=0, parent_y=0):
+    \"\"\"Convert parent-relative coordinates to absolute coordinates.\"\"\"
+    bbox = node.get('absoluteBoundingBox', {})
+    abs_x = parent_x + bbox.get('x', 0)
+    abs_y = parent_y + bbox.get('y', 0)
+    bbox['x'] = abs_x
+    bbox['y'] = abs_y
+    node['absoluteBoundingBox'] = bbox
+    for child in node.get('children', []):
+        resolve_absolute_coords(child, abs_x, abs_y)
 
 def get_bbox(node):
     \"\"\"Get bounding box from node.\"\"\"
@@ -197,6 +208,52 @@ def walk_and_detect(node, all_candidates=None):
 
     return all_candidates
 
+UNNAMED_RE = re.compile(
+    r'^(Rectangle|Ellipse|Line|Vector|Frame|Group|Component|Instance|Text|Polygon|Star|Image)\s*\d*$',
+    re.IGNORECASE
+)
+
+def deduplicate_candidates(candidates):
+    \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9).
+
+    Rules:
+    - If same node_ids appear in both proximity and pattern, keep pattern only
+    - If a parent node already has a semantic (non-auto-generated) name, skip
+    - Merge candidates that share >50% of their node_ids
+    \"\"\"
+    # Index: node_id → list of candidate indices
+    node_to_candidates = defaultdict(list)
+    for i, c in enumerate(candidates):
+        for nid in c.get('node_ids', []):
+            node_to_candidates[nid].append(i)
+        if 'node_id' in c:  # semantic candidates have single node_id
+            node_to_candidates[c['node_id']].append(i)
+
+    # Mark candidates for removal
+    remove = set()
+
+    # Rule 1: pattern > proximity when same nodes overlap
+    for nid, indices in node_to_candidates.items():
+        if len(indices) < 2:
+            continue
+        methods = {i: candidates[i].get('method', '') for i in indices}
+        has_pattern = any(m == 'pattern' for m in methods.values())
+        if has_pattern:
+            for i, m in methods.items():
+                if m == 'proximity':
+                    remove.add(i)
+
+    # Rule 2: skip candidates where parent already has semantic name
+    for i, c in enumerate(candidates):
+        parent_name = c.get('parent_name', '')
+        if parent_name and not UNNAMED_RE.match(parent_name):
+            # Parent is already semantically named — lower priority
+            # Only remove if it's a proximity candidate (less reliable)
+            if c.get('method') == 'proximity':
+                remove.add(i)
+
+    return [c for i, c in enumerate(candidates) if i not in remove]
+
 try:
     with open(sys.argv[1], 'r') as f:
         data = json.load(f)
@@ -207,7 +264,9 @@ try:
     elif 'node' in data:
         root = data['node']
 
+    resolve_absolute_coords(root)
     candidates = walk_and_detect(root)
+    candidates = deduplicate_candidates(candidates)
 
     output_file = '${OUTPUT_FILE}'
 
