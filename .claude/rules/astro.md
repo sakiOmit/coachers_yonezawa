@@ -133,11 +133,15 @@ getRepeater(data, 'items')          // → have_rows('items')
 // ✅ 正しい - SP分岐なし
 <ResponsiveImage src="/assets/images/logo.webp" alt="ロゴ" sp={false} />
 
-// ❌ 禁止 - img直接記述
+// ✅ 正しい - SVGもResponsiveImage使用（width/height自動付与でCLS対策）
+<ResponsiveImage src="/assets/images/icon.svg" alt="" sp={false} class="p-section__icon" />
+
+// ❌ 禁止 - img直接記述（SVG含む）
 <img src="/assets/images/hero.webp" alt="ヒーロー画像" />
+<img src="/assets/images/icon.svg" alt="" />
 ```
 
-**WebP専用**。`ResponsiveImage.astro` と `render_responsive_image()` が同一HTML出力を生成。
+**SVG含む全画像で `ResponsiveImage` を使用**。width/height自動付与によるCLS対策と、WP版 `render_responsive_image()` との出力一致を保証。
 
 ### 出力パターン
 
@@ -145,7 +149,7 @@ getRepeater(data, 'items')          // → have_rows('items')
 |------|------|
 | SP分岐あり | `<picture>` + `<source>(1x,2x,3x)` + `<img>(1x,2x)` |
 | SP分岐なし | `<img srcset="1x, 2x">` のみ（`<picture>` 不要） |
-| SVG | `<img>` のみ |
+| SVG | `<img>` のみ（width/height自動付与） |
 
 ```html
 <!-- SP分岐あり -->
@@ -186,7 +190,7 @@ getRepeater(data, 'items')          // → have_rows('items')
 
 | 禁止項目 | 理由 |
 |---------|------|
-| `<img>` 直接記述 | `<ResponsiveImage />` を使用。WP版との出力一致を保証 |
+| `<img>` 直接記述（SVG含む） | `<ResponsiveImage />` を使用。width/height自動付与（CLS対策）+ WP版との出力一致を保証 |
 | PNG/JPG フォールバック | WebP専用。`<source type="image/...">` 不要 |
 | `<img src="*.png">` | WebPのみ出力 |
 | `getimagesize()` でランタイム取得 | リクエスト毎のFS I/O。`images-meta.php` を使用 |
