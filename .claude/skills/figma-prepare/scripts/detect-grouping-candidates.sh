@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, math, re
 from collections import defaultdict
 sys.path.insert(0, '${SCRIPT_DIR}/../lib')
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -133,97 +133,6 @@ def detect_pattern_groups(children):
             })
     return result
 
-def detect_semantic_groups(children):
-    \"\"\"Detect semantic groupings (card, media-object, etc.).\"\"\"
-    result = []
-    for i, child in enumerate(children):
-        sub_children = child.get('children', [])
-        if not sub_children:
-            continue
-
-        types = [c.get('type', '') for c in sub_children]
-        has_image = 'IMAGE' in types
-        has_text = 'TEXT' in types
-        has_frame = 'FRAME' in types
-
-        # Already a logical group? Check if it has unnamed sub-elements
-        if has_image and has_text:
-            result.append({
-                'method': 'semantic',
-                'node_id': child.get('id', ''),
-                'node_name': child.get('name', ''),
-                'pattern': 'card' if has_frame else 'media-object',
-                'child_types': types,
-                'suggestion': 'Consider naming this element semantically',
-            })
-    return result
-
-def detect_page_kv_groups(children, parent_bbox):
-    \"\"\"Detect page-kv pattern: breadcrumb + heading + optional bg image.
-
-    Heuristics:
-    - Breadcrumb: TEXT node containing '>' separator
-    - Heading: FRAME with 2+ TEXT children (en + ja pattern)
-    - Background: RECTANGLE in the same upper area (h > 100)
-    - All in upper 30% of parent
-    \"\"\"
-    result = []
-    parent_h = parent_bbox.get('h', 0)
-    parent_y = parent_bbox.get('y', 0)
-    if parent_h <= 0:
-        return result
-
-    upper_threshold = parent_y + parent_h * 0.3
-
-    breadcrumbs = []
-    headings = []
-    bg_rects = []
-
-    for child in children:
-        bb = get_bbox(child)
-        if bb['y'] > upper_threshold:
-            continue
-
-        node_type = child.get('type', '')
-        node_name = child.get('name', '')
-
-        # Breadcrumb: TEXT with '>' or right-angle quote
-        if node_type == 'TEXT':
-            characters = child.get('characters', '')
-            check_text = characters if characters else node_name
-            if '>' in check_text or '\\u203a' in check_text:
-                breadcrumbs.append(child)
-                continue
-
-        # Heading: FRAME/GROUP with 2+ TEXT children (multi-language heading)
-        if node_type in ('FRAME', 'GROUP'):
-            sub = child.get('children', [])
-            text_children = [c for c in sub if c.get('type') == 'TEXT']
-            if len(text_children) >= 2:
-                headings.append(child)
-                continue
-
-        # Background: RECTANGLE in upper area with significant height
-        if node_type == 'RECTANGLE' and bb['h'] > 100:
-            bg_rects.append(child)
-
-    # Need at least breadcrumb + heading
-    if breadcrumbs and headings:
-        group_nodes = headings + breadcrumbs + bg_rects
-        result.append({
-            'method': 'page-kv',
-            'node_ids': [n.get('id', '') for n in group_nodes],
-            'node_names': [n.get('name', '') for n in group_nodes],
-            'count': len(group_nodes),
-            'suggested_name': 'section-page-kv',
-            'components': {
-                'breadcrumbs': [n.get('id', '') for n in breadcrumbs],
-                'headings': [n.get('id', '') for n in headings],
-                'backgrounds': [n.get('id', '') for n in bg_rects],
-            },
-        })
-    return result
-
 def walk_and_detect(node, all_candidates=None):
     \"\"\"Walk tree and detect grouping candidates at each level.\"\"\"
     if all_candidates is None:
@@ -236,27 +145,14 @@ def walk_and_detect(node, all_candidates=None):
     parent_id = node.get('id', '')
     parent_name = node.get('name', '')
 
-    # Detect at this level
+    # Detect at this level (proximity + pattern only; semantic understanding delegated to Stage B)
     proximity = detect_proximity_groups(children)
     patterns = detect_pattern_groups(children)
-    semantic = detect_semantic_groups(children)
-    parent_bb = get_bbox(node)
-    page_kv = detect_page_kv_groups(children, parent_bb)
 
     for g in proximity + patterns:
         g['parent_id'] = parent_id
         g['parent_name'] = parent_name
         all_candidates.append(g)
-
-    for s in semantic:
-        s['parent_id'] = parent_id
-        s['parent_name'] = parent_name
-        all_candidates.append(s)
-
-    for p in page_kv:
-        p['parent_id'] = parent_id
-        p['parent_name'] = parent_name
-        all_candidates.append(p)
 
     # Recurse
     for child in children:
@@ -278,14 +174,12 @@ def deduplicate_candidates(candidates, root_id=''):
     for i, c in enumerate(candidates):
         for nid in c.get('node_ids', []):
             node_to_candidates[nid].append(i)
-        if 'node_id' in c:  # semantic candidates have single node_id
-            node_to_candidates[c['node_id']].append(i)
 
     # Mark candidates for removal
     remove = set()
 
     # Rule 1: higher-quality methods > proximity when same nodes overlap
-    PRIORITY_METHODS = {'pattern', 'page-kv', 'semantic'}
+    PRIORITY_METHODS = {'pattern'}
     for nid, indices in node_to_candidates.items():
         if len(indices) < 2:
             continue
@@ -320,7 +214,7 @@ try:
     candidates = walk_and_detect(root)
     candidates = deduplicate_candidates(candidates, root_id=root.get('id', ''))
 
-    output_file = '${OUTPUT_FILE}'
+    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
 
     if output_file:
         with open(output_file, 'w') as f:
@@ -331,15 +225,15 @@ try:
             f.write('candidates:\\n')
             for i, c in enumerate(candidates):
                 f.write(f'  - index: {i}\\n')
-                f.write(f'    method: \"{c[\"method\"]}\"\\n')
-                f.write(f'    parent: \"{c.get(\"parent_name\", \"\")}\"\\n')
+                f.write(f'    method: {yaml_str(c[\"method\"])}\\n')
+                f.write(f'    parent: {yaml_str(c.get(\"parent_name\", \"\"))}\\n')
                 if 'node_ids' in c:
                     f.write(f'    node_ids: {json.dumps(c[\"node_ids\"])}\\n')
                     f.write(f'    count: {c[\"count\"]}\\n')
                 if 'suggested_name' in c:
-                    f.write(f'    suggested_name: \"{c[\"suggested_name\"]}\"\\n')
+                    f.write(f'    suggested_name: {yaml_str(c[\"suggested_name\"])}\\n')
                 if 'pattern' in c:
-                    f.write(f'    pattern: \"{c[\"pattern\"]}\"\\n')
+                    f.write(f'    pattern: {yaml_str(c[\"pattern\"])}\\n')
         print(json.dumps({
             'total': len(candidates),
             'output': output_file,
@@ -355,4 +249,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1"
+" "$1" "$OUTPUT_FILE"

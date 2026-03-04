@@ -369,14 +369,14 @@ echo ""
 bold "=== Cross-script: consistency ==="
 
 P1_UNNAMED=$(echo "$RESULT1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['unnamed_nodes'])" 2>/dev/null || echo "0")
-P2_TOTAL=$(echo "$RESULT2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
+P3_RENAME_TOTAL=$(echo "$RESULT2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
 
-# Phase 1の未命名数とPhase 2のリネーム数が一致（許容差±5）
-if python3 -c "assert abs($P1_UNNAMED - $P2_TOTAL) <= 5" 2>/dev/null; then
-  green "  PASS: Phase1 unnamed ($P1_UNNAMED) ≈ Phase3 renames ($P2_TOTAL)"
+# Phase 1の未命名数とPhase 3のリネーム数が一致（許容差±5）
+if python3 -c "assert abs($P1_UNNAMED - $P3_RENAME_TOTAL) <= 5" 2>/dev/null; then
+  green "  PASS: Phase1 unnamed ($P1_UNNAMED) ≈ Phase3 renames ($P3_RENAME_TOTAL)"
   ((PASS++)) || true
 else
-  red "  FAIL: Phase1 unnamed ($P1_UNNAMED) vs Phase2 renames ($P2_TOTAL) — gap > 5"
+  red "  FAIL: Phase1 unnamed ($P1_UNNAMED) vs Phase3 renames ($P3_RENAME_TOTAL) — gap > 5"
   ((FAIL++)) || true
 fi
 
@@ -516,7 +516,7 @@ print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed
         green "  PASS: Cross-script — Phase1 unnamed ($REAL_UNNAMED) ≈ Phase3 renames ($REAL_RENAME_COUNT)"
         ((PASS++)) || true
       else
-        red "  FAIL: Cross-script — Phase1 unnamed ($REAL_UNNAMED) vs Phase2 renames ($REAL_RENAME_COUNT) gap > 5"
+        red "  FAIL: Cross-script — Phase1 unnamed ($REAL_UNNAMED) vs Phase3 renames ($REAL_RENAME_COUNT) gap > 5"
         ((FAIL++)) || true
       fi
 
@@ -646,32 +646,28 @@ assert found, 'Tab + Card list proximity group not found at root level'
 print('  PASS: Issue 22 — Tab + Card list grouped (proximity at root)')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — Tab + Card list NOT grouped at root level"; ((FAIL++)) || true; }
 
-      # Issue 22: Lead text (1:5) must NOT be in page-kv or proximity with hero
+      # Stage A: proximity may group overlapping elements (1:5, 1:101, 1:102)
+      # Semantic boundary (lead text vs hero) is delegated to Stage B (Claude reasoning)
       echo "$REAL_P3" | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
+# Verify that any grouping with 1:5 is only proximity (not semantic/page-kv)
 for c in d.get('candidates', []):
     ids = set(c.get('node_ids', []))
-    if '1:5' in ids and ('1:101' in ids or '1:102' in ids):
-        print(f'  FAIL: Lead text (1:5) incorrectly grouped with hero: {c[\"method\"]}')
-        sys.exit(1)
-print('  PASS: Issue 22 — Lead text (1:5) not mixed with hero group')
-" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — Lead text incorrectly grouped with hero"; ((FAIL++)) || true; }
+    if '1:5' in ids:
+        assert c.get('method') == 'proximity', f'1:5 in non-proximity group: {c[\"method\"]}'
+print('  PASS: Stage A — 1:5 grouping is proximity only (semantic deferred to Stage B)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage A — 1:5 in unexpected group type"; ((FAIL++)) || true; }
 
-      # Issue 22: page-kv detected with correct components
+      # Stage A methods: only proximity and pattern (no page-kv or semantic)
       echo "$REAL_P3" | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
-found = False
-for c in d.get('candidates', []):
-    if c.get('method') == 'page-kv':
-        ids = set(c.get('node_ids', []))
-        if '1:102' in ids and '1:105' in ids and '1:101' in ids:
-            found = True
-            break
-assert found, 'page-kv group not found'
-print('  PASS: Issue 22 — page-kv hero group (heading + breadcrumb + bg)')
-" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Issue 22 — page-kv hero group missing"; ((FAIL++)) || true; }
+methods = set(c.get('method', '') for c in d.get('candidates', []))
+forbidden = methods & {'page-kv', 'semantic'}
+assert not forbidden, f'Unexpected methods in Stage A: {forbidden}'
+print(f'  PASS: Stage A — methods = {methods} (proximity/pattern only)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage A — unexpected methods found"; ((FAIL++)) || true; }
     fi
 
     # --- Phase 4: infer-autolayout ---
@@ -770,14 +766,46 @@ assert '1:300' in fc, f'1:300 not in footer_candidates: {fc}'
 print(f'  PASS: Stage B — footer_candidates contains 1:300')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:300 not in footer_candidates"; ((FAIL++)) || true; }
 
-      # Test 9: page_kv_candidates includes 1:105
+      # Test 9: gap_analysis is non-empty (9 children → 8 gaps)
       echo "$REAL_SEC" | python3 -c "
 import json,sys
 d=json.load(sys.stdin)
-pkv = d['heuristic_hints']['page_kv_candidates']
-assert '1:105' in pkv, f'1:105 not in page_kv_candidates: {pkv}'
-print(f'  PASS: Stage B — page_kv_candidates contains 1:105')
-" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:105 not in page_kv_candidates"; ((FAIL++)) || true; }
+ga = d['heuristic_hints']['gap_analysis']
+assert len(ga) == 8, f'Expected 8 gaps for 9 children, got {len(ga)}'
+print(f'  PASS: Stage B — gap_analysis has 8 entries')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — gap_analysis count wrong"; ((FAIL++)) || true; }
+
+      # Test 9b: gap_analysis — 1:5↔1:6 has significant gap (section boundary)
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+ga = d['heuristic_hints']['gap_analysis']
+target = [g for g in ga if set(g['between']) == {'1:5', '1:6'}]
+assert len(target) == 1, f'1:5↔1:6 gap not found'
+gap = target[0]['gap_px']
+assert gap > 50, f'1:5↔1:6 gap too small: {gap}'
+print(f'  PASS: Stage B — 1:5↔1:6 gap = {gap}px (section boundary)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:5↔1:6 gap not significant"; ((FAIL++)) || true; }
+
+      # Test 9c: background_candidates includes 1:101 (RECTANGLE h>=100)
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+bg = d['heuristic_hints']['background_candidates']
+assert '1:101' in bg, f'1:101 not in background_candidates: {bg}'
+print(f'  PASS: Stage B — background_candidates contains 1:101')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — 1:101 not in background_candidates"; ((FAIL++)) || true; }
+
+      # Test 9d: heuristic_hints has gap_analysis key (structure check)
+      echo "$REAL_SEC" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+hints = d['heuristic_hints']
+assert 'gap_analysis' in hints, 'gap_analysis key missing'
+assert 'background_candidates' in hints, 'background_candidates key missing'
+assert 'page_kv_candidates' not in hints, 'page_kv_candidates should be removed'
+print('  PASS: Stage B — heuristic_hints structure (gap_analysis + background_candidates, no page_kv)')
+" 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Stage B — heuristic_hints structure wrong"; ((FAIL++)) || true; }
 
       # Test 10: is_unnamed judgment (1:106=true, 1:5=false)
       echo "$REAL_SEC" | python3 -c "

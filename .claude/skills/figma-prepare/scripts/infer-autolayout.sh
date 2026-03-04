@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 python3 -c "
 import json, sys, statistics
 sys.path.insert(0, '${SCRIPT_DIR}/../lib')
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, yaml_str
 
 GRID_SNAP = 4  # px
 VARIANCE_RATIO = 1.5
@@ -187,7 +187,7 @@ try:
     resolve_absolute_coords(root)
     results = walk_and_infer(root)
 
-    output_file = '${OUTPUT_FILE}'
+    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
 
     if output_file:
         with open(output_file, 'w') as f:
@@ -197,8 +197,8 @@ try:
             f.write('# Review before applying with --apply\\n\\n')
             f.write('frames:\\n')
             for r in results:
-                f.write(f'  - node_id: \"{r[\"node_id\"]}\"\\n')
-                f.write(f'    name: \"{r[\"node_name\"]}\"\\n')
+                f.write(f'  - node_id: {yaml_str(r[\"node_id\"])}\\n')
+                f.write(f'    name: {yaml_str(r[\"node_name\"])}\\n')
                 f.write(f'    children: {r[\"child_count\"]}\\n')
                 f.write(f'    direction: {r[\"layout\"][\"direction\"]}\\n')
                 f.write(f'    gap: {r[\"layout\"][\"gap\"]}\\n')
@@ -221,4 +221,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1"
+" "$1" "$OUTPUT_FILE"

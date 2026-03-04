@@ -295,3 +295,79 @@ KNOWN-ISSUES.md から移動した FIXED Issue のアーカイブ。
 - **ファイル**: `.claude/rules/figma-prepare.md`, `references/phase-details.md`, `SKILL.md`,
   `scripts/prepare-sectioning-context.sh`
 - **テスト**: 全60件パス（回帰なし）
+
+## Issue 22: Phase 2 グルーピング精度 — FIXED
+
+- **Phase**: 2
+- **優先度**: 高
+- **概要**: 募集一覧ページ (1:4) のフラットな9子要素が、関連要素ごとに適切にグルーピングされるべきだが、Stage A ヒューリスティックに不具合があった。
+- **修正内容** (Stage A dedup ロジック修正):
+  - **Root cause**: `deduplicate_candidates()` Rule 2 がルートレベル（アートボード直下）の
+    proximity候補を一律削除していた
+  - **Fix 1**: Rule 1 拡張 — `pattern`, `page-kv`, `semantic` を proximity より高優先度に
+  - **Fix 2**: Rule 2 修正 — `root_id` パラメータ追加でルート直下候補を除外対象から除外
+- **残課題**: ネストグルーピングは Issue 23 に分離（Stage B で補完可能）
+- **修正日**: 2026-03-04
+- **テスト**: 全60件パス（3件追加）
+
+## Issue 27: YAML出力の特殊文字エスケープ — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: 3スクリプト（detect-grouping-candidates, generate-rename-map, infer-autolayout）
+  の YAML 出力が手動文字列結合で、ノード名にダブルクォートやコロン等が含まれると
+  不正な YAML が生成される。
+- **修正内容**:
+  - `lib/figma_utils.py` に `yaml_str()` ヘルパー関数を追加（`json.dumps` ベースで安全にエスケープ）
+  - 3スクリプトの YAML 出力を `yaml_str()` 使用に変更
+- **修正日**: 2026-03-04
+- **ファイル**: `lib/figma_utils.py`, `scripts/detect-grouping-candidates.sh`,
+  `scripts/generate-rename-map.sh`, `scripts/infer-autolayout.sh`
+- **テスト**: 全60件パス（回帰なし）
+
+## Issue 28: テストメッセージ Phase 番号不整合 + シェル変数インジェクション — FIXED
+
+- **Phase**: 全体
+- **優先度**: 中
+- **概要**: 2つの問題を修正。
+  1. **テストメッセージ**: Issue 21 の Phase スワップ後、`run-tests.sh` の fail メッセージに
+     "Phase2 renames" が残存（正しくは "Phase3 renames"）。変数名 `P2_TOTAL` も紛らわしい。
+  2. **シェル変数インジェクション**: 全5スクリプトで `output_file = '${OUTPUT_FILE}'` と
+     シェル変数を Python コード内に直接展開。パスにシングルクォートが含まれると構文エラー。
+- **修正内容**:
+  - `run-tests.sh`: fail メッセージを "Phase3 renames" に修正、変数名を `P3_RENAME_TOTAL` に変更
+  - 5スクリプト: `${OUTPUT_FILE}` 展開を `sys.argv` 経由のパス受け渡しに変更
+- **修正日**: 2026-03-04
+- **ファイル**: `tests/run-tests.sh`, 全5スクリプト
+  (`detect-grouping-candidates.sh`, `generate-rename-map.sh`, `infer-autolayout.sh`,
+   `prepare-sectioning-context.sh`, `enrich-metadata.sh`)
+- **テスト**: 全60件パス（回帰なし）
+
+## Issue 29: page-kv 検出ロジックの二重定義 — FIXED (設計変更)
+
+- **Phase**: 2
+- **優先度**: 低
+- **概要**: `detect-grouping-candidates.sh` の `detect_page_kv_groups()` と
+  `prepare-sectioning-context.sh` の `detect_heuristic_hints()` に、page-kv 検出の
+  類似ロジックが重複していた。
+- **修正内容**: 設計変更により `detect_page_kv_groups()` 自体を Stage A から削除。
+  セマンティック理解は Stage B（Claude 推論）に委ねる方針に転換。
+  `prepare-sectioning-context.sh` では `page_kv_candidates` を `gap_analysis` +
+  `background_candidates` に置換し、Claude にリッチな判断材料を提供。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/detect-grouping-candidates.sh`, `scripts/prepare-sectioning-context.sh`,
+  `references/sectioning-prompt-template.md`
+- **テスト**: 全63件パス
+
+## Issue 30: `detect_semantic_groups` が enriched fills を考慮しない — FIXED (設計変更)
+
+- **Phase**: 2
+- **優先度**: 低
+- **概要**: `detect-grouping-candidates.sh` の `detect_semantic_groups()` が enriched fills
+  を考慮しないため、RECTANGLE に IMAGE fill を設定したカードが検出されなかった。
+- **修正内容**: 設計変更により `detect_semantic_groups()` 自体を Stage A から削除。
+  Stage A は proximity + pattern の汎用検出のみに簡素化。
+  セマンティック理解（カード/メディアオブジェクト判定）は Stage B（Claude 推論）に委ねる。
+- **修正日**: 2026-03-04
+- **ファイル**: `scripts/detect-grouping-candidates.sh`
+- **テスト**: 全63件パス

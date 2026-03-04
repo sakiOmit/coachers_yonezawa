@@ -7,7 +7,17 @@ infer-autolayout, prepare-sectioning-context, and enrich-metadata scripts.
 Issue 24: resolve_absolute_coords was duplicated in 5 scripts.
 """
 
+import json
 import re
+
+
+def yaml_str(value):
+    """Safely encode a string for YAML double-quoted output.
+
+    Uses json.dumps which properly escapes double quotes, backslashes,
+    and other special characters. Output includes surrounding quotes.
+    """
+    return json.dumps(str(value), ensure_ascii=False)
 
 
 UNNAMED_RE = re.compile(

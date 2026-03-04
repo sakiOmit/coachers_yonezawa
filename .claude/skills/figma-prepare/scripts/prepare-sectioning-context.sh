@@ -54,18 +54,25 @@ def get_text_children_preview(node, max_items=5):
     return texts[:max_items]
 
 def detect_heuristic_hints(children, page_bbox):
-    \"\"\"Detect header/footer/page-kv candidates from top-level children.\"\"\"
+    \"\"\"Detect header/footer candidates, gap analysis, and background candidates.
+
+    Semantic understanding (page-kv, section boundaries) is delegated to Stage B Claude reasoning.
+    This function provides mechanical hints to support Claude's decision-making.
+    \"\"\"
     page_h = page_bbox['h']
     page_y = page_bbox['y']
     page_w = page_bbox['w']
     if page_h <= 0:
-        return {'header_candidates': [], 'footer_candidates': [], 'page_kv_candidates': []}
-
-    upper_threshold = page_y + page_h * 0.3
+        return {
+            'header_candidates': [],
+            'footer_candidates': [],
+            'gap_analysis': [],
+            'background_candidates': [],
+        }
 
     header_candidates = []
     footer_candidates = []
-    page_kv_candidates = []
+    background_candidates = []
 
     # Sort by Y for analysis
     sorted_children = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
@@ -73,7 +80,6 @@ def detect_heuristic_hints(children, page_bbox):
     for child in sorted_children:
         bb = get_bbox(child)
         node_type = child.get('type', '')
-        node_name = child.get('name', '')
         node_id = child.get('id', '')
 
         # Header: top area, wide frame
@@ -86,27 +92,29 @@ def detect_heuristic_hints(children, page_bbox):
             if node_type in ('FRAME', 'GROUP') and bb['w'] > page_w * 0.8:
                 footer_candidates.append(node_id)
 
-        # Page KV: upper 30%, breadcrumb or heading
-        if bb['y'] <= upper_threshold:
-            # Breadcrumb: TEXT with '>'
-            if node_type == 'TEXT':
-                check_text = child.get('characters', '') or node_name
-                if '>' in check_text or '\\u203a' in check_text:
-                    page_kv_candidates.append(node_id)
-                    continue
+        # Background candidates: RECTANGLE with significant height
+        if node_type == 'RECTANGLE' and bb['h'] >= 100:
+            background_candidates.append(node_id)
 
-            # Heading: FRAME with 2+ TEXT children
-            if node_type in ('FRAME', 'GROUP'):
-                sub = child.get('children', [])
-                text_count = sum(1 for c in sub if c.get('type') == 'TEXT')
-                if text_count >= 2:
-                    page_kv_candidates.append(node_id)
-                    continue
+    # Gap analysis: Y-direction gaps between consecutive children
+    gap_analysis = []
+    for i in range(len(sorted_children) - 1):
+        curr = sorted_children[i]
+        next_child = sorted_children[i + 1]
+        curr_bb = get_bbox(curr)
+        next_bb = get_bbox(next_child)
+        curr_bottom = curr_bb['y'] + curr_bb['h']
+        gap_px = round(next_bb['y'] - curr_bottom)
+        gap_analysis.append({
+            'between': [curr.get('id', ''), next_child.get('id', '')],
+            'gap_px': gap_px,
+        })
 
     return {
         'header_candidates': header_candidates,
         'footer_candidates': footer_candidates,
-        'page_kv_candidates': page_kv_candidates,
+        'gap_analysis': gap_analysis,
+        'background_candidates': background_candidates,
     }
 
 try:
@@ -154,7 +162,7 @@ try:
         'heuristic_hints': hints,
     }
 
-    output_file = '${OUTPUT_FILE}'
+    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
     if output_file:
         with open(output_file, 'w') as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
@@ -169,4 +177,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1"
+" "$1" "$OUTPUT_FILE"

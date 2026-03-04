@@ -80,7 +80,7 @@ try:
     stats = {'enriched_nodes': 0, 'merged_keys': 0}
     enrich_node(root, enrichment, stats)
 
-    output_file = '${OUTPUT_FILE}'
+    output_file = sys.argv[3] if len(sys.argv) > 3 else ''
 
     if output_file:
         # Write enriched metadata to file
@@ -100,4 +100,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1" "$2"
+" "$1" "$2" "$OUTPUT_FILE"

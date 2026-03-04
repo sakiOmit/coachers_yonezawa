@@ -33,7 +33,9 @@ SKILL.md の Phase 3 Stage B Step 3-2c から参照される。
 
 - ヘッダー候補: {header_candidates}
 - フッター候補: {footer_candidates}
-- ページKV候補: {page_kv_candidates}
+- 背景画像候補: {background_candidates}
+- 要素間ギャップ（px）: {gap_analysis}
+  ※ 大きなギャップはセクション境界の可能性あり
 
 ## スクリーンショット
 
@@ -71,7 +73,7 @@ sections:
    - フッター: `l-footer`
    - KV: `section-page-kv`
    - その他: `section-{purpose}` (例: `section-job-listing`, `section-about`)
-4. **ヒューリスティックヒントは参考**。スクリーンショットで明らかに異なる場合は修正可
+4. **ヒューリスティックヒントは参考**。背景画像候補やギャップ情報を活用しつつ、スクリーンショットで明らかに異なる場合は修正可
 5. **隣接する関連要素はまとめる**:
    - パンくず + 見出しフレーム + 背景画像 + リード文 → `section-page-kv`
    - タブUI + カード一覧 → `section-job-listing`
@@ -99,7 +101,7 @@ sections:
 3. テンプレートの変数を展開:
    - {context_json} → prepare-sectioning-context.sh の出力
    - {children_table} → top_level_children を Markdown テーブルに変換
-   - {header/footer/page_kv_candidates} → heuristic_hints から展開
+   - {header/footer/background_candidates, gap_analysis} → heuristic_hints から展開
 4. Claude に送信（テキスト + スクリーンショット画像）
 5. YAML レスポンスをパース → sectioning-plan.yaml に保存
 ```

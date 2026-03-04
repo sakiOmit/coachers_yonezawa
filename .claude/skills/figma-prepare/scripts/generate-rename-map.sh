@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 python3 -c "
 import json, re, sys, unicodedata
 sys.path.insert(0, '${SCRIPT_DIR}/../lib')
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str
 
 # Prefix mapping by context
 SHAPE_PREFIXES = {
@@ -278,7 +278,7 @@ try:
     resolve_absolute_coords(root)
     renames = collect_renames(root)
 
-    output_file = '${OUTPUT_FILE}'
+    output_file = sys.argv[2] if len(sys.argv) > 2 else ''
 
     if output_file:
         # YAML output
@@ -289,10 +289,10 @@ try:
             f.write('# Review before applying with --apply\\n\\n')
             f.write('renames:\\n')
             for node_id, info in sorted(renames.items()):
-                f.write(f'  \"{node_id}\":\\n')
-                f.write(f'    old: \"{info[\"old_name\"]}\"\\n')
-                f.write(f'    new: \"{info[\"new_name\"]}\"\\n')
-                f.write(f'    type: \"{info[\"type\"]}\"\\n')
+                f.write(f'  {yaml_str(node_id)}:\\n')
+                f.write(f'    old: {yaml_str(info[\"old_name\"])}\\n')
+                f.write(f'    new: {yaml_str(info[\"new_name\"])}\\n')
+                f.write(f'    type: {yaml_str(info[\"type\"])}\\n')
         print(json.dumps({
             'total': len(renames),
             'output': output_file,
@@ -309,4 +309,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "$1"
+" "$1" "$OUTPUT_FILE"

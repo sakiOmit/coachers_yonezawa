@@ -343,13 +343,13 @@ Phase 2 は2段階構成:
 
 ```
 Phase 2: グループ化 + セクショニング
-├── 2-1. Stage A: ヒューリスティック（既存、変更なし）
+├── 2-1. Stage A: ヒューリスティック（proximity + pattern のみ）
 ├── 2-2. Stage B: Claude セクショニング
-│   ├── 2-2a. prepare-sectioning-context.sh でコンテキスト生成
+│   ├── 2-2a. prepare-sectioning-context.sh でコンテキスト生成（gap_analysis + background_candidates）
 │   ├── 2-2b. get_screenshot でスクリーンショット取得
 │   ├── 2-2c. プロンプトテンプレート + コンテキストで Claude 推論
 │   └── 2-2d. sectioning-plan.yaml 保存
-├── 2-3. 結果統合（Stage A page-kv と Stage B の重複解決）
+├── 2-3. 結果統合（Stage A はネストレベル、Stage B はトップレベル。それぞれ独立して適用）
 └── 2-4. dry-run / --apply
 ```
 
@@ -361,7 +361,7 @@ bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
   --output .claude/cache/figma/grouping-plan.yaml
 ```
 
-既存のプロキシミティ/パターン/セマンティック/ページKV検出。ネストレベルのグルーピングを行う。
+プロキシミティ/パターン検出のみ。ネストレベルのグルーピングを行う。セマンティック理解は Stage B（Claude 推論）に委ねる。
 
 ### 2-2. Stage B: Claude セクショニング
 
@@ -399,7 +399,7 @@ mcp__plugin_figma_figma__get_screenshot
 
 ### 2-3. 結果統合
 
-Stage A の page-kv 候補と Stage B のセクション分割で重複する node_ids がある場合、Stage B を優先する（Claude のセクション境界推論のほうが正確なため）。
+Stage A のグルーピング候補はネストレベル、Stage B はトップレベルセクショニング。それぞれ独立して適用する（対象レベルが異なるため重複しない）。
 
 ### 2-4. dry-run / --apply
 
