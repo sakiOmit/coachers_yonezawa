@@ -159,6 +159,13 @@ score = max(0, score)
 | flag_bg_full_width_ratio | 0.95 (95%) | フラグ判定：bg-fullの幅比率（ページ幅の95%以上、Issue 203） |
 | flag_tiny_max_size | 50px | フラグ判定：tiny要素の最大幅/高さ（Issue 203） |
 | spatial_split_min_non_leaf | 6 elements | 空間ギャップ分割：非リーフグループの最小要素数（Issue 206） |
+| cta_x_position_ratio | 0.8 (80%) | CTA検出：X位置が親幅の80%以上で右上配置判定（Issue 215） |
+| side_panel_right_x_ratio | 0.9 (90%) | サイドパネル検出：右端X位置比率（Issue 216） |
+| side_panel_left_x_ratio | 0.1 (10%) | サイドパネル検出：左端X位置比率（Issue 216） |
+| footer_text_ratio | 0.3 (30%) | フッター検出：TEXT子要素の最小比率（Issue 217） |
+| image_wrapper_ratio | 0.5 (50%) | 画像ラッパー検出：IMAGE/RECTANGLE子要素の最小比率（Issue 218） |
+| heading_body_text_threshold | 50 chars | ヘッディングvs本文判定：この文字数超 → body、以下 → heading（Issue 219） |
+| grid_size_similarity | 0.20 (20%) | グリッド検出：幅/高さの最大変動率（Issue 220） |
 | grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
 | compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
 

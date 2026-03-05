@@ -28,7 +28,10 @@ from figma_utils import (resolve_absolute_coords, get_root_node, UNNAMED_RE, yam
     get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP,
     detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE,
     CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD,
+    CTA_X_POSITION_RATIO,
     SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, OVERFLOW_BG_MIN_WIDTH,
+    SIDE_PANEL_RIGHT_X_RATIO, SIDE_PANEL_LEFT_X_RATIO,
+    FOOTER_TEXT_RATIO, IMAGE_WRAPPER_RATIO, HEADING_BODY_TEXT_THRESHOLD,
     is_decoration_pattern, decoration_dominant_shape,
     DIVIDER_MAX_HEIGHT, HEADER_Y_THRESHOLD, FOOTER_PROXIMITY, FOOTER_MAX_HEIGHT,
     WIDE_ELEMENT_RATIO, WIDE_ELEMENT_MIN_WIDTH, ICON_MAX_SIZE,
@@ -79,7 +82,7 @@ def has_image_wrapper(children):
         if not sub_children:
             continue
         rect_count = sum(1 for sc in sub_children if sc.get('type', '') in ('RECTANGLE', 'IMAGE', 'ELLIPSE'))
-        if rect_count >= len(sub_children) * 0.5 and rect_count >= 1:
+        if rect_count >= len(sub_children) * IMAGE_WRAPPER_RATIO and rect_count >= 1:
             return True
     return False
 
@@ -163,7 +166,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
                 parent_bottom = parent_y + parent_h
                 if abs(node_bottom - parent_bottom) < FOOTER_PROXIMITY and h < FOOTER_MAX_HEIGHT:
                     text_count = sum(1 for c in children if c.get('type') == 'TEXT')
-                    if text_count >= max(len(children) * 0.3, 1):
+                    if text_count >= max(len(children) * FOOTER_TEXT_RATIO, 1):
                         return 'footer'
 
     # Priority 3.15: CTA square button detection (Issue 193)
@@ -178,7 +181,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         node_y = abs_bbox.get('y', 0)
         relative_y = node_y - parent_y
         if (CTA_SQUARE_RATIO_MIN <= wh_ratio <= CTA_SQUARE_RATIO_MAX
-                and node_x > parent_w * 0.8
+                and node_x > parent_w * CTA_X_POSITION_RATIO
                 and relative_y < CTA_Y_THRESHOLD):
             # Check for CTA keyword text in children or self
             cta_texts = []
@@ -207,7 +210,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         node_x = abs_bbox.get('x', 0)
         parent_x = parent_bbox.get('x', 0)
         relative_x = node_x - parent_x
-        if relative_x > parent_w * 0.9 or relative_x < parent_w * 0.1:
+        if relative_x > parent_w * SIDE_PANEL_RIGHT_X_RATIO or relative_x < parent_w * SIDE_PANEL_LEFT_X_RATIO:
             return f'side-panel-{sibling_index}'
 
     # Priority 3.2: Tiny empty frame → icon
@@ -296,7 +299,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         if text_type_count <= 2 and len(text_contents) >= 1 and not has_image and not has_image_wrap and len(children) <= 3:
             max_text_len = max(len(t) for t in text_contents)
             slug = _resolve_slug(text_contents)
-            if max_text_len > 50:
+            if max_text_len > HEADING_BODY_TEXT_THRESHOLD:
                 # Long text = body content, not heading
                 # Issue 170: TEXT-only frames use 'body-*' to avoid 'content-content'
                 has_non_text = any(ct != 'TEXT' for ct in child_types)

@@ -58,7 +58,8 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAM
     HEADER_ZONE_HEIGHT, FOOTER_ZONE_HEIGHT, ZONE_OVERLAP_ITEM, ZONE_OVERLAP_ZONE,
     HEADER_MAX_ELEMENT_HEIGHT, FOOTER_ZONE_MARGIN,
     HEADER_TEXT_MAX_WIDTH, HEADER_LOGO_MAX_WIDTH, HEADER_LOGO_MAX_HEIGHT, HEADER_NAV_MIN_TEXTS,
-    HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO)
+    HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO,
+    GRID_SIZE_SIMILARITY)
 
 class UnionFind:
     def __init__(self, n):
@@ -290,7 +291,7 @@ def is_grid_like(children):
         return False
     w_ratio = (max(widths) - min(widths)) / max(widths)
     h_ratio = (max(heights) - min(heights)) / max(heights)
-    return w_ratio <= 0.20 and h_ratio <= 0.20
+    return w_ratio <= GRID_SIZE_SIMILARITY and h_ratio <= GRID_SIZE_SIMILARITY
 
 def detect_semantic_groups(children):
     \"\"\"Structural semantic detection (fills-independent, Issue 29/30 safe).\"\"\"

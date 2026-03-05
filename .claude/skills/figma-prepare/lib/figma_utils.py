@@ -66,7 +66,14 @@ HEADER_NAV_MIN_TEXTS = 3  # min TEXT elements for nav detection in header (figma
 HERO_ZONE_DISTANCE = 200  # px — max distance from page top for hero detection (figma-prepare.md: hero_zone_distance)
 LARGE_BG_WIDTH_RATIO = 0.6  # ratio of page width for large bg detection (figma-prepare.md: large_bg_width_ratio)
 
-# --- Issues 215-220: generate-rename-map.sh constants ---
+# --- Issues 215-220: generate-rename-map.sh / detect-grouping-candidates.sh constants ---
+CTA_X_POSITION_RATIO = 0.8  # CTA detection: X position must be > parent_w * ratio (Issue 215)
+SIDE_PANEL_RIGHT_X_RATIO = 0.9  # Side panel detection: right edge ratio (Issue 216)
+SIDE_PANEL_LEFT_X_RATIO = 0.1  # Side panel detection: left edge ratio (Issue 216)
+FOOTER_TEXT_RATIO = 0.3  # Footer detection: min TEXT children ratio (Issue 217)
+IMAGE_WRAPPER_RATIO = 0.5  # Image wrapper detection: min image-like children ratio (Issue 218)
+HEADING_BODY_TEXT_THRESHOLD = 50  # chars — text longer than this → body, shorter → heading (Issue 219)
+GRID_SIZE_SIMILARITY = 0.20  # Grid detection: max width/height variation ratio (Issue 220)
 DIVIDER_MAX_HEIGHT = 5  # px — thin horizontal rectangle → divider (figma-prepare.md: divider_max_height)
 HEADER_Y_THRESHOLD = 100  # px — position from parent top to detect header (figma-prepare.md: header_y_threshold)
 FOOTER_PROXIMITY = 100  # px — distance from parent bottom to detect footer (figma-prepare.md: footer_proximity)
