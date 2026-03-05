@@ -101,8 +101,8 @@
       // 3. Compute bounding box union
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
       for (const node of childNodes) {
-        const x = node.absoluteTransform[0][2];
-        const y = node.absoluteTransform[1][2];
+        const x = node.absoluteTransform ? node.absoluteTransform[0][2] : node.x;
+        const y = node.absoluteTransform ? node.absoluteTransform[1][2] : node.y;
         minX = Math.min(minX, x);
         minY = Math.min(minY, y);
         maxX = Math.max(maxX, x + node.width);
@@ -142,14 +142,12 @@
 
       // 7. Move children into wrapper (preserve original order)
       // childNodes are already in document order from parent.children
-      const childOrder = childNodes.map((n) => ({ node: n, origX: n.x, origY: n.y }));
-
-      for (const { node, origX, origY } of childOrder) {
+      for (const node of childNodes) {
         // Convert position to wrapper-relative
-        const nodeAbsX = node.absoluteTransform[0][2];
-        const nodeAbsY = node.absoluteTransform[1][2];
-        const wrapperAbsX = wrapper.absoluteTransform[0][2];
-        const wrapperAbsY = wrapper.absoluteTransform[1][2];
+        const nodeAbsX = node.absoluteTransform ? node.absoluteTransform[0][2] : node.x;
+        const nodeAbsY = node.absoluteTransform ? node.absoluteTransform[1][2] : node.y;
+        const wrapperAbsX = wrapper.absoluteTransform ? wrapper.absoluteTransform[0][2] : wrapper.x;
+        const wrapperAbsY = wrapper.absoluteTransform ? wrapper.absoluteTransform[1][2] : wrapper.y;
 
         wrapper.appendChild(node);
 

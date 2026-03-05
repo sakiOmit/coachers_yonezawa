@@ -48,7 +48,8 @@ assert_json_range() {
   local json="$1" field="$2" min="$3" max="$4" label="$5"
   local actual
   actual=$(echo "$json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d$field)" 2>/dev/null || echo "__ERROR__")
-  if python3 -c "v=$actual; assert $min <= v <= $max" 2>/dev/null; then
+  # Issue 112: Use sys.argv to avoid shell variable interpolation in Python code
+  if python3 -c "import sys; v=float(sys.argv[1]); assert float(sys.argv[2]) <= v <= float(sys.argv[3])" "$actual" "$min" "$max" 2>/dev/null; then
     green "  PASS: $label (got: $actual, range: $min-$max)"
     ((PASS++)) || true
   else
@@ -62,7 +63,8 @@ assert_json_gte() {
   local json="$1" field="$2" min="$3" label="$4"
   local actual
   actual=$(echo "$json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d$field)" 2>/dev/null || echo "__ERROR__")
-  if python3 -c "assert float('$actual') >= $min" 2>/dev/null; then
+  # Issue 112: Use sys.argv to avoid shell variable interpolation in Python code
+  if python3 -c "import sys; assert float(sys.argv[1]) >= float(sys.argv[2])" "$actual" "$min" 2>/dev/null; then
     green "  PASS: $label (got: $actual >= $min)"
     ((PASS++)) || true
   else
@@ -277,12 +279,14 @@ for f in frames:
 print(f'  PASS: {valid} frames have valid layout structure')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Layout inference structure invalid"; ((FAIL++)) || true; }
 
-# 4pxスナップ確認
+# 4pxスナップ確認（Issue 111: exact source frames はスキップ — Figma実値は4px刻みでない場合がある）
 echo "$RESULT4" | python3 -c "
 import json,sys
 d=json.load(sys.stdin)
 violations = []
 for f in d.get('frames',[]):
+    if f.get('source') == 'exact':
+        continue
     gap = f['layout']['gap']
     if gap % 4 != 0:
         violations.append(f'gap={gap} in {f[\"node_name\"]}')
@@ -292,7 +296,7 @@ for f in d.get('frames',[]):
 if violations:
     print(f'  FAIL: 4px snap violations: {violations[:3]}')
     sys.exit(1)
-print('  PASS: All values snapped to 4px grid')
+print('  PASS: All inferred values snapped to 4px grid (exact frames skipped)')
 " 2>/dev/null && { ((PASS++)) || true; } || { red "  FAIL: Grid snap check failed"; ((FAIL++)) || true; }
 
 # サンプル表示
@@ -492,8 +496,8 @@ print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed
 
     if [[ -n "${REAL_P2:-}" ]]; then
       REAL_RENAME_COUNT=$(echo "$REAL_P2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
-      # Cross-script consistency: Phase 1 unnamed ≈ Phase 2 renames (±5)
-      if python3 -c "assert abs($REAL_UNNAMED - $REAL_RENAME_COUNT) <= 5" 2>/dev/null; then
+      # Cross-script consistency: Phase 1 unnamed ≈ Phase 3 renames (±5) — Issue 113: Phase 2→3
+      if python3 -c "import sys; assert abs(int(sys.argv[1]) - int(sys.argv[2])) <= 5" "$REAL_UNNAMED" "$REAL_RENAME_COUNT" 2>/dev/null; then
         green "  PASS: Cross-script — Phase1 unnamed ($REAL_UNNAMED) ≈ Phase3 renames ($REAL_RENAME_COUNT)"
         ((PASS++)) || true
       else

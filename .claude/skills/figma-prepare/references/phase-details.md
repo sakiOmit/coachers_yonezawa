@@ -39,7 +39,7 @@ meta:
   nodeId: "0:1"
 
 quality:
-  score: 65
+  score: 60
   grade: "B"
   recommendation: "Phase 2 (grouping) recommended"
 
@@ -53,10 +53,11 @@ metrics:
   no_autolayout_frames: 12
   total_frames: 35
   max_depth: 8
+  max_section_depth: 6  # Issue 71: セクションルートからの相対深度
 
 score_breakdown:
   unnamed_penalty: 15.9
-  flat_penalty: 10
+  flat_penalty: 10.0
   ungrouped_penalty: 5
   nesting_penalty: 9
   autolayout_penalty: 0  # unmeasurable via get_metadata — excluded from score
@@ -72,7 +73,7 @@ phases_recommended: [2]
 ║         Figma Structure Quality Report       ║
 ╠══════════════════════════════════════════════╣
 
-Score: 65 / 100  [Grade: B]
+Score: 60 / 100  [Grade: B]
 
 ┌──────────────────────────────────────────────┐
 │ Metrics                                       │
@@ -90,7 +91,7 @@ Score: 65 / 100  [Grade: B]
 ├───────────────────────────┬──────────────────┤
 │ Unnamed penalty           │ -15.9            │
 │ Flat structure penalty    │ -10.0            │
-│ Ungrouped penalty         │ -10.0            │
+│ Ungrouped penalty         │ -5.0             │
 │ Nesting penalty           │ -9.0             │
 │ Auto Layout penalty       │ 0 (excluded)     │
 └───────────────────────────┴──────────────────┘
