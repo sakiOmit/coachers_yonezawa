@@ -1,0 +1,2180 @@
+{
+  "page_name": "LP-PC5",
+  "page_id": "2:5364",
+  "page_size": {
+    "width": 1440.0,
+    "height": 10770.0
+  },
+  "top_level_children": [
+    {
+      "id": "2:8018",
+      "name": "Dot Grid",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5262.0,
+        "y": 341.0,
+        "w": 50.0,
+        "h": 50.0
+      },
+      "child_count": 6,
+      "child_types_summary": "FRAME:6",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:8073",
+      "name": "header",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5510.375,
+        "y": 391.00001525878906,
+        "w": 1378.375,
+        "h": 82.0
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:8061",
+      "name": "Group 20",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4767.000183105469,
+        "y": 445.9999237060547,
+        "w": 643.484375,
+        "h": 565.0000610351562
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7927",
+      "name": "Group 19",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5422.0,
+        "y": 558.0,
+        "w": 732.0,
+        "h": 411.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:2, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "自分の強みや夢の仕事に出会えない悩みも。 オンラインでもオフラインでも、新しいつながりと未知の情報が、君のキャリアを輝かせる手助けになる。"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7949",
+      "name": "Group 13",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5554.0,
+        "y": 574.0,
+        "w": 128.23694885389068,
+        "h": 77.5262434191809
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7936",
+      "name": "Group 12",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4907.0,
+        "y": 848.0,
+        "w": 124.5547938026175,
+        "h": 86.534611718507
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7962",
+      "name": "Group 14",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5007.0,
+        "y": 924.0,
+        "w": 129.91735551903275,
+        "h": 73.93148451535751
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7975",
+      "name": "Dot Grid",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4169.0,
+        "y": 961.0,
+        "w": 50.0,
+        "h": 50.0
+      },
+      "child_count": 6,
+      "child_types_summary": "FRAME:6",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7926",
+      "name": "Intern×Matching",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5554.0,
+        "y": 1016.0,
+        "w": 1575.0,
+        "h": 200.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7833",
+      "name": "Group 33",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4987.0,
+        "y": 1336.0,
+        "w": 330.0,
+        "h": 60.0
+      },
+      "child_count": 3,
+      "child_types_summary": "TEXT:3",
+      "has_text_children": true,
+      "text_children_preview": [
+        "導入企業続々拡大中",
+        "/",
+        "/"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7837",
+      "name": "logo",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5512.0,
+        "y": 1455.09033203125,
+        "w": 1380.0,
+        "h": 260.9096984863281
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:3",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7827",
+      "name": "Mask group",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4848.999267578125,
+        "y": 1808.0,
+        "w": 701.620361328125,
+        "h": 652.0
+      },
+      "child_count": 1,
+      "child_types_summary": "VECTOR:1",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7823",
+      "name": "About",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5292.0,
+        "y": 1866.0,
+        "w": 138.0,
+        "h": 46.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7825",
+      "name": "サービス概要",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5292.0,
+        "y": 1912.0,
+        "w": 150.0,
+        "h": 36.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7824",
+      "name": "個々の価値観が 未来を繋ぐ、HIDANE。",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5292.0,
+        "y": 2008.0,
+        "w": 415.0,
+        "h": 130.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7826",
+      "name": "私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供することです。 HIDANEは、人々が自分自身と真摯に向き合い、価値あるつながりを築くことで、より良い未来を創造します。 個人の物語が未来の社会を彩り、共に歩む仲間と出会い、成長できる場所―それがHIDANEのビジョン。",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5295.0,
+        "y": 2168.0,
+        "w": 473.0,
+        "h": 252.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7626",
+      "name": "悩み",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5541.9998779296875,
+        "y": 2677.124755859375,
+        "w": 1440.0,
+        "h": 971.630615234375
+      },
+      "child_count": 10,
+      "child_types_summary": "FRAME:8, VECTOR:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:7323",
+      "name": "Group 99",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5619.0,
+        "y": 3449.999755859375,
+        "w": 1562.000244140625,
+        "h": 1102.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:2, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "いろんな世界、見てみない？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7266",
+      "name": "Group 57",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5421.9999923706055,
+        "y": 4640.0,
+        "w": 201.0,
+        "h": 105.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "選ばれるポイント",
+        "Feature"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:7269",
+      "name": "Group 208",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5421.9999923706055,
+        "y": 4805.0,
+        "w": 1200.0,
+        "h": 2247.0
+      },
+      "child_count": 4,
+      "child_types_summary": "FRAME:4",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5541",
+      "name": "Group 72",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4389.0,
+        "y": 5166.0,
+        "w": 185.0,
+        "h": 95.0
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5886",
+      "name": "Group 73",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5367.0,
+        "y": 5391.0,
+        "w": 95.00000808660661,
+        "h": 185.00000415258182
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:6231",
+      "name": "Group 74",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5367.0,
+        "y": 5562.0,
+        "w": 95.00000808660661,
+        "h": 185.00000415258182
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5498",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 5966.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5505",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 5975.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5512",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 5984.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5519",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 5993.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5526",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 6002.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5533",
+      "name": "Frame",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4322.0,
+        "y": 6011.0,
+        "w": 50.0,
+        "h": 9.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:6576",
+      "name": "Group 75",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4687.0,
+        "y": 6428.0,
+        "w": 185.00000830516365,
+        "h": 95.00001617321323
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:6921",
+      "name": "Group 90",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4742.0,
+        "y": 7015.0,
+        "w": 185.00000830516365,
+        "h": 95.00001617321323
+      },
+      "child_count": 8,
+      "child_types_summary": "FRAME:8",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5493",
+      "name": "design",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4551.0,
+        "y": 7077.0,
+        "w": 119.0,
+        "h": 112.08360290527344
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5489",
+      "name": "Group 19",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 7184.505859375,
+        "w": 940.0,
+        "h": 95.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "HIDANEをはじめてみる",
+        "▼"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8127",
+      "name": "Group 160",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4194.0,
+        "y": 7398.505859375,
+        "w": 29.309122556328475,
+        "h": 130.95652113081633
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8226",
+      "name": "Group 97",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5422.0,
+        "y": 7433.505859375,
+        "w": 1200.0,
+        "h": 105.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "使い方は簡単。マッチングしてからメッセージのやり取りをするまでの流れを紹介します。",
+        "How to use"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8114",
+      "name": "Group 159",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4236.0,
+        "y": 7443.505859375,
+        "w": 130.2708656305649,
+        "h": 25.392274669949984
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8261",
+      "name": "Group 193",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5572.0,
+        "y": 7564.505859375,
+        "w": 473.0,
+        "h": 589.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "自分のプロフィールを 作りましょう！",
+        "マイページ画面で自分のプロフィールを編集できます。"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8244",
+      "name": "Group 188",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4420.0,
+        "y": 7597.505859375,
+        "w": 204.0,
+        "h": 511.0
+      },
+      "child_count": 1,
+      "child_types_summary": "FRAME:1",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8252",
+      "name": "Group 194",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5152.0,
+        "y": 7598.505859375,
+        "w": 395.0,
+        "h": 566.0
+      },
+      "child_count": 5,
+      "child_types_summary": "FRAME:1, TEXT:4",
+      "has_text_children": true,
+      "text_children_preview": [
+        "ホームに表示されるので簡単手軽にスワイプ。",
+        "いいなと思ったら 右にスワイプ！",
+        "気になるお相手に「興味あり」でアプローチ。",
+        "検索からも 出会える"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8232",
+      "name": "Group 171",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4687.0,
+        "y": 7600.505859375,
+        "w": 194.0,
+        "h": 575.0
+      },
+      "child_count": 2,
+      "child_types_summary": "FRAME:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8229",
+      "name": "Frame 14",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4363.0,
+        "y": 8001.505859375,
+        "w": 91.0,
+        "h": 36.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8231",
+      "name": "Frame 12",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4634.0,
+        "y": 8001.505859375,
+        "w": 91.0,
+        "h": 36.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8140",
+      "name": "Dot Grid",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4222.0,
+        "y": 8148.505859375,
+        "w": 50.0,
+        "h": 50.0
+      },
+      "child_count": 6,
+      "child_types_summary": "FRAME:6",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:8183",
+      "name": "Dot Grid",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4182.0,
+        "y": 8202.505859375,
+        "w": 50.0,
+        "h": 50.0
+      },
+      "child_count": 6,
+      "child_types_summary": "FRAME:6",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:8101",
+      "name": "Group 14",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5576.0,
+        "y": 8252.505859375,
+        "w": 127.49090886991326,
+        "h": 77.13529551051215
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5433",
+      "name": "Q&A",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5422.0,
+        "y": 8405.505859375,
+        "w": 110.0,
+        "h": 69.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5432",
+      "name": "HIDANEに関するよくあるご質問",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5422.0,
+        "y": 8474.505859375,
+        "w": 361.0,
+        "h": 36.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5434",
+      "name": "Group 35",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 8570.505859375,
+        "w": 940.0,
+        "h": 209.0
+      },
+      "child_count": 5,
+      "child_types_summary": "FRAME:2, TEXT:2, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "HIDANEって他のインターンサービスと何が違うの？",
+        "HIDANEは個々の価値観を尊重し、AIを使って最適なマッチングを提供。企業の文化や学びたいことに合わせて、よりパーソナライズされたインターンシップを見つけられるよ！"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5487",
+      "name": "Line 10",
+      "type": "LINE",
+      "bbox": {
+        "x": -5272.0,
+        "y": 8662.505859375,
+        "w": 890.0,
+        "h": 7.780627129250206e-05
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5445",
+      "name": "Group 59",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 8819.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "どんな業界・規模の企業がHIDANEに登録しているの？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5452",
+      "name": "Group 60",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 8949.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "登録や利用にお金はかからないの？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5459",
+      "name": "Group 61",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 9079.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "インターンシップの選び方に迷ってる。アドバイスもらいたい！"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5466",
+      "name": "Group 62",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 9209.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "HIDANEの導入企業はどのような会社が多いですか？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5473",
+      "name": "Group 63",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 9339.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "登録したらどんな情報が必要？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5480",
+      "name": "Group 64",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5292.0,
+        "y": 9469.505859375,
+        "w": 940.0,
+        "h": 90.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "プライバシーとセキュリティはどのように確保されていますか？"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5398",
+      "name": "Column",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5422.0,
+        "y": 9789.505859375,
+        "w": 173.0,
+        "h": 69.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5397",
+      "name": "HIDANEが運営しているインターンに関するコンテンツメディアです。",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5422.0,
+        "y": 9858.505859375,
+        "w": 1200.0,
+        "h": 36.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5399",
+      "name": "Group 66",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5474.0,
+        "y": 9954.505859375,
+        "w": 1304.0,
+        "h": 410.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, VECTOR:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5392",
+      "name": "design",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4546.0,
+        "y": 10402.0,
+        "w": 119.0,
+        "h": 113.39447021484375
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5388",
+      "name": "Group 19",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5287.0,
+        "y": 10514.5068359375,
+        "w": 940.0,
+        "h": 96.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "HIDANEをはじめてみる",
+        "▼"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5366",
+      "name": "<Group>",
+      "type": "FRAME",
+      "bbox": {
+        "x": -5422.0,
+        "y": 10642.0888671875,
+        "w": 195.00125122070312,
+        "h": 47.46791458129883
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5369",
+      "name": "サービス概要",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5121.0,
+        "y": 10773.50390625,
+        "w": 101.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5377",
+      "name": "選ばれるポイント",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4990.0,
+        "y": 10773.50390625,
+        "w": 135.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5378",
+      "name": "使い方",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4825.0,
+        "y": 10773.50390625,
+        "w": 50.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5379",
+      "name": "よくある質問",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4745.0,
+        "y": 10773.50390625,
+        "w": 101.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5380",
+      "name": "コラム",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4614.0,
+        "y": 10773.50390625,
+        "w": 50.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5381",
+      "name": "▼アカウントをすでにお持ちの方",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4474.0,
+        "y": 10773.50390625,
+        "w": 254.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5382",
+      "name": "web版ログインはこちらから",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4474.0,
+        "y": 10806.50390625,
+        "w": 218.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5383",
+      "name": "Group 25",
+      "type": "FRAME",
+      "bbox": {
+        "x": -4474.0,
+        "y": 10849.50390625,
+        "w": 175.0,
+        "h": 60.0
+      },
+      "child_count": 1,
+      "child_types_summary": "TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "ログイン"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5386",
+      "name": "Line 11",
+      "type": "LINE",
+      "bbox": {
+        "x": -5422.0,
+        "y": 10949.50390625,
+        "w": 1200.0,
+        "h": 0.00010490733257029206
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:5370",
+      "name": "HIDANEについて",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5422.0,
+        "y": 10989.50390625,
+        "w": 130.0,
+        "h": 23.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5371",
+      "name": "運営会社",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5262.0,
+        "y": 10991.50390625,
+        "w": 59.0,
+        "h": 20.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5372",
+      "name": "｜",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5193.0,
+        "y": 10991.50390625,
+        "w": 14.0,
+        "h": 20.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5373",
+      "name": "｜",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5100.0,
+        "y": 10991.50390625,
+        "w": 14.0,
+        "h": 20.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5374",
+      "name": "利用規約",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5169.0,
+        "y": 10991.50390625,
+        "w": 59.0,
+        "h": 20.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5375",
+      "name": "プライバシーポリシー",
+      "type": "TEXT",
+      "bbox": {
+        "x": -5076.0,
+        "y": 10991.50390625,
+        "w": 149.0,
+        "h": 20.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "2:5376",
+      "name": "© 2023 Coachers Inc.",
+      "type": "TEXT",
+      "bbox": {
+        "x": -4899.0,
+        "y": 11071.9990234375,
+        "w": 156.0,
+        "h": 16.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    }
+  ],
+  "total_children": 77,
+  "heuristic_hints": {
+    "header_candidates": [
+      "2:8073"
+    ],
+    "header_cluster_ids": [],
+    "footer_candidates": [
+      "2:5399"
+    ],
+    "gap_analysis": [
+      {
+        "between": [
+          "2:8018",
+          "2:8073"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:8073",
+          "2:8061"
+        ],
+        "gap_px": -27
+      },
+      {
+        "between": [
+          "2:8061",
+          "2:7927"
+        ],
+        "gap_px": -453
+      },
+      {
+        "between": [
+          "2:7927",
+          "2:7949"
+        ],
+        "gap_px": -395
+      },
+      {
+        "between": [
+          "2:7949",
+          "2:7936"
+        ],
+        "gap_px": 196
+      },
+      {
+        "between": [
+          "2:7936",
+          "2:7962"
+        ],
+        "gap_px": -11
+      },
+      {
+        "between": [
+          "2:7962",
+          "2:7975"
+        ],
+        "gap_px": -37
+      },
+      {
+        "between": [
+          "2:7975",
+          "2:7926"
+        ],
+        "gap_px": 5
+      },
+      {
+        "between": [
+          "2:7926",
+          "2:7833"
+        ],
+        "gap_px": 120
+      },
+      {
+        "between": [
+          "2:7833",
+          "2:7837"
+        ],
+        "gap_px": 59
+      },
+      {
+        "between": [
+          "2:7837",
+          "2:7827"
+        ],
+        "gap_px": 92
+      },
+      {
+        "between": [
+          "2:7827",
+          "2:7823"
+        ],
+        "gap_px": -594
+      },
+      {
+        "between": [
+          "2:7823",
+          "2:7825"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:7825",
+          "2:7824"
+        ],
+        "gap_px": 60
+      },
+      {
+        "between": [
+          "2:7824",
+          "2:7826"
+        ],
+        "gap_px": 30
+      },
+      {
+        "between": [
+          "2:7826",
+          "2:7626"
+        ],
+        "gap_px": 257
+      },
+      {
+        "between": [
+          "2:7626",
+          "2:7323"
+        ],
+        "gap_px": -199
+      },
+      {
+        "between": [
+          "2:7323",
+          "2:7266"
+        ],
+        "gap_px": 88
+      },
+      {
+        "between": [
+          "2:7266",
+          "2:7269"
+        ],
+        "gap_px": 60
+      },
+      {
+        "between": [
+          "2:7269",
+          "2:5541"
+        ],
+        "gap_px": -1886
+      },
+      {
+        "between": [
+          "2:5541",
+          "2:5886"
+        ],
+        "gap_px": 130
+      },
+      {
+        "between": [
+          "2:5886",
+          "2:6231"
+        ],
+        "gap_px": -14
+      },
+      {
+        "between": [
+          "2:6231",
+          "2:5498"
+        ],
+        "gap_px": 219
+      },
+      {
+        "between": [
+          "2:5498",
+          "2:5505"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5505",
+          "2:5512"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5512",
+          "2:5519"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5519",
+          "2:5526"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5526",
+          "2:5533"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5533",
+          "2:6576"
+        ],
+        "gap_px": 408
+      },
+      {
+        "between": [
+          "2:6576",
+          "2:6921"
+        ],
+        "gap_px": 492
+      },
+      {
+        "between": [
+          "2:6921",
+          "2:5493"
+        ],
+        "gap_px": -33
+      },
+      {
+        "between": [
+          "2:5493",
+          "2:5489"
+        ],
+        "gap_px": -5
+      },
+      {
+        "between": [
+          "2:5489",
+          "2:8127"
+        ],
+        "gap_px": 119
+      },
+      {
+        "between": [
+          "2:8127",
+          "2:8226"
+        ],
+        "gap_px": -96
+      },
+      {
+        "between": [
+          "2:8226",
+          "2:8114"
+        ],
+        "gap_px": -95
+      },
+      {
+        "between": [
+          "2:8114",
+          "2:8261"
+        ],
+        "gap_px": 96
+      },
+      {
+        "between": [
+          "2:8261",
+          "2:8244"
+        ],
+        "gap_px": -556
+      },
+      {
+        "between": [
+          "2:8244",
+          "2:8252"
+        ],
+        "gap_px": -510
+      },
+      {
+        "between": [
+          "2:8252",
+          "2:8232"
+        ],
+        "gap_px": -564
+      },
+      {
+        "between": [
+          "2:8232",
+          "2:8229"
+        ],
+        "gap_px": -174
+      },
+      {
+        "between": [
+          "2:8229",
+          "2:8231"
+        ],
+        "gap_px": -36
+      },
+      {
+        "between": [
+          "2:8231",
+          "2:8140"
+        ],
+        "gap_px": 111
+      },
+      {
+        "between": [
+          "2:8140",
+          "2:8183"
+        ],
+        "gap_px": 4
+      },
+      {
+        "between": [
+          "2:8183",
+          "2:8101"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:8101",
+          "2:5433"
+        ],
+        "gap_px": 76
+      },
+      {
+        "between": [
+          "2:5433",
+          "2:5432"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5432",
+          "2:5434"
+        ],
+        "gap_px": 60
+      },
+      {
+        "between": [
+          "2:5434",
+          "2:5487"
+        ],
+        "gap_px": -117
+      },
+      {
+        "between": [
+          "2:5487",
+          "2:5445"
+        ],
+        "gap_px": 157
+      },
+      {
+        "between": [
+          "2:5445",
+          "2:5452"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5452",
+          "2:5459"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5459",
+          "2:5466"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5466",
+          "2:5473"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5473",
+          "2:5480"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5480",
+          "2:5398"
+        ],
+        "gap_px": 230
+      },
+      {
+        "between": [
+          "2:5398",
+          "2:5397"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "2:5397",
+          "2:5399"
+        ],
+        "gap_px": 60
+      },
+      {
+        "between": [
+          "2:5399",
+          "2:5392"
+        ],
+        "gap_px": 37
+      },
+      {
+        "between": [
+          "2:5392",
+          "2:5388"
+        ],
+        "gap_px": -1
+      },
+      {
+        "between": [
+          "2:5388",
+          "2:5366"
+        ],
+        "gap_px": 32
+      },
+      {
+        "between": [
+          "2:5366",
+          "2:5369"
+        ],
+        "gap_px": 84
+      },
+      {
+        "between": [
+          "2:5369",
+          "2:5377"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "2:5377",
+          "2:5378"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "2:5378",
+          "2:5379"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "2:5379",
+          "2:5380"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "2:5380",
+          "2:5381"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "2:5381",
+          "2:5382"
+        ],
+        "gap_px": 10
+      },
+      {
+        "between": [
+          "2:5382",
+          "2:5383"
+        ],
+        "gap_px": 20
+      },
+      {
+        "between": [
+          "2:5383",
+          "2:5386"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5386",
+          "2:5370"
+        ],
+        "gap_px": 40
+      },
+      {
+        "between": [
+          "2:5370",
+          "2:5371"
+        ],
+        "gap_px": -21
+      },
+      {
+        "between": [
+          "2:5371",
+          "2:5372"
+        ],
+        "gap_px": -20
+      },
+      {
+        "between": [
+          "2:5372",
+          "2:5373"
+        ],
+        "gap_px": -20
+      },
+      {
+        "between": [
+          "2:5373",
+          "2:5374"
+        ],
+        "gap_px": -20
+      },
+      {
+        "between": [
+          "2:5374",
+          "2:5375"
+        ],
+        "gap_px": -20
+      },
+      {
+        "between": [
+          "2:5375",
+          "2:5376"
+        ],
+        "gap_px": 60
+      }
+    ],
+    "background_candidates": [],
+    "consecutive_patterns": [
+      {
+        "indices": [
+          4,
+          5,
+          6
+        ],
+        "ids": [
+          "2:7949",
+          "2:7936",
+          "2:7962"
+        ],
+        "names": [
+          "Group 13",
+          "Group 12",
+          "Group 14"
+        ],
+        "hash": "FRAME"
+      },
+      {
+        "indices": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "ids": [
+          "2:7823",
+          "2:7825",
+          "2:7824",
+          "2:7826"
+        ],
+        "names": [
+          "About",
+          "サービス概要",
+          "個々の価値観が 未来を繋ぐ、HIDANE。",
+          "私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供することです。 HIDANEは、人々が自分自身と真摯に向き合い、価値あるつながりを築くことで、より良い未来を創造します。 個人の物語が未来の社会を彩り、共に歩む仲間と出会い、成長できる場所―それがHIDANEのビジョン。"
+        ],
+        "hash": "TEXT"
+      },
+      {
+        "indices": [
+          20,
+          21,
+          22
+        ],
+        "ids": [
+          "2:5541",
+          "2:5886",
+          "2:6231"
+        ],
+        "names": [
+          "Group 72",
+          "Group 73",
+          "Group 74"
+        ],
+        "hash": "FRAME:[FRAME,FRAME,FRAME,FRAME,FRAME,FRAME,FRAME,FRAME]"
+      },
+      {
+        "indices": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "ids": [
+          "2:5498",
+          "2:5505",
+          "2:5512",
+          "2:5519",
+          "2:5526",
+          "2:5533"
+        ],
+        "names": [
+          "Frame",
+          "Frame",
+          "Frame",
+          "Frame",
+          "Frame",
+          "Frame"
+        ],
+        "hash": "FRAME"
+      },
+      {
+        "indices": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54
+        ],
+        "ids": [
+          "2:5445",
+          "2:5452",
+          "2:5459",
+          "2:5466",
+          "2:5473",
+          "2:5480"
+        ],
+        "names": [
+          "Group 59",
+          "Group 60",
+          "Group 61",
+          "Group 62",
+          "Group 63",
+          "Group 64"
+        ],
+        "hash": "FRAME:[FRAME,TEXT,VECTOR]"
+      },
+      {
+        "indices": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67
+        ],
+        "ids": [
+          "2:5369",
+          "2:5377",
+          "2:5378",
+          "2:5379",
+          "2:5380",
+          "2:5381",
+          "2:5382"
+        ],
+        "names": [
+          "サービス概要",
+          "選ばれるポイント",
+          "使い方",
+          "よくある質問",
+          "コラム",
+          "▼アカウントをすでにお持ちの方",
+          "web版ログインはこちらから"
+        ],
+        "hash": "TEXT"
+      },
+      {
+        "indices": [
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76
+        ],
+        "ids": [
+          "2:5370",
+          "2:5371",
+          "2:5372",
+          "2:5373",
+          "2:5374",
+          "2:5375",
+          "2:5376"
+        ],
+        "names": [
+          "HIDANEについて",
+          "運営会社",
+          "｜",
+          "｜",
+          "利用規約",
+          "プライバシーポリシー",
+          "© 2023 Coachers Inc."
+        ],
+        "hash": "TEXT"
+      }
+    ],
+    "heading_candidates": [
+      {
+        "index": 9,
+        "id": "2:7833",
+        "name": "Group 33",
+        "height": 60.0
+      },
+      {
+        "index": 18,
+        "id": "2:7266",
+        "name": "Group 57",
+        "height": 105.0
+      },
+      {
+        "index": 32,
+        "id": "2:5489",
+        "name": "Group 19",
+        "height": 95.0
+      },
+      {
+        "index": 34,
+        "id": "2:8226",
+        "name": "Group 97",
+        "height": 105.0
+      },
+      {
+        "index": 49,
+        "id": "2:5445",
+        "name": "Group 59",
+        "height": 90.0
+      },
+      {
+        "index": 50,
+        "id": "2:5452",
+        "name": "Group 60",
+        "height": 90.0
+      },
+      {
+        "index": 51,
+        "id": "2:5459",
+        "name": "Group 61",
+        "height": 90.0
+      },
+      {
+        "index": 52,
+        "id": "2:5466",
+        "name": "Group 62",
+        "height": 90.0
+      },
+      {
+        "index": 53,
+        "id": "2:5473",
+        "name": "Group 63",
+        "height": 90.0
+      },
+      {
+        "index": 54,
+        "id": "2:5480",
+        "name": "Group 64",
+        "height": 90.0
+      },
+      {
+        "index": 59,
+        "id": "2:5388",
+        "name": "Group 19",
+        "height": 96.0
+      },
+      {
+        "index": 68,
+        "id": "2:5383",
+        "name": "Group 25",
+        "height": 60.0
+      }
+    ],
+    "loose_elements": [
+      {
+        "index": 23,
+        "id": "2:5498",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 24,
+        "id": "2:5505",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 25,
+        "id": "2:5512",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 26,
+        "id": "2:5519",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 27,
+        "id": "2:5526",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 28,
+        "id": "2:5533",
+        "name": "Frame",
+        "type": "FRAME",
+        "height": 9.0
+      },
+      {
+        "index": 48,
+        "id": "2:5487",
+        "name": "Line 10",
+        "type": "LINE",
+        "height": 7.780627129250206e-05
+      },
+      {
+        "index": 69,
+        "id": "2:5386",
+        "name": "Line 11",
+        "type": "LINE",
+        "height": 0.00010490733257029206
+      },
+      {
+        "index": 71,
+        "id": "2:5371",
+        "name": "運営会社",
+        "type": "TEXT",
+        "height": 20.0
+      },
+      {
+        "index": 72,
+        "id": "2:5372",
+        "name": "｜",
+        "type": "TEXT",
+        "height": 20.0
+      },
+      {
+        "index": 73,
+        "id": "2:5373",
+        "name": "｜",
+        "type": "TEXT",
+        "height": 20.0
+      },
+      {
+        "index": 74,
+        "id": "2:5374",
+        "name": "利用規約",
+        "type": "TEXT",
+        "height": 20.0
+      },
+      {
+        "index": 75,
+        "id": "2:5375",
+        "name": "プライバシーポリシー",
+        "type": "TEXT",
+        "height": 20.0
+      },
+      {
+        "index": 76,
+        "id": "2:5376",
+        "name": "© 2023 Coachers Inc.",
+        "type": "TEXT",
+        "height": 16.0
+      }
+    ]
+  },
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 2:8018 | Dot Grid | FRAME | -5262 | 341 | 50x50 | N | 6FRA | - | - |\n| 2 | 2:8073 | header | FRAME | -5510 | 391 | 1378x82 | N | 8FRA | - | サービス概要 |\n| 3 | 2:8061 | Group 20 | FRAME | -4767 | 445 | 643x565 | Y | - | - | - |\n| 4 | 2:7927 | Group 19 | FRAME | -5422 | 558 | 732x411 | N | 2FRA+1TEX | - | AIインターンマッチングサービス |\n| 5 | 2:7949 | Group 13 | FRAME | -5554 | 574 | 128x77 | Y | - | - | - |\n| 6 | 2:7936 | Group 12 | FRAME | -4907 | 848 | 124x86 | Y | - | - | - |\n| 7 | 2:7962 | Group 14 | FRAME | -5007 | 924 | 129x73 | Y | - | - | - |\n| 8 | 2:7975 | Dot Grid | FRAME | -4169 | 961 | 50x50 | N | 6FRA | - | - |\n| 9 | 2:7926 | Intern×Matching | TEXT | -5554 | 1016 | 1575x200 | Y | - | overflow | Intern×Matching |\n| 10 | 2:7833 | Group 33 | FRAME | -4987 | 1336 | 330x60 | N | 3TEX | - | 導入企業続々拡大中 |\n| 11 | 2:7837 | logo | FRAME | -5512 | 1455 | 1380x260 | N | 3FRA | - | - |\n| 12 | 2:7827 | Mask group | FRAME | -4848 | 1808 | 701x652 | N | 1VEC | - | - |\n| 13 | 2:7823 | About | TEXT | -5292 | 1866 | 138x46 | Y | - | - | About |\n| 14 | 2:7825 | サービス概要 | TEXT | -5292 | 1912 | 150x36 | Y | - | - | サービス概要 |\n| 15 | 2:7824 | 個々の価値観が 未来を繋ぐ、HIDANE。 | TEXT | -5292 | 2008 | 415x130 | Y | - | - | 個々の価値観が 未来を繋ぐ、HIDANE。 |\n| 16 | 2:7826 | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供 | TEXT | -5295 | 2168 | 473x252 | Y | - | - | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わ |\n| 17 | 2:7626 | 悩み | FRAME | -5541 | 2677 | 1440x971 | N | 8FRA+2VEC | - | 漠然とした焦りや不安がある |\n| 18 | 2:7323 | Group 99 | FRAME | -5619 | 3449 | 1562x1102 | N | 2FRA+1TEX | - | いろんな世界、見てみない？ |\n| 19 | 2:7266 | Group 57 | FRAME | -5421 | 4640 | 201x105 | N | 2TEX | - | 選ばれるポイント |\n| 20 | 2:7269 | Group 208 | FRAME | -5421 | 4805 | 1200x2247 | N | 4FRA | - | 01 |\n| 21 | 2:5541 | Group 72 | FRAME | -4389 | 5166 | 185x95 | N | 8FRA | - | - |\n| 22 | 2:5886 | Group 73 | FRAME | -5367 | 5391 | 95x185 | N | 8FRA | - | - |\n| 23 | 2:6231 | Group 74 | FRAME | -5367 | 5562 | 95x185 | N | 8FRA | - | - |\n| 24 | 2:5498 | Frame | FRAME | -4322 | 5966 | 50x9 | Y | - | - | - |\n| 25 | 2:5505 | Frame | FRAME | -4322 | 5975 | 50x9 | Y | - | - | - |\n| 26 | 2:5512 | Frame | FRAME | -4322 | 5984 | 50x9 | Y | - | - | - |\n| 27 | 2:5519 | Frame | FRAME | -4322 | 5993 | 50x9 | Y | - | - | - |\n| 28 | 2:5526 | Frame | FRAME | -4322 | 6002 | 50x9 | Y | - | - | - |\n| 29 | 2:5533 | Frame | FRAME | -4322 | 6011 | 50x9 | Y | - | - | - |\n| 30 | 2:6576 | Group 75 | FRAME | -4687 | 6428 | 185x95 | N | 8FRA | - | - |\n| 31 | 2:6921 | Group 90 | FRAME | -4742 | 7015 | 185x95 | N | 8FRA | - | - |\n| 32 | 2:5493 | design | FRAME | -4551 | 7077 | 119x112 | Y | - | - | - |\n| 33 | 2:5489 | Group 19 | FRAME | -5292 | 7184 | 940x95 | N | 2TEX | - | HIDANEをはじめてみる |\n| 34 | 2:8127 | Group 160 | FRAME | -4194 | 7398 | 29x130 | Y | - | - | - |\n| 35 | 2:8226 | Group 97 | FRAME | -5422 | 7433 | 1200x105 | N | 2TEX | - | 使い方は簡単。マッチングしてからメッセージのやり取りをするま |\n| 36 | 2:8114 | Group 159 | FRAME | -4236 | 7443 | 130x25 | Y | - | - | - |\n| 37 | 2:8261 | Group 193 | FRAME | -5572 | 7564 | 473x589 | N | 1FRA+2TEX | - | 自分のプロフィールを 作りましょう！ |\n| 38 | 2:8244 | Group 188 | FRAME | -4420 | 7597 | 204x511 | N | 1FRA | - | STEP4 |\n| 39 | 2:8252 | Group 194 | FRAME | -5152 | 7598 | 395x566 | N | 1FRA+4TEX | - | STEP2 |\n| 40 | 2:8232 | Group 171 | FRAME | -4687 | 7600 | 194x575 | N | 2FRA | - | 社会人のプロフィールをチェック！企業のプロフィールをチェック |\n| 41 | 2:8229 | Frame 14 | FRAME | -4363 | 8001 | 91x36 | Y | - | - | - |\n| 42 | 2:8231 | Frame 12 | FRAME | -4634 | 8001 | 91x36 | Y | - | - | - |\n| 43 | 2:8140 | Dot Grid | FRAME | -4222 | 8148 | 50x50 | N | 6FRA | - | - |\n| 44 | 2:8183 | Dot Grid | FRAME | -4182 | 8202 | 50x50 | N | 6FRA | - | - |\n| 45 | 2:8101 | Group 14 | FRAME | -5576 | 8252 | 127x77 | Y | - | - | - |\n| 46 | 2:5433 | Q&A | TEXT | -5422 | 8405 | 110x69 | Y | - | - | Q&A |\n| 47 | 2:5432 | HIDANEに関するよくあるご質問 | TEXT | -5422 | 8474 | 361x36 | Y | - | - | HIDANEに関するよくあるご質問 |\n| 48 | 2:5434 | Group 35 | FRAME | -5292 | 8570 | 940x209 | N | 2FRA+2TEX+1VEC | - | Q |\n| 49 | 2:5487 | Line 10 | LINE | -5272 | 8662 | 890x0 | Y | - | - | - |\n| 50 | 2:5445 | Group 59 | FRAME | -5292 | 8819 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 51 | 2:5452 | Group 60 | FRAME | -5292 | 8949 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 52 | 2:5459 | Group 61 | FRAME | -5292 | 9079 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 53 | 2:5466 | Group 62 | FRAME | -5292 | 9209 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 54 | 2:5473 | Group 63 | FRAME | -5292 | 9339 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 55 | 2:5480 | Group 64 | FRAME | -5292 | 9469 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 56 | 2:5398 | Column | TEXT | -5422 | 9789 | 173x69 | Y | - | - | Column |\n| 57 | 2:5397 | HIDANEが運営しているインターンに関するコンテンツメディアです。 | TEXT | -5422 | 9858 | 1200x36 | Y | - | - | HIDANEが運営しているインターンに関するコンテンツメディ |\n| 58 | 2:5399 | Group 66 | FRAME | -5474 | 9954 | 1304x410 | N | 1FRA+2VEC | - | 大学生必見！インターンシップはいつから始まる？探し方は？気に |\n| 59 | 2:5392 | design | FRAME | -4546 | 10402 | 119x113 | Y | - | - | - |\n| 60 | 2:5388 | Group 19 | FRAME | -5287 | 10514 | 940x96 | N | 2TEX | - | HIDANEをはじめてみる |\n| 61 | 2:5366 | <Group> | FRAME | -5422 | 10642 | 195x47 | Y | - | - | - |\n| 62 | 2:5369 | サービス概要 | TEXT | -5121 | 10773 | 101x23 | Y | - | - | サービス概要 |\n| 63 | 2:5377 | 選ばれるポイント | TEXT | -4990 | 10773 | 135x23 | Y | - | - | 選ばれるポイント |\n| 64 | 2:5378 | 使い方 | TEXT | -4825 | 10773 | 50x23 | Y | - | - | 使い方 |\n| 65 | 2:5379 | よくある質問 | TEXT | -4745 | 10773 | 101x23 | Y | - | - | よくある質問 |\n| 66 | 2:5380 | コラム | TEXT | -4614 | 10773 | 50x23 | Y | - | - | コラム |\n| 67 | 2:5381 | ▼アカウントをすでにお持ちの方 | TEXT | -4474 | 10773 | 254x23 | Y | - | - | ▼アカウントをすでにお持ちの方 |\n| 68 | 2:5382 | web版ログインはこちらから | TEXT | -4474 | 10806 | 218x23 | Y | - | - | web版ログインはこちらから |\n| 69 | 2:5383 | Group 25 | FRAME | -4474 | 10849 | 175x60 | N | 1TEX | - | ログイン |\n| 70 | 2:5386 | Line 11 | LINE | -5422 | 10949 | 1200x0 | Y | - | - | - |\n| 71 | 2:5370 | HIDANEについて | TEXT | -5422 | 10989 | 130x23 | Y | - | overflow-y | HIDANEについて |\n| 72 | 2:5371 | 運営会社 | TEXT | -5262 | 10991 | 59x20 | Y | - | overflow-y | 運営会社 |\n| 73 | 2:5372 | ｜ | TEXT | -5193 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 74 | 2:5373 | ｜ | TEXT | -5100 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 75 | 2:5374 | 利用規約 | TEXT | -5169 | 10991 | 59x20 | Y | - | overflow-y | 利用規約 |\n| 76 | 2:5375 | プライバシーポリシー | TEXT | -5076 | 10991 | 149x20 | Y | - | overflow-y | プライバシーポリシー |\n| 77 | 2:5376 | © 2023 Coachers Inc. | TEXT | -4899 | 11071 | 156x16 | Y | - | overflow-y | © 2023 Coachers Inc. |"
+}
