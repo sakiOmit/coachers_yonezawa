@@ -18,11 +18,14 @@ from collections import Counter
 
 GRID_SNAP = 4  # px — gap/padding snap unit (figma-prepare.md)
 SECTION_ROOT_WIDTH = 1440  # Figma page-level frame width
+SECTION_ROOT_WIDTH_RATIO = 0.9  # Issue 191: min width ratio for section root detection (>= 1296px)
 ROW_TOLERANCE = 20  # px — Y-coordinate grouping tolerance for WRAP/grid row detection (Issue 131)
 CV_THRESHOLD = 0.25  # Coefficient of variation threshold for regular spacing detection (Issue 138)
 FLAT_THRESHOLD = 15  # children — flat structure detection threshold (Issue 140)
 DEEP_NESTING_THRESHOLD = 6  # levels — deep nesting detection threshold (Issue 140)
 OFF_CANVAS_MARGIN = 1.5  # multiplier — elements with x > page_width * OFF_CANVAS_MARGIN are off-canvas (Issue 182)
+HORIZONTAL_BAR_MAX_HEIGHT = 100  # px — max Y-range for a horizontal bar pattern (Issue 184)
+HORIZONTAL_BAR_MIN_ELEMENTS = 4  # minimum elements in a horizontal bar (Issue 184)
 
 
 def yaml_str(value):
@@ -152,9 +155,11 @@ def snap(value, grid=GRID_SNAP):
 
 
 def is_section_root(node):
-    """Detect section-level frames (width ~1440, direct children of page).
+    """Detect section-level frames (width >= 90% of 1440px).
 
     Issue 53: Extracted from analyze-structure.sh to share with other scripts.
+    Issue 191: Relaxed width check from |width - 1440| < 10 to width >= 1296
+    to catch oversized footer wrappers (e.g. 2433px wide Group).
 
     Args:
         node: Figma node dict.
@@ -166,7 +171,9 @@ def is_section_root(node):
     width = bbox.get('width', 0)
     # Issue 116: Include COMPONENT/INSTANCE/SECTION types as section roots
     # (consistent with Issue 69/72 type extensions in other scripts)
-    return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and abs(width - SECTION_ROOT_WIDTH) < 10
+    # Issue 191: Relaxed width check — width >= SECTION_ROOT_WIDTH * 0.9 (1296px)
+    # catches both exact-match (~1440) and oversized wrappers (e.g. 2433px)
+    return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and width >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO
 
 
 def is_off_canvas(node, page_width):
@@ -1178,21 +1185,137 @@ def detect_highlight_text(children):
     return results
 
 
+# === Issue 184: Horizontal bar pattern detection ===
+
+
+def detect_horizontal_bar(children, parent_bb):
+    """Detect a horizontal bar pattern among siblings.
+
+    Pattern: A narrow Y-band (< 100px height) containing 4+ elements that are
+    horizontally distributed, with at least 1 background RECTANGLE. Common in
+    news tickers, notification bars, announcement strips.
+
+    Detection criteria:
+    1. 4+ siblings fall within a narrow Y-range (< HORIZONTAL_BAR_MAX_HEIGHT)
+    2. At least 1 RECTANGLE (leaf node) in the band acts as background
+    3. Elements are horizontally distributed (X variance > Y variance * 3)
+
+    Args:
+        children: List of sibling nodes (with absoluteBoundingBox resolved).
+        parent_bb: Parent bounding box dict with x, y, w, h.
+
+    Returns:
+        list: Grouping candidates with method='semantic', semantic_type='horizontal-bar'.
+
+    Issue 184: Horizontal bar (news ticker) grouping.
+    """
+    if len(children) < HORIZONTAL_BAR_MIN_ELEMENTS:
+        return []
+
+    bboxes = [get_bbox(c) for c in children]
+
+    # Find clusters of elements in narrow Y bands
+    # Sort by Y center
+    indexed = sorted(range(len(children)), key=lambda i: bboxes[i]['y'] + bboxes[i]['h'] / 2)
+
+    results = []
+    used = set()
+
+    for start in range(len(indexed)):
+        if indexed[start] in used:
+            continue
+        band_indices = [indexed[start]]
+        band_y_min = bboxes[indexed[start]]['y']
+        band_y_max = bboxes[indexed[start]]['y'] + bboxes[indexed[start]]['h']
+
+        for j in range(start + 1, len(indexed)):
+            if indexed[j] in used:
+                continue
+            idx = indexed[j]
+            el_y = bboxes[idx]['y']
+            el_bottom = el_y + bboxes[idx]['h']
+            new_y_min = min(band_y_min, el_y)
+            new_y_max = max(band_y_max, el_bottom)
+            if new_y_max - new_y_min <= HORIZONTAL_BAR_MAX_HEIGHT:
+                band_indices.append(idx)
+                band_y_min = new_y_min
+                band_y_max = new_y_max
+
+        if len(band_indices) < HORIZONTAL_BAR_MIN_ELEMENTS:
+            continue
+
+        # Check for at least 1 background RECTANGLE (leaf node)
+        has_rect_bg = False
+        for idx in band_indices:
+            c = children[idx]
+            if c.get('type') == 'RECTANGLE' and not c.get('children'):
+                has_rect_bg = True
+                break
+
+        if not has_rect_bg:
+            continue
+
+        # Check horizontal distribution: X variance > Y variance * 3
+        band_bboxes = [bboxes[i] for i in band_indices]
+        x_centers = [b['x'] + b['w'] / 2 for b in band_bboxes]
+        y_centers = [b['y'] + b['h'] / 2 for b in band_bboxes]
+        if len(x_centers) < 2:
+            continue
+        x_var = statistics.variance(x_centers)
+        y_var = statistics.variance(y_centers)
+        if x_var <= y_var * 3:
+            continue
+
+        # Infer name from text content
+        band_nodes = [children[i] for i in band_indices]
+        texts = get_text_children_content(band_nodes, max_items=5)
+        suggested_name = 'horizontal-bar'
+        for t in texts:
+            t_lower = t.lower()
+            if 'ニュース' in t_lower or 'news' in t_lower or 'お知らせ' in t_lower:
+                suggested_name = 'news-bar'
+                break
+            if 'ブログ' in t_lower or 'blog' in t_lower:
+                suggested_name = 'blog-bar'
+                break
+
+        for idx in band_indices:
+            used.add(idx)
+
+        results.append({
+            'method': 'semantic',
+            'semantic_type': 'horizontal-bar',
+            'node_ids': [children[i].get('id', '') for i in band_indices],
+            'node_names': [children[i].get('name', '') for i in band_indices],
+            'count': len(band_indices),
+            'suggested_name': suggested_name,
+            'suggested_wrapper': 'bar',
+        })
+
+    return results
+
+
 # === Issue 180: Background-content layer detection ===
 BG_WIDTH_RATIO = 0.8  # Background RECTANGLE must cover >=80% of parent width
 BG_MIN_HEIGHT_RATIO = 0.3  # Background must be >=30% of parent height
 BG_DECORATION_MAX_AREA_RATIO = 0.05  # Small same-positioned elements are decoration
+OVERFLOW_BG_MIN_WIDTH = 1400  # px — elements near/exceeding page width are bg candidates (Issue 183)
 
 
 def detect_bg_content_layers(children, parent_bb):
     """Detect background RECTANGLE + decoration vs content elements.
 
     Pattern: A full-width RECTANGLE (>=80% parent width) acts as a background layer.
+    Also detects oversized elements (width >= OVERFLOW_BG_MIN_WIDTH or x < 0) as
+    background candidates (Issue 183: overflow design elements).
     Small sibling elements (VECTOR, ELLIPSE) that overlap the RECTANGLE's position
     are treated as decoration (same visual layer). Everything else is content.
 
     Only triggers when:
-    1. There is exactly 1 full-width RECTANGLE among siblings (leaf node, no children)
+    1. There is exactly 1 bg-candidate RECTANGLE among siblings (leaf node, no children)
+       - Width >= 80% of parent width, OR
+       - Width >= OVERFLOW_BG_MIN_WIDTH (1400px), OR
+       - x < 0 (left overflow) and width >= parent width * 0.5
     2. The RECTANGLE covers >=30% of parent height (not just a thin divider)
     3. There are >=2 non-decoration siblings (content elements)
 
@@ -1212,7 +1335,8 @@ def detect_bg_content_layers(children, parent_bb):
     if not children or not parent_bb or parent_bb['w'] <= 0 or parent_bb['h'] <= 0:
         return []
 
-    # Step 1: Find full-width RECTANGLE siblings (leaf node)
+    # Step 1: Find background RECTANGLE siblings (leaf node)
+    # Issue 183: Also detect oversized elements (width >= OVERFLOW_BG_MIN_WIDTH or x < 0)
     bg_candidates = []
     for i, child in enumerate(children):
         if child.get('type') != 'RECTANGLE':
@@ -1223,8 +1347,11 @@ def detect_bg_content_layers(children, parent_bb):
         bb = get_bbox(child)
         if bb['w'] <= 0 or bb['h'] <= 0:
             continue
-        # Width >= 80% of parent width
-        if bb['w'] < parent_bb['w'] * BG_WIDTH_RATIO:
+        # Width check: original (>=80% parent) OR overflow (>=OVERFLOW_BG_MIN_WIDTH or x<0)
+        is_wide_enough = bb['w'] >= parent_bb['w'] * BG_WIDTH_RATIO
+        is_overflow = bb['w'] >= OVERFLOW_BG_MIN_WIDTH
+        is_left_overflow = bb['x'] < 0 and bb['w'] >= parent_bb['w'] * 0.5
+        if not (is_wide_enough or is_overflow or is_left_overflow):
             continue
         # Height >= 30% of parent height (not a thin divider)
         if bb['h'] < parent_bb['h'] * BG_MIN_HEIGHT_RATIO:

@@ -44,13 +44,14 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
     compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
-    get_text_children_content, to_kebab, ROW_TOLERANCE,
+    get_text_children_content, to_kebab, ROW_TOLERANCE, SECTION_ROOT_WIDTH,
     detect_consecutive_similar, detect_heading_content_pairs,
     find_absorbable_elements, is_heading_like, is_off_canvas,
     detect_bg_content_layers, BG_WIDTH_RATIO,
     detect_table_rows, TABLE_MIN_ROWS,
     detect_repeating_tuple, TUPLE_PATTERN_MIN, TUPLE_MAX_SIZE,
     detect_highlight_text, HIGHLIGHT_OVERLAP_RATIO,
+    detect_horizontal_bar, HORIZONTAL_BAR_MAX_HEIGHT, HORIZONTAL_BAR_MIN_ELEMENTS,
     CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE,
     OFF_CANVAS_MARGIN)
 
@@ -474,7 +475,8 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
     for n, bb in zip(zone_nodes, bboxes):
         t = n.get('type', '')
         # Large background: RECTANGLE/IMAGE covering >LARGE_BG_WIDTH_RATIO of page width
-        if t in ('RECTANGLE', 'IMAGE') and bb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO:  # Issue 135
+        # Issue 183: Also detect oversized elements (width > SECTION_ROOT_WIDTH)
+        if t in ('RECTANGLE', 'IMAGE') and (bb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO or bb['w'] > SECTION_ROOT_WIDTH):
             has_large_bg = True
         if t == 'TEXT':
             has_text = True
@@ -487,7 +489,7 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
             for child in n.get('children', []):
                 ct = child.get('type', '')
                 cbb = get_bbox(child)
-                if ct in ('RECTANGLE', 'IMAGE') and cbb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO:  # Issue 135
+                if ct in ('RECTANGLE', 'IMAGE') and (cbb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO or cbb['w'] > SECTION_ROOT_WIDTH):  # Issue 183
                     has_large_bg = True
 
     if is_near_top and has_large_bg and has_text:
@@ -627,6 +629,12 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
         # Issue 85: Header/footer detection
         header_footer = detect_header_footer_groups(children, page_bb)
         for g in header_footer:
+            g['parent_id'] = parent_id
+            g['parent_name'] = parent_name
+            all_candidates.append(g)
+        # Issue 184: Horizontal bar detection (before zone detection)
+        h_bars = detect_horizontal_bar(children, page_bb)
+        for g in h_bars:
             g['parent_id'] = parent_id
             g['parent_name'] = parent_name
             all_candidates.append(g)

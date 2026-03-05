@@ -48,6 +48,7 @@ from figma_utils import (
     BG_WIDTH_RATIO,
     BG_MIN_HEIGHT_RATIO,
     BG_DECORATION_MAX_AREA_RATIO,
+    OVERFLOW_BG_MIN_WIDTH,
     CONSECUTIVE_PATTERN_MIN,
     LOOSE_ELEMENT_MAX_HEIGHT,
     LOOSE_ABSORPTION_DISTANCE,
@@ -77,6 +78,9 @@ from figma_utils import (
     HIGHLIGHT_TEXT_MAX_LEN,
     HIGHLIGHT_HEIGHT_RATIO_MIN,
     HIGHLIGHT_HEIGHT_RATIO_MAX,
+    detect_horizontal_bar,
+    HORIZONTAL_BAR_MAX_HEIGHT,
+    HORIZONTAL_BAR_MIN_ELEMENTS,
 )
 
 SCRIPTS_DIR = os.path.join(SKILLS_DIR, "scripts")
@@ -253,7 +257,7 @@ class TestIsSectionRoot:
         {"type": "GROUP", "absoluteBoundingBox": {"width": 1440}},
         {"type": "TEXT", "absoluteBoundingBox": {"width": 1440}},
         {"type": "FRAME", "absoluteBoundingBox": {"width": 800}},
-        {"type": "FRAME", "absoluteBoundingBox": {"width": 1460}},
+        {"type": "FRAME", "absoluteBoundingBox": {"width": 1295}},
         {"type": "FRAME"},
         {"type": "FRAME", "absoluteBoundingBox": {}},
     ])
@@ -271,6 +275,18 @@ class TestIsSectionRoot:
     def test_section_section_root(self):
         """SECTION type with width 1440 is a section root."""
         assert is_section_root({"type": "SECTION", "absoluteBoundingBox": {"width": 1440}}) is True
+
+    def test_oversized_width_is_section_root(self):
+        """Issue 191: Oversized footer wrapper (width=2433) is a section root."""
+        assert is_section_root({"type": "FRAME", "absoluteBoundingBox": {"width": 2433}}) is True
+
+    def test_boundary_width_1296_is_section_root(self):
+        """Issue 191: Boundary at 90% of 1440 (width=1296) is a section root."""
+        assert is_section_root({"type": "FRAME", "absoluteBoundingBox": {"width": 1296}}) is True
+
+    def test_below_boundary_width_1295_not_section_root(self):
+        """Issue 191: Below 90% boundary (width=1295) is NOT a section root."""
+        assert is_section_root({"type": "FRAME", "absoluteBoundingBox": {"width": 1295}}) is False
 
 
 # ============================================================
@@ -2092,6 +2108,65 @@ class TestDetectBgContentLayers:
         assert BG_WIDTH_RATIO == 0.8
         assert BG_MIN_HEIGHT_RATIO == 0.3
         assert BG_DECORATION_MAX_AREA_RATIO == 0.05
+        assert OVERFLOW_BG_MIN_WIDTH == 1400
+
+    def test_oversized_element_detected_as_bg(self):
+        """Issue 183: Element wider than OVERFLOW_BG_MIN_WIDTH (1400px) -> bg candidate."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 1000}
+        children = [
+            # Oversized RECTANGLE: 1943px wide (exceeds page width), leaf node
+            {"id": "bg1", "type": "RECTANGLE", "name": "red-panel",
+             "absoluteBoundingBox": {"x": -200, "y": 0, "width": 1943, "height": 937}},
+            # content elements
+            {"id": "c1", "type": "TEXT", "name": "heading",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "content-group",
+             "absoluteBoundingBox": {"x": 100, "y": 200, "width": 600, "height": 300},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        cand = result[0]
+        assert cand['semantic_type'] == 'bg-content'
+        assert 'bg1' in cand['bg_node_ids']
+        assert set(cand['node_ids']) == {'c1', 'c2'}
+
+    def test_left_overflow_element_detected_as_bg(self):
+        """Issue 183: Element with x < 0 (left overflow) and width >= 50% parent -> bg candidate."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 1200}
+        children = [
+            # Left-overflow RECTANGLE: x=-143, width=1422 (>= 50% of 1440), leaf
+            {"id": "bg1", "type": "RECTANGLE", "name": "recruit_bg",
+             "absoluteBoundingBox": {"x": -143, "y": 200, "width": 1422, "height": 578}},
+            # content
+            {"id": "c1", "type": "TEXT", "name": "title",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 300, "height": 40}},
+            {"id": "c2", "type": "FRAME", "name": "content-frame",
+             "absoluteBoundingBox": {"x": 100, "y": 400, "width": 500, "height": 200},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        cand = result[0]
+        assert 'bg1' in cand['bg_node_ids']
+        assert set(cand['node_ids']) == {'c1', 'c2'}
+
+    def test_overflow_bg_wider_parent(self):
+        """Issue 183: RECTANGLE at OVERFLOW_BG_MIN_WIDTH in wider parent -> bg candidate via overflow check."""
+        # Parent width 2000 -> 80% = 1600. Width 1400 < 1600 would fail old check.
+        # But 1400 >= OVERFLOW_BG_MIN_WIDTH should pass new check.
+        parent_bb_wide = {'x': 0, 'y': 0, 'w': 2000, 'h': 800}
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "wide-bg",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1400, "height": 400}},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "TEXT", "name": "text2",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb_wide)
+        assert len(result) == 1
+        assert 'bg1' in result[0]['bg_node_ids']
 
 
 # ============================================================
@@ -4028,3 +4103,103 @@ class TestCollectTextPreview:
         from figma_utils import _collect_text_preview
         node = {'type': 'TEXT', 'characters': 'A' * 100, 'name': 'long'}
         assert len(_collect_text_preview(node, max_len=30)) == 30
+
+
+# ── Issue 184: Horizontal bar detection ──────────────────────────────
+
+
+class TestDetectHorizontalBar:
+    """Tests for detect_horizontal_bar() — Issue 184."""
+
+    def _make_parent_bb(self):
+        return {'x': 0, 'y': 0, 'w': 1440, 'h': 5000}
+
+    def test_news_bar_detected(self):
+        """6 elements in narrow Y band with RECTANGLE bg -> detected as horizontal bar."""
+        children = [
+            {'id': '1', 'name': 'Rectangle 1402', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 64, 'y': 732, 'width': 821, 'height': 74}},
+            {'id': '2', 'name': 'Group 75', 'type': 'GROUP',
+             'absoluteBoundingBox': {'x': 1057, 'y': 751, 'width': 35, 'height': 35},
+             'children': [{'id': '2a', 'type': 'VECTOR', 'name': 'arrow'}]},
+            {'id': '3', 'name': 'お知らせ一覧', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 911, 'y': 764, 'width': 100, 'height': 20},
+             'characters': 'お知らせ一覧'},
+            {'id': '4', 'name': '2023.12.24', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 293, 'y': 756, 'width': 400, 'height': 20},
+             'characters': '2023.12.24 テスト記事'},
+            {'id': '5', 'name': 'お知らせ', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 196, 'y': 759, 'width': 80, 'height': 20},
+             'characters': 'お知らせ'},
+            {'id': '6', 'name': 'NEWS', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 98, 'y': 753, 'width': 60, 'height': 20},
+             'characters': 'NEWS'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 1
+        r = results[0]
+        assert r['method'] == 'semantic'
+        assert r['semantic_type'] == 'horizontal-bar'
+        assert r['count'] == 6
+        assert r['suggested_name'] == 'news-bar'
+        assert set(r['node_ids']) == {'1', '2', '3', '4', '5', '6'}
+
+    def test_wide_y_range_not_detected(self):
+        """Elements spread across wide Y range (> 100px) -> not detected."""
+        children = [
+            {'id': '1', 'name': 'Rect', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 800, 'height': 50}},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 10, 'width': 100, 'height': 20},
+             'characters': 'A'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 300, 'y': 80, 'width': 100, 'height': 20},
+             'characters': 'B'},
+            {'id': '4', 'name': 'T3', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 500, 'y': 160, 'width': 100, 'height': 20},
+             'characters': 'C'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 0
+
+    def test_too_few_elements_not_detected(self):
+        """Only 3 elements -> not detected (below HORIZONTAL_BAR_MIN_ELEMENTS)."""
+        children = [
+            {'id': '1', 'name': 'Rect', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 800, 'height': 50}},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 200, 'y': 110, 'width': 100, 'height': 20},
+             'characters': 'A'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 500, 'y': 115, 'width': 100, 'height': 20},
+             'characters': 'B'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 0
+
+    def test_no_rectangle_bg_not_detected(self):
+        """No RECTANGLE background -> not detected."""
+        children = [
+            {'id': '1', 'name': 'G1', 'type': 'GROUP',
+             'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 50, 'height': 50},
+             'children': [{'id': '1a', 'type': 'VECTOR', 'name': 'v'}]},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 110, 'width': 100, 'height': 20},
+             'characters': 'A'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 300, 'y': 115, 'width': 100, 'height': 20},
+             'characters': 'B'},
+            {'id': '4', 'name': 'T3', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 500, 'y': 112, 'width': 100, 'height': 20},
+             'characters': 'C'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 0

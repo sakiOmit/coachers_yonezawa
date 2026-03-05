@@ -164,7 +164,8 @@ try:
     score -= min(30, unnamed_rate * 0.5)
     # Issue 89: flat_penalty accounts for both count and severity (excess children)
     # flat_sections × 5 (count-based) + flat_excess × 0.5 (severity-based)
-    score -= min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5)
+    # Issue 188: cap raised from 30 → 40 to differentiate extreme flat structures (85 vs 50 children)
+    score -= min(40, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5)
     score -= min(10, ungrouped * 1)  # cap=10, weight=1 (grouping is least reliable metric)
     score -= min(15, stats['deep_nesting'] * 3)
     # autolayout_penalty removed — unmeasurable via get_metadata
@@ -195,6 +196,7 @@ try:
             'total_nodes': stats['total'],
             'unnamed_nodes': stats['unnamed'],
             'unnamed_rate_pct': round(unnamed_rate, 1),
+            'named_rate_pct': round(100 - unnamed_rate, 1),  # Issue 188: distinguish bad-structure+good-naming from bad-all-around
             'flat_sections': stats['flat_sections'],
             'ungrouped_candidates': ungrouped,
             'deep_nesting_count': stats['deep_nesting'],
@@ -207,7 +209,7 @@ try:
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),
-            'flat_penalty': round(min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5), 1),  # Issue 105: consistent rounding
+            'flat_penalty': round(min(40, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5), 1),  # Issue 105: consistent rounding, Issue 188: cap 30→40
             'ungrouped_penalty': min(10, ungrouped * 1),
             'nesting_penalty': min(15, stats['deep_nesting'] * 3),
             'autolayout_penalty': 0,  # unmeasurable via get_metadata — excluded from score
