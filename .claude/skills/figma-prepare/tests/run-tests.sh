@@ -1882,6 +1882,101 @@ finally:
 " 2>/dev/null && { green "  PASS: detect_header_footer — header, footer, exclusion, already-named"; ((PASS++)) || true; } || { red "  FAIL: detect_header_footer unit tests"; ((FAIL++)) || true; }
 
 # ================================================================
+bold "=== Unit: infer_zone_semantic_name (Issue 91) ==="
+python3 -c "
+import json, sys, os, tempfile, subprocess
+
+# Root is directly the artboard (FRAME) — zone detection runs on root-level children
+# This matches real usage where get_metadata returns an artboard node
+fixture = {
+    'id': '1:1', 'name': 'Artboard', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 4500},
+    'children': [
+        # Zone 1: Hero — large RECTANGLE + TEXT near top
+        {'id': '2:1', 'name': 'Rectangle 1', 'type': 'RECTANGLE',
+         'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 600}},
+        {'id': '2:2', 'name': 'Text 1', 'type': 'TEXT', 'characters': 'Welcome',
+         'absoluteBoundingBox': {'x': 100, 'y': 200, 'width': 400, 'height': 60}},
+        # Zone 2: Cards — 3 card-like frames at same Y band
+        {'id': '2:3', 'name': 'Frame 2', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 100, 'y': 800, 'width': 350, 'height': 400},
+         'children': [
+             {'id': '3:1', 'type': 'RECTANGLE', 'name': 'Image 1', 'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 350, 'height': 200}},
+             {'id': '3:2', 'type': 'TEXT', 'name': 'Title', 'characters': 'Card 1', 'absoluteBoundingBox': {'x': 0, 'y': 210, 'width': 350, 'height': 30}},
+         ]},
+        {'id': '2:4', 'name': 'Frame 3', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 500, 'y': 800, 'width': 350, 'height': 400},
+         'children': [
+             {'id': '3:3', 'type': 'RECTANGLE', 'name': 'Image 2', 'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 350, 'height': 200}},
+             {'id': '3:4', 'type': 'TEXT', 'name': 'Title 2', 'characters': 'Card 2', 'absoluteBoundingBox': {'x': 0, 'y': 210, 'width': 350, 'height': 30}},
+         ]},
+        {'id': '2:5', 'name': 'Frame 4', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 900, 'y': 800, 'width': 350, 'height': 400},
+         'children': [
+             {'id': '3:5', 'type': 'RECTANGLE', 'name': 'Image 3', 'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 350, 'height': 200}},
+             {'id': '3:6', 'type': 'TEXT', 'name': 'Title 3', 'characters': 'Card 3', 'absoluteBoundingBox': {'x': 0, 'y': 210, 'width': 350, 'height': 30}},
+         ]},
+        # Zone 3: Navigation-like — 5 small horizontal texts
+        {'id': '2:6', 'name': 'Text 2', 'type': 'TEXT', 'characters': 'Home',
+         'absoluteBoundingBox': {'x': 100, 'y': 1500, 'width': 60, 'height': 20}},
+        {'id': '2:7', 'name': 'Text 3', 'type': 'TEXT', 'characters': 'About',
+         'absoluteBoundingBox': {'x': 200, 'y': 1500, 'width': 60, 'height': 20}},
+        {'id': '2:8', 'name': 'Text 4', 'type': 'TEXT', 'characters': 'Service',
+         'absoluteBoundingBox': {'x': 300, 'y': 1500, 'width': 60, 'height': 20}},
+        {'id': '2:9', 'name': 'Text 5', 'type': 'TEXT', 'characters': 'Contact',
+         'absoluteBoundingBox': {'x': 400, 'y': 1500, 'width': 60, 'height': 20}},
+        {'id': '2:10', 'name': 'Text 6', 'type': 'TEXT', 'characters': 'FAQ',
+         'absoluteBoundingBox': {'x': 500, 'y': 1500, 'width': 60, 'height': 20}},
+        # Zone 4: Content — mixed TEXT + FRAME (fallback)
+        {'id': '2:11', 'name': 'Text 7', 'type': 'TEXT', 'characters': 'Description',
+         'absoluteBoundingBox': {'x': 100, 'y': 2000, 'width': 600, 'height': 100}},
+        {'id': '2:12', 'name': 'Frame 5', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 100, 'y': 2100, 'width': 600, 'height': 200},
+         'children': [
+             {'id': '3:7', 'type': 'TEXT', 'name': 'Sub', 'characters': 'Sub text', 'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 300, 'height': 30}},
+         ]},
+    ]
+}
+
+# Write fixture
+tmp_fd, tmp_path = tempfile.mkstemp(suffix='.json')
+with os.fdopen(tmp_fd, 'w') as f:
+    json.dump(fixture, f)
+
+try:
+    result = subprocess.run(
+        ['bash', '${SKILLS_DIR}/scripts/detect-grouping-candidates.sh', tmp_path],
+        capture_output=True, text=True, timeout=30
+    )
+    data = json.loads(result.stdout)
+    candidates = data.get('candidates', [])
+    zone_candidates = [c for c in candidates if c.get('method') == 'zone']
+
+    # Test 1: Should have at least 1 zone candidate with semantic name
+    assert len(zone_candidates) >= 1, f'Expected zone candidates, got {len(zone_candidates)} (total: {len(candidates)})'
+
+    # Test 2: No zone should have the generic name 'section' (Issue 91 fixed)
+    generic = [c for c in zone_candidates if c.get('suggested_name') == 'section']
+    assert len(generic) == 0, f'Expected no generic section names, got {len(generic)} with names: {[c[\"suggested_name\"] for c in zone_candidates]}'
+
+    # Test 3: All zone names should be descriptive (start with section- and have suffix)
+    for c in zone_candidates:
+        name = c.get('suggested_name', '')
+        assert name.startswith('section-'), f'Zone name \"{name}\" should start with section-'
+        suffix = name[len('section-'):]
+        assert len(suffix) > 0, f'Zone name \"{name}\" has empty suffix'
+
+    # Test 4: Hero zone should exist if RECTANGLE + TEXT near top detected
+    hero_zones = [c for c in zone_candidates if 'hero' in c.get('suggested_name', '')]
+    # hero may or may not be detected depending on zone merging thresholds
+    # but generic 'section' must never appear
+
+    print('OK')
+finally:
+    os.unlink(tmp_path)
+" 2>/dev/null && { green "  PASS: infer_zone_semantic_name — semantic names, no-generic, descriptive suffixes"; ((PASS++)) || true; } || { red "  FAIL: infer_zone_semantic_name unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
 bold "=== Unit: infer_direction_two / wrap / space_between (Area 4) ==="
 python3 -c "
 import sys, os

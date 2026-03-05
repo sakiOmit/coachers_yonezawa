@@ -26,7 +26,8 @@ from collections import defaultdict
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
-    compute_grouping_score, structure_similarity, detect_regular_spacing)
+    compute_grouping_score, structure_similarity, detect_regular_spacing,
+    get_text_children_content, to_kebab)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -406,6 +407,76 @@ def detect_header_footer_groups(root_children, page_bb):
 
     return result
 
+def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
+    \"\"\"Infer a semantic name for a vertical zone based on child structure (Issue 91).
+
+    Analyzes the types, sizes, and content of zone members to classify:
+    - section-hero: Large background (IMAGE/RECTANGLE) + prominent text at page top
+    - section-cards-N: 3+ card-like children
+    - section-nav-N: Navigation-like horizontal text elements
+    - section-grid-N: Grid layout of similar-sized elements
+    - section-content-N: Default fallback
+
+    Args:
+        zone_nodes: List of nodes in this zone.
+        page_bb: Page bounding box for position-based heuristics.
+        zone_counters: Dict tracking how many of each type have been seen (mutated).
+
+    Returns:
+        str: Semantic section name.
+    \"\"\"
+    # Collect zone-level stats
+    types = [n.get('type', '') for n in zone_nodes]
+    bboxes = [get_bbox(n) for n in zone_nodes]
+    zone_top = min(b['y'] for b in bboxes)
+    page_top = page_bb['y']
+
+    # Hero detection: near page top + has large background + text
+    is_near_top = abs(zone_top - page_top) < 200
+    has_large_bg = False
+    has_text = False
+    for n, bb in zip(zone_nodes, bboxes):
+        t = n.get('type', '')
+        # Large background: RECTANGLE/IMAGE covering >60% of page width
+        if t in ('RECTANGLE', 'IMAGE') and bb['w'] > page_bb['w'] * 0.6:
+            has_large_bg = True
+        if t == 'TEXT':
+            has_text = True
+        # Check children of FRAME/GROUP for text
+        if t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
+            child_texts = get_text_children_content(n.get('children', []), max_items=3)
+            if child_texts:
+                has_text = True
+            # Nested large background
+            for child in n.get('children', []):
+                ct = child.get('type', '')
+                cbb = get_bbox(child)
+                if ct in ('RECTANGLE', 'IMAGE') and cbb['w'] > page_bb['w'] * 0.6:
+                    has_large_bg = True
+
+    if is_near_top and has_large_bg and has_text:
+        return 'section-hero'
+
+    # Card list detection: 3+ card-like elements
+    cards = [n for n in zone_nodes if is_card_like(n)]
+    if len(cards) >= 3:
+        zone_counters['cards'] = zone_counters.get('cards', 0) + 1
+        return f\"section-cards-{zone_counters['cards']}\"
+
+    # Grid detection
+    if len(zone_nodes) >= 4 and is_grid_like(zone_nodes):
+        zone_counters['grid'] = zone_counters.get('grid', 0) + 1
+        return f\"section-grid-{zone_counters['grid']}\"
+
+    # Navigation detection
+    if is_navigation_like(zone_nodes):
+        zone_counters['nav'] = zone_counters.get('nav', 0) + 1
+        return f\"section-nav-{zone_counters['nav']}\"
+
+    # Fallback: content with counter
+    zone_counters['content'] = zone_counters.get('content', 0) + 1
+    return f\"section-content-{zone_counters['content']}\"
+
 def detect_vertical_zone_groups(root_children, page_bb):
     \"\"\"Detect groups of elements occupying the same vertical zone (Issue 86).
 
@@ -414,6 +485,7 @@ def detect_vertical_zone_groups(root_children, page_bb):
     1. For each element, compute its Y range [top, bottom]
     2. Greedily merge elements whose Y ranges overlap by >= 50%
     3. Only report groups of 2+ elements that are not already detected
+    4. Infer semantic name from child structure (Issue 91)
 
     Skip elements already named with semantic names (HEADER, FOOTER, CTA, etc.)
     Only runs on root-level children.
@@ -462,16 +534,18 @@ def detect_vertical_zone_groups(root_children, page_bb):
 
     # Filter: only zones with 2+ elements that aren't already a single frame
     result = []
+    zone_counters = {}  # Track semantic name counters across zones (Issue 91)
     for z_top, z_bot, nodes in zones:
         if len(nodes) < 2:
             continue
+        semantic_name = infer_zone_semantic_name(nodes, page_bb, zone_counters)
         result.append({
             'method': 'zone',
             'semantic_type': 'vertical-zone',
             'node_ids': [n.get('id', '') for n in nodes],
             'node_names': [n.get('name', '') for n in nodes],
             'count': len(nodes),
-            'suggested_name': 'section',
+            'suggested_name': semantic_name,
             'suggested_wrapper': 'section',
         })
 
