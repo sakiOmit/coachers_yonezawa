@@ -29,6 +29,7 @@
  *     skipped: N,
  *     errors: [{ index, error }],
  *     wrappers: [{ id, name, childCount }],
+ *     total: N,
  *     batch: "1/3"
  *   }
  *
@@ -174,6 +175,7 @@
     skipped,
     errors,
     wrappers,
+    total: groupingPlan.length,
     batch: batchInfo,
   };
 }

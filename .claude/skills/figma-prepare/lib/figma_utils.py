@@ -147,7 +147,9 @@ def is_section_root(node):
     """
     bbox = node.get('absoluteBoundingBox') or {}
     width = bbox.get('width', 0)
-    return node.get('type') == 'FRAME' and abs(width - SECTION_ROOT_WIDTH) < 10
+    # Issue 116: Include COMPONENT/INSTANCE/SECTION types as section roots
+    # (consistent with Issue 69/72 type extensions in other scripts)
+    return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and abs(width - SECTION_ROOT_WIDTH) < 10
 
 
 def alignment_bonus(a_bb, b_bb, tolerance=2):

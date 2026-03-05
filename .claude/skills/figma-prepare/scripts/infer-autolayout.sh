@@ -258,7 +258,8 @@ try:
                 f.write(f'    gap: {r[\"layout\"][\"gap\"]}\\n')
                 p = r['layout']['padding']
                 f.write(f'    padding: [{p[\"top\"]}, {p[\"right\"]}, {p[\"bottom\"]}, {p[\"left\"]}]\\n')
-                f.write(f'    counter_align: {r[\"layout\"][\"counter_axis_align\"]}\\n')
+                f.write(f'    primary_axis_align: {r[\"layout\"][\"primary_axis_align\"]}\\n')
+                f.write(f'    counter_axis_align: {r[\"layout\"][\"counter_axis_align\"]}\\n')
                 f.write(f'    confidence: {r[\"layout\"][\"confidence\"]}\\n')
                 f.write(f'    source: {r[\"source\"]}\\n')  # Issue 74: include source in YAML output
         print(json.dumps({
