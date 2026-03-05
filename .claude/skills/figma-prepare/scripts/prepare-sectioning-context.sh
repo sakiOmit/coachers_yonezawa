@@ -61,6 +61,7 @@ def detect_heuristic_hints(children, page_bbox):
     if page_h <= 0:
         return {
             'header_candidates': [],
+            'header_cluster_ids': [],
             'footer_candidates': [],
             'gap_analysis': [],
             'background_candidates': [],
@@ -109,6 +110,27 @@ def detect_heuristic_hints(children, page_bbox):
             'between': [curr.get('id', ''), next_child.get('id', '')],
             'gap_px': gap_px,
         })
+
+    # --- Header cluster detection for flat structures (Issue 179) ---
+    # Detect a cluster of individual elements (logo + nav texts + CTA frame)
+    # in the header zone. This provides extra context for Stage B even when
+    # header_candidates already has entries (which may be false positives like hero).
+    header_cluster_ids = []
+    header_zone_top = page_y
+    header_zone_bottom = page_y + 120  # HEADER_ZONE_HEIGHT from figma-prepare rules
+    header_zone_elements = []
+    header_zone_texts = 0
+    for child in sorted_children:
+        bb_c = get_bbox(child)
+        # Element must start within header zone and bottom within zone + 50px margin
+        if bb_c['y'] >= header_zone_top and bb_c['y'] + bb_c['h'] <= header_zone_bottom + 50:
+            header_zone_elements.append(child.get('id', ''))
+            if child.get('type') == 'TEXT':
+                text_content = child.get('characters', child.get('name', ''))
+                if len(text_content) < 20:
+                    header_zone_texts += 1
+    if header_zone_texts >= 3 and len(header_zone_elements) >= 4:
+        header_cluster_ids = header_zone_elements
 
     # --- Consecutive similar patterns ---
     # Detect runs of 3+ consecutive children with similar structure hash
@@ -170,6 +192,7 @@ def detect_heuristic_hints(children, page_bbox):
 
     return {
         'header_candidates': header_candidates,
+        'header_cluster_ids': header_cluster_ids,
         'footer_candidates': footer_candidates,
         'gap_analysis': gap_analysis,
         'background_candidates': background_candidates,

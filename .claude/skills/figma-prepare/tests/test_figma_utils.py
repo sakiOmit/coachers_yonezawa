@@ -294,6 +294,26 @@ class TestGetRootNode:
         data = {"document": {"id": "doc"}, "node": {"id": "n"}}
         assert get_root_node(data)["id"] == "doc"
 
+    def test_rest_api_format(self):
+        """Issue 177: Support Figma REST API format nodes.{id}.document"""
+        data = {"nodes": {"38:718": {"document": {"id": "38:718", "type": "FRAME", "name": "Page"}}}}
+        root = get_root_node(data)
+        assert root["id"] == "38:718"
+        assert root["name"] == "Page"
+
+    def test_rest_api_multiple_nodes(self):
+        """Issue 177: First node in nodes dict is returned"""
+        data = {"nodes": {"1:1": {"document": {"id": "1:1"}}, "2:2": {"document": {"id": "2:2"}}}}
+        root = get_root_node(data)
+        assert root["id"] in ("1:1", "2:2")  # First node returned
+
+    def test_rest_api_no_document(self):
+        """Issue 177: nodes dict without document key falls through"""
+        data = {"nodes": {"1:1": {"components": {}}}}
+        # Should fall through to bare node behavior
+        root = get_root_node(data)
+        assert "nodes" in root  # Returns data itself as fallback
+
 
 # ============================================================
 # get_text_children_content

@@ -76,7 +76,19 @@ def get_bbox(node):
 
 
 def get_root_node(data):
-    """Extract root node from various data formats."""
+    """Extract root node from various data formats.
+
+    Supports:
+    - {'document': {...}} — direct format
+    - {'node': {...}} — alternative direct format
+    - {'nodes': {'38:718': {'document': {...}}}} — Figma REST API format
+    - Raw node data — fallback
+    """
+    # Figma REST API format: nodes.{nodeId}.document
+    if 'nodes' in data and isinstance(data['nodes'], dict):
+        for node_id, node_data in data['nodes'].items():
+            if isinstance(node_data, dict) and 'document' in node_data:
+                return node_data['document']
     if 'document' in data:
         return data['document']
     elif 'node' in data:
