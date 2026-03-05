@@ -208,8 +208,11 @@ check_doc_staleness() {
         found=1
       fi
     fi
-    # phase-details.md に「削除済み」の矛盾記述がないか
-    if grep -q "Stage A から削除済み" "$REFS_DIR/phase-details.md" 2>/dev/null; then
+    # phase-details.md に Stage A 機能の「削除」矛盾記述がないか (Issue 142: パターン修正)
+    # "fills 依存の...削除" は正当（Issue 29/30）。それ以外の「Stage A から削除」は矛盾の可能性
+    local stale_removal
+    stale_removal=$(grep "Stage A から削除" "$REFS_DIR/phase-details.md" 2>/dev/null | grep -v "fills 依存" || true)
+    if [[ -n "$stale_removal" ]]; then
       issue "doc-staleness: phase-details.md says feature removed from Stage A but it exists in implementation"
       found=1
     fi

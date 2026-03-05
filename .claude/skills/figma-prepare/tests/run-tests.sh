@@ -809,7 +809,7 @@ print('  PASS: Stage B — is_unnamed: 1:106=True, 1:5=False')
       # Test 11: --output file generation + JSON validation
       SEC_OUT="/tmp/figma-prepare-test-sectioning-$$.json"
       bash "$SKILLS_DIR/scripts/prepare-sectioning-context.sh" "$REALISTIC_FIXTURE" --output "$SEC_OUT" >/dev/null 2>&1
-      if [[ -f "$SEC_OUT" ]] && python3 -c "import json; json.load(open('$SEC_OUT'))" 2>/dev/null; then
+      if [[ -f "$SEC_OUT" ]] && python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$SEC_OUT" 2>/dev/null; then
         green "  PASS: Stage B — --output file generated + valid JSON"
         ((PASS++)) || true
       else
@@ -1695,6 +1695,38 @@ assert detect_regular_spacing(vboxes) == True, 'vertical even spacing should be 
 
 print('OK')
 " 2>/dev/null && { green "  PASS: structure_similarity / detect_regular_spacing — identical, diff, partial, leaf, card, empty, regular, irregular"; ((PASS++)) || true; } || { red "  FAIL: structure_similarity / detect_regular_spacing unit tests"; ((FAIL++)) || true; }
+
+# ================================================================
+bold "=== Unit: structure_hash direct test (Issue 144) ==="
+python3 -c "
+import sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+from figma_utils import structure_hash
+
+# Leaf node — returns just TYPE
+assert structure_hash({'type': 'TEXT'}) == 'TEXT', 'leaf TEXT'
+assert structure_hash({'type': 'IMAGE', 'children': []}) == 'IMAGE', 'empty children'
+assert structure_hash({}) == 'UNKNOWN', 'missing type'
+
+# Node with children — sorted child types
+node = {'type': 'FRAME', 'children': [
+    {'type': 'TEXT'}, {'type': 'IMAGE'}, {'type': 'TEXT'}
+]}
+h = structure_hash(node)
+assert h == 'FRAME:[IMAGE,TEXT,TEXT]', f'expected sorted children, got {h}'
+
+# Single child
+node2 = {'type': 'FRAME', 'children': [{'type': 'RECTANGLE'}]}
+assert structure_hash(node2) == 'FRAME:[RECTANGLE]', 'single child'
+
+# INSTANCE type
+node3 = {'type': 'INSTANCE', 'children': [
+    {'type': 'FRAME'}, {'type': 'TEXT'}
+]}
+assert structure_hash(node3) == 'INSTANCE:[FRAME,TEXT]', 'INSTANCE parent'
+
+print('OK')
+" "$SKILLS_DIR" 2>/dev/null && { green "  PASS: structure_hash — leaf, empty, missing type, sorted children, single, INSTANCE"; ((PASS++)) || true; } || { red "  FAIL: structure_hash direct unit tests"; ((FAIL++)) || true; }
 
 # ================================================================
 bold "=== Unit: semantic_detection (Area 3) ==="

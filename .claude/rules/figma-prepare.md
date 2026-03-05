@@ -74,6 +74,7 @@ score = max(0, score)
 | deep_nesting_threshold | 6 levels | 深すぎるネストの閾値 |
 | batch_size | 50 nodes | Chrome DevTools実行時のバッチサイズ |
 | variance_ratio | 1.5 | Auto Layout方向判定（X分散 > Y分散 × ratio → HORIZONTAL） |
+| cv_threshold | 0.25 | 等間隔スペーシング検出の変動係数閾値（Issue 138） |
 | spatial_gap_threshold | 100px | サブグループ分割の最小ギャップ |
 | header_zone_height | 120px | ヘッダー検出ゾーン（ページ上端からの距離） |
 | footer_zone_height | 300px | フッター検出ゾーン（ページ下端からの距離） |

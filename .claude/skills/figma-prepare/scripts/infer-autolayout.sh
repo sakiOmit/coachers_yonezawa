@@ -261,6 +261,7 @@ try:
             for r in results:
                 f.write(f'  - node_id: {yaml_str(r[\"node_id\"])}\\n')
                 f.write(f'    name: {yaml_str(r[\"node_name\"])}\\n')
+                f.write(f'    node_type: {r.get(\"node_type\", \"FRAME\")}\\n')
                 f.write(f'    children: {r[\"child_count\"]}\\n')
                 f.write(f'    direction: {r[\"layout\"][\"direction\"]}\\n')
                 f.write(f'    gap: {r[\"layout\"][\"gap\"]}\\n')

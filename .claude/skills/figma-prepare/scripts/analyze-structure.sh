@@ -19,10 +19,7 @@ python3 -c "
 import json, re, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, is_section_root
-
-FLAT_THRESHOLD = 15
-DEEP_NESTING_THRESHOLD = 6
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, is_section_root, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD
 
 def count_nodes(node, depth=0, section_depth=None):
     \"\"\"Recursively count nodes and collect metrics.

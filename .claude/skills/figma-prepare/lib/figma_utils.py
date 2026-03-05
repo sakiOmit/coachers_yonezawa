@@ -19,6 +19,9 @@ from collections import Counter
 GRID_SNAP = 4  # px — gap/padding snap unit (figma-prepare.md)
 SECTION_ROOT_WIDTH = 1440  # Figma page-level frame width
 ROW_TOLERANCE = 20  # px — Y-coordinate grouping tolerance for WRAP/grid row detection (Issue 131)
+CV_THRESHOLD = 0.25  # Coefficient of variation threshold for regular spacing detection (Issue 138)
+FLAT_THRESHOLD = 15  # children — flat structure detection threshold (Issue 140)
+DEEP_NESTING_THRESHOLD = 6  # levels — deep nesting detection threshold (Issue 140)
 
 
 def yaml_str(value):
@@ -312,7 +315,7 @@ def detect_regular_spacing(children_bboxes, axis='auto'):
         return False
     std_gap = statistics.stdev(gaps)
     cv = std_gap / mean_gap
-    return cv < 0.25
+    return cv < CV_THRESHOLD
 
 
 def infer_direction_two_elements(c1_bb, c2_bb):

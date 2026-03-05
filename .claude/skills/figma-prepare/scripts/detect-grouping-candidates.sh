@@ -244,8 +244,8 @@ def is_navigation_like(children):
     y_range = max(ys) - min(ys) if ys else 0
     if x_range <= y_range:
         return False  # not horizontal
-    # Check all elements are narrow (text-like)
-    return all(b['w'] < 200 for b in bboxes)
+    # Check all elements are narrow (text-like) — Issue 141: use named constant
+    return all(b['w'] < HEADER_TEXT_MAX_WIDTH for b in bboxes)
 
 def is_grid_like(children):
     \"\"\"Detect grid-like pattern: 2+ rows x 2+ columns of similar-sized elements.\"\"\"
