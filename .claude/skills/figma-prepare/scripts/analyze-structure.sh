@@ -2,7 +2,7 @@
 # Phase 1: Figma Structure Quality Analysis
 #
 # Usage: bash analyze-structure.sh <metadata.json>
-# Input: Figma get_metadata XML output saved as JSON (with 'xml' key)
+# Input: Figma get_metadata output (JSON with 'document' or 'node' key)
 # Output: JSON with quality score, grade, and issue breakdown
 # Exit: 0=success, 1=error
 

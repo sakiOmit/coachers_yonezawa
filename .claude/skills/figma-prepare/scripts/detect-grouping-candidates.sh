@@ -27,7 +27,7 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
     compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
-    get_text_children_content, to_kebab)
+    get_text_children_content, to_kebab, ROW_TOLERANCE)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -39,6 +39,14 @@ ZONE_OVERLAP_ITEM = 0.5   # 50% overlap required for item merging (Issue 121)
 ZONE_OVERLAP_ZONE = 0.3   # 30% overlap required for zone expansion (Issue 121)
 HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for elements in header zone (Issue 125)
 FOOTER_ZONE_MARGIN = 50   # px — extra margin for footer zone bottom check (Issue 129)
+# Issue 134: Header validation constants
+HEADER_TEXT_MAX_WIDTH = 200  # px — max width for nav-like text elements in header
+HEADER_LOGO_MAX_WIDTH = 300  # px — max width for logo-like elements in header
+HEADER_LOGO_MAX_HEIGHT = 100  # px — max height for logo-like elements in header
+HEADER_NAV_MIN_TEXTS = 3  # min number of text elements for nav detection in header
+# Issue 135: Zone semantic name constants
+HERO_ZONE_DISTANCE = 200  # px — max distance from page top for hero detection
+LARGE_BG_WIDTH_RATIO = 0.6  # ratio of page width for large background detection
 
 class UnionFind:
     def __init__(self, n):
@@ -157,16 +165,16 @@ def _split_by_spatial_gap(nodes, gap_threshold=SPATIAL_GAP_THRESHOLD):
     ys = [b['y'] for b in bboxes]
 
     # Detect rows by Y coordinate (Issue 88: grid-aware splitting)
-    row_tolerance = 20
-    y_rows = set(round(y / row_tolerance) for y in ys)
+    # Issue 131: Use shared ROW_TOLERANCE constant
+    y_rows = set(round(y / ROW_TOLERANCE) for y in ys)
     is_grid = len(y_rows) >= 2  # multiple Y rows → grid layout
 
     if is_grid:
         # Grid: sort by Y (row), then X within row → split by row gaps
-        sorted_pairs = sorted(zip(bboxes, nodes), key=lambda p: (round(p[0]['y'] / row_tolerance), p[0]['x']))
+        sorted_pairs = sorted(zip(bboxes, nodes), key=lambda p: (round(p[0]['y'] / ROW_TOLERANCE), p[0]['x']))
         def gap_fn(a, b):
             # Only count gap when moving to a new row
-            if round(a['y'] / row_tolerance) == round(b['y'] / row_tolerance):
+            if round(a['y'] / ROW_TOLERANCE) == round(b['y'] / ROW_TOLERANCE):
                 return 0  # same row
             return b['y'] - (a['y'] + a['h'])
     else:
@@ -246,10 +254,10 @@ def is_grid_like(children):
     bboxes = [get_bbox(c) for c in children]
 
     # Group by Y position (row detection)
-    row_tolerance = 20
+    # Issue 131: Use shared ROW_TOLERANCE constant
     rows = defaultdict(list)
     for b in bboxes:
-        row_key = round(b['y'] / row_tolerance)
+        row_key = round(b['y'] / ROW_TOLERANCE)
         rows[row_key].append(b)
 
     if len(rows) < 2:
@@ -365,23 +373,23 @@ def detect_header_footer_groups(root_children, page_bb):
             t = c.get('type', '')
             if t == 'TEXT':
                 bb = get_bbox(c)
-                if bb['w'] < 200:  # text-like width
+                if bb['w'] < HEADER_TEXT_MAX_WIDTH:  # Issue 134: text-like width
                     nav_texts.append(c)
             elif t in ('VECTOR', 'IMAGE', 'RECTANGLE'):
                 bb = get_bbox(c)
-                if bb['w'] < 300 and bb['h'] < 100:  # logo-like size
+                if bb['w'] < HEADER_LOGO_MAX_WIDTH and bb['h'] < HEADER_LOGO_MAX_HEIGHT:  # Issue 134: logo-like size
                     has_logo = True
             elif t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                 # Check if it contains nav-like elements
                 sub_children = c.get('children', [])
                 sub_texts = [sc for sc in sub_children if sc.get('type') == 'TEXT']
-                if len(sub_texts) >= 3:
+                if len(sub_texts) >= HEADER_NAV_MIN_TEXTS:  # Issue 134
                     has_nav_text = True
                 # Could be a logo wrapper
                 if len(sub_children) <= 2:
                     has_logo = True
 
-        if len(nav_texts) >= 3:
+        if len(nav_texts) >= HEADER_NAV_MIN_TEXTS:  # Issue 134
             has_nav_text = True
 
         # Require either nav texts or logo for header detection
@@ -435,13 +443,13 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
     page_top = page_bb['y']
 
     # Hero detection: near page top + has large background + text
-    is_near_top = abs(zone_top - page_top) < 200
+    is_near_top = abs(zone_top - page_top) < HERO_ZONE_DISTANCE  # Issue 135
     has_large_bg = False
     has_text = False
     for n, bb in zip(zone_nodes, bboxes):
         t = n.get('type', '')
-        # Large background: RECTANGLE/IMAGE covering >60% of page width
-        if t in ('RECTANGLE', 'IMAGE') and bb['w'] > page_bb['w'] * 0.6:
+        # Large background: RECTANGLE/IMAGE covering >LARGE_BG_WIDTH_RATIO of page width
+        if t in ('RECTANGLE', 'IMAGE') and bb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO:  # Issue 135
             has_large_bg = True
         if t == 'TEXT':
             has_text = True
@@ -454,7 +462,7 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
             for child in n.get('children', []):
                 ct = child.get('type', '')
                 cbb = get_bbox(child)
-                if ct in ('RECTANGLE', 'IMAGE') and cbb['w'] > page_bb['w'] * 0.6:
+                if ct in ('RECTANGLE', 'IMAGE') and cbb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO:  # Issue 135
                     has_large_bg = True
 
     if is_near_top and has_large_bg and has_text:

@@ -18,6 +18,7 @@ from collections import Counter
 
 GRID_SNAP = 4  # px — gap/padding snap unit (figma-prepare.md)
 SECTION_ROOT_WIDTH = 1440  # Figma page-level frame width
+ROW_TOLERANCE = 20  # px — Y-coordinate grouping tolerance for WRAP/grid row detection (Issue 131)
 
 
 def yaml_str(value):
@@ -216,7 +217,12 @@ def compute_grouping_score(a_bb, b_bb, gap=24):
     Returns 0.0-1.0. Score > 0.5 indicates grouping candidate.
 
     Backward compatible: raw distance <= gap always yields score >= 0.5.
+    Issue 136: Guard against gap <= 0 to prevent ZeroDivisionError.
     """
+    if gap <= 0:
+        # With zero gap, only overlapping/touching elements score 1.0
+        raw = _raw_distance(a_bb, b_bb)
+        return 1.0 if raw == 0 else 0.0
     raw = _raw_distance(a_bb, b_bb)
     effective = raw * alignment_bonus(a_bb, b_bb) * size_similarity_bonus(a_bb, b_bb)
     return max(0.0, 1.0 - effective / (gap * 2))
@@ -325,17 +331,20 @@ def infer_direction_two_elements(c1_bb, c2_bb):
     return 'HORIZONTAL' if dx > dy else 'VERTICAL'
 
 
-def detect_wrap(children_bboxes, direction, row_tolerance=20):
+def detect_wrap(children_bboxes, direction, row_tolerance=None):
     """Detect if children wrap to multiple rows/columns.
 
     Args:
         children_bboxes: List of bbox dicts.
         direction: 'HORIZONTAL' or 'VERTICAL'.
         row_tolerance: Max Y (or X) difference to be considered same row.
+            Defaults to ROW_TOLERANCE (Issue 131).
 
     Returns:
         bool: True if HORIZONTAL with 4+ elements wrapping to 2+ rows.
     """
+    if row_tolerance is None:
+        row_tolerance = ROW_TOLERANCE
     if direction != 'HORIZONTAL' or len(children_bboxes) < 4:
         return False
 

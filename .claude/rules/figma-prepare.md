@@ -96,6 +96,13 @@ score = max(0, score)
 | nav_min_text_count | 4 items | ナビゲーション検出の最小TEXT子要素数（Phase 3 リネーム、Issue 124） |
 | nav_max_text_len | 20 chars | ナビゲーション項目の最大文字数（Phase 3 リネーム、Issue 124） |
 | nav_grandchild_min | 4 items | ヘッダーナビ検出の最小TEXTグランドチャイルド数（Phase 3 リネーム、Issue 124） |
+| row_tolerance | 20px | WRAP/グリッド行検出のY座標グルーピング許容差（Issue 131） |
+| header_text_max_width | 200px | ヘッダーナビテキスト要素の最大幅（Phase 2 検出、Issue 134） |
+| header_logo_max_width | 300px | ヘッダーロゴ要素の最大幅（Phase 2 検出、Issue 134） |
+| header_logo_max_height | 100px | ヘッダーロゴ要素の最大高さ（Phase 2 検出、Issue 134） |
+| header_nav_min_texts | 3 items | ヘッダーナビ検出の最小TEXT数（Phase 2 検出、Issue 134） |
+| hero_zone_distance | 200px | ヒーロー検出のページ上端からの最大距離（Phase 2 ゾーン命名、Issue 135） |
+| large_bg_width_ratio | 0.6 | 大背景検出のページ幅比率（Phase 2 ゾーン命名、Issue 135） |
 
 ## リネームロジック（優先順）
 

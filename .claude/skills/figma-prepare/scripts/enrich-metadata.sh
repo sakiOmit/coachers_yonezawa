@@ -45,7 +45,8 @@ from figma_utils import get_root_node
 # Properties to merge from enrichment into metadata nodes
 ENRICHMENT_KEYS = [
     'fills', 'strokes', 'effects',
-    'layoutMode', 'itemSpacing',
+    'layoutMode', 'layoutWrap',  # Issue 137: layoutWrap for WRAP detection
+    'itemSpacing',
     'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
     'primaryAxisAlignItems', 'counterAxisAlignItems',
     'characters', 'style',

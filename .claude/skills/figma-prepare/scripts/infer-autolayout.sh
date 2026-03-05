@@ -25,7 +25,7 @@ import json, sys, statistics, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP,
-    infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency)
+    ROW_TOLERANCE, infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency)
 
 VARIANCE_RATIO = 1.5
 
@@ -75,10 +75,9 @@ def infer_layout(frame):
     # Gap inference
     if is_wrap:
         # For WRAP, calculate gap within rows only
-        row_tolerance = 20
         rows = {}
         for bb in child_bboxes:
-            row_key = round(bb['y'] / row_tolerance)
+            row_key = round(bb['y'] / ROW_TOLERANCE)  # Issue 131: use shared constant
             rows.setdefault(row_key, []).append(bb)
         gaps = []
         for row_bbs in rows.values():
@@ -170,12 +169,16 @@ def infer_layout(frame):
 
 def layout_from_enrichment(frame):
     \"\"\"Extract Auto Layout settings from enriched metadata (Issue 18).
-    Returns layout dict if layoutMode is present, None otherwise.\"\"\"
+    Returns layout dict if layoutMode is present, None otherwise.
+    Issue 132: Handles layoutWrap='WRAP' by converting direction to 'WRAP'.\"\"\"
     layout_mode = frame.get('layoutMode')
     if not layout_mode:
         return None
 
     direction = layout_mode  # HORIZONTAL or VERTICAL
+    # Issue 132: Check for WRAP layout
+    if frame.get('layoutWrap') == 'WRAP':
+        direction = 'WRAP'
     # Issue 63: Do not snap exact Figma values — preserve original design intent
     item_gap = int(frame.get('itemSpacing', 0))
     padding = {
