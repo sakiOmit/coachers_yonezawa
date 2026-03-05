@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP, detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE, CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD, SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, is_decoration_pattern, decoration_dominant_shape
 
 # --- Rename Thresholds (Issue 124) ---
 DIVIDER_MAX_HEIGHT = 5         # px — thin horizontal rectangle → divider
@@ -173,6 +173,50 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
                     if text_count >= max(len(children) * 0.3, 1):
                         return 'footer'
 
+    # Priority 3.15: CTA square button detection (Issue 193)
+    # Nearly square element at top-right with CTA keyword text
+    CTA_KEYWORDS = ['お問い合わせ', '問い合わせ', 'contact', '資料請求', '相談', '申し込み', '申込']
+    if w > 0 and h > 0 and parent:
+        wh_ratio = w / h
+        parent_bbox = parent.get('absoluteBoundingBox', {})
+        parent_w = parent_bbox.get('width', 0) or SECTION_ROOT_WIDTH
+        parent_y = parent_bbox.get('y', 0)
+        node_x = abs_bbox.get('x', 0)
+        node_y = abs_bbox.get('y', 0)
+        relative_y = node_y - parent_y
+        if (CTA_SQUARE_RATIO_MIN <= wh_ratio <= CTA_SQUARE_RATIO_MAX
+                and node_x > parent_w * 0.8
+                and relative_y < CTA_Y_THRESHOLD):
+            # Check for CTA keyword text in children or self
+            cta_texts = []
+            if node_type == 'TEXT':
+                cta_texts = [node.get('characters', '') or name]
+            elif children:
+                cta_texts = get_text_children_content(children)
+                if not cta_texts:
+                    for c in children[:5]:
+                        for gc in c.get('children', []):
+                            if gc.get('type') == 'TEXT':
+                                content = gc.get('characters', '') or gc.get('name', '')
+                                if content:
+                                    cta_texts.append(content)
+            for ct in cta_texts:
+                ct_lower = ct.lower().strip()
+                if any(kw in ct_lower for kw in CTA_KEYWORDS):
+                    slug = to_kebab(ct[:20])
+                    return f'cta-{slug}' if slug and slug != 'content' else f'cta-{sibling_index}'
+
+    # Priority 3.16: Side panel detection (Issue 192)
+    # Narrow vertical frame at page edge (SNS links, scroll indicators)
+    if w > 0 and h > 0 and w <= SIDE_PANEL_MAX_WIDTH and h > w * SIDE_PANEL_HEIGHT_RATIO and parent:
+        parent_bbox = parent.get('absoluteBoundingBox', {})
+        parent_w = parent_bbox.get('width', 0) or SECTION_ROOT_WIDTH
+        node_x = abs_bbox.get('x', 0)
+        parent_x = parent_bbox.get('x', 0)
+        relative_x = node_x - parent_x
+        if relative_x > parent_w * 0.9 or relative_x < parent_w * 0.1:
+            return f'side-panel-{sibling_index}'
+
     # Priority 3.2: Tiny empty frame → icon
     if not children and w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE:
         return f'icon-{sibling_index}'
@@ -186,6 +230,14 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         # Navigation: 4+ short text children → nav
         if text_count >= NAV_MIN_TEXT_COUNT and all(len(t) <= NAV_MAX_TEXT_LEN for t in text_contents):
             return f'nav-{sibling_index}'
+
+        # Priority 4.0: Decoration pattern detection (Issue 189)
+        if is_decoration_pattern(node):
+            dominant = decoration_dominant_shape(node)
+            if dominant == 'ELLIPSE':
+                return f'decoration-dots-{sibling_index}'
+            else:
+                return f'decoration-pattern-{sibling_index}'
 
         # Priority 4: Child structure analysis
         child_types = [c.get('type', '') for c in children]
@@ -294,10 +346,12 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     type_prefix = node_type.lower().replace('_', '-')
     return f'{type_prefix}-{sibling_index}'
 
-def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, renames=None):
+def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, renames=None, en_jp_overrides=None):
     \"\"\"Recursively collect rename candidates.\"\"\"
     if renames is None:
         renames = {}
+    if en_jp_overrides is None:
+        en_jp_overrides = {}
 
     if node.get('visible') == False:
         return renames
@@ -305,7 +359,17 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
     name = node.get('name', '')
     node_id = node.get('id', '')
 
-    if UNNAMED_RE.match(name) and node_id:
+    # Issue 185: Check if this node has an EN+JP pair override
+    if node_id in en_jp_overrides:
+        override_name = en_jp_overrides[node_id]
+        if override_name != name:
+            renames[node_id] = {
+                'old_name': name,
+                'new_name': override_name,
+                'type': node.get('type', ''),
+                'inference_method': 'en_jp_pair',
+            }
+    elif UNNAMED_RE.match(name) and node_id:
         new_name = infer_name(node, parent, sibling_index, total_siblings)
         if new_name and new_name != name:
             renames[node_id] = {
@@ -316,8 +380,33 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
             }
 
     children = node.get('children', [])
+
+    # Issue 185: Detect EN+JP label pairs among children
+    child_overrides = {}
+    if children:
+        pairs = detect_en_jp_label_pairs(children)
+        for pair in pairs:
+            en_child = children[pair['en_idx']]
+            jp_child = children[pair['jp_idx']]
+            en_id = en_child.get('id', '')
+            jp_id = jp_child.get('id', '')
+            en_name_val = en_child.get('name', '')
+            jp_name_val = jp_child.get('name', '')
+            en_slug = to_kebab(pair['en_text'][:20])
+            # Only override unnamed nodes
+            if en_id and UNNAMED_RE.match(en_name_val):
+                child_overrides[en_id] = f'en-label-{en_slug}' if en_slug and en_slug != 'content' else f'en-label-{pair[\"en_idx\"]}'
+            if jp_id and UNNAMED_RE.match(jp_name_val):
+                jp_slug = _jp_keyword_lookup(pair['jp_text'])
+                if not jp_slug:
+                    jp_slug = to_kebab(pair['jp_text'][:30])
+                if jp_slug and jp_slug != 'content':
+                    child_overrides[jp_id] = f'heading-{jp_slug}'
+                else:
+                    child_overrides[jp_id] = f'heading-{pair[\"jp_idx\"]}'
+
     for i, child in enumerate(children):
-        collect_renames(child, node, i, len(children), renames)
+        collect_renames(child, node, i, len(children), renames, child_overrides)
 
     return renames
 

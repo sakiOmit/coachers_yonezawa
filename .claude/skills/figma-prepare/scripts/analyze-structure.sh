@@ -19,13 +19,14 @@ python3 -c "
 import json, re, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, is_section_root, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, is_section_root, is_off_canvas, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
 
-def count_nodes(node, depth=0, section_depth=None):
+def count_nodes(node, depth=0, section_depth=None, page_width=0):
     \"\"\"Recursively count nodes and collect metrics.
 
     depth: absolute depth from root (for reference)
     section_depth: relative depth from nearest section root (for nesting check)
+    page_width: width of the page root (for off-canvas detection, Issue 182)
     \"\"\"
     stats = {
         'total': 0,
@@ -38,7 +39,19 @@ def count_nodes(node, depth=0, section_depth=None):
         'max_section_depth': section_depth if section_depth is not None else 0,  # Issue 71: track relative depth separately
         'frames': 0,
         'unnamed_names': [],
+        'hidden_nodes': 0,  # Issue 187: count of hidden nodes skipped
+        'off_canvas_nodes': 0,  # Issue 182: count of off-canvas nodes skipped
     }
+
+    # Issue 187: Skip hidden (visible: false) nodes entirely
+    if node.get('visible') == False:
+        stats['hidden_nodes'] = 1
+        return stats
+
+    # Issue 182: Skip off-canvas nodes at top level (direct children of root)
+    if page_width > 0 and depth == 1 and is_off_canvas(node, page_width):
+        stats['off_canvas_nodes'] = 1
+        return stats
 
     name = node.get('name', '')
     node_type = node.get('type', '')
@@ -83,7 +96,7 @@ def count_nodes(node, depth=0, section_depth=None):
     # Recurse children
     child_section_depth = (section_depth + 1) if section_depth is not None else None
     for child in children:
-        child_stats = count_nodes(child, depth + 1, child_section_depth)
+        child_stats = count_nodes(child, depth + 1, child_section_depth, page_width)
         stats['total'] += child_stats['total']
         stats['unnamed'] += child_stats['unnamed']
         stats['flat_sections'] += child_stats['flat_sections']
@@ -94,6 +107,8 @@ def count_nodes(node, depth=0, section_depth=None):
         stats['max_depth'] = max(stats['max_depth'], child_stats['max_depth'])
         stats['max_section_depth'] = max(stats['max_section_depth'], child_stats['max_section_depth'])  # Issue 71
         stats['unnamed_names'].extend(child_stats['unnamed_names'])
+        stats['hidden_nodes'] += child_stats['hidden_nodes']  # Issue 187
+        stats['off_canvas_nodes'] += child_stats['off_canvas_nodes']  # Issue 182
 
     return stats
 
@@ -132,7 +147,10 @@ try:
 
     root = get_root_node(data)
     resolve_absolute_coords(root)
-    stats = count_nodes(root)
+    # Issue 182: Determine page width for off-canvas detection
+    root_bb = get_bbox(root)
+    page_width = root_bb.get('w', 0) if root_bb else 0
+    stats = count_nodes(root, page_width=page_width)
     ungrouped = detect_grouping_candidates(root)
 
     # Calculate quality score
@@ -184,6 +202,8 @@ try:
             'total_frames': stats['frames'],
             'max_depth': stats['max_depth'],
             'max_section_depth': stats['max_section_depth'],  # Issue 71: relative depth used for nesting scoring
+            'hidden_nodes': stats['hidden_nodes'],  # Issue 187: nodes skipped due to visible: false
+            'off_canvas_nodes': stats['off_canvas_nodes'],  # Issue 182: nodes skipped due to off-canvas position
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),

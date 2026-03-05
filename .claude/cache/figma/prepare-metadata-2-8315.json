@@ -1,0 +1,2537 @@
+{
+  "document": {
+    "id": "2:8315",
+    "type": "FRAME",
+    "name": "トップ_0510修正",
+    "absoluteBoundingBox": {
+      "x": -2960.0,
+      "y": 348.0,
+      "width": 1440.0,
+      "height": 5273.0
+    },
+    "children": [
+      {
+        "id": "2:8316",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1548",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 1440.0,
+          "height": 720.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8317",
+        "type": "VECTOR",
+        "name": "Rectangle 1549",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 1440.0,
+          "height": 720.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8318",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1403",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 3599.0,
+          "width": 1873.0,
+          "height": 654.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8319",
+        "type": "INSTANCE",
+        "name": "button",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 4115.0,
+          "width": 182.0,
+          "height": 38.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8320",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_541586693",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 3784.0,
+          "width": 320.0,
+          "height": 180.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8321",
+        "type": "FRAME",
+        "name": "Group 73",
+        "absoluteBoundingBox": {
+          "x": 222.60107421875,
+          "y": 3987.3369140625,
+          "width": 318.61456298828125,
+          "height": 93.6626968383789
+        },
+        "children": [
+          {
+            "id": "2:8322",
+            "type": "TEXT",
+            "name": "typeにてエンジニアの募集を掲載しました",
+            "absoluteBoundingBox": {
+              "x": 222.60107421875,
+              "y": 4011.3530864715576,
+              "width": 313.1212158203125,
+              "height": 22.41509437561035
+            },
+            "children": []
+          },
+          {
+            "id": "2:8323",
+            "type": "TEXT",
+            "name": "エンジニア（未経験者 & 経験者）の募集をtypeに掲載しました。未経験者はこちら...",
+            "absoluteBoundingBox": {
+              "x": 222.60107421875,
+              "y": 4040.9730339050293,
+              "width": 318.61456298828125,
+              "height": 40.026954650878906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8324",
+            "type": "TEXT",
+            "name": "2023.09.05",
+            "absoluteBoundingBox": {
+              "x": 288.5213394165039,
+              "y": 3989.7385313510895,
+              "width": 229.9361114501953,
+              "height": 14.409703254699707
+            },
+            "children": []
+          },
+          {
+            "id": "2:8325",
+            "type": "FRAME",
+            "name": "Frame 9",
+            "absoluteBoundingBox": {
+              "x": 222.60107421875,
+              "y": 3987.3369140625,
+              "width": 53.364009857177734,
+              "height": 19.21293830871582
+            },
+            "children": [
+              {
+                "id": "2:8326",
+                "type": "TEXT",
+                "name": "お知らせ",
+                "absoluteBoundingBox": {
+                  "x": 7.182004928588867,
+                  "y": 2.60646915435791,
+                  "width": 39.0,
+                  "height": 14.0
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8327",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_541586693",
+        "absoluteBoundingBox": {
+          "x": 573.0,
+          "y": 3784.0,
+          "width": 320.0,
+          "height": 180.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8328",
+        "type": "FRAME",
+        "name": "Group 72",
+        "absoluteBoundingBox": {
+          "x": 574.0377197265625,
+          "y": 3987.3369140625,
+          "width": 319.41510009765625,
+          "height": 93.6626968383789
+        },
+        "children": [
+          {
+            "id": "2:8329",
+            "type": "TEXT",
+            "name": "enにてエンジニアの募集を掲載しました",
+            "absoluteBoundingBox": {
+              "x": 578.7581834793091,
+              "y": 4011.3530864715576,
+              "width": 313.9079284667969,
+              "height": 22.41509437561035
+            },
+            "children": []
+          },
+          {
+            "id": "2:8330",
+            "type": "TEXT",
+            "name": "エンジニア（未経験者 & 経験者）の募集をenに掲載しました。未経験者はこちら...",
+            "absoluteBoundingBox": {
+              "x": 574.0377197265625,
+              "y": 4040.9730339050293,
+              "width": 319.41510009765625,
+              "height": 40.026954650878906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8331",
+            "type": "TEXT",
+            "name": "2023.09.05",
+            "absoluteBoundingBox": {
+              "x": 644.843994140625,
+              "y": 3989.7385313510895,
+              "width": 230.5138397216797,
+              "height": 14.409703254699707
+            },
+            "children": []
+          },
+          {
+            "id": "2:8332",
+            "type": "FRAME",
+            "name": "Frame 10",
+            "absoluteBoundingBox": {
+              "x": 578.7581834793091,
+              "y": 3987.3369140625,
+              "width": 53.49809265136719,
+              "height": 19.21293830871582
+            },
+            "children": [
+              {
+                "id": "2:8333",
+                "type": "TEXT",
+                "name": "お知らせ",
+                "absoluteBoundingBox": {
+                  "x": 7.249046325683594,
+                  "y": 2.60646915435791,
+                  "width": 39.0,
+                  "height": 14.0
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8334",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_541586693",
+        "absoluteBoundingBox": {
+          "x": 925.0,
+          "y": 3784.0,
+          "width": 321.0,
+          "height": 180.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8335",
+        "type": "FRAME",
+        "name": "Group 71",
+        "absoluteBoundingBox": {
+          "x": 926.27490234375,
+          "y": 3987.3369140625,
+          "width": 319.41510009765625,
+          "height": 93.6626968383789
+        },
+        "children": [
+          {
+            "id": "2:8336",
+            "type": "TEXT",
+            "name": "dodaにてエンジニアの募集を掲載しました",
+            "absoluteBoundingBox": {
+              "x": 926.27490234375,
+              "y": 4011.3530864715576,
+              "width": 313.9079284667969,
+              "height": 22.41509437561035
+            },
+            "children": []
+          },
+          {
+            "id": "2:8337",
+            "type": "TEXT",
+            "name": "エンジニア（未経験者 & 経験者）の募集をdodaに掲載しました。未経験者はこちら...",
+            "absoluteBoundingBox": {
+              "x": 926.27490234375,
+              "y": 4040.9730339050293,
+              "width": 319.41510009765625,
+              "height": 40.026954650878906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8338",
+            "type": "TEXT",
+            "name": "2023.09.05",
+            "absoluteBoundingBox": {
+              "x": 992.3608093261719,
+              "y": 3989.7385313510895,
+              "width": 230.5138397216797,
+              "height": 14.409703254699707
+            },
+            "children": []
+          },
+          {
+            "id": "2:8339",
+            "type": "FRAME",
+            "name": "Frame 11",
+            "absoluteBoundingBox": {
+              "x": 926.27490234375,
+              "y": 3987.3369140625,
+              "width": 53.49809265136719,
+              "height": 19.21293830871582
+            },
+            "children": [
+              {
+                "id": "2:8340",
+                "type": "TEXT",
+                "name": "お知らせ",
+                "absoluteBoundingBox": {
+                  "x": 7.249046325683594,
+                  "y": 2.60646915435791,
+                  "width": 39.0,
+                  "height": 14.0
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8341",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_541586693",
+        "absoluteBoundingBox": {
+          "x": 1598.0,
+          "y": 3784.0,
+          "width": 320.0,
+          "height": 180.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8342",
+        "type": "FRAME",
+        "name": "Group 70",
+        "absoluteBoundingBox": {
+          "x": 1278.5120849609375,
+          "y": 3987.3369140625,
+          "width": 319.41510009765625,
+          "height": 93.6626968383789
+        },
+        "children": [
+          {
+            "id": "2:8343",
+            "type": "TEXT",
+            "name": "dodaにてエンジニアの募集を掲載しました",
+            "absoluteBoundingBox": {
+              "x": 1278.5120849609375,
+              "y": 4011.3530864715576,
+              "width": 313.9079284667969,
+              "height": 22.41509437561035
+            },
+            "children": []
+          },
+          {
+            "id": "2:8344",
+            "type": "TEXT",
+            "name": "エンジニア（未経験者 & 経験者）の募集をdodaに掲載しました。未経験者はこちら...",
+            "absoluteBoundingBox": {
+              "x": 1278.5120849609375,
+              "y": 4040.9730339050293,
+              "width": 319.41510009765625,
+              "height": 40.026954650878906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8345",
+            "type": "TEXT",
+            "name": "2023.09.05",
+            "absoluteBoundingBox": {
+              "x": 1344.5979919433594,
+              "y": 3989.7385313510895,
+              "width": 230.5138397216797,
+              "height": 14.409703254699707
+            },
+            "children": []
+          },
+          {
+            "id": "2:8346",
+            "type": "FRAME",
+            "name": "Frame 12",
+            "absoluteBoundingBox": {
+              "x": 1278.5120849609375,
+              "y": 3987.3369140625,
+              "width": 53.49809265136719,
+              "height": 19.21293830871582
+            },
+            "children": [
+              {
+                "id": "2:8347",
+                "type": "TEXT",
+                "name": "お知らせ",
+                "absoluteBoundingBox": {
+                  "x": 7.249046325683594,
+                  "y": 2.60646915435791,
+                  "width": 39.0,
+                  "height": 14.0
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8348",
+        "type": "FRAME",
+        "name": "Group 76",
+        "absoluteBoundingBox": {
+          "x": 464.0,
+          "y": 3717.7998046875,
+          "width": 35.19999694824219,
+          "height": 35.19999694824219
+        },
+        "children": []
+      },
+      {
+        "id": "2:8351",
+        "type": "FRAME",
+        "name": "Group 77",
+        "absoluteBoundingBox": {
+          "x": 544.0,
+          "y": 3717.7998046875,
+          "width": 35.19999694824219,
+          "height": 35.19999694824219
+        },
+        "children": []
+      },
+      {
+        "id": "2:8354",
+        "type": "RECTANGLE",
+        "name": "image 385",
+        "absoluteBoundingBox": {
+          "x": -360.0,
+          "y": 0.0,
+          "width": 1800.0,
+          "height": 823.0
+        },
+        "children": [],
+        "visible": false
+      },
+      {
+        "id": "2:8355",
+        "type": "RECTANGLE",
+        "name": "Image",
+        "absoluteBoundingBox": {
+          "x": 3557.0,
+          "y": 5657.142578125,
+          "width": 1440.0,
+          "height": 1885.7142333984375
+        },
+        "children": []
+      },
+      {
+        "id": "2:8356",
+        "type": "FRAME",
+        "name": "赤パネル",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 1943.1302490234375,
+          "height": 936.8956298828125
+        },
+        "children": [
+          {
+            "id": "2:8357",
+            "type": "RECTANGLE",
+            "name": "Rectangle 1",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 709.5252685546875,
+              "width": 1456.9442138671875,
+              "height": 227.37037658691406
+            },
+            "children": []
+          },
+          {
+            "id": "2:8358",
+            "type": "BOOLEAN_OPERATION",
+            "name": "Union",
+            "absoluteBoundingBox": {
+              "x": 737.7443237304688,
+              "y": 0.0,
+              "width": 1205.3858642578125,
+              "height": 734.5192260742188
+            },
+            "children": [
+              {
+                "id": "2:8359",
+                "type": "VECTOR",
+                "name": "Rectangle 4",
+                "absoluteBoundingBox": {
+                  "x": 1431.911865234375,
+                  "y": -276.258056640625,
+                  "width": 1133.4398685362612,
+                  "height": 1328.1083552483506
+                },
+                "children": []
+              },
+              {
+                "id": "2:8360",
+                "type": "VECTOR",
+                "name": "Vector 3",
+                "absoluteBoundingBox": {
+                  "x": 737.7443239771535,
+                  "y": 452.32330322265625,
+                  "width": 368.87213134765625,
+                  "height": 269.6994323730469
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8361",
+        "type": "RECTANGLE",
+        "name": "Rectangle 69",
+        "absoluteBoundingBox": {
+          "x": 651.0,
+          "y": 847.0,
+          "width": 1652.0,
+          "height": 538.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8362",
+        "type": "FRAME",
+        "name": "ドット",
+        "absoluteBoundingBox": {
+          "x": 1393.0828857421875,
+          "y": 743.0052490234375,
+          "width": 153.9991519136106,
+          "height": 146.54758363581323
+        },
+        "children": []
+      },
+      {
+        "id": "2:8412",
+        "type": "FRAME",
+        "name": "キャッチコピー",
+        "absoluteBoundingBox": {
+          "x": 1026.58251953125,
+          "y": 197.0,
+          "width": 366.1347351074219,
+          "height": 532.1595458984375
+        },
+        "children": [
+          {
+            "id": "2:8413",
+            "type": "FRAME",
+            "name": "鶴",
+            "absoluteBoundingBox": {
+              "x": 1026.58251953125,
+              "y": 229.39551162719727,
+              "width": 366.1347351074219,
+              "height": 499.7640075683594
+            },
+            "children": [
+              {
+                "id": "2:8414",
+                "type": "FRAME",
+                "name": "鶴",
+                "absoluteBoundingBox": {
+                  "x": 1149.661247253418,
+                  "y": 295.5397300720215,
+                  "width": 243.05601126717193,
+                  "height": 195.1825252507606
+                },
+                "children": []
+              },
+              {
+                "id": "2:8422",
+                "type": "FRAME",
+                "name": "鶴2",
+                "absoluteBoundingBox": {
+                  "x": 1026.5824974607294,
+                  "y": 464.0224800109863,
+                  "width": 174.96231079101562,
+                  "height": 103.20357513427734
+                },
+                "children": []
+              },
+              {
+                "id": "2:8432",
+                "type": "FRAME",
+                "name": "鶴3",
+                "absoluteBoundingBox": {
+                  "x": 1137.0425720214844,
+                  "y": 645.7452125549316,
+                  "width": 174.59933165754296,
+                  "height": 114.36314948810559
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "2:8441",
+            "type": "TEXT",
+            "name": "無数の情熱で",
+            "absoluteBoundingBox": {
+              "x": 1177.817123413086,
+              "y": 362.99755859375,
+              "width": 48.89912796020508,
+              "height": 253.97755432128906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8442",
+            "type": "TEXT",
+            "name": "灯した炎を携えて",
+            "absoluteBoundingBox": {
+              "x": 1254.0000610351562,
+              "y": 231.0,
+              "width": 48.89912796020508,
+              "height": 253.97755432128906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8443",
+            "type": "TEXT",
+            "name": "価値を生み出す",
+            "absoluteBoundingBox": {
+              "x": 1098.8539733886719,
+              "y": 429.3310546875,
+              "width": 48.89912796020508,
+              "height": 253.97755432128906
+            },
+            "children": []
+          },
+          {
+            "id": "2:8444",
+            "type": "LINE",
+            "name": "Line 1",
+            "absoluteBoundingBox": {
+              "x": 1309.0000610351562,
+              "y": 197.0,
+              "width": 1.3856511259291437e-05,
+              "height": 317.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8445",
+            "type": "LINE",
+            "name": "Line 3",
+            "absoluteBoundingBox": {
+              "x": 1154.0000610351562,
+              "y": 367.0,
+              "width": 1.372537712995836e-05,
+              "height": 314.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8446",
+            "type": "LINE",
+            "name": "Line 4",
+            "absoluteBoundingBox": {
+              "x": 1075.0,
+              "y": 433.0,
+              "width": 1.2195478348075994e-05,
+              "height": 279.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8447",
+            "type": "VECTOR",
+            "name": "Line 2",
+            "absoluteBoundingBox": {
+              "x": 1233.0000610351562,
+              "y": 231.0,
+              "width": 1.4993007425800897e-05,
+              "height": 343.0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8448",
+        "type": "FRAME",
+        "name": "お問い合わせ",
+        "absoluteBoundingBox": {
+          "x": 1259.0,
+          "y": 22.0,
+          "width": 156.3025665283203,
+          "height": 156.3025665283203
+        },
+        "children": [
+          {
+            "id": "2:8449",
+            "type": "FRAME",
+            "name": "Group 1",
+            "absoluteBoundingBox": {
+              "x": 1259.0,
+              "y": 22.0,
+              "width": 156.3025665283203,
+              "height": 156.3025665283203
+            },
+            "children": []
+          },
+          {
+            "id": "2:8457",
+            "type": "TEXT",
+            "name": "採用情報",
+            "absoluteBoundingBox": {
+              "x": 1274.078369140625,
+              "y": 87.55879211425781,
+              "width": 125.77935791015625,
+              "height": 25.800893783569336
+            },
+            "children": []
+          },
+          {
+            "id": "2:8458",
+            "type": "TEXT",
+            "name": "RECRUIT",
+            "absoluteBoundingBox": {
+              "x": 1274.078369140625,
+              "y": 66.59540557861328,
+              "width": 121.74797058105469,
+              "height": 13.706725120544434
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8459",
+        "type": "TEXT",
+        "name": "無数の情熱で応える 千羽を束ねる成長カンパニー",
+        "absoluteBoundingBox": {
+          "x": 64.0,
+          "y": 444.0,
+          "width": 918.0,
+          "height": 210.0000000000001
+        },
+        "children": []
+      },
+      {
+        "id": "2:8460",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1402",
+        "absoluteBoundingBox": {
+          "x": 64.0,
+          "y": 732.0,
+          "width": 821.0,
+          "height": 74.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8461",
+        "type": "FRAME",
+        "name": "Group 75",
+        "absoluteBoundingBox": {
+          "x": 1057.0074462890625,
+          "y": 751.0,
+          "width": 35.00743865966797,
+          "height": 35.00743865966797
+        },
+        "children": []
+      },
+      {
+        "id": "2:8464",
+        "type": "TEXT",
+        "name": "お知らせ一覧",
+        "absoluteBoundingBox": {
+          "x": 911.0,
+          "y": 764.0,
+          "width": 98.0,
+          "height": 11.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8465",
+        "type": "TEXT",
+        "name": "2023.12.24 日本商工会議所の中小企業DX支援の取組みと連携開始",
+        "absoluteBoundingBox": {
+          "x": 293.0,
+          "y": 756.0,
+          "width": 493.0,
+          "height": 25.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8466",
+        "type": "TEXT",
+        "name": "お知らせ",
+        "absoluteBoundingBox": {
+          "x": 196.0,
+          "y": 759.0,
+          "width": 60.0,
+          "height": 21.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8467",
+        "type": "TEXT",
+        "name": "NEWS",
+        "absoluteBoundingBox": {
+          "x": 98.0,
+          "y": 753.0,
+          "width": 72.0,
+          "height": 33.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8468",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_456066036 2",
+        "absoluteBoundingBox": {
+          "x": -140.0,
+          "y": 938.0,
+          "width": 1514.0,
+          "height": 858.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8469",
+        "type": "FRAME",
+        "name": "Frame 37",
+        "absoluteBoundingBox": {
+          "x": -158.0,
+          "y": 938.0,
+          "width": 929.0,
+          "height": 724.0
+        },
+        "children": [
+          {
+            "id": "2:8470",
+            "type": "ELLIPSE",
+            "name": "Ellipse 74",
+            "absoluteBoundingBox": {
+              "x": 9.0,
+              "y": -280.0,
+              "width": 780.0,
+              "height": 780.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8471",
+            "type": "TEXT",
+            "name": "「感謝」、「成長」、 「恩返し」 の 気持ちを忘れない企業であり続ける",
+            "absoluteBoundingBox": {
+              "x": 295.0,
+              "y": 329.0,
+              "width": 602.0,
+              "height": 129.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8472",
+            "type": "LINE",
+            "name": "Line 15",
+            "absoluteBoundingBox": {
+              "x": 295.0,
+              "y": 347.0,
+              "width": 67.0,
+              "height": 5.85732641411596e-06
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8473",
+        "type": "TEXT",
+        "name": "これらの思いを胸に2014年に会社を創設致しました。 社名には繁栄と長寿の象徴である鶴にあやかり、 皆様から長く必要とされる企業でありたいという思いを込めております。 I(アイ)は ｢愛」 です。 弊社の3つの企業理念「感謝」 「成長」 「恩返し」 を念頭にお客様に愛 (I)される企業で在り続けます。 私たちは、数限りあるお客様との出会いを大切にし、 出会えたことへの感謝の気持を忘れず、 お客様のご希望に全力でお応えする企業づくりをめざしています。",
+        "absoluteBoundingBox": {
+          "x": 131.0,
+          "y": 1410.0,
+          "width": 500.0,
+          "height": 182.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8474",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_473232174 1",
+        "absoluteBoundingBox": {
+          "x": 706.0,
+          "y": 1273.0,
+          "width": 574.0,
+          "height": 395.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8475",
+        "type": "RECTANGLE",
+        "name": "AdobeStock_362745721 1",
+        "absoluteBoundingBox": {
+          "x": 64.0,
+          "y": 1870.0,
+          "width": 1522.0,
+          "height": 912.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8476",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1418",
+        "absoluteBoundingBox": {
+          "x": 1153.0,
+          "y": 1128.0,
+          "width": 64.0,
+          "height": 226.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8477",
+        "type": "FRAME",
+        "name": "Frame 41",
+        "absoluteBoundingBox": {
+          "x": 798.0,
+          "y": 1869.0,
+          "width": 796.0,
+          "height": 505.0
+        },
+        "children": [
+          {
+            "id": "2:8478",
+            "type": "VECTOR",
+            "name": "Ellipse 74",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": -285.0,
+              "width": 785.0,
+              "height": 785.0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8479",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1600",
+        "absoluteBoundingBox": {
+          "x": 1087.0,
+          "y": 2167.0,
+          "width": 320.0,
+          "height": 480.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8480",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1603",
+        "absoluteBoundingBox": {
+          "x": 1087.0,
+          "y": 2167.0,
+          "width": 320.0,
+          "height": 480.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8481",
+        "type": "FRAME",
+        "name": "Group 1029",
+        "absoluteBoundingBox": {
+          "x": 737.0,
+          "y": 2234.0,
+          "width": 320.0,
+          "height": 480.0
+        },
+        "children": [
+          {
+            "id": "2:8482",
+            "type": "RECTANGLE",
+            "name": "Rectangle 1601",
+            "absoluteBoundingBox": {
+              "x": 737.0,
+              "y": 2234.0,
+              "width": 320.0,
+              "height": 480.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8483",
+            "type": "RECTANGLE",
+            "name": "Rectangle 1604",
+            "absoluteBoundingBox": {
+              "x": 737.0,
+              "y": 2234.0,
+              "width": 320.0,
+              "height": 480.0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8484",
+        "type": "FRAME",
+        "name": "Group 1028",
+        "absoluteBoundingBox": {
+          "x": 387.0,
+          "y": 2167.0,
+          "width": 320.0,
+          "height": 480.0
+        },
+        "children": [
+          {
+            "id": "2:8485",
+            "type": "RECTANGLE",
+            "name": "Rectangle 1602",
+            "absoluteBoundingBox": {
+              "x": 387.0,
+              "y": 2167.0,
+              "width": 320.0,
+              "height": 480.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8486",
+            "type": "RECTANGLE",
+            "name": "Rectangle 1605",
+            "absoluteBoundingBox": {
+              "x": 387.0,
+              "y": 2167.0,
+              "width": 320.0,
+              "height": 480.0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8487",
+        "type": "TEXT",
+        "name": "エンジニア教育事業 -Study＆Works-",
+        "absoluteBoundingBox": {
+          "x": 1123.0,
+          "y": 2611.0,
+          "width": 273.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8488",
+        "type": "TEXT",
+        "name": "03",
+        "absoluteBoundingBox": {
+          "x": 1110.0,
+          "y": 2134.0,
+          "width": 92.0,
+          "height": 96.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8489",
+        "type": "TEXT",
+        "name": "02",
+        "absoluteBoundingBox": {
+          "x": 759.0,
+          "y": 2194.0,
+          "width": 92.0,
+          "height": 96.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8490",
+        "type": "TEXT",
+        "name": "私たちの主たる事業内容をご紹介します",
+        "absoluteBoundingBox": {
+          "x": 500.0,
+          "y": 2075.0,
+          "width": 357.0,
+          "height": 29.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8491",
+        "type": "LINE",
+        "name": "Line 14",
+        "absoluteBoundingBox": {
+          "x": 382.0,
+          "y": 2089.0,
+          "width": 89.0,
+          "height": 0.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8492",
+        "type": "FRAME",
+        "name": "Group 38",
+        "absoluteBoundingBox": {
+          "x": 290.478271484375,
+          "y": 2158.13134765625,
+          "width": 154.56256746439158,
+          "height": 147.08376224930817
+        },
+        "children": []
+      },
+      {
+        "id": "2:8542",
+        "type": "INSTANCE",
+        "name": "arrow",
+        "absoluteBoundingBox": {
+          "x": 413.0,
+          "y": 2599.0,
+          "width": 12.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8543",
+        "type": "INSTANCE",
+        "name": "arrow",
+        "absoluteBoundingBox": {
+          "x": 767.0,
+          "y": 2677.0,
+          "width": 12.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8544",
+        "type": "INSTANCE",
+        "name": "arrow",
+        "absoluteBoundingBox": {
+          "x": 1120.0,
+          "y": 2611.0,
+          "width": 12.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8545",
+        "type": "TEXT",
+        "name": "ITアウトソーシング事業",
+        "absoluteBoundingBox": {
+          "x": 419.0,
+          "y": 2599.0,
+          "width": 201.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8546",
+        "type": "TEXT",
+        "name": "01",
+        "absoluteBoundingBox": {
+          "x": 410.0,
+          "y": 2134.0,
+          "width": 93.0,
+          "height": 96.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8547",
+        "type": "TEXT",
+        "name": "受託事業‐Crane Lab‐",
+        "absoluteBoundingBox": {
+          "x": 772.0,
+          "y": 2677.0,
+          "width": 163.0,
+          "height": 12.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8548",
+        "type": "TEXT",
+        "name": "会社情報",
+        "absoluteBoundingBox": {
+          "x": 136.0,
+          "y": 1107.0,
+          "width": 297.0,
+          "height": 101.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8549",
+        "type": "TEXT",
+        "name": "事業紹介",
+        "absoluteBoundingBox": {
+          "x": 385.0,
+          "y": 1958.0,
+          "width": 291.0,
+          "height": 101.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8550",
+        "type": "TEXT",
+        "name": "COMPANY",
+        "absoluteBoundingBox": {
+          "x": 1211.0,
+          "y": 1155.0,
+          "width": 51.000007387224514,
+          "height": 169.00000222928088
+        },
+        "children": []
+      },
+      {
+        "id": "2:8551",
+        "type": "RECTANGLE",
+        "name": "Rectangle 1419",
+        "absoluteBoundingBox": {
+          "x": 321.0,
+          "y": 2303.0,
+          "width": 64.000001447253,
+          "height": 322.0000055950554
+        },
+        "children": []
+      },
+      {
+        "id": "2:8552",
+        "type": "TEXT",
+        "name": "OUR BUSINESS",
+        "absoluteBoundingBox": {
+          "x": 263.0,
+          "y": 2275.0,
+          "width": 51.0000116709416,
+          "height": 267.0000022292811
+        },
+        "children": []
+      },
+      {
+        "id": "2:8553",
+        "type": "FRAME",
+        "name": "Frame 52",
+        "absoluteBoundingBox": {
+          "x": 1379.0,
+          "y": 315.0,
+          "width": 42.0,
+          "height": 268.0
+        },
+        "children": [
+          {
+            "id": "2:8554",
+            "type": "FRAME",
+            "name": "Frame 50",
+            "absoluteBoundingBox": {
+              "x": -5.5,
+              "y": 0.0,
+              "width": 53.0,
+              "height": 125.86544799804688
+            },
+            "children": [
+              {
+                "id": "2:8555",
+                "type": "FRAME",
+                "name": "icon-insta",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "width": 53.0,
+                  "height": 53.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8558",
+                "type": "FRAME",
+                "name": "icon-qiita",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 73.0,
+                  "width": 52.867210388183594,
+                  "height": 52.865447998046875
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "2:8562",
+            "type": "FRAME",
+            "name": "Frame 51",
+            "absoluteBoundingBox": {
+              "x": 10.999998092651367,
+              "y": 176.86544799804688,
+              "width": 20.000003814697266,
+              "height": 154.0
+            },
+            "children": [
+              {
+                "id": "2:8563",
+                "type": "TEXT",
+                "name": "SCROLL",
+                "absoluteBoundingBox": {
+                  "x": 20.000003814697266,
+                  "y": 8.742276804696303e-07,
+                  "width": 20.00000310350856,
+                  "height": 71.0000008742278
+                },
+                "children": []
+              },
+              {
+                "id": "2:8564",
+                "type": "LINE",
+                "name": "Line 13",
+                "absoluteBoundingBox": {
+                  "x": 10.0,
+                  "y": 93.0,
+                  "width": 2.666384716576431e-06,
+                  "height": 61.0
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8565",
+        "type": "RECTANGLE",
+        "name": "recruit_bg",
+        "absoluteBoundingBox": {
+          "x": -143.0,
+          "y": 2946.0,
+          "width": 1422.0,
+          "height": 578.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8566",
+        "type": "TEXT",
+        "name": "BLOG",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 3697.0,
+          "width": 45.0,
+          "height": 14.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8567",
+        "type": "TEXT",
+        "name": "採用ブログ",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 3717.0,
+          "width": 167.0,
+          "height": 46.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8568",
+        "type": "TEXT",
+        "name": "RECRUIT",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 2856.0,
+          "width": 137.0,
+          "height": 44.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8569",
+        "type": "TEXT",
+        "name": "採用情報",
+        "absoluteBoundingBox": {
+          "x": 218.0,
+          "y": 2893.0,
+          "width": 291.0,
+          "height": 101.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8570",
+        "type": "TEXT",
+        "name": "ITはこれからの日本を牽引していかなければいけない重要な産業。 だから、優秀な人材を育成し、世界に負けないエンジニアを輩出していくのは、大きな社会貢献になる。 「エンジニアやビジネスパーソンとして成長していきたい」という人はもちろん、「会社づくりの中核を担いたい」という人の参画を、いまは心から待ち望んでいます。",
+        "absoluteBoundingBox": {
+          "x": 218.0,
+          "y": 3193.0,
+          "width": 459.0,
+          "height": 144.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8571",
+        "type": "TEXT",
+        "name": "一緒に会社づくりに参画してくれるメンバー求む。",
+        "absoluteBoundingBox": {
+          "x": 217.0,
+          "y": 3042.0,
+          "width": 840.0,
+          "height": 60.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8572",
+        "type": "FRAME",
+        "name": "Group 57",
+        "absoluteBoundingBox": {
+          "x": 724.4977416992188,
+          "y": 3012.31884765625,
+          "width": 153.66873168945312,
+          "height": 146.23342895507812
+        },
+        "children": []
+      },
+      {
+        "id": "2:8623",
+        "type": "RECTANGLE",
+        "name": "Rectangle 70",
+        "absoluteBoundingBox": {
+          "x": 774.0,
+          "y": 3114.0,
+          "width": 567.0,
+          "height": 364.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8624",
+        "type": "FRAME",
+        "name": "Frame 28",
+        "absoluteBoundingBox": {
+          "x": 221.0,
+          "y": 3367.0,
+          "width": 246.0,
+          "height": 53.0
+        },
+        "children": [
+          {
+            "id": "2:8625",
+            "type": "INSTANCE",
+            "name": "arrow",
+            "absoluteBoundingBox": {
+              "x": 82.5,
+              "y": 18.5,
+              "width": 16.0,
+              "height": 16.0
+            },
+            "children": []
+          },
+          {
+            "id": "2:8626",
+            "type": "TEXT",
+            "name": "採用サイト",
+            "absoluteBoundingBox": {
+              "x": 92.5,
+              "y": 20.5,
+              "width": 87.0,
+              "height": 12.0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "2:8627",
+        "type": "TEXT",
+        "name": "を担いませんか？",
+        "absoluteBoundingBox": {
+          "x": 440.0,
+          "y": 3098.0,
+          "width": 278.0,
+          "height": 49.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8628",
+        "type": "RECTANGLE",
+        "name": "Rectangle 14",
+        "absoluteBoundingBox": {
+          "x": 217.0,
+          "y": 3098.0,
+          "width": 205.0,
+          "height": 49.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8629",
+        "type": "TEXT",
+        "name": "会社の中核",
+        "absoluteBoundingBox": {
+          "x": 236.0,
+          "y": 3098.0,
+          "width": 167.0,
+          "height": 49.0
+        },
+        "children": []
+      },
+      {
+        "id": "2:8630",
+        "type": "FRAME",
+        "name": "Group 745",
+        "absoluteBoundingBox": {
+          "x": -495.0,
+          "y": 4253.0,
+          "width": 2433.0,
+          "height": 1020.0
+        },
+        "children": [
+          {
+            "id": "2:8631",
+            "type": "FRAME",
+            "name": "Group 589",
+            "absoluteBoundingBox": {
+              "x": -495.0,
+              "y": 4253.0,
+              "width": 2433.0,
+              "height": 430.0
+            },
+            "children": [
+              {
+                "id": "2:8632",
+                "type": "RECTANGLE",
+                "name": "Rectangle 1496",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 4253.0,
+                  "width": 1440.0,
+                  "height": 430.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8633",
+                "type": "TEXT",
+                "name": "Let us return the favor to all of you.",
+                "absoluteBoundingBox": {
+                  "x": -495.0,
+                  "y": 4439.0,
+                  "width": 2433.0,
+                  "height": 158.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8634",
+                "type": "TEXT",
+                "name": "各種サービスについてのご相談・ご質問、 お見積もり依頼など、お気軽にお問い合わせください。",
+                "absoluteBoundingBox": {
+                  "x": 485.0,
+                  "y": 4366.0,
+                  "width": 471.0,
+                  "height": 56.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8635",
+                "type": "ELLIPSE",
+                "name": "Ellipse 195",
+                "absoluteBoundingBox": {
+                  "x": 648.0,
+                  "y": 4446.0,
+                  "width": 144.0,
+                  "height": 144.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8636",
+                "type": "FRAME",
+                "name": "Page-1",
+                "absoluteBoundingBox": {
+                  "x": 705.0,
+                  "y": 4492.0,
+                  "width": 30.0,
+                  "height": 30.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8639",
+                "type": "TEXT",
+                "name": "CONTACT",
+                "absoluteBoundingBox": {
+                  "x": 683.0,
+                  "y": 4528.0,
+                  "width": 75.0,
+                  "height": 15.0
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "2:8640",
+            "type": "FRAME",
+            "name": "Group 723",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 4883.0,
+              "width": 1440.0,
+              "height": 390.0
+            },
+            "children": [
+              {
+                "id": "2:8641",
+                "type": "RECTANGLE",
+                "name": "Rectangle 24",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 4883.0,
+                  "width": 1440.0,
+                  "height": 390.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8642",
+                "type": "FRAME",
+                "name": "Group 722",
+                "absoluteBoundingBox": {
+                  "x": 183.0,
+                  "y": 4967.0,
+                  "width": 1075.0,
+                  "height": 221.3603515625
+                },
+                "children": [
+                  {
+                    "id": "2:8643",
+                    "type": "FRAME",
+                    "name": "Group 721",
+                    "absoluteBoundingBox": {
+                      "x": 183.0,
+                      "y": 4967.0,
+                      "width": 370.0,
+                      "height": 161.36000061035156
+                    },
+                    "children": [
+                      {
+                        "id": "2:8644",
+                        "type": "FRAME",
+                        "name": "Group 8",
+                        "absoluteBoundingBox": {
+                          "x": 183.0,
+                          "y": 4967.0,
+                          "width": 66.00010681152344,
+                          "height": 52.525962829589844
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8649",
+                        "type": "FRAME",
+                        "name": "Frame 54",
+                        "absoluteBoundingBox": {
+                          "x": 268.0,
+                          "y": 4967.0,
+                          "width": 285.0,
+                          "height": 161.36000061035156
+                        },
+                        "children": [
+                          {
+                            "id": "2:8650",
+                            "type": "FRAME",
+                            "name": "Frame 53",
+                            "absoluteBoundingBox": {
+                              "x": 0.0,
+                              "y": 0.0,
+                              "width": 285.0,
+                              "height": 39.0
+                            },
+                            "children": [
+                              {
+                                "id": "2:8651",
+                                "type": "TEXT",
+                                "name": "株式会社Crane＆I（クレインアンドアイ）",
+                                "absoluteBoundingBox": {
+                                  "x": 0.0,
+                                  "y": 0.0,
+                                  "width": 285.0,
+                                  "height": 21.0
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8652",
+                                "type": "TEXT",
+                                "name": "東京都新宿区神楽坂1-2 研究社英語センタービル3階",
+                                "absoluteBoundingBox": {
+                                  "x": 0.0,
+                                  "y": 24.0,
+                                  "width": 245.0,
+                                  "height": 15.0
+                                },
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "2:8653",
+                            "type": "FRAME",
+                            "name": "Frame 26",
+                            "absoluteBoundingBox": {
+                              "x": 122.0,
+                              "y": 55.0,
+                              "width": 83.0,
+                              "height": 11.0
+                            },
+                            "children": [
+                              {
+                                "id": "2:8654",
+                                "type": "VECTOR",
+                                "name": "Vector",
+                                "absoluteBoundingBox": {
+                                  "x": 0.0,
+                                  "y": 0.0,
+                                  "width": 7.0,
+                                  "height": 11.0
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8655",
+                                "type": "TEXT",
+                                "name": "Google Map",
+                                "absoluteBoundingBox": {
+                                  "x": 14.0,
+                                  "y": 1.5,
+                                  "width": 69.0,
+                                  "height": 8.0
+                                },
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "2:8656",
+                            "type": "FRAME",
+                            "name": "Frame 54",
+                            "absoluteBoundingBox": {
+                              "x": 0.0,
+                              "y": 57.0,
+                              "width": 99.75000762939453,
+                              "height": 9.208306312561035
+                            },
+                            "children": [
+                              {
+                                "id": "2:8657",
+                                "type": "VECTOR",
+                                "name": "Vector",
+                                "absoluteBoundingBox": {
+                                  "x": 0.0,
+                                  "y": 0.0,
+                                  "width": 9.750009536743164,
+                                  "height": 9.208306312561035
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8658",
+                                "type": "TEXT",
+                                "name": "03-5579-2560",
+                                "absoluteBoundingBox": {
+                                  "x": 14.750009536743164,
+                                  "y": 0.6041531562805176,
+                                  "width": 85.0,
+                                  "height": 8.0
+                                },
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "id": "2:8659",
+                            "type": "RECTANGLE",
+                            "name": "50 Certified Dark English 1",
+                            "absoluteBoundingBox": {
+                              "x": 0.0,
+                              "y": 118.0,
+                              "width": 40.0,
+                              "height": 40.0
+                            },
+                            "children": []
+                          },
+                          {
+                            "id": "2:8660",
+                            "type": "FRAME",
+                            "name": "sns-box",
+                            "absoluteBoundingBox": {
+                              "x": 0.0,
+                              "y": 81.0,
+                              "width": 101.71846008300781,
+                              "height": 17.179487228393555
+                            },
+                            "children": [
+                              {
+                                "id": "2:8661",
+                                "type": "FRAME",
+                                "name": "icon-insta",
+                                "absoluteBoundingBox": {
+                                  "x": 0.0,
+                                  "y": 0.0,
+                                  "width": 17.179487228393555,
+                                  "height": 17.179487228393555
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8663",
+                                "type": "FRAME",
+                                "name": "icon-facebook",
+                                "absoluteBoundingBox": {
+                                  "x": 28.179489135742188,
+                                  "y": 0.0,
+                                  "width": 17.179487228393555,
+                                  "height": 17.136539459228516
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8665",
+                                "type": "FRAME",
+                                "name": "icon-x",
+                                "absoluteBoundingBox": {
+                                  "x": 56.35897445678711,
+                                  "y": 0.0,
+                                  "width": 17.179487228393555,
+                                  "height": 17.179487228393555
+                                },
+                                "children": []
+                              },
+                              {
+                                "id": "2:8668",
+                                "type": "FRAME",
+                                "name": "Group 719",
+                                "absoluteBoundingBox": {
+                                  "x": 84.53857421875,
+                                  "y": 0.0,
+                                  "width": 17.18000030517578,
+                                  "height": 17.179428100585938
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2:8671",
+                    "type": "TEXT",
+                    "name": "Copyright © Crane ＆ I All Rights Reserved.",
+                    "absoluteBoundingBox": {
+                      "x": 268.0,
+                      "y": 5173.3603515625,
+                      "width": 225.0,
+                      "height": 15.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8672",
+                    "type": "TEXT",
+                    "name": "プライバシーポリシー",
+                    "absoluteBoundingBox": {
+                      "x": 268.0,
+                      "y": 5151.0,
+                      "width": 113.0,
+                      "height": 15.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8673",
+                    "type": "TEXT",
+                    "name": "会社情報",
+                    "absoluteBoundingBox": {
+                      "x": 653.0,
+                      "y": 4971.0,
+                      "width": 61.0,
+                      "height": 21.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8674",
+                    "type": "TEXT",
+                    "name": "事業紹介",
+                    "absoluteBoundingBox": {
+                      "x": 774.0,
+                      "y": 4971.0,
+                      "width": 61.0,
+                      "height": 21.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8675",
+                    "type": "TEXT",
+                    "name": "お知らせ",
+                    "absoluteBoundingBox": {
+                      "x": 653.0,
+                      "y": 5110.0,
+                      "width": 60.0,
+                      "height": 21.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8676",
+                    "type": "TEXT",
+                    "name": "お問い合わせ",
+                    "absoluteBoundingBox": {
+                      "x": 653.0,
+                      "y": 5151.0,
+                      "width": 91.0,
+                      "height": 21.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8677",
+                    "type": "TEXT",
+                    "name": "- 企業理念 - 代表挨拶 - 会社概要 - 役員紹介",
+                    "absoluteBoundingBox": {
+                      "x": 653.0,
+                      "y": 5002.0,
+                      "width": 61.359375,
+                      "height": 88.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8678",
+                    "type": "TEXT",
+                    "name": "- ITアウトソーシング事業 - 受託事業 - エンジニア教育事業",
+                    "absoluteBoundingBox": {
+                      "x": 774.0,
+                      "y": 5002.0,
+                      "width": 142.0,
+                      "height": 66.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8679",
+                    "type": "TEXT",
+                    "name": "採用情報",
+                    "absoluteBoundingBox": {
+                      "x": 976.0,
+                      "y": 4971.0,
+                      "width": 61.0,
+                      "height": 21.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8680",
+                    "type": "TEXT",
+                    "name": "- 代表メッセージ - Crane & Iを知る - 福利厚生・制度 - 数字で見るCrane&I - エンジニア未経験の方へ - メンバー",
+                    "absoluteBoundingBox": {
+                      "x": 976.0,
+                      "y": 5002.0,
+                      "width": 141.0,
+                      "height": 132.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8681",
+                    "type": "TEXT",
+                    "name": "- ブログ - 募集要項 - 新卒エントリー - 中途エントリー - Q&A",
+                    "absoluteBoundingBox": {
+                      "x": 1147.0,
+                      "y": 5002.0,
+                      "width": 111.0,
+                      "height": 110.0
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "2:8682",
+            "type": "FRAME",
+            "name": "Group 744",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 4682.0,
+              "width": 1440.0,
+              "height": 201.0
+            },
+            "children": [
+              {
+                "id": "2:8683",
+                "type": "RECTANGLE",
+                "name": "Rectangle 1595",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 4683.0,
+                  "width": 1440.0,
+                  "height": 200.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8684",
+                "type": "RECTANGLE",
+                "name": "Rectangle 1577",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 4682.0,
+                  "width": 1440.0,
+                  "height": 2.0
+                },
+                "children": []
+              },
+              {
+                "id": "2:8685",
+                "type": "FRAME",
+                "name": "Group 742",
+                "absoluteBoundingBox": {
+                  "x": 65.0,
+                  "y": 4733.0,
+                  "width": 420.0,
+                  "height": 100.0
+                },
+                "children": [
+                  {
+                    "id": "2:8686",
+                    "type": "RECTANGLE",
+                    "name": "Rectangle 1578",
+                    "absoluteBoundingBox": {
+                      "x": 65.0,
+                      "y": 4733.0,
+                      "width": 420.0,
+                      "height": 100.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8687",
+                    "type": "RECTANGLE",
+                    "name": "Rectangle 1581",
+                    "absoluteBoundingBox": {
+                      "x": 65.0,
+                      "y": 4733.0,
+                      "width": 420.0,
+                      "height": 100.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8688",
+                    "type": "TEXT",
+                    "name": "無数の情熱で応える",
+                    "absoluteBoundingBox": {
+                      "x": 257.0,
+                      "y": 4777.0,
+                      "width": 183.0,
+                      "height": 30.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8689",
+                    "type": "TEXT",
+                    "name": "採用情報",
+                    "absoluteBoundingBox": {
+                      "x": 95.0,
+                      "y": 4755.0,
+                      "width": 49.0,
+                      "height": 18.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8690",
+                    "type": "TEXT",
+                    "name": "RECRUIT",
+                    "absoluteBoundingBox": {
+                      "x": 95.0,
+                      "y": 4766.0,
+                      "width": 139.0,
+                      "height": 44.0
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "2:8691",
+                "type": "FRAME",
+                "name": "Group 741",
+                "absoluteBoundingBox": {
+                  "x": 510.0,
+                  "y": 4733.0,
+                  "width": 420.0,
+                  "height": 100.0
+                },
+                "children": [
+                  {
+                    "id": "2:8692",
+                    "type": "RECTANGLE",
+                    "name": "Rectangle 1579",
+                    "absoluteBoundingBox": {
+                      "x": 510.0,
+                      "y": 4733.0,
+                      "width": 420.0,
+                      "height": 100.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8693",
+                    "type": "FRAME",
+                    "name": "Group 693",
+                    "absoluteBoundingBox": {
+                      "x": 633.0,
+                      "y": 4757.0,
+                      "width": 173.42999267578125,
+                      "height": 52.85392379760742
+                    },
+                    "children": [
+                      {
+                        "id": "2:8694",
+                        "type": "FRAME",
+                        "name": "Group 692",
+                        "absoluteBoundingBox": {
+                          "x": 633.0,
+                          "y": 4757.0,
+                          "width": 173.42999267578125,
+                          "height": 52.85392379760742
+                        },
+                        "children": [
+                          {
+                            "id": "2:8695",
+                            "type": "FRAME",
+                            "name": "Group 689",
+                            "absoluteBoundingBox": {
+                              "x": 633.0,
+                              "y": 4757.0,
+                              "width": 173.42999267578125,
+                              "height": 52.85392379760742
+                            },
+                            "children": [
+                              {
+                                "id": "2:8696",
+                                "type": "FRAME",
+                                "name": "Group 676",
+                                "absoluteBoundingBox": {
+                                  "x": 633.0,
+                                  "y": 4757.0,
+                                  "width": 173.42999267578125,
+                                  "height": 52.85392379760742
+                                },
+                                "children": [
+                                  {
+                                    "id": "2:8697",
+                                    "type": "FRAME",
+                                    "name": "svgexport-1 (21)",
+                                    "absoluteBoundingBox": {
+                                      "x": 633.0,
+                                      "y": 4757.0,
+                                      "width": 173.42999267578125,
+                                      "height": 52.85392379760742
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "2:8703",
+                "type": "FRAME",
+                "name": "Group 740",
+                "absoluteBoundingBox": {
+                  "x": 955.0,
+                  "y": 4733.0,
+                  "width": 420.0,
+                  "height": 100.0
+                },
+                "children": [
+                  {
+                    "id": "2:8704",
+                    "type": "RECTANGLE",
+                    "name": "Rectangle 1580",
+                    "absoluteBoundingBox": {
+                      "x": 955.0,
+                      "y": 4733.0,
+                      "width": 420.0,
+                      "height": 100.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8705",
+                    "type": "TEXT",
+                    "name": "Instagram",
+                    "absoluteBoundingBox": {
+                      "x": 1105.0,
+                      "y": 4761.0,
+                      "width": 165.0,
+                      "height": 44.0
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "2:8706",
+                    "type": "FRAME",
+                    "name": "Group 720",
+                    "absoluteBoundingBox": {
+                      "x": 1005.0,
+                      "y": 4758.0,
+                      "width": 50.0,
+                      "height": 50.000335693359375
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2:8708",
+        "type": "FRAME",
+        "name": "header",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 1110.0,
+          "height": 73.0
+        },
+        "children": [
+          {
+            "id": "2:8709",
+            "type": "FRAME",
+            "name": "Group 333",
+            "absoluteBoundingBox": {
+              "x": -342.0018005371094,
+              "y": -1345.0,
+              "width": 1862.0047607421875,
+              "height": 2010.4095458984375
+            },
+            "children": [
+              {
+                "id": "2:8710",
+                "type": "FRAME",
+                "name": "Group 329",
+                "absoluteBoundingBox": {
+                  "x": -342.0018005371094,
+                  "y": -1345.0,
+                  "width": 1862.0047607421875,
+                  "height": 2010.4095458984375
+                },
+                "children": [
+                  {
+                    "id": "2:8711",
+                    "type": "VECTOR",
+                    "name": "Rectangle 5",
+                    "absoluteBoundingBox": {
+                      "x": 424.4921569824219,
+                      "y": -1345.0,
+                      "width": 1862.0047623767168,
+                      "height": 2010.4095027695876
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "2:8712",
+                "type": "FRAME",
+                "name": "g-nav",
+                "absoluteBoundingBox": {
+                  "x": 391.9999694824219,
+                  "y": 36.0,
+                  "width": 568.0,
+                  "height": 10.0
+                },
+                "children": [
+                  {
+                    "id": "2:8713",
+                    "type": "FRAME",
+                    "name": "Frame 21",
+                    "absoluteBoundingBox": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "width": 68.0,
+                      "height": 10.0
+                    },
+                    "children": [
+                      {
+                        "id": "2:8714",
+                        "type": "INSTANCE",
+                        "name": "Arrow 2",
+                        "absoluteBoundingBox": {
+                          "x": 0.0,
+                          "y": 4.999999523162842,
+                          "width": 7.0,
+                          "height": 6.993822694312257e-07
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8715",
+                        "type": "TEXT",
+                        "name": "会社情報",
+                        "absoluteBoundingBox": {
+                          "x": 12.0,
+                          "y": 0.0,
+                          "width": 56.0,
+                          "height": 10.0
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2:8716",
+                    "type": "FRAME",
+                    "name": "Frame 22",
+                    "absoluteBoundingBox": {
+                      "x": 118.0,
+                      "y": 0.0,
+                      "width": 68.0,
+                      "height": 10.0
+                    },
+                    "children": [
+                      {
+                        "id": "2:8717",
+                        "type": "INSTANCE",
+                        "name": "Arrow 2",
+                        "absoluteBoundingBox": {
+                          "x": 0.0,
+                          "y": 4.999999523162842,
+                          "width": 7.0,
+                          "height": 6.993822694312257e-07
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8718",
+                        "type": "TEXT",
+                        "name": "事業紹介",
+                        "absoluteBoundingBox": {
+                          "x": 12.0,
+                          "y": 0.0,
+                          "width": 56.0,
+                          "height": 10.0
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2:8719",
+                    "type": "FRAME",
+                    "name": "Frame 23",
+                    "absoluteBoundingBox": {
+                      "x": 236.0,
+                      "y": 0.0,
+                      "width": 68.0,
+                      "height": 10.0
+                    },
+                    "children": [
+                      {
+                        "id": "2:8720",
+                        "type": "INSTANCE",
+                        "name": "Arrow 2",
+                        "absoluteBoundingBox": {
+                          "x": 0.0,
+                          "y": 4.999999523162842,
+                          "width": 7.0,
+                          "height": 6.993822694312257e-07
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8721",
+                        "type": "TEXT",
+                        "name": "お知らせ",
+                        "absoluteBoundingBox": {
+                          "x": 12.0,
+                          "y": 0.0,
+                          "width": 56.0,
+                          "height": 10.0
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2:8722",
+                    "type": "FRAME",
+                    "name": "Frame 24",
+                    "absoluteBoundingBox": {
+                      "x": 354.0,
+                      "y": 0.0,
+                      "width": 96.0,
+                      "height": 10.0
+                    },
+                    "children": [
+                      {
+                        "id": "2:8723",
+                        "type": "INSTANCE",
+                        "name": "Arrow 2",
+                        "absoluteBoundingBox": {
+                          "x": 0.0,
+                          "y": 4.999999523162842,
+                          "width": 7.0,
+                          "height": 6.993822694312257e-07
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8724",
+                        "type": "TEXT",
+                        "name": "お問い合わせ",
+                        "absoluteBoundingBox": {
+                          "x": 12.0,
+                          "y": 0.0,
+                          "width": 84.0,
+                          "height": 10.0
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2:8725",
+                    "type": "FRAME",
+                    "name": "Frame 25",
+                    "absoluteBoundingBox": {
+                      "x": 500.0,
+                      "y": 0.0,
+                      "width": 68.0,
+                      "height": 10.0
+                    },
+                    "children": [
+                      {
+                        "id": "2:8726",
+                        "type": "INSTANCE",
+                        "name": "Arrow 2",
+                        "absoluteBoundingBox": {
+                          "x": 0.0,
+                          "y": 4.999999523162842,
+                          "width": 7.0,
+                          "height": 6.993822694312257e-07
+                        },
+                        "children": []
+                      },
+                      {
+                        "id": "2:8727",
+                        "type": "TEXT",
+                        "name": "採用情報",
+                        "absoluteBoundingBox": {
+                          "x": 12.0,
+                          "y": 0.0,
+                          "width": 56.0,
+                          "height": 10.0
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "2:8728",
+                "type": "FRAME",
+                "name": "Group 327",
+                "absoluteBoundingBox": {
+                  "x": 36.0,
+                  "y": 17.0,
+                  "width": 162.0,
+                  "height": 40.11428451538086
+                },
+                "children": [
+                  {
+                    "id": "2:8729",
+                    "type": "FRAME",
+                    "name": "グループ 36970 1",
+                    "absoluteBoundingBox": {
+                      "x": 36.0,
+                      "y": 17.0,
+                      "width": 162.0,
+                      "height": 40.11428451538086
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

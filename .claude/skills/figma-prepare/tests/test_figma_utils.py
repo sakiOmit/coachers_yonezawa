@@ -21,10 +21,12 @@ from figma_utils import (
     alignment_bonus,
     compute_gap_consistency,
     compute_grouping_score,
+    detect_bg_content_layers,
     detect_consecutive_similar,
     detect_heading_content_pairs,
     detect_regular_spacing,
     detect_space_between,
+    detect_table_rows,
     detect_wrap,
     find_absorbable_elements,
     get_bbox,
@@ -32,6 +34,7 @@ from figma_utils import (
     get_text_children_content,
     infer_direction_two_elements,
     is_heading_like,
+    is_off_canvas,
     is_section_root,
     is_unnamed,
     JP_KEYWORD_MAP,
@@ -42,9 +45,38 @@ from figma_utils import (
     structure_similarity,
     to_kebab,
     yaml_str,
+    BG_WIDTH_RATIO,
+    BG_MIN_HEIGHT_RATIO,
+    BG_DECORATION_MAX_AREA_RATIO,
     CONSECUTIVE_PATTERN_MIN,
     LOOSE_ELEMENT_MAX_HEIGHT,
     LOOSE_ABSORPTION_DISTANCE,
+    OFF_CANVAS_MARGIN,
+    TABLE_MIN_ROWS,
+    TABLE_ROW_WIDTH_RATIO,
+    TABLE_DIVIDER_MAX_HEIGHT,
+    detect_repeating_tuple,
+    TUPLE_PATTERN_MIN,
+    TUPLE_MAX_SIZE,
+    detect_en_jp_label_pairs,
+    EN_LABEL_MAX_WORDS,
+    EN_JP_PAIR_MAX_DISTANCE,
+    CTA_SQUARE_RATIO_MIN,
+    CTA_SQUARE_RATIO_MAX,
+    CTA_Y_THRESHOLD,
+    SIDE_PANEL_MAX_WIDTH,
+    SIDE_PANEL_HEIGHT_RATIO,
+    is_decoration_pattern,
+    decoration_dominant_shape,
+    DECORATION_MAX_SIZE,
+    DECORATION_SHAPE_RATIO,
+    DECORATION_MIN_SHAPES,
+    detect_highlight_text,
+    generate_enriched_table,
+    HIGHLIGHT_OVERLAP_RATIO,
+    HIGHLIGHT_TEXT_MAX_LEN,
+    HIGHLIGHT_HEIGHT_RATIO_MIN,
+    HIGHLIGHT_HEIGHT_RATIO_MAX,
 )
 
 SCRIPTS_DIR = os.path.join(SKILLS_DIR, "scripts")
@@ -1866,3 +1898,2133 @@ class TestScriptIntegration:
                 f"Expected group-0 (numeric fallback), got: {name1}"
         finally:
             os.unlink(tmp)
+
+
+# ============================================================
+# detect_bg_content_layers (Issue 180)
+# ============================================================
+class TestDetectBgContentLayers:
+    """Tests for background-content layer separation (Issue 180)."""
+
+    def test_standard_case(self):
+        """1 bg RECTANGLE + 1 decoration VECTOR + 3 content elements -> 1 candidate."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            # bg RECTANGLE: 1239x275, covers >80% of 1440 and >30% of 800
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 794",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 1239, "height": 275}},
+            # decoration VECTOR: small, overlaps bg
+            {"id": "deco1", "type": "VECTOR", "name": "Vector 4",
+             "absoluteBoundingBox": {"x": 200, "y": 300, "width": 52, "height": 40}},
+            # content: heading group
+            {"id": "c1", "type": "GROUP", "name": "Group 6030",
+             "absoluteBoundingBox": {"x": 150, "y": 150, "width": 400, "height": 60},
+             "children": [{"type": "TEXT", "children": []}]},
+            # content: text
+            {"id": "c2", "type": "TEXT", "name": "description",
+             "absoluteBoundingBox": {"x": 150, "y": 220, "width": 600, "height": 40}},
+            # content: button
+            {"id": "c3", "type": "GROUP", "name": "Group 6004",
+             "absoluteBoundingBox": {"x": 150, "y": 300, "width": 200, "height": 50},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        cand = result[0]
+        assert cand['method'] == 'semantic'
+        assert cand['semantic_type'] == 'bg-content'
+        assert cand['suggested_name'] == 'content-layer'
+        assert cand['suggested_wrapper'] == 'content-group'
+        # Content should be 3 elements (c1, c2, c3)
+        assert set(cand['node_ids']) == {'c1', 'c2', 'c3'}
+        assert cand['count'] == 3
+        # Bg should include the RECTANGLE and the small VECTOR decoration
+        assert set(cand['bg_node_ids']) == {'bg1', 'deco1'}
+
+    def test_no_bg_rectangle(self):
+        """No full-width RECTANGLE -> empty result."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            {"id": "c1", "type": "GROUP", "name": "content-1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 300},
+             "children": [{"type": "TEXT", "children": []}]},
+            {"id": "c2", "type": "TEXT", "name": "text",
+             "absoluteBoundingBox": {"x": 100, "y": 500, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_multiple_bg_rectangles(self):
+        """Multiple full-width RECTANGLEs -> empty result (ambiguous)."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 1000}
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            {"id": "bg2", "type": "RECTANGLE", "name": "Rectangle 2",
+             "absoluteBoundingBox": {"x": 0, "y": 500, "width": 1440, "height": 400}},
+            {"id": "c1", "type": "TEXT", "name": "text",
+             "absoluteBoundingBox": {"x": 100, "y": 200, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "group",
+             "absoluteBoundingBox": {"x": 100, "y": 600, "width": 400, "height": 100},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_thin_rectangle_divider(self):
+        """Thin bg RECTANGLE (height < 30% of parent) -> empty result (divider, not bg)."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            # RECTANGLE covers full width but only 5px tall (< 30% of 800)
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 400, "width": 1440, "height": 5}},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "TEXT", "name": "text2",
+             "absoluteBoundingBox": {"x": 100, "y": 500, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_content_count_less_than_two(self):
+        """Only 1 content element (+ bg) -> empty result."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            {"id": "c1", "type": "TEXT", "name": "only-content",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_empty_children(self):
+        """Empty children list -> empty result."""
+        result = detect_bg_content_layers([], {'x': 0, 'y': 0, 'w': 1440, 'h': 800})
+        assert result == []
+
+    def test_zero_parent_dimensions(self):
+        """Parent with zero width/height -> empty result."""
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+        ]
+        assert detect_bg_content_layers(children, {'x': 0, 'y': 0, 'w': 0, 'h': 800}) == []
+        assert detect_bg_content_layers(children, {'x': 0, 'y': 0, 'w': 1440, 'h': 0}) == []
+
+    def test_narrow_rectangle_not_bg(self):
+        """RECTANGLE narrower than 80% of parent -> not treated as bg."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            # Width 1000 < 1440 * 0.8 = 1152 -> too narrow
+            {"id": "r1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 220, "y": 100, "width": 1000, "height": 400}},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "TEXT", "name": "text2",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_rectangle_with_children_not_bg(self):
+        """RECTANGLE with children (non-leaf) -> not treated as bg."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            {"id": "r1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400},
+             "children": [{"type": "TEXT", "children": []}]},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "TEXT", "name": "text2",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 400, "height": 60}},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert result == []
+
+    def test_large_vector_not_decoration(self):
+        """Large VECTOR (area >= 5% of bg) -> treated as content, not decoration."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        # bg area = 1440 * 400 = 576000. 5% = 28800
+        # Large vector area = 300 * 200 = 60000 > 28800
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            {"id": "v1", "type": "VECTOR", "name": "large-vector",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 300, "height": 200}},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "group",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 400, "height": 100},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        cand = result[0]
+        # Large VECTOR should be content, not decoration
+        assert 'v1' in cand['node_ids']
+        assert 'v1' not in cand['bg_node_ids']
+        assert cand['count'] == 3  # v1, c1, c2
+
+    def test_non_overlapping_vector_not_decoration(self):
+        """Small VECTOR that doesn't overlap bg -> treated as content."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 300}},
+            # Small vector but completely below the bg RECTANGLE
+            {"id": "v1", "type": "VECTOR", "name": "Vector 1",
+             "absoluteBoundingBox": {"x": 100, "y": 500, "width": 20, "height": 20}},
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "group",
+             "absoluteBoundingBox": {"x": 100, "y": 350, "width": 400, "height": 100},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        # Non-overlapping vector is content
+        assert 'v1' in result[0]['node_ids']
+        assert 'v1' not in result[0]['bg_node_ids']
+
+    def test_constants_exported(self):
+        """Verify constants are exported and have expected values."""
+        assert BG_WIDTH_RATIO == 0.8
+        assert BG_MIN_HEIGHT_RATIO == 0.3
+        assert BG_DECORATION_MAX_AREA_RATIO == 0.05
+
+
+# ============================================================
+# detect_table_rows (Issue 181)
+# ============================================================
+class TestDetectTableRows:
+    """Tests for table row structure detection (Issue 181)."""
+
+    def _make_table_children(self):
+        """Create a standard 4-row table fixture:
+        1 heading FRAME + 4 bg RECTANGLEs + 5 divider VECTORs + 12 TEXTs.
+        Modeled after the /strength page Group 6131.
+        """
+        parent_w = 600
+        row_h = 103
+        children = []
+        y_cursor = 0
+
+        # Heading frame above table
+        children.append({
+            "id": "h:1", "type": "FRAME", "name": "Frame 1",
+            "absoluteBoundingBox": {"x": 0, "y": y_cursor, "width": parent_w, "height": 60},
+            "children": [
+                {"id": "h:2", "type": "TEXT", "name": "heading-text",
+                 "absoluteBoundingBox": {"x": 10, "y": y_cursor + 10, "width": 200, "height": 30},
+                 "characters": "水道関連有資格者数"},
+            ],
+        })
+        y_cursor += 60
+
+        # Top divider
+        children.append({
+            "id": "d:0", "type": "VECTOR", "name": "Vector 1",
+            "absoluteBoundingBox": {"x": 0, "y": y_cursor, "width": parent_w, "height": 0},
+        })
+
+        for row_idx in range(4):
+            row_y = y_cursor + row_idx * (row_h + 1)  # +1 for divider
+            # Row background RECTANGLE
+            children.append({
+                "id": f"r:{row_idx}", "type": "RECTANGLE", "name": f"Rectangle {row_idx}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": parent_w, "height": row_h},
+            })
+            # Label TEXT (left side)
+            children.append({
+                "id": f"t:label:{row_idx}", "type": "TEXT", "name": f"Text label {row_idx}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 20, "width": 200, "height": 30},
+                "characters": f"資格名{row_idx}",
+            })
+            # Value TEXT (center)
+            children.append({
+                "id": f"t:val:{row_idx}", "type": "TEXT", "name": f"Text val {row_idx}",
+                "absoluteBoundingBox": {"x": 300, "y": row_y + 20, "width": 50, "height": 30},
+                "characters": str(291 - row_idx * 10),
+            })
+            # Unit TEXT (right side)
+            children.append({
+                "id": f"t:unit:{row_idx}", "type": "TEXT", "name": f"Text unit {row_idx}",
+                "absoluteBoundingBox": {"x": 360, "y": row_y + 20, "width": 30, "height": 30},
+                "characters": "名",
+            })
+            # Divider after each row
+            children.append({
+                "id": f"d:{row_idx + 1}", "type": "VECTOR", "name": f"Vector {row_idx + 2}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y + row_h, "width": parent_w, "height": 0},
+            })
+
+        return children, parent_w
+
+    def test_standard_table(self):
+        """Standard: 4 bg RECTs + 5 dividers + 12 texts + 1 heading -> 1 table candidate."""
+        children, parent_w = self._make_table_children()
+        parent_bb = {'x': 0, 'y': 0, 'w': parent_w, 'h': 600}
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        cand = result[0]
+        assert cand['method'] == 'semantic'
+        assert cand['semantic_type'] == 'table'
+        assert cand['row_count'] == 4
+        assert cand['suggested_wrapper'] == 'table-container'
+        # All 22 children should be in the table
+        assert cand['count'] == len(children)
+        # Heading should be included
+        assert 'h:1' in cand['node_ids']
+        # All RECTs should be included
+        for i in range(4):
+            assert f'r:{i}' in cand['node_ids']
+        # All dividers should be included
+        for i in range(5):
+            assert f'd:{i}' in cand['node_ids']
+        # All texts should be included
+        for i in range(4):
+            assert f't:label:{i}' in cand['node_ids']
+            assert f't:val:{i}' in cand['node_ids']
+            assert f't:unit:{i}' in cand['node_ids']
+        # Name should contain a slug from heading text
+        assert cand['suggested_name'].startswith('table-')
+        assert len(cand['suggested_name']) > len('table-')
+
+    def test_too_few_rects(self):
+        """Only 2 full-width RECTANGLEs -> below TABLE_MIN_ROWS -> empty."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 400}
+        children = [
+            {"id": "r:0", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 600, "height": 100}},
+            {"id": "t:0", "type": "TEXT", "name": "Text 1",
+             "absoluteBoundingBox": {"x": 10, "y": 20, "width": 100, "height": 30},
+             "characters": "label"},
+            {"id": "r:1", "type": "RECTANGLE", "name": "Rectangle 2",
+             "absoluteBoundingBox": {"x": 0, "y": 110, "width": 600, "height": 100}},
+            {"id": "t:1", "type": "TEXT", "name": "Text 2",
+             "absoluteBoundingBox": {"x": 10, "y": 130, "width": 100, "height": 30},
+             "characters": "label2"},
+        ]
+        result = detect_table_rows(children, parent_bb)
+        assert result == []
+
+    def test_rects_not_full_width(self):
+        """RECTANGLEs narrower than 90% of parent -> empty."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1000, 'h': 600}
+        children = [
+            {"id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+             "absoluteBoundingBox": {"x": 100, "y": i * 110, "width": 500, "height": 100}}
+            for i in range(4)
+        ]
+        # Add text children for each rect
+        for i in range(4):
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 110, "y": i * 110 + 20, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        result = detect_table_rows(children, parent_bb)
+        assert result == []
+
+    def test_heading_included(self):
+        """FRAME element above first RECT -> included as heading."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 600}
+        children = [
+            # Heading above rects
+            {"id": "heading", "type": "FRAME", "name": "heading-frame",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 600, "height": 50},
+             "children": [
+                 {"id": "ht", "type": "TEXT", "name": "heading-text",
+                  "absoluteBoundingBox": {"x": 10, "y": 10, "width": 200, "height": 30},
+                  "characters": "Table Title"},
+             ]},
+        ]
+        # Add 3 rows
+        for i in range(3):
+            row_y = 60 + i * 110
+            children.append({
+                "id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": 600, "height": 100},
+            })
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 20, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        assert 'heading' in result[0]['node_ids']
+        assert result[0]['suggested_name'] == 'table-table-title'  # "Table Title" -> to_kebab -> "table-title"
+
+    def test_mixed_table_and_non_table_content(self):
+        """Non-table elements (outside RECT Y range) not included."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 800}
+        children = []
+        # 3 table rows
+        for i in range(3):
+            row_y = i * 110
+            children.append({
+                "id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": 600, "height": 100},
+            })
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 20, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        # Non-table TEXT far below (Y-center outside any RECT)
+        children.append({
+            "id": "extra", "type": "TEXT", "name": "extra-text",
+            "absoluteBoundingBox": {"x": 10, "y": 600, "width": 200, "height": 40},
+            "characters": "Not part of table",
+        })
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        assert 'extra' not in result[0]['node_ids']
+        assert result[0]['row_count'] == 3
+
+    def test_empty_children(self):
+        """Empty children -> empty result."""
+        result = detect_table_rows([], {'x': 0, 'y': 0, 'w': 600, 'h': 400})
+        assert result == []
+
+    def test_zero_parent_width(self):
+        """Parent with zero width -> empty result."""
+        children = [
+            {"id": "r:0", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 600, "height": 100}},
+        ]
+        result = detect_table_rows(children, {'x': 0, 'y': 0, 'w': 0, 'h': 400})
+        assert result == []
+
+    def test_dividers_included(self):
+        """VECTOR dividers (height <= 2px, full-width) are included."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 600}
+        children = []
+        for i in range(3):
+            row_y = i * 110
+            children.append({
+                "id": f"d:{i}", "type": "VECTOR", "name": f"Vector {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": 600, "height": 1},
+            })
+            children.append({
+                "id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y + 1, "width": 600, "height": 100},
+            })
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 21, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        # All dividers should be included
+        for i in range(3):
+            assert f'd:{i}' in result[0]['node_ids']
+
+    def test_line_dividers_included(self):
+        """LINE dividers (not just VECTOR) are also included."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 600}
+        children = []
+        for i in range(3):
+            row_y = i * 110
+            children.append({
+                "id": f"l:{i}", "type": "LINE", "name": f"Line {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": 600, "height": 0},
+            })
+            children.append({
+                "id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y + 1, "width": 600, "height": 100},
+            })
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 21, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        for i in range(3):
+            assert f'l:{i}' in result[0]['node_ids']
+
+    def test_constants_exported(self):
+        """Verify constants are exported and have expected values."""
+        assert TABLE_MIN_ROWS == 3
+        assert TABLE_ROW_WIDTH_RATIO == 0.9
+        assert TABLE_DIVIDER_MAX_HEIGHT == 2
+
+    def test_rects_without_content_not_counted(self):
+        """RECTANGLEs with no TEXT in their Y range -> row_count stays 0 -> empty."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 600}
+        # 3 RECTANGLEs but all text is outside their Y ranges
+        children = [
+            {"id": "r:0", "type": "RECTANGLE", "name": "Rectangle 0",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 600, "height": 50}},
+            {"id": "r:1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 60, "width": 600, "height": 50}},
+            {"id": "r:2", "type": "RECTANGLE", "name": "Rectangle 2",
+             "absoluteBoundingBox": {"x": 0, "y": 120, "width": 600, "height": 50}},
+            # All text is far below the rects
+            {"id": "t:0", "type": "TEXT", "name": "Text 0",
+             "absoluteBoundingBox": {"x": 10, "y": 500, "width": 100, "height": 30},
+             "characters": "far away"},
+        ]
+        result = detect_table_rows(children, parent_bb)
+        assert result == []
+
+    def test_node_order_preserved(self):
+        """Node IDs in result should follow children order."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 600, 'h': 600}
+        children = []
+        for i in range(3):
+            row_y = i * 110
+            children.append({
+                "id": f"r:{i}", "type": "RECTANGLE", "name": f"Rectangle {i}",
+                "absoluteBoundingBox": {"x": 0, "y": row_y, "width": 600, "height": 100},
+            })
+            children.append({
+                "id": f"t:{i}", "type": "TEXT", "name": f"Text {i}",
+                "absoluteBoundingBox": {"x": 10, "y": row_y + 20, "width": 100, "height": 30},
+                "characters": f"label{i}",
+            })
+        result = detect_table_rows(children, parent_bb)
+        assert len(result) == 1
+        ids = result[0]['node_ids']
+        # Verify order matches children order
+        child_ids = [c.get('id', '') for c in children]
+        ordered = [cid for cid in child_ids if cid in ids]
+        assert ids == ordered
+
+
+# ============================================================
+# detect_repeating_tuple (Issue 186)
+# ============================================================
+class TestDetectRepeatingTuple:
+    def _make_node(self, node_type, name, node_id=None):
+        """Helper to create a minimal Figma node dict."""
+        return {
+            "type": node_type,
+            "name": name,
+            "id": node_id or f"{node_type}-{name}",
+        }
+
+    def test_standard_3tuple_x3(self):
+        """Standard blog card pattern: 3-tuple (RECTANGLE+FRAME+INSTANCE) x 3 reps."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"img-{i}"))
+            children.append(self._make_node("FRAME", f"text-{i}"))
+            children.append(self._make_node("INSTANCE", f"arrow-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 3
+        assert result[0]['count'] == 3
+        assert result[0]['start_idx'] == 0
+        assert result[0]['children_indices'] == list(range(9))
+
+    def test_2tuple_x4(self):
+        """2-tuple (TEXT+RECTANGLE) x 4 repetitions."""
+        children = []
+        for i in range(4):
+            children.append(self._make_node("TEXT", f"label-{i}"))
+            children.append(self._make_node("RECTANGLE", f"box-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 2
+        assert result[0]['count'] == 4
+        assert result[0]['children_indices'] == list(range(8))
+
+    def test_not_enough_repetitions(self):
+        """Only 2 repetitions (below TUPLE_PATTERN_MIN=3) -> no detection."""
+        children = []
+        for i in range(2):
+            children.append(self._make_node("RECTANGLE", f"img-{i}"))
+            children.append(self._make_node("FRAME", f"text-{i}"))
+            children.append(self._make_node("INSTANCE", f"arrow-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 0
+
+    def test_mixed_types_no_tuple(self):
+        """Types that don't form any repeating tuple pattern."""
+        children = [
+            self._make_node("RECTANGLE", "a"),
+            self._make_node("FRAME", "b"),
+            self._make_node("TEXT", "c"),
+            self._make_node("VECTOR", "d"),
+            self._make_node("ELLIPSE", "e"),
+            self._make_node("LINE", "f"),
+        ]
+        result = detect_repeating_tuple(children)
+        assert len(result) == 0
+
+    def test_tuple_at_start_with_trailing(self):
+        """Tuple pattern at start with non-tuple trailing elements."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"img-{i}"))
+            children.append(self._make_node("FRAME", f"text-{i}"))
+        # Add trailing non-pattern elements
+        children.append(self._make_node("VECTOR", "decoration"))
+        children.append(self._make_node("TEXT", "footer-text"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 2
+        assert result[0]['count'] == 3
+        assert result[0]['start_idx'] == 0
+        assert result[0]['children_indices'] == list(range(6))
+
+    def test_tuple_in_middle(self):
+        """Tuple pattern in the middle with surrounding non-tuple elements."""
+        children = [
+            self._make_node("TEXT", "heading"),
+            self._make_node("VECTOR", "divider"),
+        ]
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"img-{i}"))
+            children.append(self._make_node("INSTANCE", f"btn-{i}"))
+        children.append(self._make_node("TEXT", "footer"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 2
+        assert result[0]['count'] == 3
+        assert result[0]['start_idx'] == 2
+        assert result[0]['children_indices'] == [2, 3, 4, 5, 6, 7]
+
+    def test_empty_input(self):
+        """Empty children list -> no results."""
+        result = detect_repeating_tuple([])
+        assert result == []
+
+    def test_single_element(self):
+        """Single element -> no results."""
+        children = [self._make_node("FRAME", "only-one")]
+        result = detect_repeating_tuple(children)
+        assert result == []
+
+    def test_tuple_size_exceeds_max(self):
+        """Tuple of size 6 (> TUPLE_MAX_SIZE=5) -> not detected as a single tuple."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"a-{i}"))
+            children.append(self._make_node("FRAME", f"b-{i}"))
+            children.append(self._make_node("INSTANCE", f"c-{i}"))
+            children.append(self._make_node("TEXT", f"d-{i}"))
+            children.append(self._make_node("VECTOR", f"e-{i}"))
+            children.append(self._make_node("ELLIPSE", f"f-{i}"))
+        result = detect_repeating_tuple(children)
+        # Should NOT find a tuple of size 6 (exceeds TUPLE_MAX_SIZE=5)
+        for r in result:
+            assert r['tuple_size'] <= TUPLE_MAX_SIZE
+
+    def test_constants_values(self):
+        """Verify constant values match spec."""
+        assert TUPLE_PATTERN_MIN == 3
+        assert TUPLE_MAX_SIZE == 5
+
+    def test_5tuple_x3(self):
+        """5-tuple (max size) x 3 repetitions."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"a-{i}"))
+            children.append(self._make_node("FRAME", f"b-{i}"))
+            children.append(self._make_node("INSTANCE", f"c-{i}"))
+            children.append(self._make_node("TEXT", f"d-{i}"))
+            children.append(self._make_node("VECTOR", f"e-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 5
+        assert result[0]['count'] == 3
+        assert result[0]['children_indices'] == list(range(15))
+
+    def test_two_different_tuples(self):
+        """Two non-overlapping tuple patterns of different sizes."""
+        children = []
+        # First pattern: 2-tuple x 3
+        for i in range(3):
+            children.append(self._make_node("TEXT", f"label-{i}"))
+            children.append(self._make_node("RECTANGLE", f"box-{i}"))
+        # Separator
+        children.append(self._make_node("VECTOR", "divider"))
+        # Second pattern: 3-tuple x 3
+        for i in range(3):
+            children.append(self._make_node("FRAME", f"card-{i}"))
+            children.append(self._make_node("INSTANCE", f"icon-{i}"))
+            children.append(self._make_node("ELLIPSE", f"dot-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 2
+        # First group
+        first = [r for r in result if r['start_idx'] == 0][0]
+        assert first['tuple_size'] == 2
+        assert first['count'] == 3
+        # Second group
+        second = [r for r in result if r['start_idx'] == 7][0]
+        assert second['tuple_size'] == 3
+        assert second['count'] == 3
+
+    def test_all_same_type_not_tuple(self):
+        """All elements of same type -> no tuple (tuple_size=1 is below min size of 2)."""
+        children = [self._make_node("TEXT", f"t-{i}") for i in range(6)]
+        result = detect_repeating_tuple(children)
+        assert len(result) == 0
+
+
+# ============================================================
+# Issue 189: is_decoration_pattern / decoration_dominant_shape
+# ============================================================
+class TestDecorationPattern:
+    def _make_frame(self, w, h, children, node_type='FRAME'):
+        return {
+            'type': node_type,
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': w, 'height': h},
+            'children': children,
+        }
+
+    def _make_leaf(self, node_type, w=10, h=10):
+        return {
+            'type': node_type,
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': w, 'height': h},
+        }
+
+    def test_basic_dot_pattern(self):
+        """FRAME with 5 ELLIPSE children -> decoration pattern."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(5)]
+        node = self._make_frame(100, 100, children)
+        assert is_decoration_pattern(node) is True
+
+    def test_basic_rect_pattern(self):
+        """FRAME with 4 RECTANGLE children -> decoration pattern."""
+        children = [self._make_leaf('RECTANGLE') for _ in range(4)]
+        node = self._make_frame(150, 150, children)
+        assert is_decoration_pattern(node) is True
+
+    def test_mixed_shapes(self):
+        """FRAME with ELLIPSE + VECTOR children (>= 60% shapes) -> decoration."""
+        children = [
+            self._make_leaf('ELLIPSE'), self._make_leaf('ELLIPSE'),
+            self._make_leaf('VECTOR'), self._make_leaf('VECTOR'),
+            self._make_leaf('TEXT'),  # 1 non-shape
+        ]
+        node = self._make_frame(100, 100, children)
+        assert is_decoration_pattern(node) is True  # 4/5 = 80% shapes
+
+    def test_too_few_shapes(self):
+        """Only 2 ELLIPSE children (below DECORATION_MIN_SHAPES=3) -> not decoration."""
+        children = [self._make_leaf('ELLIPSE'), self._make_leaf('ELLIPSE')]
+        node = self._make_frame(100, 100, children)
+        assert is_decoration_pattern(node) is False
+
+    def test_too_large(self):
+        """Frame larger than DECORATION_MAX_SIZE -> not decoration."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(5)]
+        node = self._make_frame(250, 250, children)
+        assert is_decoration_pattern(node) is False
+
+    def test_width_exceeds_max(self):
+        """Width exceeds max but height is small -> not decoration."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(5)]
+        node = self._make_frame(201, 100, children)
+        assert is_decoration_pattern(node) is False
+
+    def test_height_exceeds_max(self):
+        """Height exceeds max but width is small -> not decoration."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(5)]
+        node = self._make_frame(100, 201, children)
+        assert is_decoration_pattern(node) is False
+
+    def test_low_shape_ratio(self):
+        """Too many non-shape children (below 60%) -> not decoration."""
+        children = [
+            self._make_leaf('ELLIPSE'), self._make_leaf('ELLIPSE'),
+            self._make_leaf('ELLIPSE'),  # 3 shapes
+            self._make_leaf('TEXT'), self._make_leaf('TEXT'),
+            self._make_leaf('TEXT'), self._make_leaf('TEXT'),  # 4 non-shapes
+        ]
+        node = self._make_frame(100, 100, children)
+        # 3/7 = 0.43 < 0.6
+        assert is_decoration_pattern(node) is False
+
+    def test_not_frame_or_group(self):
+        """TEXT node -> not decoration regardless of children."""
+        node = {
+            'type': 'TEXT',
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 50, 'height': 50},
+            'children': [self._make_leaf('ELLIPSE') for _ in range(5)],
+        }
+        assert is_decoration_pattern(node) is False
+
+    def test_group_type(self):
+        """GROUP type should also be detected."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(4)]
+        node = self._make_frame(100, 100, children, node_type='GROUP')
+        assert is_decoration_pattern(node) is True
+
+    def test_no_children(self):
+        """FRAME with no children -> not decoration."""
+        node = self._make_frame(100, 100, [])
+        assert is_decoration_pattern(node) is False
+
+    def test_nested_shapes(self):
+        """Nested children: shapes inside sub-frames count as leaf descendants."""
+        sub_frame = {
+            'type': 'FRAME',
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 50, 'height': 50},
+            'children': [self._make_leaf('ELLIPSE') for _ in range(3)],
+        }
+        children = [sub_frame, self._make_leaf('ELLIPSE')]
+        node = self._make_frame(100, 100, children)
+        # 4 ELLIPSE leaves, 4 total leaves, ratio=1.0
+        assert is_decoration_pattern(node) is True
+
+    def test_dominant_shape_ellipse(self):
+        """Mostly ELLIPSE -> dominant is ELLIPSE."""
+        children = [
+            self._make_leaf('ELLIPSE'), self._make_leaf('ELLIPSE'),
+            self._make_leaf('ELLIPSE'), self._make_leaf('RECTANGLE'),
+        ]
+        node = self._make_frame(100, 100, children)
+        assert decoration_dominant_shape(node) == 'ELLIPSE'
+
+    def test_dominant_shape_rectangle(self):
+        """Mostly RECTANGLE -> dominant is RECTANGLE."""
+        children = [
+            self._make_leaf('RECTANGLE'), self._make_leaf('RECTANGLE'),
+            self._make_leaf('RECTANGLE'), self._make_leaf('ELLIPSE'),
+        ]
+        node = self._make_frame(100, 100, children)
+        assert decoration_dominant_shape(node) == 'RECTANGLE'
+
+    def test_dominant_shape_vector(self):
+        """Mostly VECTOR -> dominant is VECTOR."""
+        children = [
+            self._make_leaf('VECTOR'), self._make_leaf('VECTOR'),
+            self._make_leaf('VECTOR'), self._make_leaf('ELLIPSE'),
+        ]
+        node = self._make_frame(100, 100, children)
+        assert decoration_dominant_shape(node) == 'VECTOR'
+
+    def test_constants_exported(self):
+        """Verify constants are exported and have expected values."""
+        assert DECORATION_MAX_SIZE == 200
+        assert DECORATION_SHAPE_RATIO == 0.6
+        assert DECORATION_MIN_SHAPES == 3
+
+    def test_boundary_size_exactly_200(self):
+        """Frame exactly at DECORATION_MAX_SIZE boundary -> accepted."""
+        children = [self._make_leaf('ELLIPSE') for _ in range(5)]
+        node = self._make_frame(200, 200, children)
+        assert is_decoration_pattern(node) is True
+
+    def test_boundary_ratio_exactly_60_percent(self):
+        """Exactly 60% shape ratio -> accepted (>= threshold)."""
+        # 3 shapes, 2 non-shapes = 60%
+        children = [
+            self._make_leaf('ELLIPSE'), self._make_leaf('ELLIPSE'),
+            self._make_leaf('ELLIPSE'),
+            self._make_leaf('TEXT'), self._make_leaf('TEXT'),
+        ]
+        node = self._make_frame(100, 100, children)
+        assert is_decoration_pattern(node) is True
+
+
+# ============================================================
+# Issue 190: detect_highlight_text
+# ============================================================
+class TestDetectHighlightText:
+    def _make_rect(self, x, y, w, h, node_id='r1', has_children=False):
+        node = {
+            'id': node_id, 'type': 'RECTANGLE', 'name': f'Rectangle {node_id}',
+            'absoluteBoundingBox': {'x': x, 'y': y, 'width': w, 'height': h},
+        }
+        if has_children:
+            node['children'] = [{'type': 'VECTOR', 'absoluteBoundingBox': {'x': x, 'y': y, 'width': 10, 'height': 10}}]
+        return node
+
+    def _make_text(self, x, y, w, h, text='test', node_id='t1'):
+        return {
+            'id': node_id, 'type': 'TEXT', 'name': f'Text {node_id}',
+            'absoluteBoundingBox': {'x': x, 'y': y, 'width': w, 'height': h},
+            'characters': text,
+        }
+
+    def test_standard_overlap(self):
+        """RECTANGLE and TEXT overlapping at same position -> highlight detected."""
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(110, 105, 180, 30, text='key phrase'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 1
+        assert result[0]['rect_idx'] == 0
+        assert result[0]['text_idx'] == 1
+        assert result[0]['text_content'] == 'key phrase'
+
+    def test_no_overlap(self):
+        """RECTANGLE and TEXT completely separated -> no highlight."""
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(100, 300, 200, 30, text='far away'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_partial_overlap_below_threshold(self):
+        """Y overlap below 80% threshold -> no highlight."""
+        # RECT: y=100..140, TEXT: y=130..165 (overlap 10px, smaller_h=35, ratio=0.29)
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(100, 130, 200, 35, text='partial'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_rect_too_tall(self):
+        """RECT height > 2.0x TEXT height -> no highlight."""
+        children = [
+            self._make_rect(100, 100, 200, 100),  # h=100
+            self._make_text(100, 100, 200, 30, text='small'),  # h=30, ratio=3.33
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_rect_too_short(self):
+        """RECT height < 0.5x TEXT height -> no highlight."""
+        children = [
+            self._make_rect(100, 100, 200, 10),  # h=10
+            self._make_text(100, 95, 200, 40, text='tall text'),  # h=40, ratio=0.25
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_text_too_long(self):
+        """Text > HIGHLIGHT_TEXT_MAX_LEN (30) -> no highlight."""
+        long_text = 'a' * 31
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(100, 100, 200, 30, text=long_text),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_text_exactly_30_chars(self):
+        """Text exactly at max length -> highlight detected."""
+        text_30 = 'a' * 30
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(105, 105, 180, 30, text=text_30),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 1
+
+    def test_multiple_highlight_pairs(self):
+        """Two RECT+TEXT pairs -> both detected."""
+        children = [
+            self._make_rect(100, 100, 200, 40, node_id='r1'),
+            self._make_text(105, 105, 180, 30, text='first', node_id='t1'),
+            self._make_rect(100, 200, 200, 40, node_id='r2'),
+            self._make_text(105, 205, 180, 30, text='second', node_id='t2'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 2
+        texts = {r['text_content'] for r in result}
+        assert texts == {'first', 'second'}
+
+    def test_rect_with_children_not_leaf(self):
+        """RECTANGLE with children (not a leaf) -> not considered for highlight."""
+        children = [
+            self._make_rect(100, 100, 200, 40, has_children=True),
+            self._make_text(105, 105, 180, 30, text='behind'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_empty_children(self):
+        """Empty children list -> empty result."""
+        result = detect_highlight_text([])
+        assert result == []
+
+    def test_no_rectangle(self):
+        """Only TEXT children -> no highlight."""
+        children = [
+            self._make_text(100, 100, 200, 30, text='only text', node_id='t1'),
+            self._make_text(100, 200, 200, 30, text='more text', node_id='t2'),
+        ]
+        result = detect_highlight_text(children)
+        assert result == []
+
+    def test_no_text(self):
+        """Only RECTANGLE children -> no highlight."""
+        children = [
+            self._make_rect(100, 100, 200, 40, node_id='r1'),
+            self._make_rect(100, 200, 200, 40, node_id='r2'),
+        ]
+        result = detect_highlight_text(children)
+        assert result == []
+
+    def test_non_rect_text_combo(self):
+        """VECTOR + TEXT at same position -> no highlight (must be RECTANGLE)."""
+        children = [
+            {'id': 'v1', 'type': 'VECTOR', 'name': 'Vector 1',
+             'absoluteBoundingBox': {'x': 100, 'y': 100, 'width': 200, 'height': 40}},
+            self._make_text(105, 105, 180, 30, text='over vector'),
+        ]
+        result = detect_highlight_text(children)
+        assert result == []
+
+    def test_x_overlap_required(self):
+        """X ranges don't overlap -> no highlight even if Y overlaps."""
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            self._make_text(400, 100, 200, 30, text='far right'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 0
+
+    def test_constants_exported(self):
+        """Verify constants are exported and have expected values."""
+        assert HIGHLIGHT_OVERLAP_RATIO == 0.8
+        assert HIGHLIGHT_TEXT_MAX_LEN == 30
+        assert HIGHLIGHT_HEIGHT_RATIO_MIN == 0.5
+        assert HIGHLIGHT_HEIGHT_RATIO_MAX == 2.0
+
+    def test_model_case_example(self):
+        """Reproduce the model case: Rectangle 14 (205x49) behind TEXT (same position)."""
+        children = [
+            self._make_rect(217, 3098, 205, 49, node_id='rect14'),
+            self._make_text(220, 3100, 200, 40, text='key text', node_id='text-key'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 1
+        assert result[0]['text_content'] == 'key text'
+
+    def test_each_rect_used_once(self):
+        """One RECT cannot match multiple TEXTs."""
+        children = [
+            self._make_rect(100, 100, 200, 40, node_id='r1'),
+            self._make_text(105, 105, 180, 30, text='first', node_id='t1'),
+            self._make_text(105, 106, 180, 30, text='second', node_id='t2'),
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 1  # Only first TEXT matched
+
+    def test_zero_size_rect(self):
+        """RECT with zero width -> skipped."""
+        children = [
+            self._make_rect(100, 100, 0, 40),
+            self._make_text(100, 100, 200, 30, text='test'),
+        ]
+        result = detect_highlight_text(children)
+        assert result == []
+
+    def test_characters_field_preferred(self):
+        """Characters field is used over name for text content."""
+        children = [
+            self._make_rect(100, 100, 200, 40),
+            {
+                'id': 't1', 'type': 'TEXT', 'name': 'Text 1',
+                'absoluteBoundingBox': {'x': 105, 'y': 105, 'width': 180, 'height': 30},
+                'characters': 'real content',
+            },
+        ]
+        result = detect_highlight_text(children)
+        assert len(result) == 1
+        assert result[0]['text_content'] == 'real content'
+
+
+# ============================================================
+# is_off_canvas (Issue 182)
+# ============================================================
+class TestIsOffCanvas:
+    def test_element_within_viewport(self):
+        """Element at x=100, w=200 on a 1440px page -> not off-canvas."""
+        node = {"absoluteBoundingBox": {"x": 100, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_element_at_origin(self):
+        """Element at x=0 -> not off-canvas."""
+        node = {"absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 100}}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_element_far_right(self):
+        """Element at x=2200 (> 1440 * 1.5 = 2160) -> off-canvas."""
+        node = {"absoluteBoundingBox": {"x": 2200, "y": 0, "width": 300, "height": 100}}
+        assert is_off_canvas(node, 1440) is True
+
+    def test_element_just_at_margin(self):
+        """Element at x=2160 (= 1440 * 1.5) -> not off-canvas (must exceed, not equal)."""
+        node = {"absoluteBoundingBox": {"x": 2160, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_element_just_beyond_margin(self):
+        """Element at x=2161 (> 1440 * 1.5) -> off-canvas."""
+        node = {"absoluteBoundingBox": {"x": 2161, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 1440) is True
+
+    def test_element_completely_left(self):
+        """Element at x=-400, w=200 (right edge = -200 < 0) -> off-canvas."""
+        node = {"absoluteBoundingBox": {"x": -400, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 1440) is True
+
+    def test_element_partially_left(self):
+        """Element at x=-100, w=200 (right edge = 100 > 0) -> not off-canvas."""
+        node = {"absoluteBoundingBox": {"x": -100, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_zero_page_width(self):
+        """page_width=0 -> always returns False (safety guard)."""
+        node = {"absoluteBoundingBox": {"x": 5000, "y": 0, "width": 200, "height": 100}}
+        assert is_off_canvas(node, 0) is False
+
+    def test_zero_width_element(self):
+        """Element with w=0 -> returns False (degenerate bbox)."""
+        node = {"absoluteBoundingBox": {"x": 5000, "y": 0, "width": 0, "height": 100}}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_no_bbox(self):
+        """Node with no absoluteBoundingBox -> returns False (get_bbox returns defaults)."""
+        node = {}
+        assert is_off_canvas(node, 1440) is False
+
+    def test_constant_value(self):
+        """OFF_CANVAS_MARGIN should be 1.5."""
+        assert OFF_CANVAS_MARGIN == 1.5
+
+
+# ============================================================
+# analyze-structure.sh: hidden node filtering (Issue 187)
+# ============================================================
+class TestAnalyzeStructureHiddenNodes:
+    def test_hidden_nodes_excluded_from_scoring(self):
+        """Hidden (visible: false) nodes should not be counted in total/unnamed."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 2000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section 1",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:1", "type": "TEXT", "name": "Title",
+                             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Frame 1",
+                        "visible": False,
+                        "absoluteBoundingBox": {"x": 0, "y": 500, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:2", "type": "TEXT", "name": "Text 1",
+                             "absoluteBoundingBox": {"x": 0, "y": 500, "width": 200, "height": 30}},
+                            {"id": "2:3", "type": "RECTANGLE", "name": "Rectangle 1",
+                             "absoluteBoundingBox": {"x": 0, "y": 530, "width": 200, "height": 200}},
+                        ],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("analyze-structure.sh", tmp)
+            metrics = result["metrics"]
+            # Hidden node (Frame 1) detected as 1 hidden node
+            # (its subtree is skipped entirely without recursive counting)
+            assert metrics["hidden_nodes"] == 1
+            # "Rectangle 1" matches UNNAMED_RE but is hidden -> not counted as unnamed
+            assert metrics["unnamed_nodes"] == 0
+            # Total should not include hidden subtree
+            # Visible: Page (root) + Section 1 + Title = 3
+            assert metrics["total_nodes"] == 3
+        finally:
+            os.unlink(tmp)
+
+    def test_no_hidden_nodes(self):
+        """When no hidden nodes, hidden_nodes metric should be 0."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 1000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:1", "type": "TEXT", "name": "Title",
+                             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 200, "height": 30}},
+                        ],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("analyze-structure.sh", tmp)
+            assert result["metrics"]["hidden_nodes"] == 0
+        finally:
+            os.unlink(tmp)
+
+
+# ============================================================
+# analyze-structure.sh: off-canvas node filtering (Issue 182)
+# ============================================================
+class TestAnalyzeStructureOffCanvas:
+    def test_off_canvas_nodes_excluded(self):
+        """Elements far right (x > page_width * 1.5) should be excluded."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 2000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section 1",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:1", "type": "TEXT", "name": "Title",
+                             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Frame 1",
+                        "absoluteBoundingBox": {"x": 3000, "y": 0, "width": 500, "height": 500},
+                        "children": [
+                            {"id": "2:2", "type": "TEXT", "name": "Text 1",
+                             "absoluteBoundingBox": {"x": 3000, "y": 0, "width": 200, "height": 30}},
+                            {"id": "2:3", "type": "RECTANGLE", "name": "Rectangle 1",
+                             "absoluteBoundingBox": {"x": 3000, "y": 30, "width": 200, "height": 200}},
+                        ],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("analyze-structure.sh", tmp)
+            metrics = result["metrics"]
+            # Off-canvas node (Frame 1 at x=3000) counted as 1 off-canvas
+            assert metrics["off_canvas_nodes"] == 1
+            # Total should not include off-canvas subtree
+            # Visible: Page (root) + Section 1 + Title = 3
+            assert metrics["total_nodes"] == 3
+        finally:
+            os.unlink(tmp)
+
+    def test_element_within_margin_not_excluded(self):
+        """Elements within 1.5x page_width are NOT off-canvas."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 1000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Sidebar",
+                        "absoluteBoundingBox": {"x": 1500, "y": 0, "width": 300, "height": 500},
+                        "children": [],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("analyze-structure.sh", tmp)
+            metrics = result["metrics"]
+            # x=1500 < 1440 * 1.5 = 2160 -> not off-canvas
+            assert metrics["off_canvas_nodes"] == 0
+            # All nodes counted: Page + Section + Sidebar = 3
+            assert metrics["total_nodes"] == 3
+        finally:
+            os.unlink(tmp)
+
+    def test_element_negative_x_off_canvas(self):
+        """Elements completely to the left (x + w < 0) are off-canvas."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 1000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Hidden Left",
+                        "absoluteBoundingBox": {"x": -500, "y": 0, "width": 200, "height": 500},
+                        "children": [],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("analyze-structure.sh", tmp)
+            metrics = result["metrics"]
+            assert metrics["off_canvas_nodes"] == 1
+        finally:
+            os.unlink(tmp)
+
+
+# ============================================================
+# detect-grouping-candidates.sh: hidden node filtering (Issue 187)
+# ============================================================
+class TestGroupingHiddenNodes:
+    def test_hidden_children_excluded_from_grouping(self):
+        """Hidden children should not appear in grouping candidates."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 2000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section 1",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:1", "type": "TEXT", "name": "Title",
+                             "absoluteBoundingBox": {"x": 10, "y": 10, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Frame 1",
+                        "visible": False,
+                        "absoluteBoundingBox": {"x": 0, "y": 500, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:2", "type": "TEXT", "name": "Text 1",
+                             "absoluteBoundingBox": {"x": 10, "y": 510, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:3", "type": "FRAME", "name": "Section 2",
+                        "absoluteBoundingBox": {"x": 0, "y": 1000, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:3", "type": "TEXT", "name": "Subtitle",
+                             "absoluteBoundingBox": {"x": 10, "y": 1010, "width": 200, "height": 30}},
+                        ],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("detect-grouping-candidates.sh", tmp)
+            candidates = result.get("candidates", [])
+            all_node_ids = []
+            for c in candidates:
+                all_node_ids.extend(c.get("node_ids", []))
+            assert "1:2" not in all_node_ids
+            assert "2:2" not in all_node_ids
+        finally:
+            os.unlink(tmp)
+
+
+# ============================================================
+# detect-grouping-candidates.sh: off-canvas node filtering (Issue 182)
+# ============================================================
+class TestGroupingOffCanvas:
+    def test_off_canvas_excluded_from_root_grouping(self):
+        """Off-canvas nodes at root level should be excluded from grouping."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 2000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Section 1",
+                        "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:1", "type": "TEXT", "name": "Title",
+                             "absoluteBoundingBox": {"x": 10, "y": 10, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:2", "type": "FRAME", "name": "Off Canvas Asset",
+                        "absoluteBoundingBox": {"x": 5000, "y": 0, "width": 500, "height": 500},
+                        "children": [
+                            {"id": "2:2", "type": "TEXT", "name": "Hidden Text",
+                             "absoluteBoundingBox": {"x": 5000, "y": 10, "width": 200, "height": 30}},
+                        ],
+                    },
+                    {
+                        "id": "1:3", "type": "FRAME", "name": "Section 2",
+                        "absoluteBoundingBox": {"x": 0, "y": 500, "width": 1440, "height": 500},
+                        "children": [
+                            {"id": "2:3", "type": "TEXT", "name": "Subtitle",
+                             "absoluteBoundingBox": {"x": 10, "y": 510, "width": 200, "height": 30}},
+                        ],
+                    },
+                ],
+            }
+        }
+        tmp = write_fixture(data)
+        try:
+            result = run_script("detect-grouping-candidates.sh", tmp)
+            candidates = result.get("candidates", [])
+            all_node_ids = []
+            for c in candidates:
+                all_node_ids.extend(c.get("node_ids", []))
+            assert "1:2" not in all_node_ids
+            assert "2:2" not in all_node_ids
+        finally:
+            os.unlink(tmp)
+
+
+# ============================================================
+# detect_en_jp_label_pairs (Issue 185)
+# ============================================================
+class TestDetectEnJpLabelPairs:
+    def _make_text(self, text, x=0, y=0, w=100, h=30):
+        return {
+            "type": "TEXT",
+            "name": "Text 1",
+            "characters": text,
+            "absoluteBoundingBox": {"x": x, "y": y, "width": w, "height": h},
+        }
+
+    def test_basic_pair(self):
+        """COMPANY + 会社情報 at similar Y -> pair detected."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 1
+        assert pairs[0]['en_idx'] == 0
+        assert pairs[0]['jp_idx'] == 1
+        assert pairs[0]['en_text'] == "COMPANY"
+        assert pairs[0]['jp_text'] == "会社情報"
+
+    def test_multi_word_en_label(self):
+        """OUR BUSINESS + 事業紹介 -> pair detected (multi-word EN label)."""
+        children = [
+            self._make_text("OUR BUSINESS", x=100, y=100, w=200, h=30),
+            self._make_text("事業紹介", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 1
+        assert pairs[0]['en_text'] == "OUR BUSINESS"
+
+    def test_too_many_words_not_label(self):
+        """EN text with > 3 words -> not detected as label."""
+        children = [
+            self._make_text("THIS IS NOT A LABEL", x=100, y=100, w=400, h=30),
+            self._make_text("日本語テスト", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 0
+
+    def test_lowercase_not_label(self):
+        """Lowercase EN text -> not detected as label."""
+        children = [
+            self._make_text("company info", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 0
+
+    def test_too_far_apart(self):
+        """EN+JP pair more than 200px apart -> not detected."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=400, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 0
+
+    def test_multiple_pairs(self):
+        """Multiple EN+JP pairs -> all detected."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=140, w=200, h=30),
+            self._make_text("RECRUIT", x=500, y=100, w=200, h=30),
+            self._make_text("採用情報", x=500, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 2
+
+    def test_non_text_nodes_ignored(self):
+        """Non-TEXT nodes among children -> ignored."""
+        children = [
+            {"type": "FRAME", "name": "Frame 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 100, "height": 100}},
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 1
+        assert pairs[0]['en_idx'] == 1
+        assert pairs[0]['jp_idx'] == 2
+
+    def test_single_child_no_pair(self):
+        """Single child -> no pair possible."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 0
+
+    def test_empty_children(self):
+        """Empty children list -> no pairs."""
+        assert detect_en_jp_label_pairs([]) == []
+
+    def test_horizontal_proximity(self):
+        """EN+JP pair side by side (horizontal proximity) -> detected."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=100, h=30),
+            self._make_text("会社情報", x=220, y=100, w=100, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 1
+
+    def test_overlapping_nodes(self):
+        """EN+JP pair overlapping -> detected (distance=0)."""
+        children = [
+            self._make_text("COMPANY", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=110, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 1
+
+    def test_mixed_case_not_upper(self):
+        """Mixed case (not all upper) -> not an EN label."""
+        children = [
+            self._make_text("Company", x=100, y=100, w=200, h=30),
+            self._make_text("会社情報", x=100, y=140, w=200, h=30),
+        ]
+        pairs = detect_en_jp_label_pairs(children)
+        assert len(pairs) == 0
+
+
+# ============================================================
+# JP_KEYWORD_MAP additions (Issue 185)
+# ============================================================
+class TestJpKeywordMapAdditions185:
+    def test_company_info(self):
+        assert _jp_keyword_lookup("会社情報") == "company-info"
+
+    def test_business_intro(self):
+        assert _jp_keyword_lookup("事業紹介") == "business"
+
+    def test_recruit_blog(self):
+        assert _jp_keyword_lookup("採用ブログ") == "recruit-blog"
+
+
+# ============================================================
+# Constants: CTA, Side Panel, EN+JP (Issues 185, 192, 193)
+# ============================================================
+class TestNewConstants185_192_193:
+    def test_en_label_max_words(self):
+        assert EN_LABEL_MAX_WORDS == 3
+
+    def test_en_jp_pair_max_distance(self):
+        assert EN_JP_PAIR_MAX_DISTANCE == 200
+
+    def test_cta_square_ratio_min(self):
+        assert CTA_SQUARE_RATIO_MIN == 0.8
+
+    def test_cta_square_ratio_max(self):
+        assert CTA_SQUARE_RATIO_MAX == 1.2
+
+    def test_cta_y_threshold(self):
+        assert CTA_Y_THRESHOLD == 100
+
+    def test_side_panel_max_width(self):
+        assert SIDE_PANEL_MAX_WIDTH == 80
+
+    def test_side_panel_height_ratio(self):
+        assert SIDE_PANEL_HEIGHT_RATIO == 3.0
+
+
+# ============================================================
+# generate-rename-map.sh integration: CTA detection (Issue 193)
+# ============================================================
+class TestGenerateRenameMapCTA:
+    def test_cta_square_button(self):
+        """Square CTA button at top-right with contact text -> cta-contact."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 5000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Frame 1",
+                        "absoluteBoundingBox": {"x": 1250, "y": 10, "width": 156, "height": 156},
+                        "children": [
+                            {
+                                "id": "1:2", "type": "TEXT", "name": "Text 1",
+                                "characters": "お問い合わせ",
+                                "absoluteBoundingBox": {"x": 1260, "y": 50, "width": 100, "height": 30},
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            assert "1:1" in renames
+            assert renames["1:1"]["new_name"].startswith("cta-")
+            assert "contact" in renames["1:1"]["new_name"]
+        finally:
+            os.unlink(path)
+
+    def test_non_square_not_cta(self):
+        """Non-square button at top-right -> not CTA."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 5000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Frame 1",
+                        "absoluteBoundingBox": {"x": 1250, "y": 10, "width": 300, "height": 50},
+                        "children": [
+                            {
+                                "id": "1:2", "type": "TEXT", "name": "Text 1",
+                                "characters": "お問い合わせ",
+                                "absoluteBoundingBox": {"x": 1260, "y": 20, "width": 100, "height": 30},
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            if "1:1" in renames:
+                assert not renames["1:1"]["new_name"].startswith("cta-")
+        finally:
+            os.unlink(path)
+
+
+# ============================================================
+# generate-rename-map.sh integration: Side panel (Issue 192)
+# ============================================================
+class TestGenerateRenameMapSidePanel:
+    def test_side_panel_right_edge(self):
+        """Narrow vertical frame at right edge -> side-panel-*."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 5000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Frame 52",
+                        "absoluteBoundingBox": {"x": 1379, "y": 500, "width": 42, "height": 268},
+                        "children": [
+                            {
+                                "id": "1:2", "type": "VECTOR", "name": "Vector 1",
+                                "absoluteBoundingBox": {"x": 1385, "y": 510, "width": 20, "height": 20},
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            assert "1:1" in renames
+            assert renames["1:1"]["new_name"].startswith("side-panel-")
+        finally:
+            os.unlink(path)
+
+    def test_wide_frame_not_side_panel(self):
+        """Wide frame at edge -> not side panel."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "Page",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 5000},
+                "children": [
+                    {
+                        "id": "1:1", "type": "FRAME", "name": "Frame 1",
+                        "absoluteBoundingBox": {"x": 1300, "y": 500, "width": 120, "height": 268},
+                        "children": [
+                            {
+                                "id": "1:2", "type": "TEXT", "name": "Text 1",
+                                "characters": "test",
+                                "absoluteBoundingBox": {"x": 1310, "y": 510, "width": 100, "height": 30},
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            if "1:1" in renames:
+                assert not renames["1:1"]["new_name"].startswith("side-panel-")
+        finally:
+            os.unlink(path)
+
+
+# ============================================================
+# generate-rename-map.sh integration: EN+JP pairs (Issue 185)
+# ============================================================
+class TestGenerateRenameMapEnJpPairs:
+    def test_en_jp_pair_renamed(self):
+        """COMPANY + 会社情報 TEXT siblings -> en-label-company + heading-company-info."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "section-root",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                "children": [
+                    {
+                        "id": "1:1", "type": "TEXT", "name": "Text 1",
+                        "characters": "COMPANY",
+                        "absoluteBoundingBox": {"x": 100, "y": 100, "width": 200, "height": 30},
+                    },
+                    {
+                        "id": "1:2", "type": "TEXT", "name": "Text 2",
+                        "characters": "会社情報",
+                        "absoluteBoundingBox": {"x": 100, "y": 140, "width": 200, "height": 30},
+                    },
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            assert "1:1" in renames
+            assert renames["1:1"]["new_name"] == "en-label-company"
+            assert "1:2" in renames
+            assert renames["1:2"]["new_name"] == "heading-company-info"
+        finally:
+            os.unlink(path)
+
+    def test_en_jp_pair_recruit(self):
+        """RECRUIT + 採用情報 -> en-label-recruit + heading-recruit."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "section-root",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                "children": [
+                    {
+                        "id": "1:1", "type": "TEXT", "name": "Text 1",
+                        "characters": "RECRUIT",
+                        "absoluteBoundingBox": {"x": 100, "y": 100, "width": 200, "height": 30},
+                    },
+                    {
+                        "id": "1:2", "type": "TEXT", "name": "Text 2",
+                        "characters": "採用情報",
+                        "absoluteBoundingBox": {"x": 100, "y": 140, "width": 200, "height": 30},
+                    },
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            assert "1:1" in renames
+            assert renames["1:1"]["new_name"] == "en-label-recruit"
+            assert "1:2" in renames
+            assert renames["1:2"]["new_name"] == "heading-recruit"
+        finally:
+            os.unlink(path)
+
+    def test_already_named_not_overridden(self):
+        """Already-named nodes (non-matching UNNAMED_RE) -> not overridden."""
+        data = {
+            "document": {
+                "id": "0:1", "type": "FRAME", "name": "section-root",
+                "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 500},
+                "children": [
+                    {
+                        "id": "1:1", "type": "TEXT", "name": "custom-en-label",
+                        "characters": "COMPANY",
+                        "absoluteBoundingBox": {"x": 100, "y": 100, "width": 200, "height": 30},
+                    },
+                    {
+                        "id": "1:2", "type": "TEXT", "name": "Text 2",
+                        "characters": "会社情報",
+                        "absoluteBoundingBox": {"x": 100, "y": 140, "width": 200, "height": 30},
+                    },
+                ],
+            }
+        }
+        path = write_fixture(data)
+        try:
+            result = run_script("generate-rename-map.sh", path)
+            renames = result.get("renames", {})
+            # 1:1 has custom name -> should NOT be overridden
+            assert "1:1" not in renames
+            # 1:2 is unnamed -> should still get heading rename
+            assert "1:2" in renames
+            assert renames["1:2"]["new_name"] == "heading-company-info"
+        finally:
+            os.unlink(path)
+
+
+# ===== Issue 194: Enriched Children Table =====
+
+class TestGenerateEnrichedTable:
+    """Tests for generate_enriched_table (Issue 194)."""
+
+    def _make_node(self, id, type, name, x, y, w, h, children=None, visible=True, characters=None):
+        node = {
+            'id': id,
+            'type': type,
+            'name': name,
+            'absoluteBoundingBox': {'x': x, 'y': y, 'width': w, 'height': h},
+            'children': children or [],
+        }
+        if not visible:
+            node['visible'] = False
+        if characters:
+            node['characters'] = characters
+        return node
+
+    def test_basic_output_format(self):
+        """Table has correct header and separator lines."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'hero', 0, 0, 1440, 600),
+        ]
+        result = generate_enriched_table(children)
+        lines = result.strip().split('\n')
+        assert len(lines) == 3  # header + separator + 1 row
+        assert '| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |' in lines[0]
+        assert lines[1].startswith('|---')
+
+    def test_leaf_detection(self):
+        """Leaf nodes show Y, container nodes show N."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'bg', 0, 0, 1440, 600),
+            self._make_node('1:2', 'FRAME', 'section', 0, 600, 1440, 400,
+                            children=[self._make_node('1:3', 'TEXT', 'title', 0, 0, 200, 30)]),
+        ]
+        result = generate_enriched_table(children)
+        lines = result.strip().split('\n')
+        # Row 1 (RECTANGLE, no children) = leaf
+        assert '| Y |' in lines[2]
+        # Row 2 (FRAME with children) = not leaf
+        assert '| N |' in lines[3]
+
+    def test_child_types_summary(self):
+        """ChildTypes column shows compact type summary."""
+        text_child = self._make_node('1:3', 'TEXT', 'txt', 0, 0, 100, 20)
+        frame_child = self._make_node('1:4', 'FRAME', 'frm', 0, 30, 100, 50)
+        children = [
+            self._make_node('1:2', 'FRAME', 'card', 0, 0, 300, 200,
+                            children=[text_child, text_child, frame_child]),
+        ]
+        result = generate_enriched_table(children)
+        # Should contain 1FRA+2TEX (sorted alphabetically)
+        assert '1FRA+2TEX' in result
+
+    def test_bg_full_flag(self):
+        """Full-width leaf RECTANGLE gets bg-full flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'Rectangle 1', 0, 0, 1440, 720),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'bg-full' in result
+
+    def test_bg_wide_flag(self):
+        """80%+ width leaf RECTANGLE gets bg-wide flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'bg', 0, 0, 1200, 500),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'bg-wide' in result
+
+    def test_off_canvas_flag(self):
+        """Off-canvas elements get off-canvas flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'offscreen', 3000, 0, 500, 500),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'off-canvas' in result
+
+    def test_hidden_flag(self):
+        """Hidden elements get hidden flag."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'hidden-frame', 0, 0, 200, 200, visible=False),
+        ]
+        result = generate_enriched_table(children)
+        assert 'hidden' in result
+
+    def test_overflow_flag(self):
+        """Elements extending beyond page width get overflow flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'wide', 0, 0, 1873, 654),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'overflow' in result
+
+    def test_tiny_flag(self):
+        """Very small elements get tiny flag."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'dot', 100, 100, 35, 35),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'tiny' in result
+
+    def test_decoration_flag(self):
+        """Decoration pattern nodes get decoration flag."""
+        ellipses = [
+            self._make_node(f'1:{i}', 'ELLIPSE', f'Ellipse {i}', i*10, 0, 8, 8)
+            for i in range(5)
+        ]
+        children = [
+            self._make_node('1:100', 'FRAME', 'dots', 0, 0, 50, 50, children=ellipses),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        assert 'decoration' in result
+
+    def test_text_preview_from_text_node(self):
+        """TEXT nodes show their characters content."""
+        children = [
+            self._make_node('1:1', 'TEXT', 'お知らせ', 0, 0, 100, 20, characters='お知らせ'),
+        ]
+        result = generate_enriched_table(children)
+        assert 'お知らせ' in result
+
+    def test_text_preview_from_descendant(self):
+        """Text preview is extracted from descendant TEXT nodes."""
+        text_child = self._make_node('1:2', 'TEXT', 'title', 0, 0, 200, 30, characters='採用情報')
+        children = [
+            self._make_node('1:1', 'FRAME', 'section', 0, 0, 1440, 400,
+                            children=[text_child]),
+        ]
+        result = generate_enriched_table(children)
+        assert '採用情報' in result
+
+    def test_no_text_shows_dash(self):
+        """Nodes without text content show dash."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'Rectangle 1', 0, 0, 300, 200),
+        ]
+        result = generate_enriched_table(children)
+        lines = result.strip().split('\n')
+        # Last column should be "-"
+        assert lines[2].rstrip().endswith('- |')
+
+    def test_multiple_flags(self):
+        """Multiple flags are comma-separated."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'rect', 0, 0, 1440, 720, visible=False),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        # Should have both hidden and bg-full
+        assert 'hidden' in result
+        assert 'bg-full' in result
+
+    def test_no_flags_shows_dash(self):
+        """Nodes with no flags show dash in Flags column."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'normal-frame', 100, 100, 300, 200,
+                            children=[self._make_node('1:2', 'TEXT', 't', 0, 0, 100, 20)]),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        lines = result.strip().split('\n')
+        # Flags column should contain just '-'
+        cols = [c.strip() for c in lines[2].split('|')]
+        flags_col = cols[10]  # 10th column (0-indexed, accounting for leading empty)
+        assert flags_col == '-'
+
+    def test_model_case_blog_section(self):
+        """Blog section from model case (2:8315) produces expected enriched table."""
+        # Elements 5-14 from the model case represent the blog section
+        blog_children = [
+            self._make_node('2:8320', 'RECTANGLE', 'AdobeStock_541586693', 221, 3784, 320, 180),
+            self._make_node('2:8321', 'FRAME', 'Group 73', 222, 3987, 318, 93,
+                            children=[
+                                self._make_node('2:8322', 'TEXT', 't1', 222, 4011, 313, 22, characters='typeにてエンジニアの募集を掲載しました'),
+                                self._make_node('2:8323', 'TEXT', 't2', 222, 4040, 313, 44),
+                                self._make_node('2:8324', 'TEXT', 't3', 222, 3987, 100, 15),
+                                self._make_node('2:8325', 'FRAME', 'tag', 330, 3987, 50, 15),
+                            ]),
+            self._make_node('2:8327', 'RECTANGLE', 'AdobeStock_541586693', 573, 3784, 320, 180),
+            self._make_node('2:8328', 'FRAME', 'Group 72', 574, 3987, 319, 93,
+                            children=[
+                                self._make_node('2:8329', 'TEXT', 't4', 574, 4011, 313, 22),
+                                self._make_node('2:8330', 'TEXT', 't5', 574, 4040, 313, 44),
+                                self._make_node('2:8331', 'TEXT', 't6', 574, 3987, 100, 15),
+                                self._make_node('2:8332', 'FRAME', 'tag', 684, 3987, 50, 15),
+                            ]),
+            self._make_node('2:8334', 'RECTANGLE', 'AdobeStock_541586693', 925, 3784, 321, 180),
+            self._make_node('2:8335', 'FRAME', 'Group 71', 926, 3987, 319, 93,
+                            children=[
+                                self._make_node('2:8336', 'TEXT', 't7', 926, 4011, 313, 22),
+                                self._make_node('2:8337', 'TEXT', 't8', 926, 4040, 313, 44),
+                                self._make_node('2:8338', 'TEXT', 't9', 926, 3987, 100, 15),
+                                self._make_node('2:8339', 'FRAME', 'tag', 1036, 3987, 50, 15),
+                            ]),
+            # Pagination dots
+            self._make_node('2:8348', 'FRAME', 'Group 76', 464, 3717, 35, 35),
+            self._make_node('2:8351', 'FRAME', 'Group 77', 544, 3717, 35, 35),
+        ]
+        result = generate_enriched_table(blog_children, page_width=1440)
+        lines = result.strip().split('\n')
+        # Should have header + separator + 8 rows
+        assert len(lines) == 10
+        # Verify card image gets no bg flag (320px is not full-width)
+        assert 'bg-full' not in lines[2]
+        # Verify child types for Group 73 (1FRA+3TEX)
+        assert '1FRA+3TEX' in lines[3]
+        # Verify dots are tiny
+        assert 'tiny' in lines[9]
+        assert 'tiny' in lines[10] if len(lines) > 10 else True
+
+    def test_empty_children(self):
+        """Empty children list produces header-only table."""
+        result = generate_enriched_table([])
+        lines = result.strip().split('\n')
+        assert len(lines) == 2  # header + separator only
+
+    def test_name_truncation(self):
+        """Long names are truncated to 35 characters."""
+        children = [
+            self._make_node('1:1', 'TEXT', 'A' * 50, 0, 0, 200, 30, characters='test'),
+        ]
+        result = generate_enriched_table(children)
+        lines = result.strip().split('\n')
+        # Name column should be truncated
+        name_col = [c.strip() for c in lines[2].split('|')][3]
+        assert len(name_col) <= 35
+
+    def test_coordinates_are_integers(self):
+        """X, Y, W, H values are rounded to integers."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'f', 222.601, 3987.337, 318.614, 93.663),
+        ]
+        result = generate_enriched_table(children)
+        assert '222' in result
+        assert '3987' in result
+        assert '318x93' in result
+
+
+class TestComputeChildTypes:
+    """Tests for _compute_child_types helper."""
+
+    def test_empty(self):
+        from figma_utils import _compute_child_types
+        assert _compute_child_types([]) == '-'
+
+    def test_single_type(self):
+        from figma_utils import _compute_child_types
+        children = [{'type': 'TEXT'}, {'type': 'TEXT'}, {'type': 'TEXT'}]
+        assert _compute_child_types(children) == '3TEX'
+
+    def test_mixed_types(self):
+        from figma_utils import _compute_child_types
+        children = [{'type': 'FRAME'}, {'type': 'TEXT'}, {'type': 'TEXT'}, {'type': 'RECTANGLE'}]
+        result = _compute_child_types(children)
+        assert '1FRA' in result
+        assert '2TEX' in result
+        assert '1REC' in result
+
+    def test_unknown_type(self):
+        from figma_utils import _compute_child_types
+        children = [{'type': 'UNKNOWN_TYPE'}]
+        assert _compute_child_types(children) == '1OTH'
+
+
+class TestComputeFlags:
+    """Tests for _compute_flags helper."""
+
+    def test_no_flags(self):
+        from figma_utils import _compute_flags
+        node = {
+            'type': 'FRAME', 'children': [{'type': 'TEXT'}],
+            'absoluteBoundingBox': {'x': 100, 'y': 100, 'width': 300, 'height': 200},
+        }
+        flags = _compute_flags(node, 1440, 5000)
+        assert flags == []
+
+    def test_hidden_flag(self):
+        from figma_utils import _compute_flags
+        node = {
+            'type': 'FRAME', 'visible': False, 'children': [],
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 200, 'height': 200},
+        }
+        flags = _compute_flags(node, 1440, 5000)
+        assert 'hidden' in flags
+
+    def test_bg_full_for_vector(self):
+        """VECTOR type also gets bg-full flag when full-width leaf."""
+        from figma_utils import _compute_flags
+        node = {
+            'type': 'VECTOR', 'children': [],
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 720},
+        }
+        flags = _compute_flags(node, 1440, 5000)
+        assert 'bg-full' in flags
+
+    def test_no_bg_for_frame(self):
+        """FRAME type does NOT get bg-full flag even when full-width."""
+        from figma_utils import _compute_flags
+        node = {
+            'type': 'FRAME', 'children': [],
+            'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 720},
+        }
+        flags = _compute_flags(node, 1440, 5000)
+        assert 'bg-full' not in flags
+
+    def test_overflow_y_flag(self):
+        """Element extending below page gets overflow-y flag."""
+        from figma_utils import _compute_flags
+        node = {
+            'type': 'RECTANGLE', 'children': [],
+            'absoluteBoundingBox': {'x': 0, 'y': 5000, 'width': 1440, 'height': 1000},
+        }
+        flags = _compute_flags(node, 1440, 5273)
+        assert 'overflow-y' in flags
+
+
+class TestCollectTextPreview:
+    """Tests for _collect_text_preview helper."""
+
+    def test_direct_text(self):
+        from figma_utils import _collect_text_preview
+        node = {'type': 'TEXT', 'characters': 'Hello World', 'name': 'Text 1'}
+        assert _collect_text_preview(node) == 'Hello World'
+
+    def test_nested_text(self):
+        from figma_utils import _collect_text_preview
+        node = {
+            'type': 'FRAME', 'name': 'section',
+            'children': [
+                {'type': 'FRAME', 'name': 'inner', 'children': [
+                    {'type': 'TEXT', 'characters': '深いテキスト', 'name': 'Text 1', 'children': []},
+                ]},
+            ],
+        }
+        assert _collect_text_preview(node) == '深いテキスト'
+
+    def test_max_depth_respected(self):
+        from figma_utils import _collect_text_preview
+        # Text is at depth 4 but max_depth=3
+        node = {
+            'type': 'FRAME', 'name': 'a',
+            'children': [{
+                'type': 'FRAME', 'name': 'b',
+                'children': [{
+                    'type': 'FRAME', 'name': 'c',
+                    'children': [{
+                        'type': 'TEXT', 'characters': 'deep', 'name': 'd', 'children': [],
+                    }],
+                }],
+            }],
+        }
+        assert _collect_text_preview(node, max_depth=2) == ''
+
+    def test_unnamed_text_skipped(self):
+        from figma_utils import _collect_text_preview
+        node = {'type': 'TEXT', 'name': 'Text 1', 'children': []}  # no characters, unnamed
+        assert _collect_text_preview(node) == ''
+
+    def test_truncation(self):
+        from figma_utils import _collect_text_preview
+        node = {'type': 'TEXT', 'characters': 'A' * 100, 'name': 'long'}
+        assert len(_collect_text_preview(node, max_len=30)) == 30

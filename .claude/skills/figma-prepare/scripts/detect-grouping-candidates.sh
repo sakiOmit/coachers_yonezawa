@@ -46,8 +46,13 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAM
     compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
     get_text_children_content, to_kebab, ROW_TOLERANCE,
     detect_consecutive_similar, detect_heading_content_pairs,
-    find_absorbable_elements, is_heading_like,
-    CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE)
+    find_absorbable_elements, is_heading_like, is_off_canvas,
+    detect_bg_content_layers, BG_WIDTH_RATIO,
+    detect_table_rows, TABLE_MIN_ROWS,
+    detect_repeating_tuple, TUPLE_PATTERN_MIN, TUPLE_MAX_SIZE,
+    detect_highlight_text, HIGHLIGHT_OVERLAP_RATIO,
+    CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE,
+    OFF_CANVAS_MARGIN)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -591,7 +596,25 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
     if all_candidates is None:
         all_candidates = []
 
+    # Issue 187: Skip hidden nodes entirely
+    if node.get('visible') == False:
+        return all_candidates
+
     children = node.get('children', [])
+    if not children:
+        return all_candidates
+
+    # Issue 187: Filter out hidden children before detection
+    # Issue 182: Filter out off-canvas children at root level
+    if is_root:
+        page_bb_pre = get_bbox(node)
+        page_width = page_bb_pre['w'] if page_bb_pre else 0
+        children = [c for c in children
+                     if c.get('visible') != False
+                     and not (page_width > 0 and is_off_canvas(c, page_width))]
+    else:
+        children = [c for c in children if c.get('visible') != False]
+
     if not children:
         return all_candidates
 
@@ -667,6 +690,63 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
         g['parent_name'] = parent_name
         all_candidates.append(g)
 
+    # Issue 180: Background-content layer detection (non-root level)
+    if not is_root:
+        bg_content = detect_bg_content_layers(children, get_bbox(node))
+        for g in bg_content:
+            g['parent_id'] = parent_id
+            g['parent_name'] = parent_name
+            all_candidates.append(g)
+
+    # Issue 181: Table row structure detection (all levels)
+    table_groups = detect_table_rows(children, get_bbox(node))
+    for g in table_groups:
+        g['parent_id'] = parent_id
+        g['parent_name'] = parent_name
+        all_candidates.append(g)
+
+    # Issue 186: Repeating tuple pattern detection (all levels)
+    tuple_groups = detect_repeating_tuple(children)
+    for tg in tuple_groups:
+        node_ids = [children[idx].get('id', '') for idx in tg['children_indices']]
+        # Derive name from first child's text content or fall back
+        first_child = children[tg['children_indices'][0]]
+        texts = get_text_children_content([first_child], max_items=1)
+        if not texts:
+            texts = get_text_children_content(first_child.get('children', []), max_items=1)
+        slug = to_kebab(texts[0]) if texts else 'item'
+        all_candidates.append({
+            'node_ids': node_ids,
+            'parent_id': parent_id,
+            'parent_name': parent_name,
+            'suggested_name': f'card-list-{slug}',
+            'method': 'tuple',
+            'count': len(node_ids),
+            'tuple_size': tg['tuple_size'],
+            'repetitions': tg['count'],
+            'suggested_wrapper': 'card-container',
+        })
+
+    # Issue 190: Highlight text pattern detection (non-root level)
+    if not is_root:
+        highlights = detect_highlight_text(children)
+        for hl in highlights:
+            rect_node = children[hl['rect_idx']]
+            text_node = children[hl['text_idx']]
+            r_id = rect_node.get('id', '')
+            t_id = text_node.get('id', '')
+            text_content = hl['text_content']
+            slug = to_kebab(text_content[:20]) if text_content else 'text'
+            all_candidates.append({
+                'node_ids': [r_id, t_id],
+                'parent_id': parent_id,
+                'parent_name': parent_name,
+                'suggested_name': f'highlight-{slug}',
+                'method': 'highlight',
+                'semantic_type': 'highlight',
+                'count': 2,
+            })
+
     # Recurse
     for child in children:
         walk_and_detect(child, all_candidates, is_root=False)
@@ -675,7 +755,8 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
 
 # Method priority for deduplication: higher = better quality
 # Issue 165/166: consecutive (2.5) between pattern and zone; heading-content (3.5) between zone and semantic
-METHOD_PRIORITY = {'semantic': 4, 'heading-content': 3.5, 'zone': 3, 'consecutive': 2.5, 'pattern': 2, 'spacing': 1, 'proximity': 0}
+# Issue 186: tuple (2.8) between consecutive and zone — type-sequence based, higher than structure_hash pattern
+METHOD_PRIORITY = {'semantic': 4, 'highlight': 3.8, 'heading-content': 3.5, 'zone': 3, 'tuple': 2.8, 'consecutive': 2.5, 'pattern': 2, 'spacing': 1, 'proximity': 0}
 
 def deduplicate_candidates(candidates, root_id=''):
     \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
@@ -789,6 +870,14 @@ try:
                     f.write(f'    fuzzy_match: true\\n')
                 if 'semantic_type' in c:
                     f.write(f'    semantic_type: {yaml_str(c[\"semantic_type\"])}\\n')
+                if 'bg_node_ids' in c:
+                    f.write(f'    bg_node_ids: {json.dumps(c[\"bg_node_ids\"])}\\n')
+                if 'row_count' in c:
+                    f.write(f'    row_count: {c[\"row_count\"]}\\n')
+                if 'tuple_size' in c:
+                    f.write(f'    tuple_size: {c[\"tuple_size\"]}\\n')
+                if 'repetitions' in c:
+                    f.write(f'    repetitions: {c[\"repetitions\"]}\\n')
         result = {
             'total': len(candidates),
             'output': output_file,

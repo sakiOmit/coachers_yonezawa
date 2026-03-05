@@ -22,6 +22,7 @@ ROW_TOLERANCE = 20  # px — Y-coordinate grouping tolerance for WRAP/grid row d
 CV_THRESHOLD = 0.25  # Coefficient of variation threshold for regular spacing detection (Issue 138)
 FLAT_THRESHOLD = 15  # children — flat structure detection threshold (Issue 140)
 DEEP_NESTING_THRESHOLD = 6  # levels — deep nesting detection threshold (Issue 140)
+OFF_CANVAS_MARGIN = 1.5  # multiplier — elements with x > page_width * OFF_CANVAS_MARGIN are off-canvas (Issue 182)
 
 
 def yaml_str(value):
@@ -166,6 +167,39 @@ def is_section_root(node):
     # Issue 116: Include COMPONENT/INSTANCE/SECTION types as section roots
     # (consistent with Issue 69/72 type extensions in other scripts)
     return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and abs(width - SECTION_ROOT_WIDTH) < 10
+
+
+def is_off_canvas(node, page_width):
+    """Check if a node is positioned completely outside the viewport.
+
+    An element is considered off-canvas if:
+    - Its left edge (x) is beyond page_width * OFF_CANVAS_MARGIN, OR
+    - Its right edge (x + w) is less than 0 (completely to the left)
+
+    These are typically unused assets or elements placed outside the
+    visible design area.
+
+    Issue 182: Elements outside viewport should not affect scoring or grouping.
+
+    Args:
+        node: Figma node dict.
+        page_width: Width of the page/artboard (typically 1440px).
+
+    Returns:
+        bool: True if the node is completely off-canvas.
+    """
+    if page_width <= 0:
+        return False
+    bb = get_bbox(node)
+    if not bb or bb['w'] == 0:
+        return False
+    # Right edge is left of viewport
+    if bb['x'] + bb['w'] < 0:
+        return True
+    # Left edge is beyond off-canvas margin
+    if bb['x'] > page_width * OFF_CANVAS_MARGIN:
+        return True
+    return False
 
 
 def alignment_bonus(a_bb, b_bb, tolerance=2):
@@ -461,9 +495,12 @@ JP_KEYWORD_MAP = {
     '強み': 'strength',
     '理念': 'philosophy',
     '事業内容': 'business',
+    '事業紹介': 'business',
     '事業': 'business',
     '求人': 'job',
     '募集': 'recruit',
+    '会社情報': 'company-info',
+    '採用ブログ': 'recruit-blog',
 }
 
 
@@ -515,6 +552,90 @@ def _jp_keyword_lookup(text):
         if jp in text:
             return en
     return ''
+
+
+# === Issue 186: Repeating tuple pattern detection ===
+TUPLE_PATTERN_MIN = 3  # Minimum repetitions to detect a tuple pattern
+TUPLE_MAX_SIZE = 5  # Maximum elements per tuple
+
+
+def detect_repeating_tuple(children):
+    """Detect repeating tuple patterns in flat sibling lists.
+
+    Blog cards often consist of N separated sibling elements (e.g., IMAGE +
+    FRAME + INSTANCE) repeated K times, producing N*K flat siblings. Standard
+    structure_hash detection fails because each element within a tuple has a
+    different type.
+
+    This function detects such patterns by examining the sequence of element
+    types and finding repeating subsequences of length 2..TUPLE_MAX_SIZE that
+    repeat >= TUPLE_PATTERN_MIN times consecutively.
+
+    Args:
+        children: List of Figma node dicts with at least 'type', 'name', 'id'.
+
+    Returns:
+        list of detected tuple groups:
+        [{'tuple_size': N, 'start_idx': S, 'count': C, 'children_indices': [...]}]
+        - tuple_size: number of elements per tuple
+        - start_idx: index of first element in the pattern
+        - count: number of repetitions
+        - children_indices: flat list of all element indices in the pattern
+
+    Issue 186: Separated card patterns (IMAGE + FRAME + INSTANCE x 3).
+    """
+    if len(children) < TUPLE_PATTERN_MIN * 2:
+        # Need at least min_reps * 2 elements (smallest tuple_size is 2)
+        return []
+
+    types = [c.get('type', '') for c in children]
+    n = len(types)
+    results = []
+    covered = set()  # Track indices already assigned to a tuple group
+
+    # Try tuple sizes from largest to smallest (prefer larger tuples)
+    for tuple_size in range(min(TUPLE_MAX_SIZE, n // TUPLE_PATTERN_MIN), 1, -1):
+        # Slide a window across the type sequence
+        start = 0
+        while start + tuple_size * TUPLE_PATTERN_MIN <= n:
+            if start in covered:
+                start += 1
+                continue
+
+            reference = types[start:start + tuple_size]
+            # Tuple must contain at least 2 distinct types (otherwise
+            # detect_consecutive_similar handles homogeneous sequences)
+            if len(set(reference)) < 2:
+                start += 1
+                continue
+            reps = 1
+            pos = start + tuple_size
+
+            while pos + tuple_size <= n:
+                candidate = types[pos:pos + tuple_size]
+                if candidate == reference:
+                    reps += 1
+                    pos += tuple_size
+                else:
+                    break
+
+            if reps >= TUPLE_PATTERN_MIN:
+                indices = list(range(start, start + tuple_size * reps))
+                # Check no overlap with already covered indices
+                if not any(i in covered for i in indices):
+                    results.append({
+                        'tuple_size': tuple_size,
+                        'start_idx': start,
+                        'count': reps,
+                        'children_indices': indices,
+                    })
+                    covered.update(indices)
+                    start = start + tuple_size * reps
+                    continue
+
+            start += 1
+
+    return results
 
 
 # === Issue 165: Consecutive pattern detection ===
@@ -846,3 +967,742 @@ def find_absorbable_elements(children, group_indices_set, candidate_groups=None)
             })
 
     return absorptions
+
+
+# === Issue 189: Decoration dot pattern detection ===
+DECORATION_MAX_SIZE = 200  # Max width/height for decoration frame
+DECORATION_SHAPE_RATIO = 0.6  # Min ratio of shape children (ELLIPSE/RECTANGLE/VECTOR)
+DECORATION_MIN_SHAPES = 3  # Min number of shape leaf children
+
+
+def is_decoration_pattern(node):
+    """Check if a node is a decorative dot/shape pattern frame.
+
+    Decorative patterns are small frames filled with multiple ELLIPSE, RECTANGLE,
+    or VECTOR leaf nodes (e.g., dot grids, scattered circles). These get generic
+    names like 'group-N' without this detection.
+
+    Criteria:
+    1. Node must be FRAME or GROUP with children
+    2. Total size < DECORATION_MAX_SIZE x DECORATION_MAX_SIZE
+    3. >= 60% of leaf descendants are ELLIPSE, RECTANGLE, or VECTOR
+    4. At least DECORATION_MIN_SHAPES (3) shape leaf descendants
+
+    Args:
+        node: Figma node dict.
+
+    Returns:
+        bool: True if node is a decoration pattern.
+
+    Issue 189: Small decorative frames containing dot patterns.
+    """
+    node_type = node.get('type', '')
+    if node_type not in ('FRAME', 'GROUP'):
+        return False
+
+    children = node.get('children', [])
+    if not children:
+        return False
+
+    # Size check
+    bbox = node.get('absoluteBoundingBox') or {}
+    w = bbox.get('width', 0)
+    h = bbox.get('height', 0)
+    if w > DECORATION_MAX_SIZE or h > DECORATION_MAX_SIZE:
+        return False
+
+    # Count leaf descendants by type
+    shape_types = {'ELLIPSE', 'RECTANGLE', 'VECTOR'}
+
+    def count_leaves(n):
+        ch = n.get('children', [])
+        if not ch:
+            return (1 if n.get('type', '') in shape_types else 0, 1)
+        shape_total = 0
+        leaf_total = 0
+        for c in ch:
+            s, t = count_leaves(c)
+            shape_total += s
+            leaf_total += t
+        return (shape_total, leaf_total)
+
+    shape_count, total_leaves = count_leaves(node)
+
+    if total_leaves == 0:
+        return False
+    if shape_count < DECORATION_MIN_SHAPES:
+        return False
+    if shape_count / total_leaves < DECORATION_SHAPE_RATIO:
+        return False
+
+    return True
+
+
+def decoration_dominant_shape(node):
+    """Determine the dominant shape type in a decoration pattern.
+
+    Args:
+        node: Figma node dict (assumed to be a decoration pattern).
+
+    Returns:
+        str: 'ELLIPSE', 'RECTANGLE', or 'VECTOR' -- whichever has the most leaf nodes.
+
+    Issue 189: Used to distinguish 'decoration-dots' (ELLIPSE-dominant)
+    from 'decoration-pattern' (RECTANGLE/VECTOR-dominant).
+    """
+    shape_types = {'ELLIPSE', 'RECTANGLE', 'VECTOR'}
+    counts = {'ELLIPSE': 0, 'RECTANGLE': 0, 'VECTOR': 0}
+
+    def count_shapes(n):
+        ch = n.get('children', [])
+        if not ch:
+            t = n.get('type', '')
+            if t in shape_types:
+                counts[t] += 1
+            return
+        for c in ch:
+            count_shapes(c)
+
+    count_shapes(node)
+    return max(counts, key=counts.get)
+
+
+# === Issue 190: Highlight text pattern detection ===
+HIGHLIGHT_OVERLAP_RATIO = 0.8  # Min Y-overlap ratio for highlight detection
+HIGHLIGHT_TEXT_MAX_LEN = 30  # Max text length for highlight
+HIGHLIGHT_HEIGHT_RATIO_MIN = 0.5  # Min RECT height / TEXT height ratio
+HIGHLIGHT_HEIGHT_RATIO_MAX = 2.0  # Max RECT height / TEXT height ratio
+
+
+def detect_highlight_text(children):
+    """Detect RECTANGLE + TEXT highlight pairs among siblings.
+
+    Pattern: A RECTANGLE positioned behind a TEXT element at the same location
+    acts as a text highlight/emphasis background. Common in Japanese web design
+    for marking key phrases.
+
+    Detection criteria for each RECTANGLE + TEXT pair:
+    1. Y ranges overlap >= 80% (based on smaller element's height)
+    2. X ranges also overlap significantly (>= 50% of smaller width)
+    3. RECTANGLE height is 0.5-2.0x TEXT height
+    4. TEXT content is short (<= 30 chars)
+    5. RECTANGLE is a leaf node (no children)
+
+    Args:
+        children: List of sibling nodes.
+
+    Returns:
+        list: [{'rect_idx': i, 'text_idx': j, 'text_content': '...'}]
+
+    Issue 190: Text highlighting pattern detection.
+    """
+    if not children:
+        return []
+
+    # Collect RECTANGLE and TEXT indices
+    rect_indices = []
+    text_indices = []
+    for i, child in enumerate(children):
+        child_type = child.get('type', '')
+        if child_type == 'RECTANGLE' and not child.get('children'):
+            rect_indices.append(i)
+        elif child_type == 'TEXT':
+            text_indices.append(i)
+
+    if not rect_indices or not text_indices:
+        return []
+
+    results = []
+    used_rects = set()
+    used_texts = set()
+
+    for ri in rect_indices:
+        rect = children[ri]
+        r_bb = get_bbox(rect)
+        if r_bb['w'] <= 0 or r_bb['h'] <= 0:
+            continue
+        if ri in used_rects:
+            continue
+
+        for ti in text_indices:
+            if ti in used_texts:
+                continue
+            text_node = children[ti]
+            t_bb = get_bbox(text_node)
+            if t_bb['w'] <= 0 or t_bb['h'] <= 0:
+                continue
+
+            # Check text length
+            text_content = text_node.get('characters', '') or text_node.get('name', '')
+            if len(text_content) > HIGHLIGHT_TEXT_MAX_LEN:
+                continue
+
+            # Check height ratio
+            if t_bb['h'] <= 0:
+                continue
+            height_ratio = r_bb['h'] / t_bb['h']
+            if height_ratio < HIGHLIGHT_HEIGHT_RATIO_MIN or height_ratio > HIGHLIGHT_HEIGHT_RATIO_MAX:
+                continue
+
+            # Check Y overlap
+            y_overlap_top = max(r_bb['y'], t_bb['y'])
+            y_overlap_bot = min(r_bb['y'] + r_bb['h'], t_bb['y'] + t_bb['h'])
+            y_overlap = max(0, y_overlap_bot - y_overlap_top)
+            smaller_h = min(r_bb['h'], t_bb['h'])
+            if smaller_h <= 0:
+                continue
+            y_overlap_ratio = y_overlap / smaller_h
+            if y_overlap_ratio < HIGHLIGHT_OVERLAP_RATIO:
+                continue
+
+            # Check X overlap
+            x_overlap_left = max(r_bb['x'], t_bb['x'])
+            x_overlap_right = min(r_bb['x'] + r_bb['w'], t_bb['x'] + t_bb['w'])
+            x_overlap = max(0, x_overlap_right - x_overlap_left)
+            smaller_w = min(r_bb['w'], t_bb['w'])
+            if smaller_w <= 0:
+                continue
+            x_overlap_ratio = x_overlap / smaller_w
+            if x_overlap_ratio < 0.5:
+                continue
+
+            results.append({
+                'rect_idx': ri,
+                'text_idx': ti,
+                'text_content': text_content,
+            })
+            used_rects.add(ri)
+            used_texts.add(ti)
+            break  # Move to next RECTANGLE
+
+    return results
+
+
+# === Issue 180: Background-content layer detection ===
+BG_WIDTH_RATIO = 0.8  # Background RECTANGLE must cover >=80% of parent width
+BG_MIN_HEIGHT_RATIO = 0.3  # Background must be >=30% of parent height
+BG_DECORATION_MAX_AREA_RATIO = 0.05  # Small same-positioned elements are decoration
+
+
+def detect_bg_content_layers(children, parent_bb):
+    """Detect background RECTANGLE + decoration vs content elements.
+
+    Pattern: A full-width RECTANGLE (>=80% parent width) acts as a background layer.
+    Small sibling elements (VECTOR, ELLIPSE) that overlap the RECTANGLE's position
+    are treated as decoration (same visual layer). Everything else is content.
+
+    Only triggers when:
+    1. There is exactly 1 full-width RECTANGLE among siblings (leaf node, no children)
+    2. The RECTANGLE covers >=30% of parent height (not just a thin divider)
+    3. There are >=2 non-decoration siblings (content elements)
+
+    Args:
+        children: List of sibling nodes.
+        parent_bb: Parent bounding box dict with x, y, w, h.
+
+    Returns:
+        list: Grouping candidates. Each has:
+            - method: 'semantic'
+            - semantic_type: 'bg-content'
+            - node_ids: IDs of content-layer elements
+            - bg_node_ids: IDs of bg-layer elements (RECTANGLE + decorations)
+            - suggested_name: 'content-layer'
+            - suggested_wrapper: 'content-group'
+    """
+    if not children or not parent_bb or parent_bb['w'] <= 0 or parent_bb['h'] <= 0:
+        return []
+
+    # Step 1: Find full-width RECTANGLE siblings (leaf node)
+    bg_candidates = []
+    for i, child in enumerate(children):
+        if child.get('type') != 'RECTANGLE':
+            continue
+        # Must be a leaf node (no children)
+        if child.get('children'):
+            continue
+        bb = get_bbox(child)
+        if bb['w'] <= 0 or bb['h'] <= 0:
+            continue
+        # Width >= 80% of parent width
+        if bb['w'] < parent_bb['w'] * BG_WIDTH_RATIO:
+            continue
+        # Height >= 30% of parent height (not a thin divider)
+        if bb['h'] < parent_bb['h'] * BG_MIN_HEIGHT_RATIO:
+            continue
+        bg_candidates.append((i, child, bb))
+
+    # Must be exactly 1 bg candidate (ambiguous if multiple)
+    if len(bg_candidates) != 1:
+        return []
+
+    bg_idx, bg_node, bg_bb = bg_candidates[0]
+    bg_area = bg_bb['w'] * bg_bb['h']
+
+    # Step 2: Find decoration elements (small VECTOR/ELLIPSE overlapping the bg)
+    decoration_indices = set()
+    decoration_indices.add(bg_idx)
+
+    for i, child in enumerate(children):
+        if i == bg_idx:
+            continue
+        child_type = child.get('type', '')
+        if child_type not in ('VECTOR', 'ELLIPSE'):
+            continue
+        # Must be a leaf node
+        if child.get('children'):
+            continue
+        cb = get_bbox(child)
+        if cb['w'] <= 0 or cb['h'] <= 0:
+            continue
+        child_area = cb['w'] * cb['h']
+        # "small" = area < 5% of bg RECTANGLE area
+        if bg_area > 0 and child_area / bg_area >= BG_DECORATION_MAX_AREA_RATIO:
+            continue
+        # Must overlap the bg RECTANGLE's bounding box
+        overlap_x = max(0, min(bg_bb['x'] + bg_bb['w'], cb['x'] + cb['w']) - max(bg_bb['x'], cb['x']))
+        overlap_y = max(0, min(bg_bb['y'] + bg_bb['h'], cb['y'] + cb['h']) - max(bg_bb['y'], cb['y']))
+        if overlap_x > 0 and overlap_y > 0:
+            decoration_indices.add(i)
+
+    # Step 3: Content = everything else
+    content_indices = [i for i in range(len(children)) if i not in decoration_indices]
+
+    # Must have >= 2 content elements
+    if len(content_indices) < 2:
+        return []
+
+    content_ids = [children[i].get('id', '') for i in content_indices]
+    content_names = [children[i].get('name', '') for i in content_indices]
+    bg_ids = [children[i].get('id', '') for i in sorted(decoration_indices)]
+    bg_names = [children[i].get('name', '') for i in sorted(decoration_indices)]
+
+    return [{
+        'method': 'semantic',
+        'semantic_type': 'bg-content',
+        'node_ids': content_ids,
+        'node_names': content_names,
+        'bg_node_ids': bg_ids,
+        'bg_node_names': bg_names,
+        'count': len(content_ids),
+        'suggested_name': 'content-layer',
+        'suggested_wrapper': 'content-group',
+    }]
+
+
+# === Issue 185: EN+JP label pair detection ===
+EN_LABEL_MAX_WORDS = 3  # Max words for English label (e.g., "OUR BUSINESS")
+EN_JP_PAIR_MAX_DISTANCE = 200  # px — max distance between EN and JP label pair
+
+
+def detect_en_jp_label_pairs(children):
+    """Detect English + Japanese label pairs among sibling TEXT nodes.
+
+    Pattern: An uppercase ASCII text (e.g., "COMPANY") paired with a
+    Japanese text (e.g., "会社情報") at similar Y or X position.
+
+    Args:
+        children: List of sibling nodes.
+
+    Returns:
+        list of pairs: [{'en_idx': i, 'jp_idx': j, 'en_text': '...', 'jp_text': '...'}]
+
+    Issue 185: EN+JP label pairs get generic names. Detect them for
+    semantic renaming (en-label-* / heading-*).
+    """
+    if len(children) < 2:
+        return []
+
+    # Collect TEXT nodes with their indices
+    text_nodes = []
+    for i, child in enumerate(children):
+        if child.get('type') != 'TEXT':
+            continue
+        content = child.get('characters', '') or child.get('name', '')
+        if not content or not content.strip():
+            continue
+        text_nodes.append((i, child, content.strip()))
+
+    if len(text_nodes) < 2:
+        return []
+
+    def _is_en_label(text):
+        """Check if text is a short uppercase ASCII label."""
+        ascii_only = re.sub(r'[^\x00-\x7f]', '', text).strip()
+        if not ascii_only or ascii_only != text.strip():
+            return False
+        words = ascii_only.split()
+        if len(words) < 1 or len(words) > EN_LABEL_MAX_WORDS:
+            return False
+        # Must be uppercase (allow minor punctuation)
+        alpha_chars = re.sub(r'[^a-zA-Z]', '', ascii_only)
+        if not alpha_chars:
+            return False
+        return alpha_chars == alpha_chars.upper()
+
+    def _is_jp_text(text):
+        """Check if text contains non-ASCII (Japanese) characters."""
+        non_ascii = re.sub(r'[\x00-\x7f]', '', text).strip()
+        return len(non_ascii) > 0
+
+    def _pair_distance(node_a, node_b):
+        """Compute minimum distance between two nodes (Y-range or X-range proximity)."""
+        bb_a = get_bbox(node_a)
+        bb_b = get_bbox(node_b)
+        # Y distance
+        if bb_a['y'] + bb_a['h'] < bb_b['y']:
+            dy = bb_b['y'] - (bb_a['y'] + bb_a['h'])
+        elif bb_b['y'] + bb_b['h'] < bb_a['y']:
+            dy = bb_a['y'] - (bb_b['y'] + bb_b['h'])
+        else:
+            dy = 0
+        # X distance
+        if bb_a['x'] + bb_a['w'] < bb_b['x']:
+            dx = bb_b['x'] - (bb_a['x'] + bb_a['w'])
+        elif bb_b['x'] + bb_b['w'] < bb_a['x']:
+            dx = bb_a['x'] - (bb_b['x'] + bb_b['w'])
+        else:
+            dx = 0
+        return min(dx, dy) if dx > 0 and dy > 0 else max(dx, dy)
+
+    # Find all EN labels and JP texts
+    en_indices = [(i, node, text) for i, node, text in text_nodes if _is_en_label(text)]
+    jp_indices = [(i, node, text) for i, node, text in text_nodes if _is_jp_text(text)]
+
+    pairs = []
+    used_en = set()
+    used_jp = set()
+
+    for en_i, en_node, en_text in en_indices:
+        best_jp = None
+        best_dist = float('inf')
+        for jp_i, jp_node, jp_text in jp_indices:
+            if jp_i in used_jp:
+                continue
+            dist = _pair_distance(en_node, jp_node)
+            if dist <= EN_JP_PAIR_MAX_DISTANCE and dist < best_dist:
+                best_dist = dist
+                best_jp = (jp_i, jp_node, jp_text)
+        if best_jp and en_i not in used_en:
+            jp_i, jp_node, jp_text = best_jp
+            pairs.append({
+                'en_idx': en_i,
+                'jp_idx': jp_i,
+                'en_text': en_text,
+                'jp_text': jp_text,
+            })
+            used_en.add(en_i)
+            used_jp.add(jp_i)
+
+    return pairs
+
+
+# === Issue 193: CTA square button detection ===
+CTA_SQUARE_RATIO_MIN = 0.8  # Min width/height ratio for square CTA
+CTA_SQUARE_RATIO_MAX = 1.2  # Max width/height ratio for square CTA
+CTA_Y_THRESHOLD = 100  # px — max Y position from top for CTA placement
+
+# === Issue 192: Side panel detection ===
+SIDE_PANEL_MAX_WIDTH = 80  # px — max width for side panel
+SIDE_PANEL_HEIGHT_RATIO = 3.0  # Min height/width ratio for side panel
+
+
+# === Issue 181: Table row structure detection ===
+TABLE_MIN_ROWS = 3  # Minimum background RECTANGLEs to form a table
+TABLE_ROW_WIDTH_RATIO = 0.9  # Row bg RECTANGLE must cover >=90% of parent width
+TABLE_DIVIDER_MAX_HEIGHT = 2  # px — divider VECTORs are <=2px height
+
+
+def detect_table_rows(children, parent_bb):
+    """Detect table-like structure: alternating full-width background RECTANGLEs
+    + divider VECTORs + text elements grouped by Y position into rows.
+
+    Pattern detection:
+    1. Find 3+ full-width RECTANGLE siblings (>=90% parent width, leaf, unnamed)
+    2. Find full-width VECTOR/LINE dividers (>=90% parent width, height <= 2px)
+    3. For each RECTANGLE, find TEXT siblings whose Y-center falls within
+       [RECT.y, RECT.y + RECT.h]
+    4. Group: heading element (if exists, before first RECTANGLE) + row groups
+       + trailing dividers
+
+    Args:
+        children: List of sibling nodes.
+        parent_bb: Bounding box of the parent node (dict with x, y, w, h).
+
+    Returns:
+        list: One grouping candidate per table, containing:
+            - method: 'semantic'
+            - semantic_type: 'table'
+            - node_ids: All table-member node IDs (bg RECTs + dividers + texts + heading)
+            - suggested_name: 'table-{slug}'
+            - suggested_wrapper: 'table-container'
+            - row_count: number of data rows
+
+    Issue 181: Flat sibling elements forming table rows are not grouped.
+    """
+    if not children or parent_bb.get('w', 0) <= 0:
+        return []
+
+    min_width = parent_bb['w'] * TABLE_ROW_WIDTH_RATIO
+
+    # Step 1: Find full-width RECTANGLE leaves (row backgrounds)
+    full_width_rects = []
+    for c in children:
+        if (c.get('type') == 'RECTANGLE'
+                and not c.get('children')
+                and get_bbox(c)['w'] >= min_width):
+            full_width_rects.append(c)
+
+    if len(full_width_rects) < TABLE_MIN_ROWS:
+        return []
+
+    # Step 2: Find full-width dividers (VECTOR/LINE, height <= 2px)
+    dividers = []
+    for c in children:
+        if c.get('type') in ('VECTOR', 'LINE'):
+            bb = get_bbox(c)
+            if bb['w'] >= min_width and bb['h'] <= TABLE_DIVIDER_MAX_HEIGHT:
+                dividers.append(c)
+
+    rect_ids = {c.get('id', '') for c in full_width_rects}
+    divider_ids = {c.get('id', '') for c in dividers}
+
+    # Step 3: For each RECTANGLE, find TEXT siblings whose Y-center
+    # falls within [rect.y, rect.y + rect.h]
+    all_row_member_ids = set()
+    row_count = 0
+    for rect in full_width_rects:
+        rect_bb = get_bbox(rect)
+        rect_y_top = rect_bb['y']
+        rect_y_bot = rect_bb['y'] + rect_bb['h']
+        row_members = [rect]
+
+        for c in children:
+            c_id = c.get('id', '')
+            if c_id in rect_ids or c_id in divider_ids:
+                continue
+            c_bb = get_bbox(c)
+            c_cy = c_bb['y'] + c_bb['h'] / 2
+            if rect_y_top <= c_cy <= rect_y_bot:
+                row_members.append(c)
+
+        # Only count as a row if there's at least one text/content element
+        if len(row_members) > 1:
+            row_count += 1
+        for m in row_members:
+            all_row_member_ids.add(m.get('id', ''))
+
+    # Need at least TABLE_MIN_ROWS actual content rows
+    if row_count < TABLE_MIN_ROWS:
+        return []
+
+    # Step 4: Include dividers in the table
+    for d in dividers:
+        all_row_member_ids.add(d.get('id', ''))
+
+    # Step 5: Check for heading element before first RECTANGLE (by Y position)
+    rects_sorted = sorted(full_width_rects, key=lambda c: get_bbox(c)['y'])
+    first_rect_y = get_bbox(rects_sorted[0])['y']
+    for c in children:
+        c_id = c.get('id', '')
+        if c_id in all_row_member_ids:
+            continue
+        c_bb = get_bbox(c)
+        # Heading must be above first row background
+        if c_bb['y'] + c_bb['h'] <= first_rect_y:
+            c_type = c.get('type', '')
+            # Accept FRAME/GROUP/TEXT as potential headings
+            if c_type in ('FRAME', 'GROUP', 'TEXT', 'INSTANCE', 'COMPONENT'):
+                all_row_member_ids.add(c_id)
+
+    # Step 6: Infer name from heading or first text content
+    slug = ''
+    # Try heading text first (elements above first rect)
+    for c in children:
+        c_bb = get_bbox(c)
+        if c_bb['y'] + c_bb['h'] <= first_rect_y:
+            texts = get_text_children_content([c], max_items=1)
+            if not texts:
+                texts = get_text_children_content(c.get('children', []), max_items=1)
+            if texts:
+                slug = to_kebab(texts[0])
+                break
+
+    if not slug:
+        slug = 'data'
+
+    suggested_name = f'table-{slug}'
+
+    # Collect all member node IDs and names preserving child order
+    ordered_members = [c for c in children if c.get('id', '') in all_row_member_ids]
+    ordered_ids = [c.get('id', '') for c in ordered_members]
+    ordered_names = [c.get('name', '') for c in ordered_members]
+
+    return [{
+        'method': 'semantic',
+        'semantic_type': 'table',
+        'node_ids': ordered_ids,
+        'node_names': ordered_names,
+        'count': len(ordered_ids),
+        'suggested_name': suggested_name,
+        'suggested_wrapper': 'table-container',
+        'row_count': row_count,
+    }]
+
+
+# --- Enriched Children Table (Issue 194) ---
+
+def _collect_text_preview(node, max_depth=3, max_len=30):
+    """Recursively collect text content for preview.
+
+    Returns first meaningful text found in descendants, truncated to max_len.
+    """
+    if node.get('type') == 'TEXT':
+        text = node.get('characters', '') or node.get('name', '')
+        if text and not UNNAMED_RE.match(text):
+            return text[:max_len]
+    if max_depth <= 0:
+        return ''
+    for c in node.get('children', []):
+        result = _collect_text_preview(c, max_depth - 1, max_len)
+        if result:
+            return result
+    return ''
+
+
+def _compute_child_types(children):
+    """Compute compact child type summary like '2REC+1TEX+1FRA'.
+
+    Uses 3-letter abbreviations sorted alphabetically.
+    """
+    TYPE_ABBR = {
+        'BOOLEAN_OPERATION': 'BOO',
+        'COMPONENT': 'CMP',
+        'COMPONENT_SET': 'CMS',
+        'ELLIPSE': 'ELL',
+        'FRAME': 'FRA',
+        'GROUP': 'GRP',
+        'INSTANCE': 'INS',
+        'LINE': 'LIN',
+        'POLYGON': 'POL',
+        'RECTANGLE': 'REC',
+        'SECTION': 'SEC',
+        'STAR': 'STA',
+        'TEXT': 'TEX',
+        'VECTOR': 'VEC',
+    }
+    counts = Counter()
+    for c in children:
+        abbr = TYPE_ABBR.get(c.get('type', ''), 'OTH')
+        counts[abbr] += 1
+    if not counts:
+        return '-'
+    return '+'.join(f'{v}{k}' for k, v in sorted(counts.items()))
+
+
+def _compute_flags(node, page_width, page_height):
+    """Compute machine-readable flags for a node.
+
+    Flags:
+    - off-canvas: positioned outside viewport (Issue 182)
+    - hidden: visible==false (Issue 187)
+    - overflow: extends beyond page bounds
+    - bg-full: full-width leaf rectangle (background candidate)
+    - bg-wide: width > 80% of page but not full-width
+    - decoration: small frame with dot/shape pattern (Issue 189)
+    - tiny: very small element (< 50x50)
+    """
+    flags = []
+    bb = get_bbox(node)
+    node_type = node.get('type', '')
+    children = node.get('children', [])
+    is_leaf = len(children) == 0
+
+    # Visibility
+    if node.get('visible') is False:
+        flags.append('hidden')
+
+    # Off-canvas
+    if page_width > 0 and is_off_canvas(node, page_width):
+        flags.append('off-canvas')
+
+    # Overflow (extends beyond page on right or bottom)
+    if page_width > 0:
+        right_edge = bb['x'] + bb['w']
+        if right_edge > page_width * 1.05:  # 5% tolerance
+            flags.append('overflow')
+        if page_height > 0 and bb['y'] + bb['h'] > page_height * 1.02:
+            flags.append('overflow-y')
+
+    # Background candidates
+    if is_leaf and node_type in ('RECTANGLE', 'VECTOR', 'ELLIPSE'):
+        if page_width > 0:
+            width_ratio = bb['w'] / page_width
+            if width_ratio >= 0.95:
+                flags.append('bg-full')
+            elif width_ratio >= 0.8:
+                flags.append('bg-wide')
+
+    # Decoration pattern
+    if not is_leaf and is_decoration_pattern(node):
+        flags.append('decoration')
+
+    # Tiny element
+    if bb['w'] > 0 and bb['h'] > 0 and bb['w'] < 50 and bb['h'] < 50:
+        flags.append('tiny')
+
+    return flags
+
+
+def generate_enriched_table(children, page_width=1440, page_height=0):
+    """Generate enriched Markdown table for Phase B Claude reasoning.
+
+    Produces the enriched format:
+    | # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |
+
+    This format provides Claude with enough structural information to detect
+    patterns like cards, tables, background layers, etc. without needing
+    rule-based Phase A detectors.
+
+    Issue 194: Phase B Claude推論のネストレベル拡張
+
+    Args:
+        children: List of Figma child nodes (with absoluteBoundingBox).
+        page_width: Page width for flag computation (default: 1440).
+        page_height: Page height for overflow detection (default: 0 = skip).
+
+    Returns:
+        str: Markdown table string.
+    """
+    header = '| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |'
+    separator = '|---|-----|------|------|---|---|-------|-------|------------|-------|------|'
+    rows = [header, separator]
+
+    for i, child in enumerate(children):
+        bb = get_bbox(child)
+        x = int(bb['x'])
+        y = int(bb['y'])
+        w = int(bb['w'])
+        h = int(bb['h'])
+        node_type = child.get('type', '')
+        name = (child.get('name', '') or '')[:35]
+        node_id = child.get('id', '')
+        child_nodes = child.get('children', [])
+        is_leaf = len(child_nodes) == 0
+        leaf_str = 'Y' if is_leaf else 'N'
+
+        # Child types summary
+        child_types = _compute_child_types(child_nodes)
+
+        # Flags
+        flags = _compute_flags(child, page_width, page_height)
+        flags_str = ','.join(flags) if flags else '-'
+
+        # Text preview
+        text = _collect_text_preview(child)
+        if not text:
+            text = '-'
+
+        row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {text} |'
+        rows.append(row)
+
+    return '\n'.join(rows)
