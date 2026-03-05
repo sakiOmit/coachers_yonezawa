@@ -28,6 +28,8 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, yaml_
     ROW_TOLERANCE, infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency)
 
 VARIANCE_RATIO = 1.5
+CENTER_ALIGN_VARIANCE = 4   # center alignment variance threshold (std ~2px)
+ALIGN_TOLERANCE = 2         # alignment position tolerance in px
 
 def infer_layout(frame):
     \"\"\"Infer Auto Layout settings for a frame.\"\"\"
@@ -123,22 +125,22 @@ def infer_layout(frame):
     if direction in ('HORIZONTAL', 'WRAP'):
         centers = [bb['y'] + bb['h'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
-        if center_var < 4:
+        if center_var < CENTER_ALIGN_VARIANCE:
             counter_align = 'CENTER'
-        elif all(abs((bb['y'] + bb['h']) - (child_bboxes[0]['y'] + child_bboxes[0]['h'])) < 2 for bb in child_bboxes):
+        elif all(abs((bb['y'] + bb['h']) - (child_bboxes[0]['y'] + child_bboxes[0]['h'])) < ALIGN_TOLERANCE for bb in child_bboxes):
             counter_align = 'MAX'
-        elif all(abs(bb['y'] - child_bboxes[0]['y']) < 2 for bb in child_bboxes):
+        elif all(abs(bb['y'] - child_bboxes[0]['y']) < ALIGN_TOLERANCE for bb in child_bboxes):
             counter_align = 'MIN'
         else:
             counter_align = 'MIN'
     else:
         centers = [bb['x'] + bb['w'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
-        if center_var < 4:
+        if center_var < CENTER_ALIGN_VARIANCE:
             counter_align = 'CENTER'
-        elif all(abs((bb['x'] + bb['w']) - (child_bboxes[0]['x'] + child_bboxes[0]['w'])) < 2 for bb in child_bboxes):
+        elif all(abs((bb['x'] + bb['w']) - (child_bboxes[0]['x'] + child_bboxes[0]['w'])) < ALIGN_TOLERANCE for bb in child_bboxes):
             counter_align = 'MAX'
-        elif all(abs(bb['x'] - child_bboxes[0]['x']) < 2 for bb in child_bboxes):
+        elif all(abs(bb['x'] - child_bboxes[0]['x']) < ALIGN_TOLERANCE for bb in child_bboxes):
             counter_align = 'MIN'
         else:
             counter_align = 'MIN'
@@ -208,7 +210,7 @@ def walk_and_infer(node, results=None):
     children = node.get('children', [])
 
     # Issue 69: Include INSTANCE/COMPONENT nodes for Auto Layout inference
-    if node_type in ('FRAME', 'INSTANCE', 'COMPONENT') and len(children) >= 2:
+    if node_type in ('FRAME', 'INSTANCE', 'COMPONENT', 'SECTION') and len(children) >= 2:
         # Issue 18: Use enriched layoutMode if available
         layout = layout_from_enrichment(node)
         source = None  # Issue 95: Initialize before conditional assignment

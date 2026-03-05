@@ -235,6 +235,9 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
     if renames is None:
         renames = {}
 
+    if node.get('visible') == False:
+        return renames
+
     name = node.get('name', '')
     node_id = node.get('id', '')
 

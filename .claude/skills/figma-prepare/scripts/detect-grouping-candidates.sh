@@ -466,7 +466,8 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
                     has_large_bg = True
 
     if is_near_top and has_large_bg and has_text:
-        return 'section-hero'
+        zone_counters['hero'] = zone_counters.get('hero', 0) + 1
+        return f\"section-hero-{zone_counters['hero']}\"
 
     # Card list detection: 3+ card-like elements
     cards = [n for n in zone_nodes if is_card_like(n)]

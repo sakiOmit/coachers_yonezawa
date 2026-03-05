@@ -507,9 +507,17 @@ print('fills-based detection OK')
 " && { green "  PASS: Issue 17 — IMAGE/SOLID fill detection"; ((PASS++)) || true; } \
      || { red "  FAIL: Issue 17 — fill detection"; ((FAIL++)) || true; }
 
-      # Issue 32: fills=[] no crash
-      green "  PASS: Issue 32 — fills=[] did not crash rename pipeline"
-      ((PASS++)) || true
+      # Issue 32: fills=[] no crash — verify node 1:20 (fills: [] in enrichment) processed without error
+      echo "$ENRICHED_P2" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+# Enriched data includes node 1:20 with fills=[]; verify no error entries for it
+assert 'error' not in d, 'Top-level error in rename output'
+renames = d.get('renames',{})
+r = renames.get('1:20', {})
+assert r.get('error') is None, f'Error for node 1:20: {r}'
+" && { green "  PASS: Issue 32 — fills=[] node 1:20 processed without error"; ((PASS++)) || true; } \
+       || { red "  FAIL: Issue 32 — fills=[] caused error for node 1:20"; ((FAIL++)) || true; }
     fi
 
     # Issue 18: layoutMode complement

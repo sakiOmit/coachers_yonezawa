@@ -53,10 +53,11 @@
 
   // 4. Build ID mapping via parallel DFS traversal
   const mapping = {};
+  const warnings = [];
   let total = 0;
   let nameMatches = 0;
 
-  function buildMapping(origNode, cloneNode) {
+  function buildMapping(origNode, cloneNode, warnings) {
     mapping[origNode.id] = cloneNode.id;
     total++;
     if (origNode.name === cloneNode.name || cloneNode.name === `${origNode.name} [prepared]`) {
@@ -67,14 +68,17 @@
     if ("children" in origNode && "children" in cloneNode) {
       const origChildren = origNode.children;
       const cloneChildren = cloneNode.children;
+      if (origChildren.length !== cloneChildren.length) {
+        warnings.push(`Child count mismatch at ${origNode.id}: orig=${origChildren.length}, clone=${cloneChildren.length}`);
+      }
       const len = Math.min(origChildren.length, cloneChildren.length);
       for (let i = 0; i < len; i++) {
-        buildMapping(origChildren[i], cloneChildren[i]);
+        buildMapping(origChildren[i], cloneChildren[i], warnings);
       }
     }
   }
 
-  buildMapping(source, clone);
+  buildMapping(source, clone, warnings);
 
   const nameMatchRate = total > 0 ? nameMatches / total : 0;
 
@@ -92,6 +96,7 @@
     mapping,
     total,
     nameMatchRate: Math.round(nameMatchRate * 1000) / 1000,
+    warnings,
   };
 
   if (nameMatchRate < 0.95) {

@@ -123,7 +123,7 @@
       // 5. Create wrapper FRAME
       const wrapper = figma.createFrame();
       wrapper.name = name;
-      wrapper.resize(maxX - minX, maxY - minY);
+      wrapper.resize(Math.max(1, maxX - minX), Math.max(1, maxY - minY));
 
       // Position wrapper at the bounding box origin
       // Use parent-relative coordinates
@@ -170,7 +170,7 @@
   }
 
   return {
-    success: true,
+    success: applied > 0 || errors.length === 0,
     applied,
     skipped,
     errors,

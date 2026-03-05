@@ -244,7 +244,7 @@ def structure_hash(node):
     if not children:
         return node.get('type', 'UNKNOWN')
     child_types = sorted(c.get('type', '') for c in children)
-    return f"{node.get('type', '')}:[{','.join(child_types)}]"
+    return f"{node.get('type', 'UNKNOWN')}:[{','.join(child_types)}]"
 
 
 def structure_similarity(hash_a, hash_b):
@@ -311,8 +311,6 @@ def detect_regular_spacing(children_bboxes, axis='auto'):
         return False
 
     mean_gap = statistics.mean(gaps)
-    if mean_gap <= 0:
-        return False
     std_gap = statistics.stdev(gaps)
     cv = std_gap / mean_gap
     return cv < CV_THRESHOLD

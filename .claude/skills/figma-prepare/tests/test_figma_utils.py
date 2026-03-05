@@ -16,6 +16,7 @@ SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(SKILLS_DIR, "lib"))
 
 from figma_utils import (
+    _raw_distance,
     alignment_bonus,
     compute_gap_consistency,
     compute_grouping_score,
@@ -127,6 +128,14 @@ class TestSnap:
     def test_float(self):
         assert snap(5.7) == 4
 
+    def test_zero_grid(self):
+        """grid=0 falls back to round()."""
+        assert snap(2.5, grid=0) == round(2.5)
+
+    def test_negative_grid(self):
+        """grid=-1 falls back to round()."""
+        assert snap(2.5, grid=-1) == round(2.5)
+
 
 # ============================================================
 # is_section_root
@@ -146,6 +155,18 @@ class TestIsSectionRoot:
     ])
     def test_invalid_roots(self, node):
         assert is_section_root(node) is False
+
+    def test_component_section_root(self):
+        """COMPONENT type with width 1440 is a section root."""
+        assert is_section_root({"type": "COMPONENT", "absoluteBoundingBox": {"width": 1440}}) is True
+
+    def test_instance_section_root(self):
+        """INSTANCE type with width 1440 is a section root."""
+        assert is_section_root({"type": "INSTANCE", "absoluteBoundingBox": {"width": 1440}}) is True
+
+    def test_section_section_root(self):
+        """SECTION type with width 1440 is a section root."""
+        assert is_section_root({"type": "SECTION", "absoluteBoundingBox": {"width": 1440}}) is True
 
 
 # ============================================================
@@ -315,6 +336,29 @@ class TestResolveAbsoluteCoords:
 
 
 # ============================================================
+# _raw_distance
+# ============================================================
+class TestRawDistance:
+    def test_overlapping_boxes(self):
+        """Two overlapping boxes -> distance 0."""
+        a = {"x": 0, "y": 0, "w": 100, "h": 50}
+        b = {"x": 50, "y": 25, "w": 100, "h": 50}
+        assert _raw_distance(a, b) == 0
+
+    def test_touching_boxes(self):
+        """Two touching boxes -> distance 0."""
+        a = {"x": 0, "y": 0, "w": 100, "h": 50}
+        b = {"x": 100, "y": 0, "w": 100, "h": 50}
+        assert _raw_distance(a, b) == 0
+
+    def test_containment(self):
+        """One box fully inside another -> distance 0."""
+        outer = {"x": 0, "y": 0, "w": 200, "h": 200}
+        inner = {"x": 50, "y": 50, "w": 50, "h": 50}
+        assert _raw_distance(outer, inner) == 0
+
+
+# ============================================================
 # compute_grouping_score (Area 1)
 # ============================================================
 class TestComputeGroupingScore:
@@ -354,6 +398,11 @@ class TestComputeGroupingScore:
     def test_zero_size(self):
         zero = {"x": 0, "y": 0, "w": 0, "h": 0}
         assert size_similarity_bonus(self.A, zero) == 1.0
+
+    def test_zero_gap(self):
+        """Issue 136: gap=0 returns 0.0 for non-overlapping boxes."""
+        b = {"x": 200, "y": 0, "w": 100, "h": 50}
+        assert compute_grouping_score(self.A, b, gap=0) == 0.0
 
 
 # ============================================================
@@ -432,6 +481,12 @@ class TestStructureHash:
     def test_instance(self):
         node = {"type": "INSTANCE", "children": [{"type": "FRAME"}, {"type": "TEXT"}]}
         assert structure_hash(node) == "INSTANCE:[FRAME,TEXT]"
+
+    def test_children_but_no_type(self):
+        """Node with children but missing type field produces 'UNKNOWN:[CHILD_TYPES]' hash."""
+        node = {"children": [{"type": "TEXT"}, {"type": "TEXT"}]}
+        result = structure_hash(node)
+        assert result == "UNKNOWN:[TEXT,TEXT]"
 
 
 # ============================================================

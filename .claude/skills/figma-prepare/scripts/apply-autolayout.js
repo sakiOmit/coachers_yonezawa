@@ -40,7 +40,7 @@
  * Constraints:
  *   - Max 50 nodes per batch (timeout prevention)
  *   - Errors are per-node skip (batch continues)
- *   - Only applies to FRAME nodes (INSTANCE/COMPONENT are read-only in Plugin API)
+ *   - Only applies to FRAME/COMPONENT/SECTION nodes (INSTANCE is read-only in Plugin API)
  *   - Confidence filtering: skip entries below min_confidence
  */
 () => {
@@ -74,10 +74,11 @@
         continue;
       }
 
-      // Auto Layout can only be set on FRAME nodes
-      // INSTANCE/COMPONENT are typically read-only for layout changes
-      if (node.type !== "FRAME") {
-        errors.push({ nodeId, error: `type ${node.type} — only FRAME supported for layout changes` });
+      // Auto Layout can be set on FRAME, COMPONENT, and SECTION nodes.
+      // INSTANCE is excluded: instances inherit layout from their main component
+      // and cannot have their layout directly modified via the Plugin API.
+      if (!["FRAME", "COMPONENT", "SECTION"].includes(node.type)) {
+        errors.push({ nodeId, error: `type ${node.type} — only FRAME/COMPONENT/SECTION supported for layout changes` });
         skipped++;
         continue;
       }
@@ -143,7 +144,7 @@
   }
 
   return {
-    success: true,
+    success: applied > 0 || errors.length === 0,
     applied,
     skipped,
     errors,

@@ -59,7 +59,7 @@
   }
 
   return {
-    success: true,
+    success: renamed > 0 || errors.length === 0,
     renamed,
     skipped,
     errors,

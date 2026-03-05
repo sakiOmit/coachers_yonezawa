@@ -11,6 +11,7 @@ red()   { printf "\033[31m%s\033[0m\n" "$1"; }
 yellow(){ printf "\033[33m%s\033[0m\n" "$1"; }
 bold()  { printf "\033[1m%s\033[0m\n" "$1"; }
 
+# SAFETY: $field MUST be a hardcoded literal (e.g., "['score']"). Never use external input.
 assert_json_field() {
   local json="$1" field="$2" expected="$3" label="$4"
   local actual
@@ -25,6 +26,7 @@ assert_json_field() {
   fi
 }
 
+# SAFETY: $field MUST be a hardcoded literal (e.g., "['score']"). Never use external input.
 assert_json_range() {
   local json="$1" field="$2" min="$3" max="$4" label="$5"
   local actual
@@ -39,6 +41,7 @@ assert_json_range() {
   fi
 }
 
+# SAFETY: $field MUST be a hardcoded literal (e.g., "['score']"). Never use external input.
 assert_json_gte() {
   local json="$1" field="$2" min="$3" label="$4"
   local actual
