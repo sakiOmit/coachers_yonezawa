@@ -391,15 +391,81 @@ def compute_gap_consistency(gaps):
     return statistics.stdev(gaps) / mean_val
 
 
+JP_KEYWORD_MAP = {
+    # Navigation / Actions
+    'お問い合わせ': 'contact',
+    '問い合わせ': 'contact',
+    'お知らせ': 'news',
+    '新着情報': 'news',
+    '会社概要': 'company',
+    '採用情報': 'recruit',
+    'アクセス': 'access',
+    'よくある質問': 'faq',
+    'プライバシー': 'privacy',
+    '利用規約': 'terms',
+    'サイトマップ': 'sitemap',
+    'ホーム': 'home',
+    'トップ': 'top',
+    'ログイン': 'login',
+    '検索': 'search',
+    '詳しく': 'more',
+    '一覧': 'list',
+    '特徴': 'features',
+    '実績': 'works',
+    'サービス': 'service',
+    '料金': 'pricing',
+    'メニュー': 'menu',
+    'プラン': 'plan',
+    'コンセプト': 'concept',
+    # Food / Catering domain
+    'ケータリング': 'catering',
+    'フィンガーフード': 'finger-food',
+    'フード': 'food',
+    'イベント': 'event',
+    'パーティー': 'party',
+    'パーティ': 'party',
+    # Business domain
+    '企業': 'corporate',
+    'オフィス': 'office',
+    'スタッフ': 'staff',
+    # Section types
+    'ヒーロー': 'hero',
+    'フッター': 'footer',
+    'ヘッダー': 'header',
+    'ナビゲーション': 'nav',
+    'ギャラリー': 'gallery',
+    'テスティモニアル': 'testimonial',
+    'ブログ': 'blog',
+    'カテゴリ': 'category',
+    'カテゴリー': 'category',
+    # Common words
+    'ビジョン': 'vision',
+    'ミッション': 'mission',
+    '代表': 'representative',
+    '紹介': 'introduction',
+    'ご挨拶': 'greeting',
+    '歴史': 'history',
+    '沿革': 'history',
+    '強み': 'strength',
+    '理念': 'philosophy',
+    '事業内容': 'business',
+    '事業': 'business',
+    '求人': 'job',
+    '募集': 'recruit',
+}
+
+
 def to_kebab(text):
     """Convert text to kebab-case safe name.
 
-    Non-ASCII-only text returns 'content' as a generic label.
-    The downstream AI (via get_design_context) will assign final
-    semantic names using the node's characters field.
+    Non-ASCII-only text is matched against JP_KEYWORD_MAP for known
+    Japanese terms. If no keyword matches, returns 'content' as a
+    generic label. The downstream AI (via get_design_context) will
+    assign final semantic names using the node's characters field.
 
     Issue 45: Extracted from generate-rename-map.sh to avoid duplication.
     Issue 47: Added CamelCase splitting (e.g. CamelCase → camel-case).
+    Issue 170: Added JP_KEYWORD_MAP for Japanese keyword → English slug.
     """
     text = text.strip()
     if not text:
@@ -407,7 +473,9 @@ def to_kebab(text):
     # Extract ASCII portion
     ascii_part = re.sub(r'[^\x00-\x7f]', '', text).strip()
     if not ascii_part:
-        return 'content'
+        # Issue 170: Try JP_KEYWORD_MAP before falling back to 'content'
+        slug = _jp_keyword_lookup(text)
+        return slug if slug else 'content'
     # Split CamelCase before lowercasing (Issue 47)
     ascii_part = re.sub(r'([a-z])([A-Z])', r'\1 \2', ascii_part)
     ascii_part = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', ascii_part)
@@ -416,3 +484,353 @@ def to_kebab(text):
     ascii_part = re.sub(r'[\s_]+', '-', ascii_part)
     ascii_part = re.sub(r'-+', '-', ascii_part).strip('-')
     return ascii_part[:40] if ascii_part else 'content'
+
+
+def _jp_keyword_lookup(text):
+    """Look up Japanese text in JP_KEYWORD_MAP.
+
+    Searches for known keywords in the text. Returns the first match
+    found (longest match preferred to avoid partial hits).
+    Returns empty string if no match.
+
+    Issue 170: Extracted to share between to_kebab and generate-rename-map.
+    """
+    if not text:
+        return ''
+    # Sort by descending length so longer keywords match first
+    # (e.g., "フィンガーフード" before "フード")
+    for jp, en in sorted(JP_KEYWORD_MAP.items(), key=lambda kv: -len(kv[0])):
+        if jp in text:
+            return en
+    return ''
+
+
+# === Issue 165: Consecutive pattern detection ===
+CONSECUTIVE_PATTERN_MIN = 3  # Minimum consecutive siblings with similar structure
+
+
+def detect_consecutive_similar(children, min_count=None, similarity_threshold=None):
+    """Detect runs of 3+ consecutive siblings with similar structure_hash.
+
+    Unlike detect_pattern_groups which clusters ALL matching patterns regardless
+    of position, this function only groups elements that are adjacent siblings.
+    This is important for top-level sections where menu-1, menu-2, menu-3 should
+    be grouped but non-adjacent similar frames should not.
+
+    Args:
+        children: List of child nodes.
+        min_count: Minimum consecutive siblings to form a group (default: 3).
+        similarity_threshold: Jaccard similarity threshold (default: 0.7).
+
+    Returns:
+        list of groups: [{'indices': [0,1,2], 'children': [...], 'hash': '...'}]
+    """
+    if min_count is None:
+        min_count = CONSECUTIVE_PATTERN_MIN
+    if similarity_threshold is None:
+        similarity_threshold = 0.7  # JACCARD_THRESHOLD
+
+    if len(children) < min_count:
+        return []
+
+    hashes = [structure_hash(c) for c in children]
+    groups = []
+    i = 0
+    while i < len(children):
+        run = [i]
+        base_hash = hashes[i]
+        j = i + 1
+        while j < len(children):
+            sim = structure_similarity(base_hash, hashes[j])
+            if sim >= similarity_threshold:
+                run.append(j)
+                j += 1
+            else:
+                break
+        if len(run) >= min_count:
+            groups.append({
+                'indices': run,
+                'children': [children[idx] for idx in run],
+                'hash': base_hash
+            })
+            i = j  # skip past the run
+        else:
+            i += 1
+    return groups
+
+
+# === Issue 166: Heading-content pair detection ===
+HEADING_MAX_HEIGHT_RATIO = 0.4  # Heading must be < 40% of content height
+HEADING_MAX_CHILDREN = 5  # Heading frames typically have few children
+HEADING_TEXT_RATIO = 0.5  # At least 50% of leaf descendants should be TEXT/VECTOR
+
+
+def is_heading_like(node):
+    """Check if a node looks like a section heading (small, text-heavy, decorative).
+
+    Heading frames typically contain: title text + subtitle text + decorative
+    elements (dots, vectors). They are small relative to content sections.
+
+    Args:
+        node: Figma node dict with children.
+
+    Returns:
+        bool: True if node appears to be a heading frame.
+    """
+    children = node.get('children', [])
+    if not children:
+        return False
+    if len(children) > HEADING_MAX_CHILDREN:
+        return False
+
+    # Count leaf descendants by type
+    def count_leaves(n):
+        ch = n.get('children', [])
+        if not ch:
+            return {n.get('type', 'UNKNOWN'): 1}
+        counts = {}
+        for c in ch:
+            for t, cnt in count_leaves(c).items():
+                counts[t] = counts.get(t, 0) + cnt
+        return counts
+
+    leaf_counts = count_leaves(node)
+    total_leaves = sum(leaf_counts.values())
+    if total_leaves == 0:
+        return False
+
+    # Issue 175: ELLIPSE-dominated frames are decoration, not headings.
+    # A heading MUST have at least as many TEXT nodes as ELLIPSE nodes.
+    ellipse_count = leaf_counts.get('ELLIPSE', 0)
+    text_count = leaf_counts.get('TEXT', 0)
+    if ellipse_count > text_count:
+        return False
+
+    text_vector_count = (text_count
+                         + leaf_counts.get('VECTOR', 0)
+                         + ellipse_count)
+    return (text_vector_count / total_leaves) >= HEADING_TEXT_RATIO
+
+
+def detect_heading_content_pairs(children):
+    """Detect heading-like frame followed by larger content frame.
+
+    Pattern: a small "heading-like" frame (mostly text/vector, small height
+    relative to siblings) followed by a larger "content" frame.
+
+    Args:
+        children: List of sibling nodes.
+
+    Returns:
+        list of pairs: [{'heading_idx': i, 'content_idx': j, 'children': [h, c]}]
+    """
+    if len(children) < 2:
+        return []
+
+    pairs = []
+    used = set()
+
+    for i in range(len(children) - 1):
+        if i in used:
+            continue
+
+        h = children[i]
+        c = children[i + 1]
+
+        h_bb = get_bbox(h)
+        c_bb = get_bbox(c)
+        if not h_bb or not c_bb:
+            continue
+
+        # Heading must be shorter than content
+        if h_bb['h'] >= c_bb['h'] * HEADING_MAX_HEIGHT_RATIO:
+            # Only if heading is genuinely small
+            if h_bb['h'] >= c_bb['h'] * 0.8:
+                continue
+
+        if not is_heading_like(h):
+            continue
+
+        # Content must be a substantial frame
+        c_type = c.get('type', '')
+        if c_type not in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION'):
+            continue
+        if not c.get('children'):
+            continue
+
+        pairs.append({
+            'heading_idx': i,
+            'content_idx': i + 1,
+            'children': [h, c]
+        })
+        used.add(i)
+        used.add(i + 1)
+
+    return pairs
+
+
+# === Issue 167: Loose element absorption ===
+LOOSE_ELEMENT_MAX_HEIGHT = 20  # Small elements (dividers, spacers)
+LOOSE_ABSORPTION_DISTANCE = 200  # Max distance to absorb into a group (member-level)
+
+
+def _compute_zone_bboxes(children, candidate_groups):
+    """Compute vertical bounding box for each candidate group from its member nodes.
+
+    Args:
+        children: list of sibling nodes.
+        candidate_groups: list of dicts, each with 'node_ids' list.
+
+    Returns:
+        list of dicts: [{'y_top': float, 'y_bot': float,
+                         'representative_idx': int, 'member_indices': set}]
+    """
+    child_id_to_idx = {ch.get('id', ''): idx for idx, ch in enumerate(children)}
+    zone_bboxes = []
+    for cg in candidate_groups:
+        member_indices = [child_id_to_idx[nid] for nid in cg.get('node_ids', [])
+                          if nid in child_id_to_idx]
+        if not member_indices:
+            continue
+        y_tops = []
+        y_bots = []
+        for mi in member_indices:
+            mbb = get_bbox(children[mi])
+            if mbb:
+                y_tops.append(mbb['y'])
+                y_bots.append(mbb['y'] + mbb['h'])
+        if y_tops and y_bots:
+            zone_bboxes.append({
+                'y_top': min(y_tops),
+                'y_bot': max(y_bots),
+                'representative_idx': member_indices[0],
+                'member_indices': set(member_indices),
+            })
+    return zone_bboxes
+
+
+def find_absorbable_elements(children, group_indices_set, candidate_groups=None):
+    """Find loose elements (dividers, small frames) that should be absorbed
+    into nearby groups.
+
+    Loose elements are LINE nodes, small leaf shapes, or small rectangles
+    that float between grouped sections. They should be merged into the
+    nearest existing group.
+
+    Two-pass approach (Issue 167 fix):
+    1. Zone-level: If candidate_groups are provided, check if the loose
+       element's Y-center falls within a zone's bounding box (y_top..y_bot).
+       Elements inside a zone get distance=0 (overlap). This handles
+       root-level dividers that sit between zone members but within the
+       zone's vertical span.
+    2. Member-level fallback: Check distance to individual group members
+       using LOOSE_ABSORPTION_DISTANCE (original behavior).
+
+    Args:
+        children: list of sibling nodes.
+        group_indices_set: set of indices already in groups.
+        candidate_groups: optional list of candidate group dicts, each with
+            'node_ids' (list of child node IDs). When provided, enables
+            zone-level bounding box matching for root-level absorption.
+
+    Returns:
+        list of absorptions: [{'element_idx': i, 'target_group_idx': j,
+                                'distance': float, 'reason': '...'}]
+    """
+    absorptions = []
+
+    # Pre-compute zone bounding boxes if candidate groups provided
+    zone_bboxes = _compute_zone_bboxes(children, candidate_groups) if candidate_groups else []
+
+    for i, child in enumerate(children):
+        if i in group_indices_set:
+            continue
+
+        bb = get_bbox(child)
+        if not bb:
+            continue
+
+        child_type = child.get('type', '')
+
+        # Criteria for "loose" element:
+        # 1. LINE type (always loose)
+        # 2. Small height element (divider-like) without children
+        # 3. Small shape element (RECTANGLE/VECTOR)
+        is_loose = False
+        reason = ''
+
+        if child_type == 'LINE':
+            is_loose = True
+            reason = 'LINE element'
+        elif bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and not child.get('children'):
+            is_loose = True
+            reason = f'small leaf (h={bb["h"]}px)'
+        elif bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and child_type in ('RECTANGLE', 'VECTOR'):
+            is_loose = True
+            reason = f'small shape (h={bb["h"]}px)'
+
+        if not is_loose:
+            continue
+
+        # --- Pass 1: Zone-level bounding box check ---
+        # If the loose element's Y-center falls within any zone's vertical
+        # extent, absorb it into that zone (distance=0).
+        best_group_idx = None
+        best_distance = float('inf')
+        zone_matched = False
+
+        if zone_bboxes:
+            elem_cy = bb['y'] + bb['h'] / 2
+            for zb in zone_bboxes:
+                if i in zb['member_indices']:
+                    continue  # skip if already a member
+                # Check if element center is within zone bbox
+                if zb['y_top'] <= elem_cy <= zb['y_bot']:
+                    # Element is inside the zone's vertical span
+                    if 0.0 < best_distance:
+                        best_distance = 0.0
+                        best_group_idx = zb['representative_idx']
+                        zone_matched = True
+                else:
+                    # Vertical distance to zone bbox edges
+                    if elem_cy < zb['y_top']:
+                        dist = zb['y_top'] - (bb['y'] + bb['h'])
+                    else:
+                        dist = bb['y'] - zb['y_bot']
+                    dist = max(0.0, dist)
+                    if dist < best_distance:
+                        best_distance = dist
+                        best_group_idx = zb['representative_idx']
+                        zone_matched = (dist < LOOSE_ABSORPTION_DISTANCE)
+
+        # --- Pass 2: Member-level fallback ---
+        # Also check individual members; a closer member overrides zone result.
+        for gi in group_indices_set:
+            g_bb = get_bbox(children[gi])
+            if not g_bb:
+                continue
+
+            # Vertical distance between element and group member
+            if bb['y'] + bb['h'] <= g_bb['y']:
+                dist = g_bb['y'] - (bb['y'] + bb['h'])
+            elif g_bb['y'] + g_bb['h'] <= bb['y']:
+                dist = bb['y'] - (g_bb['y'] + g_bb['h'])
+            else:
+                dist = 0  # overlapping
+
+            if dist < best_distance:
+                best_distance = dist
+                best_group_idx = gi
+
+        # Accept if:
+        # - zone_matched (element center is within a zone's vertical span), OR
+        # - best_distance < LOOSE_ABSORPTION_DISTANCE (member-level proximity)
+        if best_group_idx is not None and (zone_matched or best_distance < LOOSE_ABSORPTION_DISTANCE):
+            absorptions.append({
+                'element_idx': i,
+                'target_group_idx': best_group_idx,
+                'distance': best_distance,
+                'reason': reason
+            })
+
+    return absorptions

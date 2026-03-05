@@ -27,7 +27,10 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
     compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
-    get_text_children_content, to_kebab, ROW_TOLERANCE)
+    get_text_children_content, to_kebab, ROW_TOLERANCE,
+    detect_consecutive_similar, detect_heading_content_pairs,
+    find_absorbable_elements, is_heading_like,
+    CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -594,6 +597,48 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
             g['parent_name'] = parent_name
             all_candidates.append(g)
 
+        # Issue 165: Consecutive pattern groups (root level only)
+        consecutive_groups = detect_consecutive_similar(children)
+        for cg in consecutive_groups:
+            node_ids = [children[idx].get('id', '') for idx in cg['indices']]
+            if len(node_ids) >= 2:
+                # Infer name from common structure
+                suggested_name = f\"list-{to_kebab(children[cg['indices'][0]].get('name', 'item'))}\"
+                all_candidates.append({
+                    'node_ids': node_ids,
+                    'parent_id': parent_id,
+                    'parent_name': parent_name,
+                    'suggested_name': suggested_name,
+                    'method': 'consecutive',
+                    'priority': 2.5,
+                    'count': len(node_ids),
+                    'structure_hash': cg['hash'],
+                })
+
+        # Issue 166: Heading-content pairs (root level only)
+        hc_pairs = detect_heading_content_pairs(children)
+        for pair in hc_pairs:
+            h = children[pair['heading_idx']]
+            c = children[pair['content_idx']]
+            h_id = h.get('id', '')
+            c_id = c.get('id', '')
+            # Name from heading text
+            h_texts = get_text_children_content([h], max_items=2)
+            if not h_texts:
+                # Try children of heading frame
+                h_texts = get_text_children_content(h.get('children', []), max_items=2)
+            slug = to_kebab(h_texts[0]) if h_texts else 'section'
+            all_candidates.append({
+                'node_ids': [h_id, c_id],
+                'parent_id': parent_id,
+                'parent_name': parent_name,
+                'suggested_name': f'section-{slug}',
+                'method': 'heading-content',
+                'priority': 3.5,
+                'count': 2,
+                'structure_hash': '',
+            })
+
     # Detect at this level (all Stage A methods)
     semantic = detect_semantic_groups(children)
     patterns = detect_pattern_groups(children)
@@ -612,7 +657,8 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
     return all_candidates
 
 # Method priority for deduplication: higher = better quality
-METHOD_PRIORITY = {'semantic': 4, 'zone': 3, 'pattern': 2, 'spacing': 1, 'proximity': 0}
+# Issue 165/166: consecutive (2.5) between pattern and zone; heading-content (3.5) between zone and semantic
+METHOD_PRIORITY = {'semantic': 4, 'heading-content': 3.5, 'zone': 3, 'consecutive': 2.5, 'pattern': 2, 'spacing': 1, 'proximity': 0}
 
 def deduplicate_candidates(candidates, root_id=''):
     \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
@@ -662,6 +708,32 @@ try:
     resolve_absolute_coords(root)
     candidates = walk_and_detect(root)
     candidates = deduplicate_candidates(candidates, root_id=root.get('id', ''))
+
+    # Issue 167: Absorb loose elements into nearest existing group (post-dedup)
+    root_children = root.get('children', [])
+    if root_children and candidates:
+        # Build set of indices already in root-level groups
+        root_id_str = root.get('id', '')
+        child_id_to_idx = {ch.get('id', ''): idx for idx, ch in enumerate(root_children)}
+        grouped_indices = set()
+        root_candidates = [c for c in candidates if c.get('parent_id') == root_id_str]
+        for cand in root_candidates:
+            for nid in cand.get('node_ids', []):
+                if nid in child_id_to_idx:
+                    grouped_indices.add(child_id_to_idx[nid])
+
+        absorptions = find_absorbable_elements(root_children, grouped_indices, candidate_groups=root_candidates)
+        for ab in absorptions:
+            elem = root_children[ab['element_idx']]
+            elem_id = elem.get('id', '')
+            # Find which candidate contains the target group member
+            target_child = root_children[ab['target_group_idx']]
+            target_id = target_child.get('id', '')
+            for cand in root_candidates:
+                if target_id in cand.get('node_ids', []):
+                    cand['node_ids'].append(elem_id)
+                    cand['count'] = len(cand['node_ids'])
+                    break
 
     output_file = sys.argv[3] if len(sys.argv) > 3 else ''
 

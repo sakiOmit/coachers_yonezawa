@@ -1,0 +1,23 @@
+[
+  {
+    "node_ids": [
+      "61:58",
+      "61:59",
+      "61:62"
+    ],
+    "suggested_name": "section-concept-heading",
+    "suggested_wrapper": "section",
+    "parent_id": "__PARENT_section-concept-area__"
+  },
+  {
+    "node_ids": [
+      "61:67",
+      "61:71",
+      "61:108",
+      "61:111"
+    ],
+    "suggested_name": "section-concept-detail",
+    "suggested_wrapper": "section",
+    "parent_id": "__PARENT_section-concept-area__"
+  }
+]

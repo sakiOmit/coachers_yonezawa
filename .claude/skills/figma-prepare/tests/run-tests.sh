@@ -116,6 +116,74 @@ else
 fi
 rm -f "$YAML_OUT"
 
+# Issue 174: Semantic group/container naming test
+bold "  --- Issue 174: Semantic group/container naming ---"
+SEMANTIC_FIXTURE="/tmp/figma-prepare-test-semantic-$$.json"
+python3 -c "
+import json
+fixture = {
+    'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
+    'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 3000},
+    'children': [
+        {'id': '1:1', 'name': 'Frame 1', 'type': 'FRAME',
+         'absoluteBoundingBox': {'x': 100, 'y': 100, 'width': 600, 'height': 800},
+         'children': [
+             {'id': '1:10', 'name': 'Frame 10', 'type': 'FRAME',
+              'absoluteBoundingBox': {'x': 100, 'y': 100, 'width': 500, 'height': 180},
+              'children': [
+                  {'id': '1:11', 'name': 'Text 1', 'type': 'TEXT',
+                   'absoluteBoundingBox': {'x': 110, 'y': 110, 'width': 200, 'height': 30},
+                   'characters': 'サービスについて', 'children': []},
+              ]},
+             {'id': '1:20', 'name': 'Frame 11', 'type': 'FRAME',
+              'absoluteBoundingBox': {'x': 100, 'y': 300, 'width': 500, 'height': 180},
+              'children': [
+                  {'id': '1:21', 'name': 'Text 2', 'type': 'TEXT',
+                   'absoluteBoundingBox': {'x': 110, 'y': 310, 'width': 200, 'height': 30},
+                   'characters': '詳しくはこちら', 'children': []},
+              ]},
+             {'id': '1:30', 'name': 'Frame 12', 'type': 'FRAME',
+              'absoluteBoundingBox': {'x': 100, 'y': 500, 'width': 500, 'height': 180},
+              'children': [
+                  {'id': '1:31', 'name': 'Text 3', 'type': 'TEXT',
+                   'absoluteBoundingBox': {'x': 110, 'y': 510, 'width': 200, 'height': 30},
+                   'characters': 'お問い合わせ', 'children': []},
+              ]},
+             {'id': '1:40', 'name': 'Frame 13', 'type': 'FRAME',
+              'absoluteBoundingBox': {'x': 100, 'y': 700, 'width': 500, 'height': 180},
+              'children': [
+                  {'id': '1:41', 'name': 'Text 4', 'type': 'TEXT',
+                   'absoluteBoundingBox': {'x': 110, 'y': 710, 'width': 200, 'height': 30},
+                   'characters': '料金プラン', 'children': []},
+              ]},
+         ]},
+    ],
+}
+with open('$SEMANTIC_FIXTURE', 'w') as f:
+    json.dump(fixture, f)
+"
+
+SEMANTIC_RESULT=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$SEMANTIC_FIXTURE" 2>&1) || {
+  red "  FATAL: generate-rename-map.sh crashed on semantic fixture"
+  ((FAIL++)) || true
+}
+
+if [[ -n "${SEMANTIC_RESULT:-}" ]]; then
+  echo "$SEMANTIC_RESULT" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+renames = d.get('renames',{})
+r = renames.get('1:1', {})
+name = r.get('new_name', '')
+assert name.startswith('group-'), f'Expected group-*, got: {name}'
+assert 'service' in name, f'Expected service slug, got: {name}'
+assert not name.split('-')[-1].isdigit(), f'Expected semantic slug, not numeric: {name}'
+print(f'Semantic name: {name}')
+" && { green "  PASS: Issue 174 — group uses semantic slug from child text"; ((PASS++)) || true; } \
+   || { red "  FAIL: Issue 174 — semantic group naming"; ((FAIL++)) || true; }
+fi
+rm -f "$SEMANTIC_FIXTURE"
+
 echo ""
 
 # ================================================================
@@ -313,7 +381,7 @@ checks = [
     ('1:108', 'icon-',    'Icon detection'),
     ('1:102', 'heading-', 'Heading detection'),
     ('1:109', 'icon-',    'Tiny frame icon'),
-    ('1:200', 'content-', 'Issue 14: heading+body'),
+    ('1:200', 'body-',    'Issue 14: heading+body (Issue 170: TEXT-only → body-*)'),
     ('1:106', 'header',   'Issue 16: header'),
     ('1:300', 'footer',   'Issue 16: footer'),
 ]
@@ -354,9 +422,9 @@ assert len(candidates) >= 1, 'No candidates'
 # Dedup: < 50% of nodes
 assert len(candidates) < total_nodes * 0.5, f'{len(candidates)} >= {total_nodes}*0.5'
 
-# Issue 22: Tab + Card list proximity
+# Issue 22: Tab + Card list grouped (proximity or heading-content)
 found_22 = any(
-    c.get('method') == 'proximity' and c.get('parent_name') == '募集一覧'
+    c.get('method') in ('proximity', 'heading-content')
     and {'1:6', '1:15'} <= set(c.get('node_ids', []))
     for c in candidates
 )

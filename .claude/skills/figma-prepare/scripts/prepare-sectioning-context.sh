@@ -26,7 +26,8 @@ import json, sys, os
 from collections import Counter
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, get_text_children_content
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE,
+    get_text_children_content, structure_hash, structure_similarity, is_heading_like)
 
 def count_children(node):
     return len(node.get('children', []))
@@ -63,6 +64,9 @@ def detect_heuristic_hints(children, page_bbox):
             'footer_candidates': [],
             'gap_analysis': [],
             'background_candidates': [],
+            'consecutive_patterns': [],
+            'heading_candidates': [],
+            'loose_elements': [],
         }
 
     header_candidates = []
@@ -106,11 +110,72 @@ def detect_heuristic_hints(children, page_bbox):
             'gap_px': gap_px,
         })
 
+    # --- Consecutive similar patterns ---
+    # Detect runs of 3+ consecutive children with similar structure hash
+    hashes = [structure_hash(c) for c in sorted_children]
+    consecutive_patterns = []
+    i = 0
+    while i < len(sorted_children):
+        run_indices = [i]
+        j = i + 1
+        while j < len(sorted_children):
+            sim = structure_similarity(hashes[i], hashes[j])
+            if sim >= 0.7:
+                run_indices.append(j)
+                j += 1
+            else:
+                break
+        if len(run_indices) >= 3:
+            consecutive_patterns.append({
+                'indices': run_indices,
+                'ids': [sorted_children[idx].get('id', '') for idx in run_indices],
+                'names': [sorted_children[idx].get('name', '') for idx in run_indices],
+                'hash': hashes[i],
+            })
+            i = j
+        else:
+            i += 1
+
+    # --- Heading candidates ---
+    # Small, text-heavy frames that likely serve as section headings
+    # Height filter: headings should be compact (<=200px) to distinguish from card/content frames
+    heading_candidates = []
+    for idx, child in enumerate(sorted_children):
+        bb = get_bbox(child)
+        child_h = bb.get('h', 999)
+        if child_h > 200:
+            continue
+        if is_heading_like(child):
+            heading_candidates.append({
+                'index': idx,
+                'id': child.get('id', ''),
+                'name': child.get('name', ''),
+                'height': child_h,
+            })
+
+    # --- Loose elements ---
+    # LINE nodes or very small leaf elements (dividers, spacers, decorations)
+    loose_elements = []
+    for idx, child in enumerate(sorted_children):
+        bb = get_bbox(child)
+        child_type = child.get('type', '')
+        if child_type == 'LINE' or (bb.get('h', 999) <= 20 and not child.get('children')):
+            loose_elements.append({
+                'index': idx,
+                'id': child.get('id', ''),
+                'name': child.get('name', ''),
+                'type': child_type,
+                'height': bb.get('h', 0),
+            })
+
     return {
         'header_candidates': header_candidates,
         'footer_candidates': footer_candidates,
         'gap_analysis': gap_analysis,
         'background_candidates': background_candidates,
+        'consecutive_patterns': consecutive_patterns,
+        'heading_candidates': heading_candidates,
+        'loose_elements': loose_elements,
     }
 
 try:

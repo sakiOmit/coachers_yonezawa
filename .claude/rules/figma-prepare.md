@@ -106,6 +106,12 @@ score = max(0, score)
 | header_nav_min_texts | 3 items | ヘッダーナビ検出の最小TEXT数（Phase 2 検出、Issue 134） |
 | hero_zone_distance | 200px | ヒーロー検出のページ上端からの最大距離（Phase 2 ゾーン命名、Issue 135） |
 | large_bg_width_ratio | 0.6 | 大背景検出のページ幅比率（Phase 2 ゾーン命名、Issue 135） |
+| consecutive_pattern_min | 3 occurrences | 連続パターンの最小検出回数 |
+| heading_max_height_ratio | 0.4 (40%) | ヘッディング検出：コンテンツ高さ比の上限 |
+| heading_max_children | 5 | ヘッディングフレームの最大子要素数 |
+| heading_text_ratio | 0.5 (50%) | ヘッディング検出：TEXT/VECTOR葉ノード比率の下限 |
+| loose_element_max_height | 20px | 遊離要素の最大高さ |
+| loose_absorption_distance | 200px | 遊離要素吸収の最大距離 |
 
 ## リネームロジック（優先順）
 
@@ -148,6 +154,33 @@ score = max(0, score)
 1. 兄弟要素をY座標範囲でゾーンに分類
 2. ゾーン同士の重なり率を計算（zone_overlap_item: 50%, zone_overlap_zone: 30%）
 3. 閾値以上の重なり → ゾーンをマージしてグルーピング候補
+
+### 連続パターン検出
+
+```
+1. 各兄弟要素の structure_hash を計算
+2. 連続する要素のハッシュを Jaccard 類似度 >= 0.7 で比較
+3. 3回以上連続でマッチ → 連続パターングループ
+4. グループの suggested_name は先頭要素の名前から推論
+```
+
+### ヘッディング-コンテンツペア検出
+
+```
+1. 兄弟要素を順番にスキャン
+2. is_heading_like 判定: 子要素5個以下、TEXT/VECTOR/ELLIPSE葉が50%以上
+3. heading の高さ < 次の兄弟の高さ × 0.4 → ペア検出
+4. ペアは section-{heading-text-slug} として命名
+```
+
+### 遊離要素吸収
+
+```
+1. グルーピング後、未グループ要素をスキャン
+2. LINE型、または高さ20px以下のリーフ要素を「遊離」と判定
+3. 200px以内の最近グループに吸収
+4. 吸収先はY座標距離で決定
+```
 
 ### セマンティック検出（Phase 2 Stage A）
 

@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "applied": 1,
+  "skipped": 1,
+  "errors": [
+    {
+      "index": 1,
+      "error": "children have different parents"
+    }
+  ],
+  "wrappers": [
+    {
+      "id": "61:234",
+      "name": "l-header",
+      "childCount": 8
+    }
+  ],
+  "total": 2,
+  "batch": "Phase1-TopLevel"
+}
