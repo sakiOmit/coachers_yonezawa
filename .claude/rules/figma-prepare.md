@@ -338,6 +338,8 @@ score = max(0, score)
 | Table | 3+全幅RECTANGLE(90%+) + VECTOR/LINE区切り線 + TEXT行メンバー | table（Issue 181） |
 | Highlight | RECTANGLE + TEXT 同位置ペア（Y重なり80%+、X重なり50%+） | highlight（Issue 190） |
 | Horizontal-Bar | 狭Y帯域(<100px)に4+要素、RECTANGLE背景あり、水平分布(X分散>Y分散×3) | horizontal-bar / news-bar（Issue 184） |
+| Two-Column | テキスト群が片側+画像がもう片側、X座標で左右分離 | two-column（Issue #223、Stage C Claude推論） |
+| Decoration | ドットグリッド等の装飾FRAME、コンテンツと分離 | decoration（Issue #223、Stage C Claude推論） |
 
 ## Auto Layout推論ロジック
 
