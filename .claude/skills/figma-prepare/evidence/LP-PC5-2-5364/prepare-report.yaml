@@ -1,0 +1,82 @@
+# Figma Prepare Report
+# Generated: 2026-03-06
+# URL: https://www.figma.com/design/LoSe3INOuPV02kBttJFDSO/figma-prepare?node-id=2-5364
+# fileKey: LoSe3INOuPV02kBttJFDSO
+# nodeId: 2:5364
+
+source:
+  id: "2:5364"
+  name: "LP-PC5"
+  width: 1440
+  height: 10770
+  total_children: 82
+
+clone:
+  id: "87:15127"
+  name: "LP-PC5 [prepared]"
+  position: "Adjacent (right side, 100px gap)"
+
+phase_1:
+  score: 20
+  grade: "D"
+  recommendation: "All phases recommended"
+  metrics:
+    total_nodes: 841
+    unnamed_nodes: 595
+    unnamed_rate_pct: 70.7
+    flat_sections: 3
+    ungrouped_candidates: 77
+    deep_nesting_count: 0
+    no_autolayout_frames: 464
+
+phase_2:
+  stage_a:
+    grouping_candidates: 55
+    status: "completed"
+  stage_b:
+    sectioning_plan: "completed"
+    sections:
+      - l-header (1 node)
+      - main-content (12 subsections)
+      - l-footer (17 nodes)
+    subsections:
+      - section-hero-area (8 nodes)
+      - section-logo-bar (2 nodes)
+      - section-about (6 nodes)
+      - section-worries (1 node)
+      - section-feature-intro (1 node)
+      - section-feature-points (12 nodes)
+      - section-cta-1 (2 nodes)
+      - section-how-to-use (14 nodes)
+      - section-qa (12 nodes)
+      - section-column (3 nodes)
+      - section-cta-2 (2 nodes)
+      - section-dot-grid-bottom (1 node)
+  stage_c:
+    nested_groups: 28
+    status: "completed"
+    coverage: "100% of section children assigned"
+  integration:
+    strategy: "Stage C adopted for nested grouping"
+
+phase_3:
+  clone_id: "87:15127"
+  clone_name: "LP-PC5 [prepared]"
+  mapping_total: 2891
+  name_match_rate: 1.0
+  grouping_applied:
+    level_1: 2 groups (main-content, l-footer)
+    level_2: 9 groups (subsections)
+    single_renames: 3 (section-worries, section-feature-intro, section-dot-grid-bottom)
+    nested_groups: 28
+  renames_applied: 595
+  renames_skipped: 0
+  renames_errors: 0
+  verification:
+    visual: "identical to original"
+    structure:
+      top_level: 3 children (header, main-content, l-footer)
+      main_content_sections: 12
+
+executed_phases: [1, 2, 3]
+status: "completed"

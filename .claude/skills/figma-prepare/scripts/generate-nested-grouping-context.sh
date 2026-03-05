@@ -8,40 +8,68 @@
 # workflow level uses to invoke Claude, mirroring the Stage B design pattern.
 #
 # Issue 194 Phase 3: Stage C parallel execution alongside Stage A.
+# Issue 225: --groups and --depth support for recursive nested grouping.
 #
 # Usage:
 #   bash generate-nested-grouping-context.sh <metadata.json> <sectioning-plan.yaml> \
 #     [--output nested-context.json]
+#
+#   bash generate-nested-grouping-context.sh <metadata.json> --groups <nested-grouping-result.json> \
+#     [--depth <n>] [--output nested-context.json]
 #
 # Exit: 0=success, 1=error
 
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-  echo '{"error": "Usage: generate-nested-grouping-context.sh <metadata.json> <sectioning-plan.yaml> [--output nested-context.json]"}' >&2
+  echo '{"error": "Usage: generate-nested-grouping-context.sh <metadata.json> <sectioning-plan.yaml> [--output nested-context.json] OR <metadata.json> --groups <groups.json> [--depth n] [--output out.json]"}' >&2
   exit 1
 fi
 
 METADATA_FILE="$1"
-PLAN_FILE="$2"
+PLAN_FILE=""
+GROUPS_FILE=""
 OUTPUT_FILE=""
+DEPTH="0"
 
 if [[ ! -f "$METADATA_FILE" ]]; then
   echo "{\"error\": \"Metadata file not found: $METADATA_FILE\"}" >&2
   exit 1
 fi
 
-if [[ ! -f "$PLAN_FILE" ]]; then
-  echo "{\"error\": \"Sectioning plan file not found: $PLAN_FILE\"}" >&2
-  exit 1
+# Parse arguments: detect --groups mode vs plan mode
+shift 1
+if [[ $# -gt 0 && "$1" == "--groups" ]]; then
+  # --groups mode
+  GROUPS_FILE="${2:-}"
+  if [[ -z "$GROUPS_FILE" ]]; then
+    echo '{"error": "--groups requires a file path argument"}' >&2
+    exit 1
+  fi
+  if [[ ! -f "$GROUPS_FILE" ]]; then
+    echo "{\"error\": \"Groups file not found: $GROUPS_FILE\"}" >&2
+    exit 1
+  fi
+  shift 2
+else
+  # Plan mode (original behavior)
+  PLAN_FILE="$1"
+  if [[ ! -f "$PLAN_FILE" ]]; then
+    echo "{\"error\": \"Sectioning plan file not found: $PLAN_FILE\"}" >&2
+    exit 1
+  fi
+  shift 1
 fi
 
 # Parse optional flags
-shift 2
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --output)
       OUTPUT_FILE="${2:-}"
+      shift 2
+      ;;
+    --depth)
+      DEPTH="${2:-0}"
       shift 2
       ;;
     *)
@@ -64,12 +92,14 @@ import json, sys, os, re
 sys.setrecursionlimit(3000)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_metadata,
-    find_node_by_id, generate_enriched_table, GRANDCHILD_THRESHOLD)
+    find_node_by_id, generate_enriched_table, GRANDCHILD_THRESHOLD, MAX_STAGE_C_DEPTH)
 
 METADATA_FILE = sys.argv[2]
 PLAN_FILE = sys.argv[3]
-OUTPUT_FILE = sys.argv[4]
-TEMPLATE_FILE = sys.argv[5]
+GROUPS_FILE = sys.argv[4]
+OUTPUT_FILE = sys.argv[5]
+TEMPLATE_FILE = sys.argv[6]
+DEPTH = int(sys.argv[7])
 
 # --- Load prompt template ---
 # Extract the prompt body between the first pair of triple backticks in the
@@ -95,169 +125,320 @@ page_bbox = get_bbox(root)
 page_width = page_bbox['w']
 page_height = page_bbox['h']
 
-# --- Load sectioning plan (YAML) ---
-# Minimal YAML parser for the specific structure we expect.
-# sectioning-plan.yaml is simple enough to parse without PyYAML.
-import importlib
-yaml_available = False
-try:
-    yaml = importlib.import_module('yaml')
-    yaml_available = True
-except ImportError:
-    pass
+# --- Determine mode: groups vs plan ---
+use_groups_mode = bool(GROUPS_FILE)
 
-with open(PLAN_FILE, 'r') as f:
-    plan_text = f.read()
+if use_groups_mode:
+    # ==============================
+    # GROUPS MODE (Issue 225)
+    # ==============================
+    # Enforce MAX_STAGE_C_DEPTH: skip if depth exceeds limit
+    if DEPTH >= MAX_STAGE_C_DEPTH:
+        result = {
+            'sections': [],
+            'total_sections': 0,
+            'depth': DEPTH,
+            'model': 'haiku',
+            'skipped_reason': f'depth {DEPTH} >= MAX_STAGE_C_DEPTH ({MAX_STAGE_C_DEPTH})',
+        }
+        if OUTPUT_FILE:
+            with open(OUTPUT_FILE, 'w') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+            print(json.dumps({
+                'status': 'ok',
+                'output': OUTPUT_FILE,
+                'total_sections': 0,
+                'depth': DEPTH,
+                'model': 'haiku',
+                'skipped_reason': result['skipped_reason'],
+            }, indent=2))
+        else:
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        sys.exit(0)
 
-if yaml_available:
-    plan = yaml.safe_load(plan_text)
-else:
-    # Fallback: try JSON (sectioning-plan may also be saved as JSON)
+    # Load groups file (JSON or YAML)
+    import importlib
+    yaml_available = False
     try:
-        plan = json.loads(plan_text)
-    except json.JSONDecodeError:
-        print(json.dumps({'error': 'Cannot parse sectioning plan. Install PyYAML or use JSON format.'}), file=sys.stderr)
-        sys.exit(1)
+        yaml = importlib.import_module('yaml')
+        yaml_available = True
+    except ImportError:
+        pass
 
-# --- Collect leaf sections (no subsections) ---
-def collect_leaf_sections(sections, depth=0):
-    \"\"\"Recursively collect leaf sections (those without subsections).\"\"\"
-    leaves = []
-    for section in sections:
-        if 'subsections' in section and section['subsections']:
-            leaves.extend(collect_leaf_sections(section['subsections'], depth + 1))
-        else:
-            leaves.append(section)
-    return leaves
+    with open(GROUPS_FILE, 'r') as f:
+        groups_text = f.read()
 
-sections_list = plan.get('sections', [])
-leaf_sections = collect_leaf_sections(sections_list)
-
-# --- Determine children for each section ---
-# Each leaf section has node_ids which are IDs of elements within the section.
-# Strategy:
-#   - If node_ids count <= 5 AND each has children -> use grandchildren (children of each node)
-#   - Otherwise -> use the node_ids themselves as the children table entries
-
-def get_section_children(section):
-    \"\"\"Get the children to include in the enriched table for a section.
-
-    Returns (children_list, section_node) where section_node is used for
-    bbox when the section is a single wrapper node.
-    \"\"\"
-    node_ids = section.get('node_ids', [])
-    if not node_ids:
-        return [], None
-
-    # Resolve all nodes
-    nodes = []
-    for nid in node_ids:
-        node = find_node_by_id(root, nid)
-        if node:
-            nodes.append(node)
-
-    if not nodes:
-        return [], None
-
-    # Determine strategy: if few nodes and each has children, use grandchildren
-    if len(nodes) <= GRANDCHILD_THRESHOLD:
-        has_children_count = sum(1 for n in nodes if n.get('children'))
-        if has_children_count == len(nodes) and len(nodes) > 0:
-            # Use grandchildren (children of each node)
-            grandchildren = []
-            for n in nodes:
-                grandchildren.extend(n.get('children', []))
-            if grandchildren:
-                return grandchildren, None
-
-    # Default: use the nodes themselves
-    return nodes, None
-
-# --- Build section contexts ---
-section_contexts = []
-
-for section in leaf_sections:
-    section_name = section.get('name', 'unknown')
-    node_ids = section.get('node_ids', [])
-
-    if not node_ids:
-        continue
-
-    children, _ = get_section_children(section)
-    if not children:
-        continue
-
-    # Sort by Y ascending
-    children_sorted = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
-
-    # Compute section bbox from children
-    if len(node_ids) == 1:
-        # Single wrapper node: use its bbox
-        wrapper = find_node_by_id(root, node_ids[0])
-        if wrapper:
-            sb = get_bbox(wrapper)
-            section_width = sb['w']
-            section_height = sb['h']
-        else:
-            section_width = page_width
-            section_height = 0
+    if yaml_available:
+        try:
+            groups_data = yaml.safe_load(groups_text)
+        except Exception:
+            groups_data = json.loads(groups_text)
     else:
-        # Multiple nodes: compute bounding box
-        min_x = min(get_bbox(c)['x'] for c in children_sorted)
-        min_y = min(get_bbox(c)['y'] for c in children_sorted)
-        max_x = max(get_bbox(c)['x'] + get_bbox(c)['w'] for c in children_sorted)
-        max_y = max(get_bbox(c)['y'] + get_bbox(c)['h'] for c in children_sorted)
-        section_width = max_x - min_x
-        section_height = max_y - min_y
+        groups_data = json.loads(groups_text)
 
-    # Determine section_id: first node_id or single wrapper
-    section_id = node_ids[0] if len(node_ids) == 1 else node_ids[0]
+    groups_list = groups_data.get('groups', [])
 
-    # Generate enriched table
-    enriched_table = generate_enriched_table(
-        children_sorted,
-        page_width=section_width if section_width > 0 else page_width,
-        page_height=section_height if section_height > 0 else page_height,
-    )
+    # Build section contexts from groups
+    section_contexts = []
+    skipped_groups = []
 
-    total_children = len(children_sorted)
+    for group in groups_list:
+        group_pattern = group.get('pattern', '')
+        group_name = group.get('name', 'unknown')
+        group_node_ids = group.get('node_ids', [])
 
-    # Build prompt by substituting variables
-    prompt = prompt_template
-    prompt = prompt.replace('{section_name}', str(section_name))
-    prompt = prompt.replace('{section_id}', str(section_id))
-    prompt = prompt.replace('{section_width}', str(int(section_width)))
-    prompt = prompt.replace('{section_height}', str(int(section_height)))
-    prompt = prompt.replace('{total_children}', str(total_children))
-    prompt = prompt.replace('{enriched_children_table}', enriched_table)
+        # Skip groups with pattern 'single'
+        if group_pattern == 'single':
+            skipped_groups.append({'name': group_name, 'reason': 'pattern=single'})
+            continue
 
-    section_contexts.append({
-        'section_name': section_name,
-        'section_id': section_id,
-        'section_width': int(section_width),
-        'section_height': int(section_height),
-        'total_children': total_children,
-        'enriched_children_table': enriched_table,
-        'prompt': prompt,
-    })
+        if not group_node_ids:
+            skipped_groups.append({'name': group_name, 'reason': 'no node_ids'})
+            continue
 
-# --- Output ---
-result = {
-    'sections': section_contexts,
-    'total_sections': len(section_contexts),
-    'model': 'haiku',
-}
+        # For each node_id in the group, find the node and get its children
+        for nid in group_node_ids:
+            node = find_node_by_id(root, nid)
+            if not node:
+                skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'node not found'})
+                continue
 
-if OUTPUT_FILE:
-    with open(OUTPUT_FILE, 'w') as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-    print(json.dumps({
-        'status': 'ok',
-        'output': OUTPUT_FILE,
+            children = node.get('children', [])
+            if not children:
+                skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'no children'})
+                continue
+
+            # Sort by Y ascending
+            children_sorted = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
+
+            # Compute section bbox from the parent node
+            nb = get_bbox(node)
+            section_width = nb['w']
+            section_height = nb['h']
+
+            section_id = nid
+
+            # Generate enriched table
+            enriched_table = generate_enriched_table(
+                children_sorted,
+                page_width=section_width if section_width > 0 else page_width,
+                page_height=section_height if section_height > 0 else page_height,
+            )
+
+            total_children = len(children_sorted)
+
+            # Build prompt by substituting variables
+            prompt = prompt_template
+            prompt = prompt.replace('{section_name}', str(group_name))
+            prompt = prompt.replace('{section_id}', str(section_id))
+            prompt = prompt.replace('{section_width}', str(int(section_width)))
+            prompt = prompt.replace('{section_height}', str(int(section_height)))
+            prompt = prompt.replace('{total_children}', str(total_children))
+            prompt = prompt.replace('{enriched_children_table}', enriched_table)
+
+            section_contexts.append({
+                'section_name': group_name,
+                'section_id': section_id,
+                'parent_group': group_name,
+                'depth': DEPTH,
+                'section_width': int(section_width),
+                'section_height': int(section_height),
+                'total_children': total_children,
+                'enriched_children_table': enriched_table,
+                'prompt': prompt,
+            })
+
+    # --- Output ---
+    result = {
+        'sections': section_contexts,
+        'total_sections': len(section_contexts),
+        'depth': DEPTH,
+        'model': 'haiku',
+        'skipped_groups': skipped_groups,
+        'skipped_count': len(skipped_groups),
+    }
+
+    if OUTPUT_FILE:
+        with open(OUTPUT_FILE, 'w') as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(json.dumps({
+            'status': 'ok',
+            'output': OUTPUT_FILE,
+            'total_sections': len(section_contexts),
+            'depth': DEPTH,
+            'model': 'haiku',
+            'skipped_count': len(skipped_groups),
+        }, indent=2))
+    else:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+
+else:
+    # ==============================
+    # PLAN MODE (original behavior)
+    # ==============================
+    # --- Load sectioning plan (YAML) ---
+    # Minimal YAML parser for the specific structure we expect.
+    # sectioning-plan.yaml is simple enough to parse without PyYAML.
+    import importlib
+    yaml_available = False
+    try:
+        yaml = importlib.import_module('yaml')
+        yaml_available = True
+    except ImportError:
+        pass
+
+    with open(PLAN_FILE, 'r') as f:
+        plan_text = f.read()
+
+    if yaml_available:
+        plan = yaml.safe_load(plan_text)
+    else:
+        # Fallback: try JSON (sectioning-plan may also be saved as JSON)
+        try:
+            plan = json.loads(plan_text)
+        except json.JSONDecodeError:
+            print(json.dumps({'error': 'Cannot parse sectioning plan. Install PyYAML or use JSON format.'}), file=sys.stderr)
+            sys.exit(1)
+
+    # --- Collect leaf sections (no subsections) ---
+    def collect_leaf_sections(sections, depth=0):
+        \"\"\"Recursively collect leaf sections (those without subsections).\"\"\"
+        leaves = []
+        for section in sections:
+            if 'subsections' in section and section['subsections']:
+                leaves.extend(collect_leaf_sections(section['subsections'], depth + 1))
+            else:
+                leaves.append(section)
+        return leaves
+
+    sections_list = plan.get('sections', [])
+    leaf_sections = collect_leaf_sections(sections_list)
+
+    # --- Determine children for each section ---
+    # Each leaf section has node_ids which are IDs of elements within the section.
+    # Strategy:
+    #   - If node_ids count <= 5 AND each has children -> use grandchildren (children of each node)
+    #   - Otherwise -> use the node_ids themselves as the children table entries
+
+    def get_section_children(section):
+        \"\"\"Get the children to include in the enriched table for a section.
+
+        Returns (children_list, section_node) where section_node is used for
+        bbox when the section is a single wrapper node.
+        \"\"\"
+        node_ids = section.get('node_ids', [])
+        if not node_ids:
+            return [], None
+
+        # Resolve all nodes
+        nodes = []
+        for nid in node_ids:
+            node = find_node_by_id(root, nid)
+            if node:
+                nodes.append(node)
+
+        if not nodes:
+            return [], None
+
+        # Determine strategy: if few nodes and each has children, use grandchildren
+        if len(nodes) <= GRANDCHILD_THRESHOLD:
+            has_children_count = sum(1 for n in nodes if n.get('children'))
+            if has_children_count == len(nodes) and len(nodes) > 0:
+                # Use grandchildren (children of each node)
+                grandchildren = []
+                for n in nodes:
+                    grandchildren.extend(n.get('children', []))
+                if grandchildren:
+                    return grandchildren, None
+
+        # Default: use the nodes themselves
+        return nodes, None
+
+    # --- Build section contexts ---
+    section_contexts = []
+
+    for section in leaf_sections:
+        section_name = section.get('name', 'unknown')
+        node_ids = section.get('node_ids', [])
+
+        if not node_ids:
+            continue
+
+        children, _ = get_section_children(section)
+        if not children:
+            continue
+
+        # Sort by Y ascending
+        children_sorted = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
+
+        # Compute section bbox from children
+        if len(node_ids) == 1:
+            # Single wrapper node: use its bbox
+            wrapper = find_node_by_id(root, node_ids[0])
+            if wrapper:
+                sb = get_bbox(wrapper)
+                section_width = sb['w']
+                section_height = sb['h']
+            else:
+                section_width = page_width
+                section_height = 0
+        else:
+            # Multiple nodes: compute bounding box
+            min_x = min(get_bbox(c)['x'] for c in children_sorted)
+            min_y = min(get_bbox(c)['y'] for c in children_sorted)
+            max_x = max(get_bbox(c)['x'] + get_bbox(c)['w'] for c in children_sorted)
+            max_y = max(get_bbox(c)['y'] + get_bbox(c)['h'] for c in children_sorted)
+            section_width = max_x - min_x
+            section_height = max_y - min_y
+
+        # Determine section_id: first node_id or single wrapper
+        section_id = node_ids[0] if len(node_ids) == 1 else node_ids[0]
+
+        # Generate enriched table
+        enriched_table = generate_enriched_table(
+            children_sorted,
+            page_width=section_width if section_width > 0 else page_width,
+            page_height=section_height if section_height > 0 else page_height,
+        )
+
+        total_children = len(children_sorted)
+
+        # Build prompt by substituting variables
+        prompt = prompt_template
+        prompt = prompt.replace('{section_name}', str(section_name))
+        prompt = prompt.replace('{section_id}', str(section_id))
+        prompt = prompt.replace('{section_width}', str(int(section_width)))
+        prompt = prompt.replace('{section_height}', str(int(section_height)))
+        prompt = prompt.replace('{total_children}', str(total_children))
+        prompt = prompt.replace('{enriched_children_table}', enriched_table)
+
+        section_contexts.append({
+            'section_name': section_name,
+            'section_id': section_id,
+            'section_width': int(section_width),
+            'section_height': int(section_height),
+            'total_children': total_children,
+            'enriched_children_table': enriched_table,
+            'prompt': prompt,
+        })
+
+    # --- Output ---
+    result = {
+        'sections': section_contexts,
         'total_sections': len(section_contexts),
         'model': 'haiku',
-    }, indent=2))
-else:
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    }
 
-" "$SKILLS_DIR" "$METADATA_FILE" "$PLAN_FILE" "$OUTPUT_FILE" "$TEMPLATE_FILE"
+    if OUTPUT_FILE:
+        with open(OUTPUT_FILE, 'w') as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(json.dumps({
+            'status': 'ok',
+            'output': OUTPUT_FILE,
+            'total_sections': len(section_contexts),
+            'model': 'haiku',
+        }, indent=2))
+    else:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+
+" "$SKILLS_DIR" "$METADATA_FILE" "$PLAN_FILE" "$GROUPS_FILE" "$OUTPUT_FILE" "$TEMPLATE_FILE" "$DEPTH"

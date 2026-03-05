@@ -120,6 +120,47 @@ Haiku: ~500-1500 tokens入力/セクション、~200-500 tokens出力
 | Haiku API エラー（個別） | 該当セクションのみ Stage A フォールバック |
 | YAML パース/検証失敗 | 該当セクションのみ Stage A フォールバック |
 
+### 再帰的 Stage C の適用順序（Issue #227）
+
+Stage C の再帰結果（Issue #224）を `--apply` する場合、以下の順序で実行する:
+
+1. **Stage B** (トップレベルセクショニング) -- レベル別トップダウン
+2. **Stage C depth 0** (セクション内グルーピング) -- セクションごとに適用
+3. **Stage C depth 1** (グループ内サブグルーピング) -- 前ステップの新ラッパーを parent に
+4. **Stage C depth 2** (サブグループ内) -- 同上
+5. **Stage A フォールバック** -- depth 0 のみ（Stage C が不十分なセクション）
+
+各ステップの間で parent_id の再マッピングが必要。具体的には:
+
+- depth N の `apply-grouping.js` 実行後に `wrappers[].id` を取得
+- depth N+1 のグルーピング候補で、該当グループの `parent_id` を新ラッパーIDに置換
+- Stage A フォールバックセクションは depth 0 でのみ適用（再帰対象外）
+
+```
+適用フロー図:
+
+Stage B (sectioning-plan.yaml)
+  Level 1 → Level 2 → ... → Level N
+    ↓ parent_id マッピング更新
+
+Stage C depth 0 (nested-grouping-plan.yaml, depth=0)
+  各セクションの直接 children をグルーピング
+    ↓ 新ラッパーID記録
+
+Stage C depth 1 (nested-grouping-plan.yaml, depth=1)
+  depth 0 で生成されたラッパー内部をサブグルーピング
+    ↓ 新ラッパーID記録
+
+Stage C depth 2 (nested-grouping-plan.yaml, depth=2)
+  depth 1 で生成されたラッパー内部をサブグルーピング
+
+Stage A fallback (grouping-plan.yaml)
+  Stage C カバレッジ < 80% のセクションのみ、depth 0 で適用
+
+verify-grouping.js
+  全 depth のラッパーを一括検証
+```
+
 ## Phase 2: 結果統合（Stage A / Stage C 比較）
 
 Stage B（トップレベル）は常に独立適用。Stage A と Stage C はセクションごとに比較。

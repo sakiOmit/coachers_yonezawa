@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Phase 2: Detect Grouping Candidates
 #
-# Usage: bash detect-grouping-candidates.sh <metadata.json> [--output grouping-plan.yaml] [--skip-root]
+# Usage: bash detect-grouping-candidates.sh <metadata.json> [--output grouping-plan.yaml] [--skip-root] [--disable-detectors bg-content,table,highlight]
 # Input: Figma get_metadata output (JSON)
 # Output: JSON/YAML with grouping candidates
 # Exit: 0=success, 1=error
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
-  echo '{"error": "Usage: detect-grouping-candidates.sh <metadata.json> [--output file.yaml] [--skip-root]"}' >&2
+  echo '{"error": "Usage: detect-grouping-candidates.sh <metadata.json> [--output file.yaml] [--skip-root] [--disable-detectors list]"}' >&2
   exit 1
 fi
 
@@ -17,6 +17,7 @@ INPUT_FILE="$1"
 
 OUTPUT_FILE=""
 SKIP_ROOT=""
+DISABLE_DETECTORS=""
 # Parse optional flags (order-independent)
 shift  # consume the positional metadata.json argument
 while [[ $# -gt 0 ]]; do
@@ -28,6 +29,10 @@ while [[ $# -gt 0 ]]; do
     --skip-root)
       SKIP_ROOT="1"
       shift
+      ;;
+    --disable-detectors)
+      DISABLE_DETECTORS="${2:-}"
+      shift 2
       ;;
     *)
       shift
@@ -59,7 +64,7 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_
     HEADER_MAX_ELEMENT_HEIGHT, FOOTER_ZONE_MARGIN,
     HEADER_TEXT_MAX_WIDTH, HEADER_LOGO_MAX_WIDTH, HEADER_LOGO_MAX_HEIGHT, HEADER_NAV_MIN_TEXTS,
     HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO,
-    GRID_SIZE_SIMILARITY, FLAT_THRESHOLD)
+    GRID_SIZE_SIMILARITY, FLAT_THRESHOLD, STAGE_A_ONLY_DETECTORS)
 
 class UnionFind:
     def __init__(self, n):
@@ -600,10 +605,19 @@ def _is_protected_node(node):
         return True
     return False
 
-def walk_and_detect(node, all_candidates=None, is_root=True):
-    \"\"\"Walk tree and detect grouping candidates at each level.\"\"\"
+def walk_and_detect(node, all_candidates=None, is_root=True, disabled=None):
+    \"\"\"Walk tree and detect grouping candidates at each level.
+
+    Args:
+        node: Figma node to process.
+        all_candidates: Accumulator list (created if None).
+        is_root: Whether this is the root-level call.
+        disabled: Set of detector method names to skip (Issue 229).
+    \"\"\"
     if all_candidates is None:
         all_candidates = []
+    if disabled is None:
+        disabled = set()
 
     # Issue 187: Skip hidden nodes entirely
     if node.get('visible') == False:
@@ -633,7 +647,7 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
     # don't propose regrouping its children — preserve the original structure.
     if not is_root and _is_protected_node(node):
         for child in children:
-            walk_and_detect(child, all_candidates, is_root=False)
+            walk_and_detect(child, all_candidates, is_root=False, disabled=disabled)
         return all_candidates
 
     parent_id = node.get('id', '')
@@ -642,66 +656,71 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
     # Issue 85, 86: Root-level-only detectors
     if is_root:
         page_bb = page_bb_pre  # reuse bbox computed above (Issue 198)
-        # Issue 85: Header/footer detection
-        header_footer = detect_header_footer_groups(children, page_bb)
-        for g in header_footer:
-            g['parent_id'] = parent_id
-            g['parent_name'] = parent_name
-            all_candidates.append(g)
+        # Issue 85: Header/footer detection (Issue 229: respect disabled)
+        if 'header-footer' not in disabled:
+            header_footer = detect_header_footer_groups(children, page_bb)
+            for g in header_footer:
+                g['parent_id'] = parent_id
+                g['parent_name'] = parent_name
+                all_candidates.append(g)
         # Issue 184: Horizontal bar detection (before zone detection)
-        h_bars = detect_horizontal_bar(children, page_bb)
-        for g in h_bars:
-            g['parent_id'] = parent_id
-            g['parent_name'] = parent_name
-            all_candidates.append(g)
+        if 'horizontal-bar' not in disabled:
+            h_bars = detect_horizontal_bar(children, page_bb)
+            for g in h_bars:
+                g['parent_id'] = parent_id
+                g['parent_name'] = parent_name
+                all_candidates.append(g)
         # Issue 86: Vertical zone detection (mixed-type sections)
-        vertical_zones = detect_vertical_zone_groups(children, page_bb)
-        for g in vertical_zones:
-            g['parent_id'] = parent_id
-            g['parent_name'] = parent_name
-            all_candidates.append(g)
+        if 'zone' not in disabled:
+            vertical_zones = detect_vertical_zone_groups(children, page_bb)
+            for g in vertical_zones:
+                g['parent_id'] = parent_id
+                g['parent_name'] = parent_name
+                all_candidates.append(g)
 
         # Issue 165: Consecutive pattern groups (root level only)
-        consecutive_groups = detect_consecutive_similar(children)
-        for cg in consecutive_groups:
-            node_ids = [children[idx].get('id', '') for idx in cg['indices']]
-            if len(node_ids) >= 2:
-                # Infer name from common structure
-                suggested_name = f\"list-{to_kebab(children[cg['indices'][0]].get('name', 'item'))}\"
-                all_candidates.append({
-                    'node_ids': node_ids,
-                    'parent_id': parent_id,
-                    'parent_name': parent_name,
-                    'suggested_name': suggested_name,
-                    'method': 'consecutive',
-                    'priority': 2.5,
-                    'count': len(node_ids),
-                    'structure_hash': cg['hash'],
-                })
+        if 'consecutive' not in disabled:
+            consecutive_groups = detect_consecutive_similar(children)
+            for cg in consecutive_groups:
+                node_ids = [children[idx].get('id', '') for idx in cg['indices']]
+                if len(node_ids) >= 2:
+                    # Infer name from common structure
+                    suggested_name = f\"list-{to_kebab(children[cg['indices'][0]].get('name', 'item'))}\"
+                    all_candidates.append({
+                        'node_ids': node_ids,
+                        'parent_id': parent_id,
+                        'parent_name': parent_name,
+                        'suggested_name': suggested_name,
+                        'method': 'consecutive',
+                        'priority': 2.5,
+                        'count': len(node_ids),
+                        'structure_hash': cg['hash'],
+                    })
 
         # Issue 166: Heading-content pairs (root level only)
-        hc_pairs = detect_heading_content_pairs(children)
-        for pair in hc_pairs:
-            h = children[pair['heading_idx']]
-            c = children[pair['content_idx']]
-            h_id = h.get('id', '')
-            c_id = c.get('id', '')
-            # Name from heading text
-            h_texts = get_text_children_content([h], max_items=2)
-            if not h_texts:
-                # Try children of heading frame
-                h_texts = get_text_children_content(h.get('children', []), max_items=2)
-            slug = to_kebab(h_texts[0]) if h_texts else 'section'
-            all_candidates.append({
-                'node_ids': [h_id, c_id],
-                'parent_id': parent_id,
-                'parent_name': parent_name,
-                'suggested_name': f'section-{slug}',
-                'method': 'heading-content',
-                'priority': 3.5,
-                'count': 2,
-                'structure_hash': '',
-            })
+        if 'heading-content' not in disabled:
+            hc_pairs = detect_heading_content_pairs(children)
+            for pair in hc_pairs:
+                h = children[pair['heading_idx']]
+                c = children[pair['content_idx']]
+                h_id = h.get('id', '')
+                c_id = c.get('id', '')
+                # Name from heading text
+                h_texts = get_text_children_content([h], max_items=2)
+                if not h_texts:
+                    # Try children of heading frame
+                    h_texts = get_text_children_content(h.get('children', []), max_items=2)
+                slug = to_kebab(h_texts[0]) if h_texts else 'section'
+                all_candidates.append({
+                    'node_ids': [h_id, c_id],
+                    'parent_id': parent_id,
+                    'parent_name': parent_name,
+                    'suggested_name': f'section-{slug}',
+                    'method': 'heading-content',
+                    'priority': 3.5,
+                    'count': 2,
+                    'structure_hash': '',
+                })
 
     # Detect at this level (all Stage A methods)
     # Issue #222: At non-root levels, only run proximity/pattern/semantic if
@@ -709,16 +728,14 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
     # Well-structured nodes with few children don't need aggressive grouping.
     # Additionally, named non-root FRAMEs with few children are considered
     # well-structured and skip all general detection methods.
+    # Issue 229: Respect disabled detectors
     if is_root or len(children) >= FLAT_THRESHOLD:
-        semantic = detect_semantic_groups(children)
-        patterns = detect_pattern_groups(children)
-        spacing = detect_spacing_groups(children)
-        proximity = detect_proximity_groups(children)
+        semantic = detect_semantic_groups(children) if 'semantic' not in disabled else []
+        patterns = detect_pattern_groups(children) if 'pattern' not in disabled else []
+        spacing = detect_spacing_groups(children) if 'spacing' not in disabled else []
+        proximity = detect_proximity_groups(children) if 'proximity' not in disabled else []
     else:
-        # Unnamed non-root with few children: only run semantic detection
-        # (cards/nav/grid are genuinely useful patterns to detect at any level)
-        # Skip proximity and pattern to prevent over-grouping
-        semantic = detect_semantic_groups(children)
+        semantic = detect_semantic_groups(children) if 'semantic' not in disabled else []
         patterns = []
         spacing = []
         proximity = []
@@ -729,7 +746,7 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
         all_candidates.append(g)
 
     # Issue 180: Background-content layer detection (non-root level)
-    if not is_root:
+    if not is_root and 'bg-content' not in disabled:
         bg_content = detect_bg_content_layers(children, get_bbox(node))
         for g in bg_content:
             g['parent_id'] = parent_id
@@ -737,36 +754,38 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
             all_candidates.append(g)
 
     # Issue 181: Table row structure detection (all levels)
-    table_groups = detect_table_rows(children, get_bbox(node))
-    for g in table_groups:
-        g['parent_id'] = parent_id
-        g['parent_name'] = parent_name
-        all_candidates.append(g)
+    if 'table' not in disabled:
+        table_groups = detect_table_rows(children, get_bbox(node))
+        for g in table_groups:
+            g['parent_id'] = parent_id
+            g['parent_name'] = parent_name
+            all_candidates.append(g)
 
     # Issue 186: Repeating tuple pattern detection (all levels)
-    tuple_groups = detect_repeating_tuple(children)
-    for tg in tuple_groups:
-        node_ids = [children[idx].get('id', '') for idx in tg['children_indices']]
-        # Derive name from first child's text content or fall back
-        first_child = children[tg['children_indices'][0]]
-        texts = get_text_children_content([first_child], max_items=1)
-        if not texts:
-            texts = get_text_children_content(first_child.get('children', []), max_items=1)
-        slug = to_kebab(texts[0]) if texts else 'item'
-        all_candidates.append({
-            'node_ids': node_ids,
-            'parent_id': parent_id,
-            'parent_name': parent_name,
-            'suggested_name': f'card-list-{slug}',
-            'method': 'tuple',
-            'count': len(node_ids),
-            'tuple_size': tg['tuple_size'],
-            'repetitions': tg['count'],
-            'suggested_wrapper': 'card-container',
-        })
+    if 'tuple' not in disabled:
+        tuple_groups = detect_repeating_tuple(children)
+        for tg in tuple_groups:
+            node_ids = [children[idx].get('id', '') for idx in tg['children_indices']]
+            # Derive name from first child's text content or fall back
+            first_child = children[tg['children_indices'][0]]
+            texts = get_text_children_content([first_child], max_items=1)
+            if not texts:
+                texts = get_text_children_content(first_child.get('children', []), max_items=1)
+            slug = to_kebab(texts[0]) if texts else 'item'
+            all_candidates.append({
+                'node_ids': node_ids,
+                'parent_id': parent_id,
+                'parent_name': parent_name,
+                'suggested_name': f'card-list-{slug}',
+                'method': 'tuple',
+                'count': len(node_ids),
+                'tuple_size': tg['tuple_size'],
+                'repetitions': tg['count'],
+                'suggested_wrapper': 'card-container',
+            })
 
     # Issue 190: Highlight text pattern detection (non-root level)
-    if not is_root:
+    if not is_root and 'highlight' not in disabled:
         highlights = detect_highlight_text(children)
         for hl in highlights:
             rect_node = children[hl['rect_idx']]
@@ -787,7 +806,7 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
 
     # Recurse
     for child in children:
-        walk_and_detect(child, all_candidates, is_root=False)
+        walk_and_detect(child, all_candidates, is_root=False, disabled=disabled)
 
     return all_candidates
 
@@ -837,10 +856,29 @@ def deduplicate_candidates(candidates, root_id=''):
     return [c for i, c in enumerate(candidates) if i not in remove]
 
 try:
+    # Issue 229: Parse --disable-detectors flag
+    DISABLE_DETECTORS = sys.argv[5] if len(sys.argv) > 5 else ''
+    disabled = set(d.strip() for d in DISABLE_DETECTORS.split(',') if d.strip()) if DISABLE_DETECTORS else set()
+
+    # Validate detector names against known methods
+    ALL_DETECTOR_METHODS = {'proximity', 'pattern', 'spacing', 'semantic', 'zone', 'tuple',
+                             'consecutive', 'heading-content', 'highlight', 'bg-content',
+                             'table', 'horizontal-bar', 'header-footer'}
+    unknown = disabled - ALL_DETECTOR_METHODS
+    if unknown:
+        print(json.dumps({'warning': f'Unknown detector names ignored: {sorted(unknown)}'}), file=sys.stderr)
+        disabled = disabled & ALL_DETECTOR_METHODS
+
+    # Guard Stage A-only detectors from being disabled
+    forced_a = disabled & STAGE_A_ONLY_DETECTORS
+    if forced_a:
+        print(json.dumps({'warning': f'Stage A-only detectors cannot be disabled: {sorted(forced_a)}. Ignoring.'}), file=sys.stderr)
+        disabled = disabled - STAGE_A_ONLY_DETECTORS
+
     data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
-    candidates = walk_and_detect(root)
+    candidates = walk_and_detect(root, disabled=disabled)
     candidates = deduplicate_candidates(candidates, root_id=root.get('id', ''))
 
     # Issue 167: Absorb loose elements into nearest existing group (post-dedup)
@@ -921,6 +959,8 @@ try:
         }
         if root_skipped:
             result['root_skipped'] = root_skipped
+        if disabled:
+            result['disabled_detectors'] = sorted(disabled)
         print(json.dumps(result, indent=2))
     else:
         result = {
@@ -930,9 +970,11 @@ try:
         }
         if root_skipped:
             result['root_skipped'] = root_skipped
+        if disabled:
+            result['disabled_detectors'] = sorted(disabled)
         print(json.dumps(result, indent=2, ensure_ascii=False))
 
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE" "$SKIP_ROOT"
+" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE" "$SKIP_ROOT" "$DISABLE_DETECTORS"

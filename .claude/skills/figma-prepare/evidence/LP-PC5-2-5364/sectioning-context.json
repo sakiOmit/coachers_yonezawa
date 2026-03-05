@@ -48,8 +48,8 @@
         "w": 643.484375,
         "h": 565.0000610351562
       },
-      "child_count": 0,
-      "child_types_summary": "",
+      "child_count": 5,
+      "child_types_summary": "BOOLEAN_OPERATION:4, RECTANGLE:1",
       "has_text_children": false,
       "text_children_preview": [],
       "is_unnamed": true
@@ -198,8 +198,8 @@
         "w": 701.620361328125,
         "h": 652.0
       },
-      "child_count": 1,
-      "child_types_summary": "VECTOR:1",
+      "child_count": 3,
+      "child_types_summary": "RECTANGLE:2, VECTOR:1",
       "has_text_children": false,
       "text_children_preview": [],
       "is_unnamed": false
@@ -253,6 +253,22 @@
       "is_unnamed": false
     },
     {
+      "id": "2:7831",
+      "name": "image 28",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": -4734.0,
+        "y": 2163.0,
+        "w": 182.0,
+        "h": 366.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
       "id": "2:7826",
       "name": "私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供することです。 HIDANEは、人々が自分自身と真摯に向き合い、価値あるつながりを築くことで、より良い未来を創造します。 個人の物語が未来の社会を彩り、共に歩む仲間と出会い、成長できる場所―それがHIDANEのビジョン。",
       "type": "TEXT",
@@ -278,8 +294,8 @@
         "w": 1440.0,
         "h": 971.630615234375
       },
-      "child_count": 10,
-      "child_types_summary": "FRAME:8, VECTOR:2",
+      "child_count": 9,
+      "child_types_summary": "BOOLEAN_OPERATION:1, FRAME:8",
       "has_text_children": false,
       "text_children_preview": [],
       "is_unnamed": false
@@ -294,8 +310,8 @@
         "w": 1562.000244140625,
         "h": 1102.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:2, TEXT:1",
+      "child_count": 7,
+      "child_types_summary": "FRAME:2, RECTANGLE:4, TEXT:1",
       "has_text_children": true,
       "text_children_preview": [
         "いろんな世界、見てみない？"
@@ -539,8 +555,8 @@
         "w": 940.0,
         "h": 95.0
       },
-      "child_count": 2,
-      "child_types_summary": "TEXT:2",
+      "child_count": 3,
+      "child_types_summary": "RECTANGLE:1, TEXT:2",
       "has_text_children": true,
       "text_children_preview": [
         "HIDANEをはじめてみる",
@@ -609,8 +625,8 @@
         "w": 473.0,
         "h": 589.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:2",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:2",
       "has_text_children": true,
       "text_children_preview": [
         "自分のプロフィールを 作りましょう！",
@@ -628,8 +644,8 @@
         "w": 204.0,
         "h": 511.0
       },
-      "child_count": 1,
-      "child_types_summary": "FRAME:1",
+      "child_count": 2,
+      "child_types_summary": "FRAME:1, RECTANGLE:1",
       "has_text_children": false,
       "text_children_preview": [],
       "is_unnamed": true
@@ -644,8 +660,8 @@
         "w": 395.0,
         "h": 566.0
       },
-      "child_count": 5,
-      "child_types_summary": "FRAME:1, TEXT:4",
+      "child_count": 7,
+      "child_types_summary": "FRAME:1, RECTANGLE:2, TEXT:4",
       "has_text_children": true,
       "text_children_preview": [
         "ホームに表示されるので簡単手軽にスワイプ。",
@@ -665,8 +681,56 @@
         "w": 194.0,
         "h": 575.0
       },
-      "child_count": 2,
-      "child_types_summary": "FRAME:2",
+      "child_count": 4,
+      "child_types_summary": "FRAME:2, RECTANGLE:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8230",
+      "name": "Polygon 5",
+      "type": "REGULAR-POLYGON",
+      "bbox": {
+        "x": -5176.0,
+        "y": 7773.505859375,
+        "w": 35.00000152989833,
+        "h": 35.00000152989833
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8242",
+      "name": "Polygon 3",
+      "type": "REGULAR-POLYGON",
+      "bbox": {
+        "x": -4712.0,
+        "y": 7773.505859375,
+        "w": 35.00000152989833,
+        "h": 35.00000152989833
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "2:8243",
+      "name": "Polygon 6",
+      "type": "REGULAR-POLYGON",
+      "bbox": {
+        "x": -4439.0,
+        "y": 7773.505859375,
+        "w": 35.00000152989833,
+        "h": 35.00000152989833
+      },
+      "child_count": 0,
+      "child_types_summary": "",
       "has_text_children": false,
       "text_children_preview": [],
       "is_unnamed": true
@@ -752,6 +816,22 @@
       "is_unnamed": true
     },
     {
+      "id": "2:5431",
+      "name": "Rectangle 260",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": -5512.0,
+        "y": 8325.505859375,
+        "w": 1380.0,
+        "h": 1314.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
       "id": "2:5433",
       "name": "Q&A",
       "type": "TEXT",
@@ -793,8 +873,8 @@
         "w": 940.0,
         "h": 209.0
       },
-      "child_count": 5,
-      "child_types_summary": "FRAME:2, TEXT:2, VECTOR:1",
+      "child_count": 6,
+      "child_types_summary": "FRAME:2, RECTANGLE:1, TEXT:2, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "HIDANEって他のインターンサービスと何が違うの？",
@@ -828,8 +908,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "どんな業界・規模の企業がHIDANEに登録しているの？"
@@ -846,8 +926,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "登録や利用にお金はかからないの？"
@@ -864,8 +944,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "インターンシップの選び方に迷ってる。アドバイスもらいたい！"
@@ -882,8 +962,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "HIDANEの導入企業はどのような会社が多いですか？"
@@ -900,8 +980,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "登録したらどんな情報が必要？"
@@ -918,8 +998,8 @@
         "w": 940.0,
         "h": 90.0
       },
-      "child_count": 3,
-      "child_types_summary": "FRAME:1, TEXT:1, VECTOR:1",
+      "child_count": 4,
+      "child_types_summary": "FRAME:1, RECTANGLE:1, TEXT:1, VECTOR:1",
       "has_text_children": true,
       "text_children_preview": [
         "プライバシーとセキュリティはどのように確保されていますか？"
@@ -1000,8 +1080,8 @@
         "w": 940.0,
         "h": 96.0
       },
-      "child_count": 2,
-      "child_types_summary": "TEXT:2",
+      "child_count": 3,
+      "child_types_summary": "RECTANGLE:1, TEXT:2",
       "has_text_children": true,
       "text_children_preview": [
         "HIDANEをはじめてみる",
@@ -1147,8 +1227,8 @@
         "w": 175.0,
         "h": 60.0
       },
-      "child_count": 1,
-      "child_types_summary": "TEXT:1",
+      "child_count": 2,
+      "child_types_summary": "RECTANGLE:1, TEXT:1",
       "has_text_children": true,
       "text_children_preview": [
         "ログイン"
@@ -1284,7 +1364,7 @@
       "is_unnamed": false
     }
   ],
-  "total_children": 77,
+  "total_children": 82,
   "heuristic_hints": {
     "header_candidates": [
       "2:8073"
@@ -1395,9 +1475,16 @@
       {
         "between": [
           "2:7824",
+          "2:7831"
+        ],
+        "gap_px": 25
+      },
+      {
+        "between": [
+          "2:7831",
           "2:7826"
         ],
-        "gap_px": 30
+        "gap_px": -361
       },
       {
         "between": [
@@ -1570,9 +1657,30 @@
       {
         "between": [
           "2:8232",
+          "2:8230"
+        ],
+        "gap_px": -402
+      },
+      {
+        "between": [
+          "2:8230",
+          "2:8242"
+        ],
+        "gap_px": -35
+      },
+      {
+        "between": [
+          "2:8242",
+          "2:8243"
+        ],
+        "gap_px": -35
+      },
+      {
+        "between": [
+          "2:8243",
           "2:8229"
         ],
-        "gap_px": -174
+        "gap_px": 193
       },
       {
         "between": [
@@ -1605,9 +1713,16 @@
       {
         "between": [
           "2:8101",
+          "2:5431"
+        ],
+        "gap_px": -4
+      },
+      {
+        "between": [
+          "2:5431",
           "2:5433"
         ],
-        "gap_px": 76
+        "gap_px": -1234
       },
       {
         "between": [
@@ -1827,7 +1942,10 @@
         "gap_px": 60
       }
     ],
-    "background_candidates": [],
+    "background_candidates": [
+      "2:7831",
+      "2:5431"
+    ],
     "consecutive_patterns": [
       {
         "indices": [
@@ -1851,28 +1969,25 @@
         "indices": [
           12,
           13,
-          14,
-          15
+          14
         ],
         "ids": [
           "2:7823",
           "2:7825",
-          "2:7824",
-          "2:7826"
+          "2:7824"
         ],
         "names": [
           "About",
           "サービス概要",
-          "個々の価値観が 未来を繋ぐ、HIDANE。",
-          "私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供することです。 HIDANEは、人々が自分自身と真摯に向き合い、価値あるつながりを築くことで、より良い未来を創造します。 個人の物語が未来の社会を彩り、共に歩む仲間と出会い、成長できる場所―それがHIDANEのビジョン。"
+          "個々の価値観が 未来を繋ぐ、HIDANE。"
         ],
         "hash": "TEXT"
       },
       {
         "indices": [
-          20,
           21,
-          22
+          22,
+          23
         ],
         "ids": [
           "2:5541",
@@ -1888,12 +2003,12 @@
       },
       {
         "indices": [
-          23,
           24,
           25,
           26,
           27,
-          28
+          28,
+          29
         ],
         "ids": [
           "2:5498",
@@ -1915,12 +2030,30 @@
       },
       {
         "indices": [
-          49,
-          50,
-          51,
-          52,
-          53,
-          54
+          41,
+          42,
+          43
+        ],
+        "ids": [
+          "2:8230",
+          "2:8242",
+          "2:8243"
+        ],
+        "names": [
+          "Polygon 5",
+          "Polygon 3",
+          "Polygon 6"
+        ],
+        "hash": "REGULAR-POLYGON"
+      },
+      {
+        "indices": [
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
         ],
         "ids": [
           "2:5445",
@@ -1938,17 +2071,17 @@
           "Group 63",
           "Group 64"
         ],
-        "hash": "FRAME:[FRAME,TEXT,VECTOR]"
+        "hash": "FRAME:[FRAME,RECTANGLE,TEXT,VECTOR]"
       },
       {
         "indices": [
-          61,
-          62,
-          63,
-          64,
-          65,
           66,
-          67
+          67,
+          68,
+          69,
+          70,
+          71,
+          72
         ],
         "ids": [
           "2:5369",
@@ -1972,13 +2105,13 @@
       },
       {
         "indices": [
-          70,
-          71,
-          72,
-          73,
-          74,
           75,
-          76
+          76,
+          77,
+          78,
+          79,
+          80,
+          81
         ],
         "ids": [
           "2:5370",
@@ -2009,67 +2142,67 @@
         "height": 60.0
       },
       {
-        "index": 18,
+        "index": 19,
         "id": "2:7266",
         "name": "Group 57",
         "height": 105.0
       },
       {
-        "index": 32,
+        "index": 33,
         "id": "2:5489",
         "name": "Group 19",
         "height": 95.0
       },
       {
-        "index": 34,
+        "index": 35,
         "id": "2:8226",
         "name": "Group 97",
         "height": 105.0
       },
       {
-        "index": 49,
+        "index": 54,
         "id": "2:5445",
         "name": "Group 59",
         "height": 90.0
       },
       {
-        "index": 50,
+        "index": 55,
         "id": "2:5452",
         "name": "Group 60",
         "height": 90.0
       },
       {
-        "index": 51,
+        "index": 56,
         "id": "2:5459",
         "name": "Group 61",
         "height": 90.0
       },
       {
-        "index": 52,
+        "index": 57,
         "id": "2:5466",
         "name": "Group 62",
         "height": 90.0
       },
       {
-        "index": 53,
+        "index": 58,
         "id": "2:5473",
         "name": "Group 63",
         "height": 90.0
       },
       {
-        "index": 54,
+        "index": 59,
         "id": "2:5480",
         "name": "Group 64",
         "height": 90.0
       },
       {
-        "index": 59,
+        "index": 64,
         "id": "2:5388",
         "name": "Group 19",
         "height": 96.0
       },
       {
-        "index": 68,
+        "index": 73,
         "id": "2:5383",
         "name": "Group 25",
         "height": 60.0
@@ -2077,98 +2210,98 @@
     ],
     "loose_elements": [
       {
-        "index": 23,
+        "index": 24,
         "id": "2:5498",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 24,
+        "index": 25,
         "id": "2:5505",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 25,
+        "index": 26,
         "id": "2:5512",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 26,
+        "index": 27,
         "id": "2:5519",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 27,
+        "index": 28,
         "id": "2:5526",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 28,
+        "index": 29,
         "id": "2:5533",
         "name": "Frame",
         "type": "FRAME",
         "height": 9.0
       },
       {
-        "index": 48,
+        "index": 53,
         "id": "2:5487",
         "name": "Line 10",
         "type": "LINE",
         "height": 7.780627129250206e-05
       },
       {
-        "index": 69,
+        "index": 74,
         "id": "2:5386",
         "name": "Line 11",
         "type": "LINE",
         "height": 0.00010490733257029206
       },
       {
-        "index": 71,
+        "index": 76,
         "id": "2:5371",
         "name": "運営会社",
         "type": "TEXT",
         "height": 20.0
       },
       {
-        "index": 72,
+        "index": 77,
         "id": "2:5372",
         "name": "｜",
         "type": "TEXT",
         "height": 20.0
       },
       {
-        "index": 73,
+        "index": 78,
         "id": "2:5373",
         "name": "｜",
         "type": "TEXT",
         "height": 20.0
       },
       {
-        "index": 74,
+        "index": 79,
         "id": "2:5374",
         "name": "利用規約",
         "type": "TEXT",
         "height": 20.0
       },
       {
-        "index": 75,
+        "index": 80,
         "id": "2:5375",
         "name": "プライバシーポリシー",
         "type": "TEXT",
         "height": 20.0
       },
       {
-        "index": 76,
+        "index": 81,
         "id": "2:5376",
         "name": "© 2023 Coachers Inc.",
         "type": "TEXT",
@@ -2176,5 +2309,5 @@
       }
     ]
   },
-  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 2:8018 | Dot Grid | FRAME | -5262 | 341 | 50x50 | N | 6FRA | - | - |\n| 2 | 2:8073 | header | FRAME | -5510 | 391 | 1378x82 | N | 8FRA | - | サービス概要 |\n| 3 | 2:8061 | Group 20 | FRAME | -4767 | 445 | 643x565 | Y | - | - | - |\n| 4 | 2:7927 | Group 19 | FRAME | -5422 | 558 | 732x411 | N | 2FRA+1TEX | - | AIインターンマッチングサービス |\n| 5 | 2:7949 | Group 13 | FRAME | -5554 | 574 | 128x77 | Y | - | - | - |\n| 6 | 2:7936 | Group 12 | FRAME | -4907 | 848 | 124x86 | Y | - | - | - |\n| 7 | 2:7962 | Group 14 | FRAME | -5007 | 924 | 129x73 | Y | - | - | - |\n| 8 | 2:7975 | Dot Grid | FRAME | -4169 | 961 | 50x50 | N | 6FRA | - | - |\n| 9 | 2:7926 | Intern×Matching | TEXT | -5554 | 1016 | 1575x200 | Y | - | overflow | Intern×Matching |\n| 10 | 2:7833 | Group 33 | FRAME | -4987 | 1336 | 330x60 | N | 3TEX | - | 導入企業続々拡大中 |\n| 11 | 2:7837 | logo | FRAME | -5512 | 1455 | 1380x260 | N | 3FRA | - | - |\n| 12 | 2:7827 | Mask group | FRAME | -4848 | 1808 | 701x652 | N | 1VEC | - | - |\n| 13 | 2:7823 | About | TEXT | -5292 | 1866 | 138x46 | Y | - | - | About |\n| 14 | 2:7825 | サービス概要 | TEXT | -5292 | 1912 | 150x36 | Y | - | - | サービス概要 |\n| 15 | 2:7824 | 個々の価値観が 未来を繋ぐ、HIDANE。 | TEXT | -5292 | 2008 | 415x130 | Y | - | - | 個々の価値観が 未来を繋ぐ、HIDANE。 |\n| 16 | 2:7826 | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供 | TEXT | -5295 | 2168 | 473x252 | Y | - | - | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わ |\n| 17 | 2:7626 | 悩み | FRAME | -5541 | 2677 | 1440x971 | N | 8FRA+2VEC | - | 漠然とした焦りや不安がある |\n| 18 | 2:7323 | Group 99 | FRAME | -5619 | 3449 | 1562x1102 | N | 2FRA+1TEX | - | いろんな世界、見てみない？ |\n| 19 | 2:7266 | Group 57 | FRAME | -5421 | 4640 | 201x105 | N | 2TEX | - | 選ばれるポイント |\n| 20 | 2:7269 | Group 208 | FRAME | -5421 | 4805 | 1200x2247 | N | 4FRA | - | 01 |\n| 21 | 2:5541 | Group 72 | FRAME | -4389 | 5166 | 185x95 | N | 8FRA | - | - |\n| 22 | 2:5886 | Group 73 | FRAME | -5367 | 5391 | 95x185 | N | 8FRA | - | - |\n| 23 | 2:6231 | Group 74 | FRAME | -5367 | 5562 | 95x185 | N | 8FRA | - | - |\n| 24 | 2:5498 | Frame | FRAME | -4322 | 5966 | 50x9 | Y | - | - | - |\n| 25 | 2:5505 | Frame | FRAME | -4322 | 5975 | 50x9 | Y | - | - | - |\n| 26 | 2:5512 | Frame | FRAME | -4322 | 5984 | 50x9 | Y | - | - | - |\n| 27 | 2:5519 | Frame | FRAME | -4322 | 5993 | 50x9 | Y | - | - | - |\n| 28 | 2:5526 | Frame | FRAME | -4322 | 6002 | 50x9 | Y | - | - | - |\n| 29 | 2:5533 | Frame | FRAME | -4322 | 6011 | 50x9 | Y | - | - | - |\n| 30 | 2:6576 | Group 75 | FRAME | -4687 | 6428 | 185x95 | N | 8FRA | - | - |\n| 31 | 2:6921 | Group 90 | FRAME | -4742 | 7015 | 185x95 | N | 8FRA | - | - |\n| 32 | 2:5493 | design | FRAME | -4551 | 7077 | 119x112 | Y | - | - | - |\n| 33 | 2:5489 | Group 19 | FRAME | -5292 | 7184 | 940x95 | N | 2TEX | - | HIDANEをはじめてみる |\n| 34 | 2:8127 | Group 160 | FRAME | -4194 | 7398 | 29x130 | Y | - | - | - |\n| 35 | 2:8226 | Group 97 | FRAME | -5422 | 7433 | 1200x105 | N | 2TEX | - | 使い方は簡単。マッチングしてからメッセージのやり取りをするま |\n| 36 | 2:8114 | Group 159 | FRAME | -4236 | 7443 | 130x25 | Y | - | - | - |\n| 37 | 2:8261 | Group 193 | FRAME | -5572 | 7564 | 473x589 | N | 1FRA+2TEX | - | 自分のプロフィールを 作りましょう！ |\n| 38 | 2:8244 | Group 188 | FRAME | -4420 | 7597 | 204x511 | N | 1FRA | - | STEP4 |\n| 39 | 2:8252 | Group 194 | FRAME | -5152 | 7598 | 395x566 | N | 1FRA+4TEX | - | STEP2 |\n| 40 | 2:8232 | Group 171 | FRAME | -4687 | 7600 | 194x575 | N | 2FRA | - | 社会人のプロフィールをチェック！企業のプロフィールをチェック |\n| 41 | 2:8229 | Frame 14 | FRAME | -4363 | 8001 | 91x36 | Y | - | - | - |\n| 42 | 2:8231 | Frame 12 | FRAME | -4634 | 8001 | 91x36 | Y | - | - | - |\n| 43 | 2:8140 | Dot Grid | FRAME | -4222 | 8148 | 50x50 | N | 6FRA | - | - |\n| 44 | 2:8183 | Dot Grid | FRAME | -4182 | 8202 | 50x50 | N | 6FRA | - | - |\n| 45 | 2:8101 | Group 14 | FRAME | -5576 | 8252 | 127x77 | Y | - | - | - |\n| 46 | 2:5433 | Q&A | TEXT | -5422 | 8405 | 110x69 | Y | - | - | Q&A |\n| 47 | 2:5432 | HIDANEに関するよくあるご質問 | TEXT | -5422 | 8474 | 361x36 | Y | - | - | HIDANEに関するよくあるご質問 |\n| 48 | 2:5434 | Group 35 | FRAME | -5292 | 8570 | 940x209 | N | 2FRA+2TEX+1VEC | - | Q |\n| 49 | 2:5487 | Line 10 | LINE | -5272 | 8662 | 890x0 | Y | - | - | - |\n| 50 | 2:5445 | Group 59 | FRAME | -5292 | 8819 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 51 | 2:5452 | Group 60 | FRAME | -5292 | 8949 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 52 | 2:5459 | Group 61 | FRAME | -5292 | 9079 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 53 | 2:5466 | Group 62 | FRAME | -5292 | 9209 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 54 | 2:5473 | Group 63 | FRAME | -5292 | 9339 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 55 | 2:5480 | Group 64 | FRAME | -5292 | 9469 | 940x90 | N | 1FRA+1TEX+1VEC | - | Q |\n| 56 | 2:5398 | Column | TEXT | -5422 | 9789 | 173x69 | Y | - | - | Column |\n| 57 | 2:5397 | HIDANEが運営しているインターンに関するコンテンツメディアです。 | TEXT | -5422 | 9858 | 1200x36 | Y | - | - | HIDANEが運営しているインターンに関するコンテンツメディ |\n| 58 | 2:5399 | Group 66 | FRAME | -5474 | 9954 | 1304x410 | N | 1FRA+2VEC | - | 大学生必見！インターンシップはいつから始まる？探し方は？気に |\n| 59 | 2:5392 | design | FRAME | -4546 | 10402 | 119x113 | Y | - | - | - |\n| 60 | 2:5388 | Group 19 | FRAME | -5287 | 10514 | 940x96 | N | 2TEX | - | HIDANEをはじめてみる |\n| 61 | 2:5366 | <Group> | FRAME | -5422 | 10642 | 195x47 | Y | - | - | - |\n| 62 | 2:5369 | サービス概要 | TEXT | -5121 | 10773 | 101x23 | Y | - | - | サービス概要 |\n| 63 | 2:5377 | 選ばれるポイント | TEXT | -4990 | 10773 | 135x23 | Y | - | - | 選ばれるポイント |\n| 64 | 2:5378 | 使い方 | TEXT | -4825 | 10773 | 50x23 | Y | - | - | 使い方 |\n| 65 | 2:5379 | よくある質問 | TEXT | -4745 | 10773 | 101x23 | Y | - | - | よくある質問 |\n| 66 | 2:5380 | コラム | TEXT | -4614 | 10773 | 50x23 | Y | - | - | コラム |\n| 67 | 2:5381 | ▼アカウントをすでにお持ちの方 | TEXT | -4474 | 10773 | 254x23 | Y | - | - | ▼アカウントをすでにお持ちの方 |\n| 68 | 2:5382 | web版ログインはこちらから | TEXT | -4474 | 10806 | 218x23 | Y | - | - | web版ログインはこちらから |\n| 69 | 2:5383 | Group 25 | FRAME | -4474 | 10849 | 175x60 | N | 1TEX | - | ログイン |\n| 70 | 2:5386 | Line 11 | LINE | -5422 | 10949 | 1200x0 | Y | - | - | - |\n| 71 | 2:5370 | HIDANEについて | TEXT | -5422 | 10989 | 130x23 | Y | - | overflow-y | HIDANEについて |\n| 72 | 2:5371 | 運営会社 | TEXT | -5262 | 10991 | 59x20 | Y | - | overflow-y | 運営会社 |\n| 73 | 2:5372 | ｜ | TEXT | -5193 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 74 | 2:5373 | ｜ | TEXT | -5100 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 75 | 2:5374 | 利用規約 | TEXT | -5169 | 10991 | 59x20 | Y | - | overflow-y | 利用規約 |\n| 76 | 2:5375 | プライバシーポリシー | TEXT | -5076 | 10991 | 149x20 | Y | - | overflow-y | プライバシーポリシー |\n| 77 | 2:5376 | © 2023 Coachers Inc. | TEXT | -4899 | 11071 | 156x16 | Y | - | overflow-y | © 2023 Coachers Inc. |"
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 2:8018 | Dot Grid | FRAME | -5262 | 341 | 50x50 | N | 6FRA | - | - |\n| 2 | 2:8073 | header | FRAME | -5510 | 391 | 1378x82 | N | 8FRA | - | サービス概要 |\n| 3 | 2:8061 | Group 20 | FRAME | -4767 | 445 | 643x565 | N | 4BOO+1REC | - | - |\n| 4 | 2:7927 | Group 19 | FRAME | -5422 | 558 | 732x411 | N | 2FRA+1TEX | - | AIインターンマッチングサービス |\n| 5 | 2:7949 | Group 13 | FRAME | -5554 | 574 | 128x77 | Y | - | - | - |\n| 6 | 2:7936 | Group 12 | FRAME | -4907 | 848 | 124x86 | Y | - | - | - |\n| 7 | 2:7962 | Group 14 | FRAME | -5007 | 924 | 129x73 | Y | - | - | - |\n| 8 | 2:7975 | Dot Grid | FRAME | -4169 | 961 | 50x50 | N | 6FRA | - | - |\n| 9 | 2:7926 | Intern×Matching | TEXT | -5554 | 1016 | 1575x200 | Y | - | overflow | Intern×Matching |\n| 10 | 2:7833 | Group 33 | FRAME | -4987 | 1336 | 330x60 | N | 3TEX | - | 導入企業続々拡大中 |\n| 11 | 2:7837 | logo | FRAME | -5512 | 1455 | 1380x260 | N | 3FRA | - | - |\n| 12 | 2:7827 | Mask group | FRAME | -4848 | 1808 | 701x652 | N | 2REC+1VEC | - | - |\n| 13 | 2:7823 | About | TEXT | -5292 | 1866 | 138x46 | Y | - | - | About |\n| 14 | 2:7825 | サービス概要 | TEXT | -5292 | 1912 | 150x36 | Y | - | - | サービス概要 |\n| 15 | 2:7824 | 個々の価値観が 未来を繋ぐ、HIDANE。 | TEXT | -5292 | 2008 | 415x130 | Y | - | - | 個々の価値観が 未来を繋ぐ、HIDANE。 |\n| 16 | 2:7831 | image 28 | RECTANGLE | -4734 | 2163 | 182x366 | Y | - | - | - |\n| 17 | 2:7826 | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わる場を提供 | TEXT | -5295 | 2168 | 473x252 | Y | - | - | 私たちのビジョンは、個人の独自性を尊重し、異なる価値観が交わ |\n| 18 | 2:7626 | 悩み | FRAME | -5541 | 2677 | 1440x971 | N | 1BOO+8FRA | - | 漠然とした焦りや不安がある |\n| 19 | 2:7323 | Group 99 | FRAME | -5619 | 3449 | 1562x1102 | N | 2FRA+4REC+1TEX | - | いろんな世界、見てみない？ |\n| 20 | 2:7266 | Group 57 | FRAME | -5421 | 4640 | 201x105 | N | 2TEX | - | 選ばれるポイント |\n| 21 | 2:7269 | Group 208 | FRAME | -5421 | 4805 | 1200x2247 | N | 4FRA | - | 01 |\n| 22 | 2:5541 | Group 72 | FRAME | -4389 | 5166 | 185x95 | N | 8FRA | - | - |\n| 23 | 2:5886 | Group 73 | FRAME | -5367 | 5391 | 95x185 | N | 8FRA | - | - |\n| 24 | 2:6231 | Group 74 | FRAME | -5367 | 5562 | 95x185 | N | 8FRA | - | - |\n| 25 | 2:5498 | Frame | FRAME | -4322 | 5966 | 50x9 | Y | - | - | - |\n| 26 | 2:5505 | Frame | FRAME | -4322 | 5975 | 50x9 | Y | - | - | - |\n| 27 | 2:5512 | Frame | FRAME | -4322 | 5984 | 50x9 | Y | - | - | - |\n| 28 | 2:5519 | Frame | FRAME | -4322 | 5993 | 50x9 | Y | - | - | - |\n| 29 | 2:5526 | Frame | FRAME | -4322 | 6002 | 50x9 | Y | - | - | - |\n| 30 | 2:5533 | Frame | FRAME | -4322 | 6011 | 50x9 | Y | - | - | - |\n| 31 | 2:6576 | Group 75 | FRAME | -4687 | 6428 | 185x95 | N | 8FRA | - | - |\n| 32 | 2:6921 | Group 90 | FRAME | -4742 | 7015 | 185x95 | N | 8FRA | - | - |\n| 33 | 2:5493 | design | FRAME | -4551 | 7077 | 119x112 | Y | - | - | - |\n| 34 | 2:5489 | Group 19 | FRAME | -5292 | 7184 | 940x95 | N | 1REC+2TEX | - | HIDANEをはじめてみる |\n| 35 | 2:8127 | Group 160 | FRAME | -4194 | 7398 | 29x130 | Y | - | - | - |\n| 36 | 2:8226 | Group 97 | FRAME | -5422 | 7433 | 1200x105 | N | 2TEX | - | 使い方は簡単。マッチングしてからメッセージのやり取りをするま |\n| 37 | 2:8114 | Group 159 | FRAME | -4236 | 7443 | 130x25 | Y | - | - | - |\n| 38 | 2:8261 | Group 193 | FRAME | -5572 | 7564 | 473x589 | N | 1FRA+1REC+2TEX | - | 自分のプロフィールを 作りましょう！ |\n| 39 | 2:8244 | Group 188 | FRAME | -4420 | 7597 | 204x511 | N | 1FRA+1REC | - | STEP4 |\n| 40 | 2:8252 | Group 194 | FRAME | -5152 | 7598 | 395x566 | N | 1FRA+2REC+4TEX | - | STEP2 |\n| 41 | 2:8232 | Group 171 | FRAME | -4687 | 7600 | 194x575 | N | 2FRA+2REC | - | 社会人のプロフィールをチェック！企業のプロフィールをチェック |\n| 42 | 2:8230 | Polygon 5 | REGULAR-POLYGON | -5176 | 7773 | 35x35 | Y | - | tiny | - |\n| 43 | 2:8242 | Polygon 3 | REGULAR-POLYGON | -4712 | 7773 | 35x35 | Y | - | tiny | - |\n| 44 | 2:8243 | Polygon 6 | REGULAR-POLYGON | -4439 | 7773 | 35x35 | Y | - | tiny | - |\n| 45 | 2:8229 | Frame 14 | FRAME | -4363 | 8001 | 91x36 | Y | - | - | - |\n| 46 | 2:8231 | Frame 12 | FRAME | -4634 | 8001 | 91x36 | Y | - | - | - |\n| 47 | 2:8140 | Dot Grid | FRAME | -4222 | 8148 | 50x50 | N | 6FRA | - | - |\n| 48 | 2:8183 | Dot Grid | FRAME | -4182 | 8202 | 50x50 | N | 6FRA | - | - |\n| 49 | 2:8101 | Group 14 | FRAME | -5576 | 8252 | 127x77 | Y | - | - | - |\n| 50 | 2:5431 | Rectangle 260 | RECTANGLE | -5512 | 8325 | 1380x1314 | Y | - | bg-full | - |\n| 51 | 2:5433 | Q&A | TEXT | -5422 | 8405 | 110x69 | Y | - | - | Q&A |\n| 52 | 2:5432 | HIDANEに関するよくあるご質問 | TEXT | -5422 | 8474 | 361x36 | Y | - | - | HIDANEに関するよくあるご質問 |\n| 53 | 2:5434 | Group 35 | FRAME | -5292 | 8570 | 940x209 | N | 2FRA+1REC+2TEX+1VEC | - | Q |\n| 54 | 2:5487 | Line 10 | LINE | -5272 | 8662 | 890x0 | Y | - | - | - |\n| 55 | 2:5445 | Group 59 | FRAME | -5292 | 8819 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 56 | 2:5452 | Group 60 | FRAME | -5292 | 8949 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 57 | 2:5459 | Group 61 | FRAME | -5292 | 9079 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 58 | 2:5466 | Group 62 | FRAME | -5292 | 9209 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 59 | 2:5473 | Group 63 | FRAME | -5292 | 9339 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 60 | 2:5480 | Group 64 | FRAME | -5292 | 9469 | 940x90 | N | 1FRA+1REC+1TEX+1VEC | - | Q |\n| 61 | 2:5398 | Column | TEXT | -5422 | 9789 | 173x69 | Y | - | - | Column |\n| 62 | 2:5397 | HIDANEが運営しているインターンに関するコンテンツメディアです。 | TEXT | -5422 | 9858 | 1200x36 | Y | - | - | HIDANEが運営しているインターンに関するコンテンツメディ |\n| 63 | 2:5399 | Group 66 | FRAME | -5474 | 9954 | 1304x410 | N | 1FRA+2VEC | - | 大学生必見！インターンシップはいつから始まる？探し方は？気に |\n| 64 | 2:5392 | design | FRAME | -4546 | 10402 | 119x113 | Y | - | - | - |\n| 65 | 2:5388 | Group 19 | FRAME | -5287 | 10514 | 940x96 | N | 1REC+2TEX | - | HIDANEをはじめてみる |\n| 66 | 2:5366 | <Group> | FRAME | -5422 | 10642 | 195x47 | Y | - | - | - |\n| 67 | 2:5369 | サービス概要 | TEXT | -5121 | 10773 | 101x23 | Y | - | - | サービス概要 |\n| 68 | 2:5377 | 選ばれるポイント | TEXT | -4990 | 10773 | 135x23 | Y | - | - | 選ばれるポイント |\n| 69 | 2:5378 | 使い方 | TEXT | -4825 | 10773 | 50x23 | Y | - | - | 使い方 |\n| 70 | 2:5379 | よくある質問 | TEXT | -4745 | 10773 | 101x23 | Y | - | - | よくある質問 |\n| 71 | 2:5380 | コラム | TEXT | -4614 | 10773 | 50x23 | Y | - | - | コラム |\n| 72 | 2:5381 | ▼アカウントをすでにお持ちの方 | TEXT | -4474 | 10773 | 254x23 | Y | - | - | ▼アカウントをすでにお持ちの方 |\n| 73 | 2:5382 | web版ログインはこちらから | TEXT | -4474 | 10806 | 218x23 | Y | - | - | web版ログインはこちらから |\n| 74 | 2:5383 | Group 25 | FRAME | -4474 | 10849 | 175x60 | N | 1REC+1TEX | - | ログイン |\n| 75 | 2:5386 | Line 11 | LINE | -5422 | 10949 | 1200x0 | Y | - | - | - |\n| 76 | 2:5370 | HIDANEについて | TEXT | -5422 | 10989 | 130x23 | Y | - | overflow-y | HIDANEについて |\n| 77 | 2:5371 | 運営会社 | TEXT | -5262 | 10991 | 59x20 | Y | - | overflow-y | 運営会社 |\n| 78 | 2:5372 | ｜ | TEXT | -5193 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 79 | 2:5373 | ｜ | TEXT | -5100 | 10991 | 14x20 | Y | - | overflow-y,tiny | ｜ |\n| 80 | 2:5374 | 利用規約 | TEXT | -5169 | 10991 | 59x20 | Y | - | overflow-y | 利用規約 |\n| 81 | 2:5375 | プライバシーポリシー | TEXT | -5076 | 10991 | 149x20 | Y | - | overflow-y | プライバシーポリシー |\n| 82 | 2:5376 | © 2023 Coachers Inc. | TEXT | -4899 | 11071 | 156x16 | Y | - | overflow-y | © 2023 Coachers Inc. |"
 }

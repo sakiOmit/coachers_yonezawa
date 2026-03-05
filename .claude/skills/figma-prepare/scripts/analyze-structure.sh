@@ -19,7 +19,7 @@ python3 -c "
 import json, re, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, load_metadata, UNNAMED_RE, is_section_root, is_off_canvas, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, load_metadata, UNNAMED_RE, is_section_root, is_off_canvas, count_nested_flat, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
 
 def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
     \"\"\"Recursively count nodes and collect metrics.
@@ -152,6 +152,8 @@ try:
     root_x = root_bb.get('x', 0) if root_bb else 0
     stats = count_nodes(root, page_width=page_width, root_x=root_x)
     ungrouped = detect_grouping_candidates(root)
+    # Issue 228: Count all FRAME/GROUP nodes at any level with >FLAT_THRESHOLD visible children
+    nested_flat = count_nested_flat(root)
 
     # Calculate quality score
     total = max(stats['total'], 1)
@@ -169,6 +171,8 @@ try:
     score -= min(10, ungrouped * 1)  # cap=10, weight=1 (grouping is least reliable metric)
     score -= min(15, stats['deep_nesting'] * 3)
     # autolayout_penalty removed — unmeasurable via get_metadata
+    # Issue 228: nested_flat_count is informational only (not in score yet).
+    # Future integration: score -= min(20, nested_flat * 3)
     score = max(0, round(score, 1))
 
     # Grade
@@ -206,6 +210,7 @@ try:
             'max_section_depth': stats['max_section_depth'],  # Issue 71: relative depth used for nesting scoring
             'hidden_nodes': stats['hidden_nodes'],  # Issue 187: nodes skipped due to visible: false
             'off_canvas_nodes': stats['off_canvas_nodes'],  # Issue 182: nodes skipped due to off-canvas position
+            'nested_flat_count': nested_flat,  # Issue 228: FRAME/GROUP nodes with >15 children at any level (informational, not in score yet)
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),

@@ -98,6 +98,32 @@ GRANDCHILD_THRESHOLD = 5  # Stage C: max node_ids to switch to grandchildren mod
 
 # --- Issue 214: compare_grouping_results constants ---
 COMPARE_MATCH_THRESHOLD = 0.5  # Jaccard threshold for Stage A/C group matching
+STAGE_C_COVERAGE_THRESHOLD = 0.8  # Stage C adoption: coverage >= 80% → use Stage C, else Stage A fallback
+
+# --- Issue 224: Stage C recursive nesting ---
+MAX_STAGE_C_DEPTH = 2  # Maximum recursion depth for Stage C nested grouping
+
+# --- Issue 229: Detector disable/coverable sets ---
+# Detectors that Stage C Claude inference can potentially replace
+STAGE_C_COVERABLE_DETECTORS = {
+    'bg-content',      # bg-content pattern in Stage C prompt
+    'table',           # table pattern in Stage C prompt
+    'highlight',       # highlight detection in Stage C prompt
+    'tuple',           # card/list patterns in Stage C prompt
+    'consecutive',     # list patterns in Stage C prompt
+    'heading-content', # heading-pair pattern in Stage C prompt
+}
+
+# Detectors that should always remain in Stage A (not coverable by Stage C)
+STAGE_A_ONLY_DETECTORS = {
+    'header-footer',   # Root-level only, handled by Stage B
+    'horizontal-bar',  # Root-level only, specialized pattern
+    'zone',            # Root-level only, spatial grouping
+    'semantic',        # Always useful as fallback
+    'proximity',       # Fine-grained, always useful
+    'spacing',         # Fine-grained, always useful
+    'pattern',         # General pattern matching
+}
 
 
 def yaml_str(value):
@@ -421,6 +447,66 @@ def is_section_root(node):
     # Issue 191: Relaxed width check — width >= SECTION_ROOT_WIDTH * 0.9 (1296px)
     # catches both exact-match (~1440) and oversized wrappers (e.g. 2433px)
     return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and width >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO
+
+
+def count_nested_flat(node, threshold=FLAT_THRESHOLD):
+    """Count FRAME/GROUP nodes with > threshold visible children, below section roots only.
+
+    Issue 228: Captures internal structural quality beyond section-root flatness.
+    Issue 231: Only counts within section root boundaries. Section roots themselves
+    are excluded (they are counted by the flat_sections metric). Nodes above
+    section roots are not counted either.
+
+    Args:
+        node: Figma node dict.
+        threshold: Maximum visible children before a node is considered flat.
+
+    Returns:
+        int: Number of nodes with > threshold visible children inside section roots.
+    """
+    count = 0
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
+
+    if is_section_root(node):
+        # Inside a section root: count flat descendants (but not the root itself)
+        count += _count_flat_descendants(node, threshold)
+    else:
+        # Above section roots: recurse to find section roots
+        for child in children:
+            count += count_nested_flat(child, threshold)
+
+    return count
+
+
+def _count_flat_descendants(node, threshold=FLAT_THRESHOLD):
+    """Count flat nodes within a subtree (excluding the root node itself).
+
+    Issue 231: Helper for count_nested_flat. Walks all descendants and counts
+    FRAME/GROUP/COMPONENT/INSTANCE/SECTION nodes with > threshold visible children.
+    Section roots encountered as children are skipped (not counted) but their
+    subtrees are still recursed into, since nested section roots are handled
+    by the flat_sections metric.
+
+    Args:
+        node: Figma node dict (subtree root, not counted itself).
+        threshold: Maximum visible children before a node is considered flat.
+
+    Returns:
+        int: Number of flat descendant nodes.
+    """
+    count = 0
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    for child in children:
+        if is_section_root(child):
+            # Skip counting this child (flat_sections handles it),
+            # but recurse into its subtree
+            count += _count_flat_descendants(child, threshold)
+        else:
+            child_children = [c for c in child.get('children', []) if c.get('visible') != False]
+            if child.get('type') in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION') and len(child_children) > threshold:
+                count += 1
+            count += _count_flat_descendants(child, threshold)
+    return count
 
 
 def is_off_canvas(node, page_width, root_x=0):
@@ -2137,7 +2223,7 @@ def _stage_a_pattern_key(candidate):
     return method
 
 
-def compare_grouping_results(stage_a_candidates, stage_c_groups):
+def compare_grouping_results(stage_a_candidates, stage_c_groups, parent_id=None):
     """Compare Stage A and Stage C grouping results and return metrics.
 
     Stage A candidates come from detect-grouping-candidates.sh output
@@ -2149,6 +2235,10 @@ def compare_grouping_results(stage_a_candidates, stage_c_groups):
     Args:
         stage_a_candidates: Stage A output (list of {method, node_ids, ...})
         stage_c_groups: Stage C output (list of {name, pattern, node_ids, ...})
+        parent_id: Optional parent ID to filter candidates/groups by section.
+            When specified, only Stage A candidates with matching parent_id
+            (or parent field) and Stage C groups with matching section_id
+            (or parent_group) are compared. When None, all are compared.
 
     Returns:
         dict: {
@@ -2161,6 +2251,16 @@ def compare_grouping_results(stage_a_candidates, stage_c_groups):
             'pattern_accuracy': {...},  # Per pattern type match/total
         }
     """
+    # Filter by parent_id if specified
+    if parent_id is not None:
+        stage_a_candidates = [
+            c for c in stage_a_candidates
+            if c.get('parent_id') == parent_id or c.get('parent') == parent_id
+        ]
+        stage_c_groups = [
+            g for g in stage_c_groups
+            if g.get('section_id') == parent_id or g.get('parent_group') == parent_id
+        ]
     if not stage_a_candidates and not stage_c_groups:
         return {
             'coverage': 1.0,
@@ -2280,4 +2380,106 @@ def compare_grouping_results(stage_a_candidates, stage_c_groups):
         'stage_c_only': stage_c_only,
         'matched_pairs': matched_pairs,
         'pattern_accuracy': pattern_counts,
+    }
+
+
+def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
+    """Compare Stage A and Stage C results section-by-section.
+
+    Groups Stage A candidates by parent_id, matches them against Stage C
+    sections, and decides per-section whether to adopt Stage C or fall back
+    to Stage A based on STAGE_C_COVERAGE_THRESHOLD.
+
+    Args:
+        stage_a_candidates: List of Stage A grouping candidates (with parent_id field)
+        stage_c_sections: List of dicts with 'section_id' and 'groups' keys
+
+    Returns:
+        Dict with per-section results and overall summary:
+        {
+            'sections': [
+                {
+                    'section_id': '2:8320',
+                    'source': 'stage_c' | 'stage_a',
+                    'coverage': 0.95,
+                    'mean_jaccard': 0.82,
+                    'candidates': [...]  # adopted candidates for this section
+                }
+            ],
+            'overall_coverage': 0.88,
+            'stage_a_sections': int,
+            'stage_c_sections': int,
+            'total_sections': int
+        }
+    """
+    if not stage_a_candidates and not stage_c_sections:
+        return {
+            'sections': [],
+            'overall_coverage': 1.0,
+            'stage_a_sections': 0,
+            'stage_c_sections': 0,
+            'total_sections': 0,
+        }
+
+    # Group Stage A candidates by parent_id
+    a_by_parent = {}
+    for c in stage_a_candidates:
+        pid = c.get('parent_id') or c.get('parent')
+        if pid is not None:
+            a_by_parent.setdefault(pid, []).append(c)
+
+    # Build Stage C lookup by section_id
+    c_by_section = {}
+    for sec in stage_c_sections:
+        sid = sec.get('section_id')
+        if sid is not None:
+            c_by_section[sid] = sec.get('groups', [])
+
+    # Collect all section IDs from both sides
+    all_section_ids = list(dict.fromkeys(
+        list(a_by_parent.keys()) + list(c_by_section.keys())
+    ))
+
+    sections = []
+    stage_a_count = 0
+    stage_c_count = 0
+    total_coverage_sum = 0.0
+
+    for sid in all_section_ids:
+        a_cands = a_by_parent.get(sid, [])
+        c_groups = c_by_section.get(sid, [])
+
+        result = compare_grouping_results(a_cands, c_groups)
+        coverage = result['coverage']
+        mean_jaccard = result['mean_jaccard']
+
+        # Decision: adopt Stage C if coverage >= threshold, else fall back to Stage A
+        if coverage >= STAGE_C_COVERAGE_THRESHOLD:
+            source = 'stage_c'
+            candidates = c_groups
+            stage_c_count += 1
+        else:
+            source = 'stage_a'
+            candidates = a_cands
+            stage_a_count += 1
+
+        total_coverage_sum += coverage
+
+        sections.append({
+            'section_id': sid,
+            'source': source,
+            'coverage': coverage,
+            'mean_jaccard': mean_jaccard,
+            'candidates': candidates,
+        })
+
+    total_sections = len(all_section_ids)
+    overall_coverage = (total_coverage_sum / total_sections) if total_sections > 0 else 1.0
+
+    return {
+        'sections': sections,
+        'overall_coverage': overall_coverage,
+        'stage_a_sections': stage_a_count,
+        'stage_c_sections': stage_c_count,
+        'total_sections': total_sections,
     }

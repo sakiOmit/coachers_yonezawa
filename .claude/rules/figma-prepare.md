@@ -167,6 +167,7 @@ score = max(0, score)
 | heading_body_text_threshold | 50 chars | ヘッディングvs本文判定：この文字数超 → body、以下 → heading（Issue 219） |
 | grid_size_similarity | 0.20 (20%) | グリッド検出：幅/高さの最大変動率（Issue 220） |
 | grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
+| max_stage_c_depth | 2 levels | Stage C 再帰的ネスト処理の最大深度（Issue 224） |
 | compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
 
 ## リネームロジック（優先順）

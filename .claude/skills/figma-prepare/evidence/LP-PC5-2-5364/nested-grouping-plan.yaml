@@ -1,0 +1,214 @@
+sections:
+  - section_name: "l-header"
+    groups:
+      - pattern: "two-column"
+        suggested_name: "header-nav"
+        node_ids: ["2:8078", "2:8081", "2:8084", "2:8087", "2:8090"]
+        description: "ナビゲーションリンク群（サービス概要、Features、How to use、Q&A、Column）"
+      - pattern: "two-column"
+        suggested_name: "header-actions"
+        node_ids: ["2:8093", "2:8096"]
+        description: "アクションボタン群（ログイン、企業様はこちら）"
+      - pattern: "single"
+        suggested_name: "logo-red"
+        node_ids: ["2:8074"]
+        description: "ロゴ"
+
+  - section_name: "section-hero-area"
+    groups:
+      - pattern: "bg-content"
+        suggested_name: "hero-content"
+        node_ids: ["2:8061", "2:7927"]
+        description: "ヒーローメインコンテンツ（ビジュアル + テキスト）"
+      - pattern: "decoration"
+        suggested_name: "hero-decorations"
+        node_ids: ["2:8018", "2:7949", "2:7936", "2:7962", "2:7975"]
+        description: "装飾要素（Dot Grid + 小さな図形）"
+      - pattern: "single"
+        suggested_name: "hero-title"
+        node_ids: ["2:7926"]
+        description: "Intern×Matching 大テキスト"
+
+  - section_name: "section-logo-bar"
+    groups:
+      - pattern: "heading-pair"
+        suggested_name: "logo-bar-heading"
+        node_ids: ["2:7835", "2:7836", "2:7834"]
+        description: "導入企業見出し（テキスト + スラッシュ装飾）"
+      - pattern: "list"
+        suggested_name: "logo-bar-rows"
+        node_ids: ["2:7875", "2:7838", "2:7906"]
+        description: "ロゴ行グリッド（3行）"
+
+  - section_name: "section-about"
+    groups:
+      - pattern: "heading-pair"
+        suggested_name: "about-heading"
+        node_ids: ["2:7823", "2:7825", "2:7824"]
+        description: "About見出し（EN + JP + キャッチコピー）"
+      - pattern: "two-column"
+        suggested_name: "about-content"
+        node_ids: ["2:7827", "2:7831", "2:7826"]
+        description: "About本文（マスク画像 + 小画像 + テキスト）"
+
+  - section_name: "section-worries"
+    groups:
+      - pattern: "bg-content"
+        suggested_name: "worries-bg"
+        node_ids: ["2:7627"]
+        description: "悩みセクション背景"
+      - pattern: "list"
+        suggested_name: "worries-items"
+        node_ids: ["2:7637", "2:7817", "2:7642", "2:7632"]
+        description: "悩み吹き出しリスト"
+      - pattern: "decoration"
+        suggested_name: "worries-decorations"
+        node_ids: ["2:7810", "2:7798", "2:7804"]
+        description: "悩みセクション装飾要素"
+      - pattern: "single"
+        suggested_name: "worries-illustration"
+        node_ids: ["2:7647"]
+        description: "悩みセクション中央イラスト"
+
+  - section_name: "section-feature-intro"
+    groups:
+      - pattern: "bg-content"
+        suggested_name: "feature-intro-bg"
+        node_ids: ["2:7324"]
+        description: "背景画像（AdobeStock）"
+      - pattern: "single"
+        suggested_name: "feature-intro-heading"
+        node_ids: ["2:7325"]
+        description: "いろんな世界、見てみない？テキスト"
+      - pattern: "list"
+        suggested_name: "feature-intro-images"
+        node_ids: ["2:7326", "2:7328", "2:7327"]
+        description: "携帯画面イメージ群"
+      - pattern: "decoration"
+        suggested_name: "feature-intro-decorations"
+        node_ids: ["2:7444", "2:7329"]
+        description: "装飾パターン"
+
+  - section_name: "section-feature-points"
+    groups:
+      - pattern: "heading-pair"
+        suggested_name: "feature-points-heading"
+        node_ids: ["2:7266"]
+        description: "選ばれるポイント見出し"
+      - pattern: "single"
+        suggested_name: "feature-points-cards"
+        node_ids: ["2:7269"]
+        description: "フィーチャーカード群（01-04）"
+      - pattern: "decoration"
+        suggested_name: "feature-points-dot-grids"
+        node_ids: ["2:5541", "2:5886", "2:6231", "2:6576"]
+        description: "装飾ドットグリッド"
+      - pattern: "decoration"
+        suggested_name: "feature-points-bars"
+        node_ids: ["2:5498", "2:5505", "2:5512", "2:5519", "2:5526", "2:5533"]
+        description: "装飾バー要素"
+
+  - section_name: "section-cta-1"
+    groups:
+      - pattern: "single"
+        suggested_name: "cta-1"
+        node_ids: ["2:5493", "2:5489"]
+        description: "CTAボタン + デザインアイコン"
+
+  - section_name: "section-how-to-use"
+    groups:
+      - pattern: "heading-pair"
+        suggested_name: "how-to-use-heading"
+        node_ids: ["2:8226"]
+        description: "使い方見出し（How to use + 説明テキスト）"
+      - pattern: "list"
+        suggested_name: "how-to-use-steps"
+        node_ids: ["2:8261", "2:8252", "2:8232", "2:8244"]
+        description: "STEP1-4 カード群"
+      - pattern: "decoration"
+        suggested_name: "how-to-use-arrows"
+        node_ids: ["2:8230", "2:8242", "2:8243"]
+        description: "ステップ間矢印（ポリゴン）"
+      - pattern: "decoration"
+        suggested_name: "how-to-use-progress"
+        node_ids: ["2:8229", "2:8231"]
+        description: "プログレスバー的なフレーム"
+      - pattern: "decoration"
+        suggested_name: "how-to-use-misc"
+        node_ids: ["2:8127", "2:8114", "2:8140", "2:8183"]
+        description: "装飾要素（グループ + Dot Grid）"
+
+  - section_name: "section-qa"
+    groups:
+      - pattern: "bg-content"
+        suggested_name: "qa-bg"
+        node_ids: ["2:5431"]
+        description: "Q&Aセクション背景RECTANGLE"
+      - pattern: "heading-pair"
+        suggested_name: "qa-heading"
+        node_ids: ["2:5433", "2:5432"]
+        description: "Q&A見出し"
+      - pattern: "single"
+        suggested_name: "qa-first-item"
+        node_ids: ["2:5434", "2:5487"]
+        description: "最初のQ&Aアイテム（展開済み + 区切り線）"
+      - pattern: "list"
+        suggested_name: "qa-items"
+        node_ids: ["2:5445", "2:5452", "2:5459", "2:5466", "2:5473", "2:5480"]
+        description: "Q&Aアコーディオンリスト"
+      - pattern: "decoration"
+        suggested_name: "qa-decoration"
+        node_ids: ["2:8101"]
+        description: "Q&Aセクション装飾"
+
+  - section_name: "section-column"
+    groups:
+      - pattern: "heading-pair"
+        suggested_name: "column-heading"
+        node_ids: ["2:5398", "2:5397"]
+        description: "Column見出し + 説明テキスト"
+      - pattern: "single"
+        suggested_name: "column-content"
+        node_ids: ["2:5399"]
+        description: "コラム記事グリッド"
+
+  - section_name: "section-cta-2"
+    groups:
+      - pattern: "single"
+        suggested_name: "cta-2"
+        node_ids: ["2:5392", "2:5388"]
+        description: "CTAボタン + デザインアイコン（下部）"
+
+  - section_name: "section-dot-grid-bottom"
+    groups:
+      - pattern: "decoration"
+        suggested_name: "dot-grid-cluster"
+        node_ids: ["2:6922", "2:6965", "2:7008", "2:7051", "2:7094", "2:7137", "2:7180", "2:7223"]
+        description: "ドットグリッド集合体"
+
+  - section_name: "l-footer"
+    groups:
+      - pattern: "single"
+        suggested_name: "footer-logo"
+        node_ids: ["2:5366"]
+        description: "フッターロゴ"
+      - pattern: "list"
+        suggested_name: "footer-nav"
+        node_ids: ["2:5369", "2:5377", "2:5378", "2:5379", "2:5380"]
+        description: "フッターナビゲーションリンク"
+      - pattern: "two-column"
+        suggested_name: "footer-login"
+        node_ids: ["2:5381", "2:5382", "2:5383"]
+        description: "ログインセクション"
+      - pattern: "single"
+        suggested_name: "footer-divider"
+        node_ids: ["2:5386"]
+        description: "区切り線"
+      - pattern: "list"
+        suggested_name: "footer-legal"
+        node_ids: ["2:5370", "2:5371", "2:5372", "2:5373", "2:5374", "2:5375"]
+        description: "法的リンク（HIDANEについて、運営会社、利用規約、PP）"
+      - pattern: "single"
+        suggested_name: "footer-copyright"
+        node_ids: ["2:5376"]
+        description: "コピーライト"
