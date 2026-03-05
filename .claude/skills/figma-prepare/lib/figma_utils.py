@@ -26,6 +26,7 @@ DEEP_NESTING_THRESHOLD = 6  # levels — deep nesting detection threshold (Issue
 OFF_CANVAS_MARGIN = 1.5  # multiplier — elements with x > page_width * OFF_CANVAS_MARGIN are off-canvas (Issue 182)
 HORIZONTAL_BAR_MAX_HEIGHT = 100  # px — max Y-range for a horizontal bar pattern (Issue 184)
 HORIZONTAL_BAR_MIN_ELEMENTS = 4  # minimum elements in a horizontal bar (Issue 184)
+HORIZONTAL_BAR_VARIANCE_RATIO = 3  # X variance must exceed Y variance by this factor (Issue 184)
 
 
 def yaml_str(value):
@@ -98,6 +99,23 @@ def get_root_node(data):
     elif 'node' in data:
         return data['node']
     return data
+
+
+def find_node_by_id(root, node_id):
+    """Recursively search the tree and return the node with the given ID.
+
+    Returns None if no node with the specified ID is found.
+
+    Issue 194: Used by generate-nested-grouping-context.sh to locate
+    section nodes within the metadata tree.
+    """
+    if root.get('id') == node_id:
+        return root
+    for child in root.get('children', []):
+        found = find_node_by_id(child, node_id)
+        if found:
+            return found
+    return None
 
 
 def is_unnamed(name):
@@ -701,6 +719,7 @@ def detect_consecutive_similar(children, min_count=None, similarity_threshold=No
 
 # === Issue 166: Heading-content pair detection ===
 HEADING_MAX_HEIGHT_RATIO = 0.4  # Heading must be < 40% of content height
+HEADING_SOFT_HEIGHT_RATIO = 0.8  # Heading can be 40-80% of content height if heading-like
 HEADING_MAX_CHILDREN = 5  # Heading frames typically have few children
 HEADING_TEXT_RATIO = 0.5  # At least 50% of leaf descendants should be TEXT/VECTOR
 
@@ -784,8 +803,8 @@ def detect_heading_content_pairs(children):
 
         # Heading must be shorter than content
         if h_bb['h'] >= c_bb['h'] * HEADING_MAX_HEIGHT_RATIO:
-            # Only if heading is genuinely small
-            if h_bb['h'] >= c_bb['h'] * 0.8:
+            # Allow headings between 40-80% height if they pass is_heading_like
+            if h_bb['h'] >= c_bb['h'] * HEADING_SOFT_HEIGHT_RATIO:
                 continue
 
         if not is_heading_like(h):
@@ -1076,6 +1095,7 @@ def decoration_dominant_shape(node):
 
 # === Issue 190: Highlight text pattern detection ===
 HIGHLIGHT_OVERLAP_RATIO = 0.8  # Min Y-overlap ratio for highlight detection
+HIGHLIGHT_X_OVERLAP_RATIO = 0.5  # Min X-overlap ratio for highlight detection (Issue 196)
 HIGHLIGHT_TEXT_MAX_LEN = 30  # Max text length for highlight
 HIGHLIGHT_HEIGHT_RATIO_MIN = 0.5  # Min RECT height / TEXT height ratio
 HIGHLIGHT_HEIGHT_RATIO_MAX = 2.0  # Max RECT height / TEXT height ratio
@@ -1170,7 +1190,7 @@ def detect_highlight_text(children):
             if smaller_w <= 0:
                 continue
             x_overlap_ratio = x_overlap / smaller_w
-            if x_overlap_ratio < 0.5:
+            if x_overlap_ratio < HIGHLIGHT_X_OVERLAP_RATIO:
                 continue
 
             results.append({
@@ -1255,7 +1275,7 @@ def detect_horizontal_bar(children, parent_bb):
         if not has_rect_bg:
             continue
 
-        # Check horizontal distribution: X variance > Y variance * 3
+        # Check horizontal distribution: X variance > Y variance * HORIZONTAL_BAR_VARIANCE_RATIO
         band_bboxes = [bboxes[i] for i in band_indices]
         x_centers = [b['x'] + b['w'] / 2 for b in band_bboxes]
         y_centers = [b['y'] + b['h'] / 2 for b in band_bboxes]
@@ -1263,7 +1283,7 @@ def detect_horizontal_bar(children, parent_bb):
             continue
         x_var = statistics.variance(x_centers)
         y_var = statistics.variance(y_centers)
-        if x_var <= y_var * 3:
+        if x_var <= y_var * HORIZONTAL_BAR_VARIANCE_RATIO:
             continue
 
         # Infer name from text content
@@ -1708,6 +1728,7 @@ def _compute_child_types(children):
         'ELLIPSE': 'ELL',
         'FRAME': 'FRA',
         'GROUP': 'GRP',
+        'IMAGE': 'IMG',  # Issue 199: Missing IMAGE type abbreviation
         'INSTANCE': 'INS',
         'LINE': 'LIN',
         'POLYGON': 'POL',
@@ -1833,3 +1854,189 @@ def generate_enriched_table(children, page_width=1440, page_height=0):
         rows.append(row)
 
     return '\n'.join(rows)
+
+
+# --- Stage A / Stage C Comparison (Issue 194 Phase 3) ---
+
+# Pattern type mapping: Stage A method/semantic_type -> Stage C pattern
+_STAGE_A_TO_C_PATTERN_MAP = {
+    # Stage A method -> possible Stage C patterns
+    'semantic:card-list': ['card'],
+    'semantic:navigation': ['list'],
+    'semantic:grid': ['card', 'list'],
+    'semantic:header': ['single'],
+    'semantic:footer': ['single'],
+    'pattern': ['card', 'list'],
+    'spacing': ['list'],
+    'proximity': ['single', 'list'],
+    'consecutive': ['card', 'list'],
+    'tuple': ['card', 'list'],
+    'heading-content': ['heading-pair'],
+    'highlight': ['heading-pair', 'single'],
+    'zone': ['single', 'list'],
+    'bg-content': ['bg-content'],
+    'table': ['table'],
+    'horizontal-bar': ['list', 'single'],
+}
+
+
+def _stage_a_pattern_key(candidate):
+    """Derive a canonical pattern key from a Stage A candidate.
+
+    Combines method and semantic_type (if present) for pattern mapping.
+    """
+    method = candidate.get('method', '')
+    semantic_type = candidate.get('semantic_type', '')
+    if method == 'semantic' and semantic_type:
+        return f'semantic:{semantic_type}'
+    # Special cases: bg-content and table are stored as method directly
+    if method in ('bg-content', 'table', 'highlight', 'heading-content',
+                  'tuple', 'consecutive', 'horizontal-bar'):
+        return method
+    return method
+
+
+def compare_grouping_results(stage_a_candidates, stage_c_groups):
+    """Compare Stage A and Stage C grouping results and return metrics.
+
+    Stage A candidates come from detect-grouping-candidates.sh output
+    (list of dicts with 'method', 'node_ids', 'semantic_type', etc.).
+
+    Stage C groups come from nested-grouping-prompt-template.md output
+    (list of dicts with 'name', 'pattern', 'node_ids', etc.).
+
+    Args:
+        stage_a_candidates: Stage A output (list of {method, node_ids, ...})
+        stage_c_groups: Stage C output (list of {name, pattern, node_ids, ...})
+
+    Returns:
+        dict: {
+            'coverage': float,         # Stage C covers what fraction of Stage A nodes
+            'jaccard_by_group': [...],  # Per Stage A group best-match Jaccard
+            'mean_jaccard': float,      # Average Jaccard similarity
+            'stage_a_only': [...],      # Stage A groups with no Stage C match
+            'stage_c_only': [...],      # Stage C groups with no Stage A match
+            'matched_pairs': [...],     # Matched (stage_a_idx, stage_c_idx, jaccard)
+            'pattern_accuracy': {...},  # Per pattern type match/total
+        }
+    """
+    if not stage_a_candidates and not stage_c_groups:
+        return {
+            'coverage': 1.0,
+            'jaccard_by_group': [],
+            'mean_jaccard': 1.0,
+            'stage_a_only': [],
+            'stage_c_only': [],
+            'matched_pairs': [],
+            'pattern_accuracy': {},
+        }
+
+    if not stage_a_candidates:
+        return {
+            'coverage': 1.0,
+            'jaccard_by_group': [],
+            'mean_jaccard': 0.0,
+            'stage_a_only': [],
+            'stage_c_only': list(range(len(stage_c_groups))),
+            'matched_pairs': [],
+            'pattern_accuracy': {},
+        }
+
+    if not stage_c_groups:
+        return {
+            'coverage': 0.0,
+            'jaccard_by_group': [0.0] * len(stage_a_candidates),
+            'mean_jaccard': 0.0,
+            'stage_a_only': list(range(len(stage_a_candidates))),
+            'stage_c_only': [],
+            'matched_pairs': [],
+            'pattern_accuracy': {},
+        }
+
+    # Build node_id sets
+    a_sets = [set(c.get('node_ids', [])) for c in stage_a_candidates]
+    c_sets = [set(g.get('node_ids', [])) for g in stage_c_groups]
+
+    # All Stage A node IDs
+    all_a_nodes = set()
+    for s in a_sets:
+        all_a_nodes |= s
+
+    # All Stage C node IDs
+    all_c_nodes = set()
+    for s in c_sets:
+        all_c_nodes |= s
+
+    # Coverage: fraction of Stage A nodes also in Stage C
+    if all_a_nodes:
+        coverage = len(all_a_nodes & all_c_nodes) / len(all_a_nodes)
+    else:
+        coverage = 1.0
+
+    # For each Stage A group, find best-matching Stage C group by Jaccard
+    jaccard_by_group = []
+    matched_pairs = []
+    matched_c_indices = set()
+    match_threshold = 0.5
+
+    for a_idx, a_set in enumerate(a_sets):
+        best_jaccard = 0.0
+        best_c_idx = -1
+        for c_idx, c_set in enumerate(c_sets):
+            if not a_set and not c_set:
+                j = 1.0
+            elif not a_set or not c_set:
+                j = 0.0
+            else:
+                intersection = len(a_set & c_set)
+                union = len(a_set | c_set)
+                j = intersection / union if union > 0 else 0.0
+            if j > best_jaccard:
+                best_jaccard = j
+                best_c_idx = c_idx
+        jaccard_by_group.append(best_jaccard)
+        if best_jaccard >= match_threshold and best_c_idx >= 0:
+            matched_pairs.append({
+                'stage_a_idx': a_idx,
+                'stage_c_idx': best_c_idx,
+                'jaccard': best_jaccard,
+            })
+            matched_c_indices.add(best_c_idx)
+
+    # Mean Jaccard
+    mean_jaccard = (sum(jaccard_by_group) / len(jaccard_by_group)
+                    if jaccard_by_group else 0.0)
+
+    # Unmatched groups
+    matched_a_indices = {p['stage_a_idx'] for p in matched_pairs}
+    stage_a_only = [i for i in range(len(stage_a_candidates))
+                    if i not in matched_a_indices]
+    stage_c_only = [i for i in range(len(stage_c_groups))
+                    if i not in matched_c_indices]
+
+    # Pattern accuracy: for matched pairs, check if Stage C pattern
+    # is compatible with Stage A method
+    pattern_counts = {}  # pattern_key -> {'matched': int, 'total': int}
+    for a_idx in range(len(stage_a_candidates)):
+        a_key = _stage_a_pattern_key(stage_a_candidates[a_idx])
+        if a_key not in pattern_counts:
+            pattern_counts[a_key] = {'matched': 0, 'total': 0}
+        pattern_counts[a_key]['total'] += 1
+
+        # Check if this Stage A group was matched and pattern is compatible
+        pair = next((p for p in matched_pairs if p['stage_a_idx'] == a_idx), None)
+        if pair:
+            c_pattern = stage_c_groups[pair['stage_c_idx']].get('pattern', '')
+            expected = _STAGE_A_TO_C_PATTERN_MAP.get(a_key, [])
+            if c_pattern in expected:
+                pattern_counts[a_key]['matched'] += 1
+
+    return {
+        'coverage': coverage,
+        'jaccard_by_group': jaccard_by_group,
+        'mean_jaccard': mean_jaccard,
+        'stage_a_only': stage_a_only,
+        'stage_c_only': stage_c_only,
+        'matched_pairs': matched_pairs,
+        'pattern_accuracy': pattern_counts,
+    }

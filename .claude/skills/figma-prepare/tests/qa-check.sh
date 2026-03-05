@@ -263,6 +263,53 @@ check_dead_code() {
 }
 
 # ================================================================
+# 6. detector-coverage: Issue 180-193 検出器のテストカバレッジ
+# ================================================================
+check_detector_coverage() {
+  bold "=== Check: detector-coverage ==="
+
+  local found=0
+
+  # Issue 180-193 detectors must be imported in test file
+  local detectors=(
+    "detect_bg_content_layers"
+    "detect_table_rows"
+    "detect_repeating_tuple"
+    "detect_en_jp_label_pairs"
+    "is_decoration_pattern"
+    "decoration_dominant_shape"
+    "detect_highlight_text"
+    "detect_horizontal_bar"
+    "generate_enriched_table"
+  )
+
+  local test_file="$SCRIPT_DIR/test_figma_utils.py"
+  if [[ -f "$test_file" ]]; then
+    for func in "${detectors[@]}"; do
+      if ! grep -q "$func" "$test_file" 2>/dev/null; then
+        issue "detector-coverage: $func not tested in test_figma_utils.py"
+        found=1
+      fi
+    done
+  else
+    warn "detector-coverage: test_figma_utils.py not found"
+    found=1
+  fi
+
+  # Verify detectors exist in figma_utils.py
+  for func in "${detectors[@]}"; do
+    if ! grep -q "def $func" "$LIB_DIR/figma_utils.py" 2>/dev/null; then
+      issue "detector-coverage: $func defined in check but not in figma_utils.py"
+      found=1
+    fi
+  done
+
+  if [[ $found -eq 0 ]]; then
+    green "  PASS: All Issue 180-193 detectors tested"
+  fi
+}
+
+# ================================================================
 # Main
 # ================================================================
 echo ""
@@ -280,6 +327,8 @@ echo ""
 check_doc_staleness
 echo ""
 check_dead_code
+echo ""
+check_detector_coverage
 echo ""
 
 # ================================================================

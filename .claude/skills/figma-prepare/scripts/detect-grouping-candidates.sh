@@ -625,7 +625,7 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
 
     # Issue 85, 86: Root-level-only detectors
     if is_root:
-        page_bb = get_bbox(node)
+        page_bb = page_bb_pre  # reuse bbox computed above (Issue 198)
         # Issue 85: Header/footer detection
         header_footer = detect_header_footer_groups(children, page_bb)
         for g in header_footer:

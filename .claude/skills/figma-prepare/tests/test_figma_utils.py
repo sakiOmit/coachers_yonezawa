@@ -81,6 +81,8 @@ from figma_utils import (
     detect_horizontal_bar,
     HORIZONTAL_BAR_MAX_HEIGHT,
     HORIZONTAL_BAR_MIN_ELEMENTS,
+    HORIZONTAL_BAR_VARIANCE_RATIO,
+    _compute_zone_bboxes,
 )
 
 SCRIPTS_DIR = os.path.join(SKILLS_DIR, "scripts")
@@ -4203,3 +4205,510 @@ class TestDetectHorizontalBar:
             resolve_absolute_coords(c)
         results = detect_horizontal_bar(children, self._make_parent_bb())
         assert len(results) == 0
+
+    def test_empty_children(self):
+        """Empty children list -> empty result."""
+        results = detect_horizontal_bar([], self._make_parent_bb())
+        assert results == []
+
+    def test_blog_bar_naming(self):
+        """Bar with blog-related text -> named blog-bar."""
+        children = [
+            {'id': '1', 'name': 'Rectangle 1', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 800, 'height': 50}},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 110, 'width': 100, 'height': 20},
+             'characters': 'ブログ一覧'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 300, 'y': 115, 'width': 100, 'height': 20},
+             'characters': '2024.01.01 記事タイトル'},
+            {'id': '4', 'name': 'T3', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 600, 'y': 112, 'width': 60, 'height': 20},
+             'characters': 'もっと見る'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 1
+        assert results[0]['suggested_name'] == 'blog-bar'
+
+    def test_generic_bar_naming(self):
+        """Bar without news/blog text -> named horizontal-bar."""
+        children = [
+            {'id': '1', 'name': 'Rectangle 1', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 0, 'y': 100, 'width': 800, 'height': 50}},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 110, 'width': 100, 'height': 20},
+             'characters': 'Alpha'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 300, 'y': 115, 'width': 100, 'height': 20},
+             'characters': 'Beta'},
+            {'id': '4', 'name': 'T3', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 600, 'y': 112, 'width': 60, 'height': 20},
+             'characters': 'Gamma'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 1
+        assert results[0]['suggested_name'] == 'horizontal-bar'
+
+    def test_variance_ratio_constant(self):
+        """HORIZONTAL_BAR_VARIANCE_RATIO should be 3."""
+        assert HORIZONTAL_BAR_VARIANCE_RATIO == 3
+
+    def test_vertically_stacked_not_detected(self):
+        """Elements stacked vertically in narrow Y band -> not detected (X_var <= Y_var * 3)."""
+        # All at same X, different Y but within 100px band
+        children = [
+            {'id': '1', 'name': 'Rectangle 1', 'type': 'RECTANGLE',
+             'absoluteBoundingBox': {'x': 100, 'y': 100, 'width': 200, 'height': 15}},
+            {'id': '2', 'name': 'T1', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 120, 'width': 200, 'height': 15},
+             'characters': 'A'},
+            {'id': '3', 'name': 'T2', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 140, 'width': 200, 'height': 15},
+             'characters': 'B'},
+            {'id': '4', 'name': 'T3', 'type': 'TEXT',
+             'absoluteBoundingBox': {'x': 100, 'y': 160, 'width': 200, 'height': 15},
+             'characters': 'C'},
+        ]
+        for c in children:
+            resolve_absolute_coords(c)
+        results = detect_horizontal_bar(children, self._make_parent_bb())
+        assert len(results) == 0  # vertically stacked
+
+
+# ============================================================
+# _compute_zone_bboxes (Issue 197: indirect coverage -> direct unit tests)
+# ============================================================
+class TestComputeZoneBboxes:
+    """Direct unit tests for _compute_zone_bboxes helper."""
+
+    def _make_child(self, cid, y, h=200):
+        return {
+            "id": cid, "type": "FRAME", "name": f"Frame {cid}",
+            "absoluteBoundingBox": {"x": 0, "y": y, "width": 1440, "height": h},
+        }
+
+    def test_single_group(self):
+        """One candidate group with 2 members -> 1 zone bbox."""
+        children = [
+            self._make_child("a", 100, 200),
+            self._make_child("b", 400, 200),
+        ]
+        candidate_groups = [{"node_ids": ["a", "b"]}]
+        zones = _compute_zone_bboxes(children, candidate_groups)
+        assert len(zones) == 1
+        # Zone should span from y=100 to y=600 (400+200)
+        assert zones[0]["y_top"] == 100
+        assert zones[0]["y_bot"] == 600
+
+    def test_multiple_groups(self):
+        """Two candidate groups -> 2 zone bboxes."""
+        children = [
+            self._make_child("a", 100, 200),
+            self._make_child("b", 400, 200),
+            self._make_child("c", 1000, 200),
+            self._make_child("d", 1300, 200),
+        ]
+        candidate_groups = [
+            {"node_ids": ["a", "b"]},
+            {"node_ids": ["c", "d"]},
+        ]
+        zones = _compute_zone_bboxes(children, candidate_groups)
+        assert len(zones) == 2
+
+    def test_empty_groups(self):
+        """Empty candidate_groups -> empty zones."""
+        children = [self._make_child("a", 100)]
+        zones = _compute_zone_bboxes(children, [])
+        assert zones == []
+
+    def test_nonexistent_ids(self):
+        """Group with IDs not in children -> zone skipped."""
+        children = [self._make_child("a", 100)]
+        candidate_groups = [{"node_ids": ["x", "y"]}]
+        zones = _compute_zone_bboxes(children, candidate_groups)
+        assert len(zones) == 0
+
+    def test_single_member_group(self):
+        """Group with 1 member -> zone has that member's bbox."""
+        children = [self._make_child("a", 500, 300)]
+        candidate_groups = [{"node_ids": ["a"]}]
+        zones = _compute_zone_bboxes(children, candidate_groups)
+        assert len(zones) == 1
+        assert zones[0]["y_top"] == 500
+        assert zones[0]["y_bot"] == 800
+
+
+# ============================================================
+# detect_bg_content_layers: ELLIPSE decoration edge case (Issue 199)
+# ============================================================
+class TestDetectBgContentLayersEllipseDecoration:
+    """Additional edge cases for detect_bg_content_layers."""
+
+    def test_small_ellipse_as_decoration(self):
+        """Small ELLIPSE overlapping bg RECTANGLE -> treated as decoration."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            # Small ELLIPSE decoration: area = 30*30 = 900 < 5% of bg (576000*0.05=28800)
+            {"id": "deco1", "type": "ELLIPSE", "name": "Ellipse 1",
+             "absoluteBoundingBox": {"x": 200, "y": 100, "width": 30, "height": 30}},
+            {"id": "c1", "type": "TEXT", "name": "heading",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "content-group",
+             "absoluteBoundingBox": {"x": 100, "y": 200, "width": 600, "height": 100},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        # ELLIPSE should be in bg_node_ids as decoration
+        assert 'deco1' in result[0]['bg_node_ids']
+        # Content should be c1, c2
+        assert set(result[0]['node_ids']) == {'c1', 'c2'}
+
+    def test_large_ellipse_as_content(self):
+        """Large ELLIPSE overlapping bg RECTANGLE -> treated as content, not decoration."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        # bg area = 1440 * 400 = 576000. 5% = 28800
+        # Large ellipse area = 200 * 200 = 40000 > 28800
+        children = [
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            {"id": "e1", "type": "ELLIPSE", "name": "Ellipse 1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 200, "height": 200}},
+            {"id": "c1", "type": "TEXT", "name": "heading",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "group",
+             "absoluteBoundingBox": {"x": 100, "y": 300, "width": 400, "height": 100},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        assert len(result) == 1
+        # Large ELLIPSE should be content, not decoration
+        assert 'e1' in result[0]['node_ids']
+        assert 'e1' not in result[0]['bg_node_ids']
+
+
+# ============================================================
+# generate_enriched_table: page_height overflow-y (Issue 202)
+# ============================================================
+class TestGenerateEnrichedTableOverflowY:
+    """Tests for generate_enriched_table overflow-y detection."""
+
+    def _make_node(self, nid, ntype, name, x, y, w, h, children=None):
+        return {
+            'id': nid, 'type': ntype, 'name': name,
+            'absoluteBoundingBox': {'x': x, 'y': y, 'width': w, 'height': h},
+            'children': children or [],
+        }
+
+    def test_overflow_y_with_page_height(self):
+        """Element extending below page_height -> overflow-y flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'bg', 0, 4800, 1440, 500),
+        ]
+        result = generate_enriched_table(children, page_width=1440, page_height=5000)
+        assert 'overflow-y' in result
+
+    def test_no_overflow_y_within_page(self):
+        """Element within page_height -> no overflow-y flag."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'bg', 0, 4800, 1440, 100),
+        ]
+        result = generate_enriched_table(children, page_width=1440, page_height=5000)
+        assert 'overflow-y' not in result
+
+    def test_zero_page_height_no_overflow_y(self):
+        """page_height=0 (default) -> never overflow-y."""
+        children = [
+            self._make_node('1:1', 'RECTANGLE', 'bg', 0, 99999, 1440, 500),
+        ]
+        result = generate_enriched_table(children, page_width=1440, page_height=0)
+        assert 'overflow-y' not in result
+
+
+# ============================================================
+# detect_repeating_tuple: single-type distinct_type < 2 (Issue 200)
+# ============================================================
+class TestDetectRepeatingTupleSingleDistinct:
+    """Test that tuples with distinct type count < 2 are skipped."""
+
+    def _make_node(self, node_type, name):
+        return {"type": node_type, "name": name, "id": f"{node_type}-{name}"}
+
+    def test_two_type_tuple_detected(self):
+        """Tuple of 2 distinct types repeated 3x -> detected."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("TEXT", f"t-{i}"))
+            children.append(self._make_node("RECTANGLE", f"r-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 2
+
+    def test_same_type_pair_not_tuple(self):
+        """Pairs of same type (e.g., TEXT+TEXT) repeated 3x -> not detected as tuple
+        (distinct types < 2, handled by consecutive_similar instead)."""
+        children = []
+        for i in range(6):
+            children.append(self._make_node("TEXT", f"t-{i}"))
+        result = detect_repeating_tuple(children)
+        assert len(result) == 0
+
+
+# ================================================================
+# Issue 194 Phase 3: compare_grouping_results tests
+# ================================================================
+
+from figma_utils import compare_grouping_results, _stage_a_pattern_key
+
+
+class TestCompareGroupingResults:
+    """Tests for compare_grouping_results (Issue 194 Phase 3)."""
+
+    def test_perfect_match(self):
+        """Both stages produce identical groups -> full coverage, Jaccard=1.0."""
+        stage_a = [
+            {'method': 'pattern', 'node_ids': ['1:1', '1:2', '1:3'], 'count': 3,
+             'suggested_name': 'card-list'},
+        ]
+        stage_c = [
+            {'name': 'card-list', 'pattern': 'card', 'node_ids': ['1:1', '1:2', '1:3']},
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        assert result['coverage'] == 1.0
+        assert result['mean_jaccard'] == 1.0
+        assert len(result['matched_pairs']) == 1
+        assert result['matched_pairs'][0]['jaccard'] == 1.0
+        assert result['stage_a_only'] == []
+        assert result['stage_c_only'] == []
+        # Pattern accuracy: pattern -> card is valid match
+        assert result['pattern_accuracy']['pattern']['matched'] == 1
+        assert result['pattern_accuracy']['pattern']['total'] == 1
+
+    def test_partial_overlap(self):
+        """Stage A and C overlap partially -> Jaccard between 0 and 1."""
+        stage_a = [
+            {'method': 'semantic', 'semantic_type': 'card-list',
+             'node_ids': ['1:1', '1:2', '1:3', '1:4'], 'count': 4,
+             'suggested_name': 'card-list'},
+        ]
+        stage_c = [
+            {'name': 'cards', 'pattern': 'card',
+             'node_ids': ['1:1', '1:2', '1:3']},  # missing 1:4
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        # 3 out of 4 Stage A nodes covered
+        assert result['coverage'] == 0.75
+        # Jaccard = 3 / 4 = 0.75
+        assert abs(result['jaccard_by_group'][0] - 0.75) < 0.01
+        assert len(result['matched_pairs']) == 1
+
+    def test_stage_a_only(self):
+        """Stage A detects a group that Stage C misses entirely."""
+        stage_a = [
+            {'method': 'highlight', 'semantic_type': 'highlight',
+             'node_ids': ['2:1', '2:2'], 'count': 2,
+             'suggested_name': 'highlight-text'},
+            {'method': 'pattern', 'node_ids': ['3:1', '3:2', '3:3'], 'count': 3,
+             'suggested_name': 'list-items'},
+        ]
+        stage_c = [
+            {'name': 'card-list', 'pattern': 'card',
+             'node_ids': ['3:1', '3:2', '3:3']},
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        # highlight group (2:1, 2:2) not covered
+        assert result['coverage'] == 3 / 5  # 3 of 5 Stage A nodes covered
+        assert len(result['stage_a_only']) == 1
+        assert 0 in result['stage_a_only']  # index 0 = highlight
+        assert result['stage_c_only'] == []
+
+    def test_stage_c_only(self):
+        """Stage C detects a group that Stage A does not have."""
+        stage_a = [
+            {'method': 'pattern', 'node_ids': ['1:1', '1:2'], 'count': 2,
+             'suggested_name': 'list-items'},
+        ]
+        stage_c = [
+            {'name': 'list-items', 'pattern': 'list',
+             'node_ids': ['1:1', '1:2']},
+            {'name': 'decoration-dots', 'pattern': 'single',
+             'node_ids': ['5:1', '5:2']},
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        assert len(result['stage_c_only']) == 1
+        assert 1 in result['stage_c_only']  # decoration-dots
+
+    def test_both_empty(self):
+        """Both empty -> perfect agreement."""
+        result = compare_grouping_results([], [])
+        assert result['coverage'] == 1.0
+        assert result['mean_jaccard'] == 1.0
+        assert result['matched_pairs'] == []
+
+    def test_stage_a_empty(self):
+        """Stage A empty, Stage C has groups -> coverage=1.0 (nothing to cover)."""
+        stage_c = [
+            {'name': 'g1', 'pattern': 'card', 'node_ids': ['1:1']},
+        ]
+        result = compare_grouping_results([], stage_c)
+        assert result['coverage'] == 1.0
+        assert result['stage_c_only'] == [0]
+
+    def test_stage_c_empty(self):
+        """Stage C empty, Stage A has groups -> coverage=0.0."""
+        stage_a = [
+            {'method': 'pattern', 'node_ids': ['1:1', '1:2'], 'count': 2,
+             'suggested_name': 'items'},
+        ]
+        result = compare_grouping_results(stage_a, [])
+        assert result['coverage'] == 0.0
+        assert result['mean_jaccard'] == 0.0
+        assert result['stage_a_only'] == [0]
+
+    def test_pattern_type_mapping(self):
+        """Pattern accuracy correctly maps Stage A methods to Stage C patterns."""
+        stage_a = [
+            {'method': 'semantic', 'semantic_type': 'card-list',
+             'node_ids': ['1:1', '1:2', '1:3'], 'count': 3},
+            {'method': 'table', 'node_ids': ['2:1', '2:2', '2:3'], 'count': 3},
+            {'method': 'heading-content',
+             'node_ids': ['3:1', '3:2'], 'count': 2},
+        ]
+        stage_c = [
+            {'name': 'cards', 'pattern': 'card',
+             'node_ids': ['1:1', '1:2', '1:3']},
+            {'name': 'data-table', 'pattern': 'table',
+             'node_ids': ['2:1', '2:2', '2:3']},
+            {'name': 'section-heading', 'pattern': 'heading-pair',
+             'node_ids': ['3:1', '3:2']},
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        pa = result['pattern_accuracy']
+        assert pa['semantic:card-list']['matched'] == 1
+        assert pa['table']['matched'] == 1
+        assert pa['heading-content']['matched'] == 1
+        assert result['mean_jaccard'] == 1.0
+
+    def test_no_match_below_threshold(self):
+        """Jaccard below 0.5 -> no match."""
+        stage_a = [
+            {'method': 'pattern',
+             'node_ids': ['1:1', '1:2', '1:3', '1:4', '1:5'], 'count': 5},
+        ]
+        stage_c = [
+            # Only 1 overlap out of 5+4=8 unique -> Jaccard = 1/8 = 0.125
+            {'name': 'other', 'pattern': 'list',
+             'node_ids': ['1:1', '2:1', '2:2', '2:3']},
+        ]
+        result = compare_grouping_results(stage_a, stage_c)
+        # Jaccard < 0.5 -> no match
+        assert len(result['matched_pairs']) == 0
+        assert 0 in result['stage_a_only']
+
+    def test_stage_a_pattern_key(self):
+        """_stage_a_pattern_key returns correct keys."""
+        assert _stage_a_pattern_key({'method': 'semantic', 'semantic_type': 'card-list'}) == 'semantic:card-list'
+        assert _stage_a_pattern_key({'method': 'pattern'}) == 'pattern'
+        assert _stage_a_pattern_key({'method': 'table'}) == 'table'
+        assert _stage_a_pattern_key({'method': 'highlight', 'semantic_type': 'highlight'}) == 'highlight'
+        assert _stage_a_pattern_key({'method': 'heading-content'}) == 'heading-content'
+
+
+# ============================================================
+# Issue 194 Phase 3: find_node_by_id tests
+# ============================================================
+
+try:
+    from figma_utils import find_node_by_id
+    HAS_FIND_NODE = True
+except ImportError:
+    HAS_FIND_NODE = False
+
+
+@pytest.mark.skipif(not HAS_FIND_NODE, reason="find_node_by_id not yet implemented")
+class TestFindNodeById:
+    """Tests for find_node_by_id() tree search utility (Issue 194 Phase 3)."""
+
+    TREE = {
+        "id": "0:1", "name": "Root", "type": "FRAME",
+        "children": [
+            {
+                "id": "1:1", "name": "Section A", "type": "FRAME",
+                "children": [
+                    {"id": "1:10", "name": "Heading", "type": "TEXT", "children": []},
+                    {"id": "1:11", "name": "Body", "type": "TEXT", "children": []},
+                ],
+            },
+            {
+                "id": "1:2", "name": "Section B", "type": "FRAME",
+                "children": [
+                    {
+                        "id": "1:20", "name": "Card", "type": "FRAME",
+                        "children": [
+                            {"id": "1:200", "name": "Image", "type": "RECTANGLE",
+                             "children": []},
+                        ],
+                    },
+                ],
+            },
+        ],
+    }
+
+    def test_find_root(self):
+        """Root node itself is found by its ID."""
+        result = find_node_by_id(self.TREE, "0:1")
+        assert result is not None
+        assert result["id"] == "0:1"
+        assert result["name"] == "Root"
+
+    def test_find_nested(self):
+        """Direct child node is found."""
+        result = find_node_by_id(self.TREE, "1:1")
+        assert result is not None
+        assert result["name"] == "Section A"
+
+    def test_find_grandchild(self):
+        """Grandchild (depth=2) is found."""
+        result = find_node_by_id(self.TREE, "1:10")
+        assert result is not None
+        assert result["name"] == "Heading"
+
+    def test_not_found(self):
+        """Non-existent ID returns None."""
+        result = find_node_by_id(self.TREE, "99:99")
+        assert result is None
+
+    def test_deep_nesting(self):
+        """Deeply nested node (5 levels) is found."""
+        deep_tree = {"id": "L0", "children": [
+            {"id": "L1", "children": [
+                {"id": "L2", "children": [
+                    {"id": "L3", "children": [
+                        {"id": "L4", "children": [
+                            {"id": "L5", "name": "deepest", "children": []}
+                        ]}
+                    ]}
+                ]}
+            ]}
+        ]}
+        result = find_node_by_id(deep_tree, "L5")
+        assert result is not None
+        assert result["name"] == "deepest"
+
+    def test_empty_tree(self):
+        """Root with no children -- search for non-root returns None."""
+        root_only = {"id": "0:1", "name": "Alone"}
+        assert find_node_by_id(root_only, "0:1") is not None
+        assert find_node_by_id(root_only, "1:1") is None
+
+    def test_find_leaf_in_nested_branch(self):
+        """Leaf node in a nested branch (depth=3) is found."""
+        result = find_node_by_id(self.TREE, "1:200")
+        assert result is not None
+        assert result["name"] == "Image"

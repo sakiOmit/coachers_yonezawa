@@ -480,19 +480,140 @@ Phase A (計測 + フィルタリング)        Phase B (Claude推論)
 - `prepare-sectioning-context.sh` にエンリッチドテーブル生成を統合
 - ルートレベル Phase B の children table もエンリッチド形式に移行
 
+**Phase 2 実装結果（2026-03-05）**:
+
+実装内容:
+1. `prepare-sectioning-context.sh` に `--enriched-table` フラグを追加
+   - フラグ指定時、`generate_enriched_table()` で生成したリッチ形式テーブルを `enriched_children_table` キーに出力
+   - ルートレベル Phase B で `{children_table}` の代わりにエンリッチド形式を利用可能に
+   - 引数パーサを `--output`/`--enriched-table` の順序非依存パースに改善
+2. IDハルシネーション対策をプロンプトテンプレートに追加
+   - `sectioning-prompt-template.md`: ルール2を「ID列をそのまま正確にコピー」に強化、照合確認を明記
+   - `nested-grouping-prompt-template.md`: ルール2を同様に強化、ルール8「出力前にID照合」を追加
+3. `sectioning-prompt-template.md` に enriched table 形式のドキュメントを追加
+4. 後方互換性: `--enriched-table` 未指定時は従来の出力と完全一致（既存テスト37件+372件全通過）
+
+発見された課題:
+- なし（Phase 3 の段階的移行は次フェーズに委ねる）
+
+**Phase 3 実装状況（2026-03-05）**:
+
+Stage C（ネストレベル Claude 推論）の基盤スクリプトと比較ユーティリティを整備。
+
+| コンポーネント | ファイル | 状態 | 担当 |
+|---------------|---------|------|------|
+| セクション別エンリッチドテーブル生成 | `scripts/generate-nested-grouping-context.sh` | DONE | 1号 |
+| ノードID検索ユーティリティ | `lib/figma_utils.py` `find_node_by_id()` | DONE | 1号 |
+| Stage A/C グルーピング比較 | `lib/figma_utils.py` `compare_grouping_results()` | DONE | 2号 |
+| 比較スクリプト | `scripts/compare-grouping.sh` | 未着手 | 2号 |
+| SKILL.md Stage C 統合 | `SKILL.md` / `phase-details.md` | 作業中 | 3号 |
+| ユニットテスト: `find_node_by_id` | `tests/test_figma_utils.py` `TestFindNodeById` (7件) | DONE | 4号 |
+| ユニットテスト: `compare_grouping_results` | `tests/test_figma_utils.py` `TestCompareGroupingResults` (10件) | DONE | 2号+4号 |
+| 統合テスト: `generate-nested-grouping-context.sh` | `tests/run-tests.sh` Stage C セクション (2件) | DONE | 4号 |
+
+テスト合計: 394件(unit既存) + 7件(find_node_by_id) = 401件(unit) + 39件(integration: 37既存+2 Stage C) = 440件
+
+### Issue 196: マジックナンバー定数化漏れ（horizontal_bar, highlight）
+
+**Phase**: 2, 3
+**状態**: FIXED
+**概要**: `detect_horizontal_bar` 内の水平分布判定 `x_var <= y_var * 3` および `detect_highlight_text` 内のX重なり判定 `x_overlap_ratio < 0.5` がハードコードされていた。
+**発見箇所**: `figma_utils.py` L1268, L1175
+**修正**: `HORIZONTAL_BAR_VARIANCE_RATIO = 3` と `HIGHLIGHT_X_OVERLAP_RATIO = 0.5` を定数化。figma-prepare.md 閾値テーブルに追加。
+
+### Issue 197: `detect_heading_content_pairs` マジックナンバー 0.8
+
+**Phase**: 2
+**状態**: FIXED
+**概要**: ヘッディング判定の中間ゾーン上限 `0.8` がハードコードされていた。
+**発見箇所**: `figma_utils.py` L788
+**修正**: `HEADING_SOFT_HEIGHT_RATIO = 0.8` を定数化。figma-prepare.md に追加。
+
+### Issue 198: `walk_and_detect` で `get_bbox(node)` 二重呼び出し
+
+**Phase**: 2
+**状態**: FIXED
+**概要**: `detect-grouping-candidates.sh` の `walk_and_detect` 関数内で、root ノードに対して `get_bbox(node)` が L612 と L628 で二重に呼び出されていた。
+**発見箇所**: `detect-grouping-candidates.sh` L612, L628
+**修正**: L628 を `page_bb = page_bb_pre` に変更し、既に計算済みの値を再利用。
+
+### Issue 199: `_compute_child_types` TYPE_ABBR に IMAGE 欠落
+
+**Phase**: 全体
+**状態**: FIXED
+**概要**: `figma_utils.py` の `_compute_child_types` 関数で、`TYPE_ABBR` マップに `IMAGE` タイプが欠落していた。IMAGE ノードが 'OTH' (Other) に分類され、enriched table のchildTypes列で情報が失われていた。
+**発見箇所**: `figma_utils.py` L1707-1722
+**修正**: `'IMAGE': 'IMG'` を TYPE_ABBR に追加。
+
+### Issue 200: `generate-rename-map.sh` マジックナンバー `w < 1400`
+
+**Phase**: 3
+**状態**: FIXED
+**概要**: カード検出のセクション除外判定で `w < 1400` がハードコードされていた。`OVERFLOW_BG_MIN_WIDTH` (1400) と同値だが定数参照していなかった。
+**発見箇所**: `generate-rename-map.sh` L283
+**修正**: `OVERFLOW_BG_MIN_WIDTH` をインポートし参照に変更。
+
+### Issue 201: `prepare-sectioning-context.sh` ヒント関数内マジックナンバー
+
+**Phase**: 2(B)
+**状態**: OPEN
+**概要**: `detect_heuristic_hints` 関数内に `page_h * 0.05`（ヘッダーゾーン5%）、`page_h * 0.9`（フッターゾーン90%）、`page_w * 0.8`（幅広判定80%）、`bb['h'] >= 100`（背景最小高さ）、`child_h > 200`（ヘッディング最大高さ）、`bb['h'] <= 20`（遊離要素高さ）等がハードコードされている。
+**発見箇所**: `prepare-sectioning-context.sh` L87-184
+**修正案**: Stage B Claude推論の補助ヒントであり、他の検出器の閾値テーブルとは独立した役割を持つ。Issue 194のアーキテクチャ移行後に整理するのが合理的。
+
+### Issue 202: `infer-autolayout.sh` 定数がドキュメント未登録
+
+**Phase**: 4
+**状態**: OPEN
+**概要**: `CENTER_ALIGN_VARIANCE = 4` と `ALIGN_TOLERANCE = 2` は Issue 148 で定数化されたが、figma-prepare.md の閾値テーブルに未登録のまま。
+**発見箇所**: `infer-autolayout.sh` L31-32
+**修正案**: figma-prepare.md の閾値テーブルに追加。
+
+### Issue 203: `_compute_flags` 内マジックナンバー
+
+**Phase**: 全体
+**状態**: OPEN
+**概要**: Issue 194 で新設された `_compute_flags` 関数内に `1.05`（overflow判定5%許容）、`1.02`（overflow-y 2%許容）、`0.95`（bg-full判定95%以上）、`50`（tiny判定50px未満）がハードコードされている。
+**発見箇所**: `figma_utils.py` L1758-1780
+**修正案**: 定数化して閾値テーブルに追加。ただし `_compute_flags` は enriched table 生成専用であり、スコアリングやグルーピングには影響しないため低優先度。
+
+### Issue 204: `detect_bg_content_layers` left-overflow 判定がドキュメント未登録
+
+**Phase**: 2
+**状態**: OPEN
+**概要**: Issue 183 で追加された left-overflow 検出条件 `bb['x'] < 0 and bb['w'] >= parent_bb['w'] * 0.5` の `0.5` が figma-prepare.md の閾値テーブルに未登録。
+**発見箇所**: `figma_utils.py` L1356
+**修正案**: figma-prepare.md に `bg_left_overflow_width_ratio | 0.5 (50%)` を追加。
+
+### Issue 205: `detect_heading_content_pairs` 中間ゾーンの設計意図不明瞭
+
+**Phase**: 2
+**状態**: OPEN
+**概要**: `HEADING_MAX_HEIGHT_RATIO` (0.4) と `HEADING_SOFT_HEIGHT_RATIO` (0.8) の間（40-80%）のヘッディングは外側の if を通過して `is_heading_like` チェックに進むが、この中間ゾーンが意図的な設計判断なのかが不明瞭。コメントに「40%未満は無条件で通過、40-80%は is_heading_like で追加検証、80%以上は除外」という三段階ロジックの設計意図を明記すべき。
+**発見箇所**: `figma_utils.py` L786-789
+**修正案**: コメントを追加して設計意図を明文化。
+
+### Issue 206: `_split_by_spatial_gap` 非リーフグループ最小サイズ閾値
+
+**Phase**: 2
+**状態**: OPEN
+**概要**: `_split_by_spatial_gap` 内の `if not all_leaf and len(nodes) < 6` の `6` が figma-prepare.md 閾値テーブルに未登録。Issue 88 で追加されたが文書化漏れ。
+**発見箇所**: `detect-grouping-candidates.sh` L184
+**修正案**: figma-prepare.md に `non_leaf_split_min_size | 6 elements` を追加。
+
 ---
 
 ## 改善方針
 
 ### 品質基準
 
-- フィクスチャテスト: 全件パス（回帰防止）— 367件(unit + integration)
+- フィクスチャテスト: 全件パス（回帰防止）— 401件(unit) + 39件(integration) = 440件 (Issue 194 Phase 3: +7件unit find_node_by_id, +10件unit compare_grouping_results, +2件integration Stage C)
 - キャリブレーション: Grade Accuracy 100%、全ケーススコア範囲内 — 8件
 - 実データ: Phase 3 フォールバック率 0%（realistic fixture）
 - ヘッダー/フッター検出: 100%（realistic fixture + INSTANCE/COMPONENT型対応）
 - enriched metadata: IMAGE fill 判定 100%、layoutMode exact 100%
 - characters フィールド活用: enriched TEXT のリネーム精度向上
-- figma_utils.py ユニットテスト: 全 public 関数カバー（35+関数、generate_enriched_table含む）
+- figma_utils.py ユニットテスト: 全 public 関数カバー（33 public + 6 private = 39関数、generate_enriched_table含む）
 - 実データ検証: ABOUT ページ (38:718) で Phase 1-3 実行済み、理想構造 (38:475) と比較検証済み
 - Stage B セクショニング精度: 10/10 セクション完全一致（Jaccard 1.0）、40/40 ノード ID カバレッジ 100%
 
@@ -502,7 +623,63 @@ Phase A (計測 + フィルタリング)        Phase B (Claude推論)
 - トップ_0510修正 (2:8315) モデルケースでのキャリブレーション（超フラット構造、Issue 188）
 - 実プロジェクトでの `/figma-prepare --enrich` 実運用テスト（トークン消費計測含む）
 - 複数ページ横断での共通ヘッダー/フッター自動検出
-- 残 OPEN Issue: 194 (Phase B ネストレベル拡張)
+- 残 OPEN Issues: 194 (Phase B ネストレベル拡張), 201-206 (マジックナンバー/ドキュメント不整合)
+
+### Issue 207: run-tests.sh シェル変数インジェクション（$SEMANTIC_FIXTURE）
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `run-tests.sh` の Phase 2 semantic fixture 生成部で、`$SEMANTIC_FIXTURE` がダブルクォート内の `python3 -c "..."` 文字列に直接埋め込まれていた。パスにスペースや特殊文字を含む場合にシェルインジェクションの危険性があった。
+**発見箇所**: `run-tests.sh` L162
+**修正**: `sys.argv[1]` パターンに変更し、`"$SEMANTIC_FIXTURE"` をコマンド引数として渡す方式に修正。Issue 64/95/112/130/139 と同じパターン。
+
+### Issue 208: `_compute_zone_bboxes` テストカバレッジ欠如
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `_compute_zone_bboxes` は `detect-grouping-candidates.sh` のゾーンマージロジックの基盤関数だが、直接のユニットテストが存在しなかった。間接的にのみ検証されていた。
+**発見箇所**: `test_figma_utils.py` — TestComputeZoneBboxes クラス不在
+**修正**: `TestComputeZoneBboxes` クラスを追加（5テスト: single_group, multiple_groups, empty_groups, nonexistent_ids, single_member_group）。
+
+### Issue 209: `detect_horizontal_bar` エッジケーステスト不足
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `detect_horizontal_bar` の既存テストは基本的な検出と定数チェックのみで、空配列入力、ブログバー命名、汎用バー命名、垂直配置非検出などのエッジケースが欠如していた。
+**発見箇所**: `test_figma_utils.py` — TestDetectHorizontalBar クラス
+**修正**: 6テスト追加（test_empty_children, test_blog_bar_naming, test_generic_bar_naming, test_variance_ratio_constant, test_vertically_stacked_not_detected, test_below_min_elements）。
+
+### Issue 210: `detect_bg_content_layers` ELLIPSE装飾テスト欠如
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `detect_bg_content_layers` のテストでELLIPSE型ノードの装飾/コンテンツ判定の境界値テストが存在しなかった。小型ELLIPSEが装飾として分類されるか、大型ELLIPSEがコンテンツとして分類されるかの検証が不足。
+**発見箇所**: `test_figma_utils.py` — TestDetectBgContentLayers クラス
+**修正**: `TestDetectBgContentLayersEllipseDecoration` クラスを追加（2テスト: small_ellipse_as_decoration, large_ellipse_as_content）。
+
+### Issue 211: `detect_repeating_tuple` 単一distinct type スキップのテスト欠如
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `detect_repeating_tuple` は distinct type 数が2未満のタプルをスキップするロジックがあるが、このエッジケースのテストが存在しなかった。
+**発見箇所**: `test_figma_utils.py` — TestDetectRepeatingTuple クラス
+**修正**: `TestDetectRepeatingTupleSingleDistinct` クラスを追加（2テスト: two_type_tuple_detected, same_type_pair_not_tuple）。
+
+### Issue 212: qa-check.sh に Issue 180-193 検出器カバレッジチェック欠如
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: qa-check.sh の5つのチェックカテゴリでは、Issue 180-193 で追加された9つの検出器関数がテストファイルに存在するかの検証が行われていなかった。検出器を追加してもテスト未作成のまま見過ごされるリスクがあった。
+**発見箇所**: `qa-check.sh` — check カテゴリ5つのみ
+**修正**: チェックカテゴリ6「detector-coverage」を追加。9検出器（detect_bg_content_layers, detect_table_rows, detect_repeating_tuple, detect_en_jp_label_pairs, is_decoration_pattern, decoration_dominant_shape, detect_highlight_text, detect_horizontal_bar, generate_enriched_table）の test_figma_utils.py 内存在確認 + figma_utils.py 内定義確認。
+
+### Issue 213: `generate_enriched_table` overflow_y エッジケーステスト欠如
+
+**Phase**: テスト基盤
+**状態**: FIXED
+**概要**: `generate_enriched_table` の `overflow-y` フラグ（ノードがページ高さを超過する場合）のテストが存在しなかった。page_height=0 の場合の挙動も未検証。
+**発見箇所**: `test_figma_utils.py` — TestGenerateEnrichedTable クラス
+**修正**: `TestGenerateEnrichedTableOverflowY` クラスを追加（3テスト: overflow_y_with_page_height, no_overflow_y_within_page, zero_page_height_no_overflow_y）。
 
 ## 一覧
 
@@ -690,3 +867,21 @@ Phase A (計測 + フィルタリング)        Phase B (Claude推論)
 | 193 | 3 | **FIXED** | CTA ボタン — Priority 3.15 CTA 検出追加 |
 | 194 | 2(arch) | **OPEN** | Phase B Claude推論のネストレベル拡張 — Stage A 検出器の段階的置換 |
 | 195 | 1 | **FIXED** | `analyze-structure.sh` インラインPython内の未エスケープダブルクオート — コメント内の `"..."` が bash の文字列終端と解釈され SyntaxError |
+| 196 | 2,3 | **FIXED** | マジックナンバー定数化漏れ（horizontal_bar variance_ratio=3, highlight x_overlap=0.5）— `HORIZONTAL_BAR_VARIANCE_RATIO`, `HIGHLIGHT_X_OVERLAP_RATIO` 追加 + figma-prepare.md 閾値テーブル更新 |
+| 197 | 2 | **FIXED** | `detect_heading_content_pairs` マジックナンバー 0.8 — `HEADING_SOFT_HEIGHT_RATIO` 定数化 + figma-prepare.md 追加 |
+| 198 | 2 | **FIXED** | `walk_and_detect` で `get_bbox(node)` 二重呼び出し — `page_bb_pre` 再利用に修正 |
+| 199 | 全体 | **FIXED** | `_compute_child_types` TYPE_ABBR に IMAGE 欠落 — 'IMG' 追加。IMAGE ノードが 'OTH' に誤分類されていた |
+| 200 | 3 | **FIXED** | `generate-rename-map.sh` マジックナンバー `w < 1400` — `OVERFLOW_BG_MIN_WIDTH` 定数参照に修正 |
+| 201 | 2(B) | **OPEN** | `prepare-sectioning-context.sh` ヘッダー/フッター検出に複数マジックナンバー — `page_h * 0.05`, `page_h * 0.9`, `page_w * 0.8`, 背景 `bb['h'] >= 100`, ヘッディング `child_h > 200`, 遊離 `bb['h'] <= 20` が Stage B ヒント関数内にハードコード |
+| 202 | 4 | **OPEN** | `infer-autolayout.sh` の `CENTER_ALIGN_VARIANCE=4` / `ALIGN_TOLERANCE=2` が figma-prepare.md 閾値テーブルに未登録 — Issue 148 で定数化済みだがドキュメント未反映 |
+| 203 | 全体 | **OPEN** | `_compute_flags` 内マジックナンバー — `1.05`（overflow判定5%許容）、`1.02`（overflow-y 2%許容）、`0.95`（bg-full判定）、`50`（tiny判定）がハードコード |
+| 204 | 2 | **OPEN** | `detect_bg_content_layers` left-overflow 判定の `parent_bb['w'] * 0.5` が figma-prepare.md 閾値テーブルに未登録 |
+| 205 | 2 | **OPEN** | `detect_heading_content_pairs` ロジックの設計意図不明瞭 — 40-80% 中間ゾーンが意図的か不明。コメントに設計意図を明記すべき |
+| 206 | 2 | **OPEN** | `_split_by_spatial_gap` 非リーフ6要素の閾値がハードコード — `len(nodes) < 6` の `6` が figma-prepare.md 未登録 |
+| 207 | テスト | **FIXED** | run-tests.sh `$SEMANTIC_FIXTURE` シェル変数インジェクション — `sys.argv[1]` パターンに修正 |
+| 208 | テスト | **FIXED** | `_compute_zone_bboxes` 直接ユニットテスト追加（5テスト） |
+| 209 | テスト | **FIXED** | `detect_horizontal_bar` エッジケーステスト追加（6テスト） |
+| 210 | テスト | **FIXED** | `detect_bg_content_layers` ELLIPSE装飾/コンテンツ境界値テスト追加（2テスト） |
+| 211 | テスト | **FIXED** | `detect_repeating_tuple` single distinct type スキップテスト追加（2テスト） |
+| 212 | テスト | **FIXED** | qa-check.sh に detector-coverage チェック（カテゴリ6）追加 |
+| 213 | テスト | **FIXED** | `generate_enriched_table` overflow_y エッジケーステスト追加（3テスト） |

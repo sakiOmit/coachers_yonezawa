@@ -143,7 +143,7 @@ sections:
 
 ### 基本ルール
 1. **全 children を漏れなく1つのセクションに割り当てる**（余りなし、重複なし）
-2. **node_ids はページ情報の id をそのまま使用**（新規 ID を作らない）
+2. **node_ids はテーブルの ID 列をそのまま正確にコピーすること**（⚠️ 1文字でも異なるとエラーになります。ID を改変・推測・補完しないでください。出力前に全 node_ids がテーブルの ID 列に存在するか必ず照合してください）
 3. **セクション名は kebab-case**:
    - ヘッダー: `l-header`
    - フッター: `l-footer`
@@ -172,6 +172,8 @@ sections:
 
 ## Children Table Format
 
+### Standard format (default)
+
 `{children_table}` は以下の Markdown テーブル形式で展開する:
 
 ```
@@ -180,6 +182,26 @@ sections:
 | 1 | 1:106 | Group 46165 | FRAME | 10 | 1420x60 | 4 | Yes | - |
 | 2 | 1:102 | Frame 46405 | FRAME | 162 | 808x186 | 2 | Yes | job description, 募集要項 |
 ```
+
+### Enriched format (--enriched-table)
+
+`--enriched-table` フラグ使用時は、`generate_enriched_table()` (Issue 194) で生成されるリッチ形式を使用:
+
+```
+| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |
+|---|-----|------|------|---|---|-------|-------|------------|-------|------|
+| 1 | 1:106 | Group 46165 | FRAME | 0 | 10 | 1420x60 | N | 2TEX+1VEC | - | メニュー |
+| 2 | 1:101 | Rectangle 4 | RECTANGLE | 0 | 0 | 1440x400 | Y | - | bg-full | - |
+```
+
+追加カラムの意味:
+- **X**: X座標（横並び・グリッド検出に有用）
+- **Leaf?**: Y=リーフ（子なし）、N=コンテナ（背景RECTとコンテナFRAMEの区別）
+- **ChildTypes**: `2REC+1TEX` 形式の子要素構成（構造パターン検出用）
+- **Flags**: `bg-full`, `overflow`, `tiny`, `decoration` 等の機械的フラグ
+- **Text**: テキストプレビュー（セマンティック推論用）
+
+`{children_table}` を enriched 形式に置き換える場合は、`sectioning-context.json` の `enriched_children_table` フィールドをそのまま使用する。
 
 ## Output YAML Schema
 

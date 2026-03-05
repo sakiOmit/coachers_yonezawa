@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP, detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE, CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD, SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, is_decoration_pattern, decoration_dominant_shape
+from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP, detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE, CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD, SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, OVERFLOW_BG_MIN_WIDTH, is_decoration_pattern, decoration_dominant_shape
 
 # --- Rename Thresholds (Issue 124) ---
 DIVIDER_MAX_HEIGHT = 5         # px — thin horizontal rectangle → divider
@@ -279,8 +279,8 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             return ''
 
         # Card-like: image/rectangle (direct or wrapped) + text (with or without button)
-        # Exclude section-root-width frames (w >= 1400) from card detection — those are sections, not cards
-        if has_image and has_text and w < 1400:
+        # Exclude section-root-width frames (w >= OVERFLOW_BG_MIN_WIDTH) from card detection — those are sections, not cards
+        if has_image and has_text and w < OVERFLOW_BG_MIN_WIDTH:
             slug = _resolve_slug(text_contents)
             if not slug:
                 slug = str(sibling_index)

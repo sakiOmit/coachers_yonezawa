@@ -80,12 +80,13 @@ groups:
 ## ルール
 
 1. **全要素を漏れなく1つのグループに割り当てる**（余りなし、重複なし）
-2. **node_ids はテーブルの ID をそのまま使用**
+2. **node_ids はテーブルの ID 列をそのまま正確にコピーすること**（⚠️ 1文字でも異なるとエラーになります。テーブルの ID を改変・推測・補完しないでください）
 3. **name は kebab-case** (例: blog-card-1, recruit-heading, bg-layer)
 4. **pattern は検出したパターン種別**: card, table, bg-content, heading-pair, list, single
 5. **single はどのパターンにも属さない単独要素**
 6. **Flags を積極的に活用**: bg-full → 背景、tiny → 装飾、off-canvas → 除外候補
 7. **ChildTypes の類似性でカード/リスト検出**: 同じ ChildTypes が3回以上 → カード/リストパターン
+8. **ID の正確性を最終確認**: 出力前に、全 node_ids がテーブルの ID 列に存在するか照合すること
 ```
 
 ---

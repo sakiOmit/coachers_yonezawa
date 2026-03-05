@@ -4,20 +4,37 @@
 # Extracts top-level children summary from metadata JSON for Claude sectioning.
 # Output: JSON with page info, sorted children (Y ascending), and heuristic hints.
 #
-# Usage: bash prepare-sectioning-context.sh <metadata.json> [--output file.json]
+# Usage: bash prepare-sectioning-context.sh <metadata.json> [--output file.json] [--enriched-table]
 # Exit: 0=success, 1=error
 
 set -euo pipefail
 
 if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
-  echo '{"error": "Usage: prepare-sectioning-context.sh <metadata.json> [--output file.json]"}' >&2
+  echo '{"error": "Usage: prepare-sectioning-context.sh <metadata.json> [--output file.json] [--enriched-table]"}' >&2
   exit 1
 fi
 
+INPUT_FILE="$1"
 OUTPUT_FILE=""
-if [[ "${2:-}" == "--output" ]] && [[ -n "${3:-}" ]]; then
-  OUTPUT_FILE="$3"
-fi
+ENRICHED_TABLE=""
+
+# Parse optional flags (order-independent)
+shift  # consume the positional metadata.json argument
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --output)
+      OUTPUT_FILE="${2:-}"
+      shift 2
+      ;;
+    --enriched-table)
+      ENRICHED_TABLE="1"
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -27,7 +44,8 @@ from collections import Counter
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE,
-    get_text_children_content, structure_hash, structure_similarity, is_heading_like)
+    get_text_children_content, structure_hash, structure_similarity, is_heading_like,
+    generate_enriched_table)
 
 def count_children(node):
     return len(node.get('children', []))
@@ -246,6 +264,16 @@ try:
         'heuristic_hints': hints,
     }
 
+    # Issue 194: Generate enriched table when --enriched-table flag is set
+    enriched_flag = sys.argv[4] if len(sys.argv) > 4 else ''
+    if enriched_flag:
+        enriched = generate_enriched_table(
+            sorted_children,
+            page_width=page_bbox['w'],
+            page_height=page_bbox['h'],
+        )
+        result['enriched_children_table'] = enriched
+
     output_file = sys.argv[3] if len(sys.argv) > 3 else ''
     if output_file:
         with open(output_file, 'w') as f:
@@ -254,6 +282,7 @@ try:
             'status': 'ok',
             'output': output_file,
             'total_children': len(sorted_children),
+            'enriched_table': bool(enriched_flag),
         }, indent=2))
     else:
         print(json.dumps(result, indent=2, ensure_ascii=False))
@@ -261,4 +290,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$1" "$OUTPUT_FILE"
+" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE" "$ENRICHED_TABLE"

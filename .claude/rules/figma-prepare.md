@@ -129,6 +129,7 @@ score = max(0, score)
 | decoration_shape_ratio | 0.6 (60%) | 装飾パターン内のシェイプ葉ノード比率の下限（Issue 189） |
 | decoration_min_shapes | 3 | 装飾パターンの最小シェイプ葉ノード数（Issue 189） |
 | highlight_overlap_ratio | 0.8 (80%) | ハイライト検出のY重なり率下限（Issue 190） |
+| highlight_x_overlap_ratio | 0.5 (50%) | ハイライト検出のX重なり率下限（Issue 196） |
 | highlight_text_max_len | 30 chars | ハイライトテキストの最大文字数（Issue 190） |
 | highlight_height_ratio_min | 0.5 | ハイライトRECT高さ/TEXT高さの下限比率（Issue 190） |
 | highlight_height_ratio_max | 2.0 | ハイライトRECT高さ/TEXT高さの上限比率（Issue 190） |
@@ -141,6 +142,8 @@ score = max(0, score)
 | side_panel_height_ratio | 3.0 | サイドパネル検出：高さ/幅の最小比率（Issue 192） |
 | horizontal_bar_max_height | 100px | 水平バー検出：Y帯域の最大高さ（Issue 184） |
 | horizontal_bar_min_elements | 4 | 水平バー検出：帯域内の最小要素数（Issue 184） |
+| horizontal_bar_variance_ratio | 3 | 水平バー検出：X分散がY分散の何倍以上で水平判定（Issue 196） |
+| heading_soft_height_ratio | 0.8 (80%) | ヘッディング検出：40-80%の中間ゾーンの上限比率（Issue 197） |
 
 ## リネームロジック（優先順）
 

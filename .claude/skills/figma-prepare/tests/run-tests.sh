@@ -119,8 +119,9 @@ rm -f "$YAML_OUT"
 # Issue 174: Semantic group/container naming test
 bold "  --- Issue 174: Semantic group/container naming ---"
 SEMANTIC_FIXTURE="/tmp/figma-prepare-test-semantic-$$.json"
+# Issue 196: Pass path via sys.argv to avoid shell variable injection in Python string literal
 python3 -c "
-import json
+import json, sys
 fixture = {
     'id': '0:1', 'name': 'Test Page', 'type': 'FRAME',
     'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 1440, 'height': 3000},
@@ -159,9 +160,9 @@ fixture = {
          ]},
     ],
 }
-with open('$SEMANTIC_FIXTURE', 'w') as f:
+with open(sys.argv[1], 'w') as f:
     json.dump(fixture, f)
-"
+" "$SEMANTIC_FIXTURE"
 
 SEMANTIC_RESULT=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$SEMANTIC_FIXTURE" 2>&1) || {
   red "  FATAL: generate-rename-map.sh crashed on semantic fixture"
@@ -612,6 +613,103 @@ for f in exact:
   fi
 else
   skip_test "Enrichment fixtures not found"
+fi
+
+echo ""
+
+# ================================================================
+# Stage C: generate-nested-grouping-context.sh (Issue 194 Phase 3)
+# ================================================================
+bold "=== Stage C: generate-nested-grouping-context.sh ==="
+
+NESTED_SCRIPT="$SKILLS_DIR/scripts/generate-nested-grouping-context.sh"
+if [[ -f "$NESTED_SCRIPT" ]] && [[ -f "$REALISTIC_FIXTURE" ]]; then
+  # Create a minimal sectioning-plan for testing
+  PLAN_TMP="/tmp/figma-prepare-test-plan-$$.yaml"
+  python3 -c "
+import json, sys
+# Generate a minimal sectioning plan from fixture-realistic.json
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+children = data.get('children', [])
+# Use first 2 children as separate sections
+sections = []
+for c in children[:2]:
+    sections.append({'name': c.get('name', 'unknown')[:30], 'node_ids': [c['id']]})
+# Write as JSON (script supports JSON fallback when PyYAML unavailable)
+plan = {'sections': sections}
+with open(sys.argv[2], 'w') as f:
+    json.dump(plan, f, ensure_ascii=False)
+" "$REALISTIC_FIXTURE" "$PLAN_TMP"
+
+  if [[ -f "$PLAN_TMP" ]]; then
+    NESTED_OUT="/tmp/figma-prepare-test-nested-$$.json"
+    NESTED_RESULT=$(bash "$NESTED_SCRIPT" "$REALISTIC_FIXTURE" "$PLAN_TMP" --output "$NESTED_OUT" 2>&1) || {
+      red "  FATAL: generate-nested-grouping-context.sh crashed"
+      echo "$NESTED_RESULT"
+      ((FAIL++)) || true
+    }
+
+    if [[ -f "$NESTED_OUT" ]]; then
+      python3 -c "
+import json, sys
+with open(sys.argv[1]) as f:
+    d = json.load(f)
+
+# Must have sections array
+assert 'sections' in d, 'Missing sections key'
+assert isinstance(d['sections'], list), 'sections is not a list'
+
+# Each section must have enriched_children_table and prompt
+for s in d['sections']:
+    assert 'enriched_children_table' in s, f'Missing enriched_children_table in {s.get(\"section_name\",\"?\")}'
+    assert 'prompt' in s, f'Missing prompt in {s.get(\"section_name\",\"?\")}'
+    assert 'section_name' in s
+    assert 'total_children' in s
+    assert s['total_children'] > 0, f'No children in {s[\"section_name\"]}'
+
+print(f'{len(d[\"sections\"])} sections with enriched tables')
+" "$NESTED_OUT" && { green "  PASS: Stage C output structure valid"; ((PASS++)) || true; } \
+             || { red "  FAIL: Stage C output structure"; ((FAIL++)) || true; }
+
+      # Verify total_sections matches
+      echo "$NESTED_RESULT" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d.get('status') == 'ok', f'Status not ok: {d}'
+assert d.get('total_sections', 0) > 0, 'No sections generated'
+" 2>/dev/null && { green "  PASS: Stage C status=ok + sections > 0"; ((PASS++)) || true; } \
+               || { red "  FAIL: Stage C status check"; ((FAIL++)) || true; }
+
+      rm -f "$NESTED_OUT"
+    else
+      red "  FAIL: Stage C output file not created"
+      ((FAIL++)) || true
+    fi
+
+    rm -f "$PLAN_TMP"
+  else
+    red "  FAIL: Could not create sectioning plan fixture"
+    ((FAIL++)) || true
+  fi
+else
+  if [[ ! -f "$NESTED_SCRIPT" ]]; then
+    skip_test "generate-nested-grouping-context.sh not yet created"
+  else
+    skip_test "Realistic fixture not found (needed for Stage C test)"
+  fi
+fi
+
+# ================================================================
+# compare-grouping.sh (Issue 194 Phase 3)
+# ================================================================
+bold "=== compare-grouping.sh ==="
+
+COMPARE_SCRIPT="$SKILLS_DIR/scripts/compare-grouping.sh"
+if [[ -f "$COMPARE_SCRIPT" ]]; then
+  skip_test "compare-grouping.sh integration tests (placeholder — tests in test_figma_utils.py)"
+else
+  skip_test "compare-grouping.sh not yet created"
 fi
 
 echo ""
