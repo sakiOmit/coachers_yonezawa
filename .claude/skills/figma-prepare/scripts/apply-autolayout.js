@@ -120,6 +120,8 @@
       }
 
       // Counter axis alignment
+      // Issue 104: infer_layout now outputs 'MAX' directly (Figma API terminology)
+      // 'END' kept for backward compatibility with any existing plans
       const counterAlign = entry.counter_axis_align;
       if (counterAlign === "CENTER") {
         node.counterAxisAlignItems = "CENTER";

@@ -208,12 +208,22 @@ check_dead_code() {
   local found=0
 
   # figma_utils.py の公開関数が少なくとも1つのスクリプトで使われているか
+  # Issue 102: Also check internal usage within figma_utils.py itself
+  # (e.g. alignment_bonus is used by compute_grouping_score, not directly imported)
   while IFS= read -r func; do
     if [[ -n "$func" ]]; then
-      if ! grep -rq "$func" "$SCRIPTS_DIR"/*.sh 2>/dev/null; then
-        warn "dead-code: figma_utils.py exports '$func' but no script imports it"
-        found=1
+      # Check 1: imported in any .sh script
+      if grep -rq "$func" "$SCRIPTS_DIR"/*.sh 2>/dev/null; then
+        continue
       fi
+      # Check 2: called internally within figma_utils.py (excluding its own def line)
+      local internal_uses
+      internal_uses=$(grep -c "$func" "$LIB_DIR/figma_utils.py" 2>/dev/null || echo 0)
+      if [[ "$internal_uses" -gt 1 ]]; then
+        continue  # used internally (1=def line, >1=also called somewhere)
+      fi
+      warn "dead-code: figma_utils.py exports '$func' but no script imports it"
+      found=1
     fi
   done < <(grep -oP "^def (\w+)" "$LIB_DIR/figma_utils.py" 2>/dev/null | sed 's/^def //' || true)
 

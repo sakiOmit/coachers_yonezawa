@@ -190,7 +190,7 @@ try:
         },
         'score_breakdown': {
             'unnamed_penalty': round(min(30, unnamed_rate * 0.5), 1),
-            'flat_penalty': min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5),
+            'flat_penalty': round(min(30, stats['flat_sections'] * 5 + stats['flat_excess'] * 0.5), 1),  # Issue 105: consistent rounding
             'ungrouped_penalty': min(10, ungrouped * 1),
             'nesting_penalty': min(15, stats['deep_nesting'] * 3),
             'autolayout_penalty': 0,  # unmeasurable via get_metadata — excluded from score

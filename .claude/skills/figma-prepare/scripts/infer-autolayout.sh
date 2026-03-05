@@ -119,13 +119,15 @@ def infer_layout(frame):
         primary_align = 'SPACE_BETWEEN'
 
     # Counter axis alignment
+    # Issue 104: Use 'MAX' instead of 'END' to match Figma Plugin API terminology
+    # Figma's counterAxisAlignItems only accepts: MIN, CENTER, MAX
     if direction in ('HORIZONTAL', 'WRAP'):
         centers = [bb['y'] + bb['h'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
         if center_var < 4:
             counter_align = 'CENTER'
         elif all(abs((bb['y'] + bb['h']) - (child_bboxes[0]['y'] + child_bboxes[0]['h'])) < 2 for bb in child_bboxes):
-            counter_align = 'END'
+            counter_align = 'MAX'
         elif all(abs(bb['y'] - child_bboxes[0]['y']) < 2 for bb in child_bboxes):
             counter_align = 'MIN'
         else:
@@ -136,7 +138,7 @@ def infer_layout(frame):
         if center_var < 4:
             counter_align = 'CENTER'
         elif all(abs((bb['x'] + bb['w']) - (child_bboxes[0]['x'] + child_bboxes[0]['w'])) < 2 for bb in child_bboxes):
-            counter_align = 'END'
+            counter_align = 'MAX'
         elif all(abs(bb['x'] - child_bboxes[0]['x']) < 2 for bb in child_bboxes):
             counter_align = 'MIN'
         else:
