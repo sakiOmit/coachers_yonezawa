@@ -206,6 +206,7 @@ def walk_and_infer(node, results=None):
     if node_type in ('FRAME', 'INSTANCE', 'COMPONENT') and len(children) >= 2:
         # Issue 18: Use enriched layoutMode if available
         layout = layout_from_enrichment(node)
+        source = None  # Issue 95: Initialize before conditional assignment
         # Issue 70, 75: Set source based on actual data origin
         # 'exact' = from Figma layoutMode (base or enriched metadata)
         # 'inferred' = calculated from child positions

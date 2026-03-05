@@ -277,7 +277,6 @@ else
 
   if $JSON_MODE; then
     # Issue 64: Use temp files to avoid shell injection in Python string literals
-    local tmp_issues tmp_warnings
     tmp_issues=$(mktemp)
     tmp_warnings=$(mktemp)
     printf '%s\n' "${ISSUES[@]}" > "$tmp_issues"

@@ -11,6 +11,8 @@ Issue 53: is_section_root() extracted from analyze-structure.sh.
 
 import json
 import re
+import statistics
+from collections import Counter
 
 # --- Constants ---
 
@@ -239,7 +241,6 @@ def structure_similarity(hash_a, hash_b):
         return 1.0 if hash_a == hash_b else 0.0
 
     # Multiset Jaccard
-    from collections import Counter
     ca = Counter(a_children)
     cb = Counter(b_children)
     all_keys = set(ca) | set(cb)
@@ -248,13 +249,12 @@ def structure_similarity(hash_a, hash_b):
     return intersection / union if union > 0 else 0.0
 
 
-def detect_regular_spacing(children_bboxes, axis='auto', tolerance=4):
+def detect_regular_spacing(children_bboxes, axis='auto'):
     """Detect if children are regularly spaced along an axis.
 
     Args:
         children_bboxes: List of bbox dicts with x, y, w, h.
         axis: 'x', 'y', or 'auto' (auto-detect from variance).
-        tolerance: Not used directly; CV threshold is 0.25.
 
     Returns:
         bool: True if coefficient of variation of gaps < 0.25.
@@ -283,7 +283,6 @@ def detect_regular_spacing(children_bboxes, axis='auto', tolerance=4):
     if len(gaps) < 2:
         return False
 
-    import statistics
     mean_gap = statistics.mean(gaps)
     if mean_gap <= 0:
         return False
@@ -358,7 +357,6 @@ def compute_gap_consistency(gaps):
     if len(gaps) < 2:
         return 0.0 if len(gaps) == 1 else 1.0
 
-    import statistics
     mean_val = statistics.mean(gaps)
     if mean_val <= 0:
         return 1.0

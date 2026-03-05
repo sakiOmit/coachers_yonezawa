@@ -141,13 +141,8 @@
       parent.insertChild(insertIndex, wrapper);
 
       // 7. Move children into wrapper (preserve original order)
-      // Sort by original index in parent to maintain z-order
-      const childOrder = childNodes
-        .map((n) => ({ node: n, origX: n.x, origY: n.y }))
-        .sort((a, b) => {
-          // Maintain document order (already resolved by parent.children order)
-          return 0;
-        });
+      // childNodes are already in document order from parent.children
+      const childOrder = childNodes.map((n) => ({ node: n, origX: n.x, origY: n.y }));
 
       for (const { node, origX, origY } of childOrder) {
         // Convert position to wrapper-relative

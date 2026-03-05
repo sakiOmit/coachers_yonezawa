@@ -10,6 +10,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
+export SCRIPT_DIR SKILLS_DIR
 FIXTURE="${1:-$SCRIPT_DIR/fixture-metadata.json}"
 IS_FIXTURE=false
 [[ "$FIXTURE" == "$SCRIPT_DIR/fixture-metadata.json" ]] && IS_FIXTURE=true
@@ -968,7 +969,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'generate-rename-map.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'generate-rename-map.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     if result.returncode != 0:
         print(f'CRASH: {result.stderr}')
@@ -1016,7 +1017,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'prepare-sectioning-context.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'prepare-sectioning-context.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     if result.returncode != 0:
         print(f'CRASH: {result.stderr}')
@@ -1075,7 +1076,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'generate-rename-map.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'generate-rename-map.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     if result.returncode != 0:
         print(f'CRASH: {result.stderr}')
@@ -1139,7 +1140,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
 
 yaml_path = tmp_path + '.yaml'
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'detect-grouping-candidates.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'detect-grouping-candidates.sh')
     result = subprocess.run(['bash', script, tmp_path, '--output', yaml_path], capture_output=True, text=True)
     if result.returncode != 0:
         print(f'CRASH: {result.stderr}')
@@ -1162,7 +1163,7 @@ echo ""
 bold "=== Unit: figma_utils.py — yaml_str ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import yaml_str
 
 # Basic string
@@ -1199,7 +1200,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — get_bbox ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import get_bbox
 
 # Normal node
@@ -1222,7 +1223,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — get_root_node ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import get_root_node
 
 # With 'document' key
@@ -1248,7 +1249,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — get_text_children_content ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import get_text_children_content
 
 children = [
@@ -1288,7 +1289,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — to_kebab edge cases ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import to_kebab
 
 # Empty / whitespace
@@ -1321,7 +1322,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — is_unnamed (Issue 55) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import is_unnamed
 
 # Unnamed patterns (auto-generated)
@@ -1353,7 +1354,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — resolve_absolute_coords (Issue 56) ==="
 python3 -c "
 import sys, os, copy
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import resolve_absolute_coords
 
 # Test 1: Simple parent-child offset accumulation
@@ -1418,7 +1419,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — snap (Issue 52) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import snap
 
 # Exact multiples of 4
@@ -1460,7 +1461,7 @@ print('OK')
 bold "=== Unit: figma_utils.py — is_section_root (Issue 53) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import is_section_root
 
 # Section root: FRAME with width ~1440
@@ -1534,7 +1535,7 @@ out_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
 out_file.close()
 
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'enrich-metadata.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'enrich-metadata.sh')
     result = subprocess.run(['bash', script, meta_file.name, enrich_file.name, '--output', out_file.name],
                            capture_output=True, text=True)
     if result.returncode != 0:
@@ -1571,7 +1572,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SCRIPT_DIR}', '..', 'scripts', 'prepare-sectioning-context.sh')
+    script = os.path.join(os.environ['SCRIPT_DIR'], '..', 'scripts', 'prepare-sectioning-context.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     if result.returncode != 0:
         print(f'CRASH: {result.stderr}')
@@ -1591,7 +1592,7 @@ finally:
 bold "=== Unit: compute_grouping_score (Area 1) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import alignment_bonus, size_similarity_bonus, compute_grouping_score, _raw_distance
 
 # 1. Identical boxes → score = 1.0
@@ -1640,7 +1641,7 @@ print('OK')
 bold "=== Unit: structure_similarity / detect_regular_spacing (Area 2) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import structure_similarity, detect_regular_spacing
 
 # 1. Identical hashes → 1.0
@@ -1738,7 +1739,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SKILLS_DIR}', 'scripts', 'detect-grouping-candidates.sh')
+    script = os.path.join(os.environ['SKILLS_DIR'], 'scripts', 'detect-grouping-candidates.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     assert result.returncode == 0, f'Script failed: {result.stderr}'
     data = json.loads(result.stdout)
@@ -1829,7 +1830,7 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
     tmp_path = f.name
 
 try:
-    script = os.path.join('${SKILLS_DIR}', 'scripts', 'detect-grouping-candidates.sh')
+    script = os.path.join(os.environ['SKILLS_DIR'], 'scripts', 'detect-grouping-candidates.sh')
     result = subprocess.run(['bash', script, tmp_path], capture_output=True, text=True)
     assert result.returncode == 0, f'Script failed: {result.stderr}'
     data = json.loads(result.stdout)
@@ -1945,7 +1946,7 @@ with os.fdopen(tmp_fd, 'w') as f:
 
 try:
     result = subprocess.run(
-        ['bash', '${SKILLS_DIR}/scripts/detect-grouping-candidates.sh', tmp_path],
+        ['bash', os.path.join(os.environ['SKILLS_DIR'], 'scripts', 'detect-grouping-candidates.sh'), tmp_path],
         capture_output=True, text=True, timeout=30
     )
     data = json.loads(result.stdout)
@@ -1980,7 +1981,7 @@ finally:
 bold "=== Unit: infer_direction_two / wrap / space_between (Area 4) ==="
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, os.path.join(os.environ['SKILLS_DIR'], 'lib'))
 from figma_utils import (infer_direction_two_elements, detect_wrap, detect_space_between,
     compute_gap_consistency)
 
