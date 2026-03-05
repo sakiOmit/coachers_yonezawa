@@ -13,6 +13,7 @@ import json
 import re
 import statistics
 from collections import Counter
+from html import unescape
 
 # --- Constants ---
 
@@ -148,6 +149,164 @@ def get_bbox(node):
         'w': bbox.get('width', 0),
         'h': bbox.get('height', 0),
     }
+
+
+def parse_figma_xml(xml_str):
+    """Parse Figma Dev Mode MCP XML metadata to JSON node tree.
+
+    The Figma Dev Mode MCP (get_metadata) returns XML like:
+      <frame id="2:5364" name="LP-PC5" x="-5542" y="348" width="1440" height="10770">
+        <text id="2:5369" name="..." x="421" y="10425" width="101" height="23" />
+        ...
+      </frame>
+
+    This converts to the JSON format expected by analyze-structure.sh:
+      {"type": "FRAME", "id": "2:5364", "name": "LP-PC5",
+       "absoluteBoundingBox": {"x": -5542, "y": 348, "width": 1440, "height": 10770},
+       "children": [...]}
+    """
+    TAG_TYPE_MAP = {
+        'frame': 'FRAME', 'text': 'TEXT', 'rectangle': 'RECTANGLE',
+        'rounded-rectangle': 'RECTANGLE', 'ellipse': 'ELLIPSE',
+        'vector': 'VECTOR', 'line': 'LINE', 'group': 'GROUP',
+        'component': 'COMPONENT', 'instance': 'INSTANCE',
+        'image': 'IMAGE', 'polygon': 'POLYGON', 'star': 'STAR',
+        'section': 'SECTION', 'boolean-operation': 'BOOLEAN_OPERATION',
+        'svg': 'VECTOR',
+    }
+
+    pos = 0
+    length = len(xml_str)
+
+    def skip_ws():
+        nonlocal pos
+        while pos < length and xml_str[pos] in ' \t\n\r':
+            pos += 1
+
+    def parse_tag():
+        nonlocal pos
+        skip_ws()
+        if pos >= length or xml_str[pos] != '<':
+            return None
+        if xml_str[pos:pos + 2] == '</':
+            return None
+
+        pos += 1  # skip <
+        tag_start = pos
+        while pos < length and xml_str[pos] not in ' \t\n\r/>':
+            pos += 1
+        tag_name = xml_str[tag_start:pos]
+
+        node = {'type': TAG_TYPE_MAP.get(tag_name, tag_name.upper())}
+        bbox = {}
+
+        # Parse attributes
+        while pos < length:
+            skip_ws()
+            if pos >= length:
+                break
+            if xml_str[pos] == '/' and pos + 1 < length and xml_str[pos + 1] == '>':
+                pos += 2
+                if bbox:
+                    node['absoluteBoundingBox'] = bbox
+                return node
+            if xml_str[pos] == '>':
+                pos += 1
+                break
+
+            attr_start = pos
+            while pos < length and xml_str[pos] not in '= \t\n\r/>':
+                pos += 1
+            attr_name = xml_str[attr_start:pos]
+
+            skip_ws()
+            if pos < length and xml_str[pos] == '=':
+                pos += 1
+                skip_ws()
+                if pos < length and xml_str[pos] == '"':
+                    pos += 1
+                    val_start = pos
+                    while pos < length and xml_str[pos] != '"':
+                        pos += 1
+                    attr_val = unescape(xml_str[val_start:pos])
+                    pos += 1
+
+                    if attr_name == 'name':
+                        node['name'] = attr_val
+                    elif attr_name == 'id':
+                        node['id'] = attr_val
+                    elif attr_name in ('x', 'y', 'width', 'height'):
+                        try:
+                            bbox[attr_name] = float(attr_val)
+                        except ValueError:
+                            bbox[attr_name] = 0
+                    elif attr_name == 'visible' and attr_val == 'false':
+                        node['visible'] = False
+                    elif attr_name == 'characters':
+                        node['characters'] = attr_val
+
+        if bbox:
+            node['absoluteBoundingBox'] = bbox
+
+        # Parse children
+        children = []
+        while pos < length:
+            skip_ws()
+            if pos >= length:
+                break
+            if xml_str[pos:pos + 2] == '</':
+                end = xml_str.find('>', pos)
+                if end >= 0:
+                    pos = end + 1
+                break
+            if xml_str[pos] == '<':
+                child = parse_tag()
+                if child:
+                    children.append(child)
+            else:
+                pos += 1
+
+        if children:
+            node['children'] = children
+
+        return node
+
+    return parse_tag()
+
+
+def load_metadata(file_path):
+    """Load Figma metadata from file, auto-detecting format.
+
+    Supports:
+    - JSON with 'document'/'node'/'nodes' key (existing format)
+    - MCP response wrapper: [{"type": "text", "text": "<frame ...>"}]
+    - Raw XML string (Figma Dev Mode MCP get_metadata output)
+
+    Returns: dict with 'document' key containing the root node.
+    """
+    with open(file_path, 'r') as f:
+        content = f.read().strip()
+
+    # Try JSON first
+    if content.startswith('{') or content.startswith('['):
+        data = json.loads(content)
+
+        # MCP response wrapper: [{"type": "text", "text": "<frame ...>"}]
+        if isinstance(data, list) and data and isinstance(data[0], dict) and 'text' in data[0]:
+            xml_text = data[0]['text']
+            if xml_text.strip().startswith('<'):
+                root = parse_figma_xml(xml_text)
+                return {'document': root}
+
+        # Already JSON node format
+        return data
+
+    # Raw XML
+    if content.startswith('<'):
+        root = parse_figma_xml(content)
+        return {'document': root}
+
+    raise ValueError(f"Unknown metadata format in {file_path}")
 
 
 def get_root_node(data):

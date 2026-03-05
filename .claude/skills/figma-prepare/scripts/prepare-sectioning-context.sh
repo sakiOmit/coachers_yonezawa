@@ -43,7 +43,7 @@ import json, sys, os
 from collections import Counter
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE,
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_metadata, UNNAMED_RE,
     get_text_children_content, structure_hash, structure_similarity, is_heading_like,
     generate_enriched_table,
     HINT_HEADER_Y_RATIO, HINT_FOOTER_Y_RATIO, HINT_WIDE_ELEMENT_RATIO,
@@ -224,9 +224,7 @@ def detect_heuristic_hints(children, page_bbox):
     }
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        data = json.load(f)
-
+    data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
 

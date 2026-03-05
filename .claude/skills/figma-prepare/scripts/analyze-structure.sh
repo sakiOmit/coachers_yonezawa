@@ -19,7 +19,7 @@ python3 -c "
 import json, re, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, is_section_root, is_off_canvas, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
+from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, load_metadata, UNNAMED_RE, is_section_root, is_off_canvas, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
 
 def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
     \"\"\"Recursively count nodes and collect metrics.
@@ -143,9 +143,7 @@ def detect_grouping_candidates(node):
     return candidates
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        data = json.load(f)
-
+    data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
     # Issue 182: Determine page width for off-canvas detection

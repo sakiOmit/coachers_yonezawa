@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, statistics, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP,
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_metadata, yaml_str, snap, GRID_SNAP,
     ROW_TOLERANCE, infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency,
     CENTER_ALIGN_VARIANCE, ALIGN_TOLERANCE, CONFIDENCE_HIGH_COV, CONFIDENCE_MEDIUM_COV,
     VARIANCE_RATIO)
@@ -242,9 +242,7 @@ def walk_and_infer(node, results=None):
     return results
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        data = json.load(f)
-
+    data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
     results = walk_and_infer(root)

@@ -63,7 +63,7 @@ python3 -c "
 import json, sys, os, re
 sys.setrecursionlimit(3000)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node,
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_metadata,
     find_node_by_id, generate_enriched_table, GRANDCHILD_THRESHOLD)
 
 METADATA_FILE = sys.argv[2]
@@ -88,9 +88,7 @@ if not prompt_section_match:
 prompt_template = prompt_section_match.group(1)
 
 # --- Load metadata ---
-with open(METADATA_FILE, 'r') as f:
-    data = json.load(f)
-
+data = load_metadata(METADATA_FILE)
 root = get_root_node(data)
 resolve_absolute_coords(root)
 page_bbox = get_bbox(root)

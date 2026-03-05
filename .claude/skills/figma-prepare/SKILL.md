@@ -142,15 +142,28 @@ Options:
 
 ## Processing Flow
 
-### Argument Parsing
+### Argument Parsing (CRITICAL — 必ず最初に実行)
+
+**$ARGUMENTS にはユーザーが渡した引数が含まれている。URL は必ず存在する。**
+**「引数がない」「URLが提供されていない」と判断してはならない。$ARGUMENTS を必ずパースせよ。**
 
 ```
-入力: $ARGUMENTS
-パース:
-  - URL: Figma URL から fileKey と nodeId を抽出
-  - --phase: 実行フェーズ上限 (1-4, default: 1)
-  - --section: 対象セクション名 (optional)
-  - --dry-run / --apply: 実行モード (default: dry-run)
+Step 1: $ARGUMENTS から Figma URL を正規表現で抽出する
+  Pattern: https?://[^\s]*(figma\.com|figma\.design)[^\s]*
+  ※ URL が見つからない場合のみユーザーに確認する
+
+Step 2: URL から fileKey と nodeId を抽出する
+  URL format: https://figma.com/design/{fileKey}/{fileName}?node-id={int1}-{int2}
+  fileKey = URL path の 3番目セグメント
+  nodeId = node-id パラメータの "-" を ":" に置換 (例: 2-5364 → 2:5364)
+  ※ &m=dev 等の追加パラメータは無視する
+
+Step 3: フラグを抽出する
+  --phase {n}: 実行フェーズ上限 (1-4, default: 1)
+  --section {name}: 対象セクション名 (optional)
+  --enrich: メタデータ補完 (optional)
+  --dry-run: 計画のみ (Phase 2-4 デフォルト)
+  --apply: 変更を適用 (optional)
 ```
 
 ### Flow Diagram
@@ -184,14 +197,18 @@ Phase 2: グループ化 + セクショニング
 Gate: グルーピング結果をFigmaで確認
         │
         ▼
-Phase 3: セマンティックリネーム
+Phase 3: グルーピング適用 + セマンティックリネーム
         │ → dry-run: rename-map.yaml 出力
         │ → --apply:
         │     3-A. clone-artboard.js → 複製アートボード作成
         │     3-B. ID マッピングテーブル生成
-        │     3-C. リネームマップを複製 ID に変換
-        │     3-D. apply-renames.js → バッチリネーム実行
-        │     3-E. verify-structure.js → 構造 diff 検証
+        │     3-C. ★ Phase 2 グルーピングをクローンに適用（必須）
+        │          sectioning-plan → apply-grouping.js（レベルごと）
+        │          grouping-plan → apply-grouping.js（ネストレベル）
+        │          verify-grouping.js → 構造検証
+        │     3-D. リネームマップを複製 ID に変換
+        │     3-E. apply-renames.js → バッチリネーム実行
+        │     3-F. verify-structure.js → 構造 diff 検証
         │
         ├─ [--phase 3] → 終了
         │
@@ -246,21 +263,34 @@ ls -la .claude/cache/figma/
 ### 1-1. メタデータ取得
 
 ```
-mcp__figma__get_metadata (または figma-dev-mode-mcp-server)
-  fileKey: "{fileKey}"
+mcp__figma-dev-mode-mcp-server__get_metadata
   nodeId: "{nodeId}"
 ```
 
-### 1-2. メタデータ保存
+MCP レスポンスは XML 形式で返る（`<frame id="..." name="..." ...>`）。
+レスポンスが大きい場合、ファイルに自動保存される。
+
+### 1-2. メタデータ保存・変換
+
+MCP レスポンス（XML/JSON いずれか）をそのままファイルに保存する。
+`analyze-structure.sh` が XML/MCP wrapper/JSON を自動検出して変換するため、手動変換は不要。
 
 ```bash
-# 一時ファイルに保存
+# MCP レスポンスをそのまま保存（XML でも JSON でも可）
 Write .claude/cache/figma/prepare-metadata-{nodeId}.json
+```
+
+**手動変換が必要な場合のみ:**
+```bash
+bash .claude/skills/figma-prepare/scripts/convert-metadata.sh \
+  .claude/cache/figma/prepare-metadata-{nodeId}.json \
+  --output .claude/cache/figma/prepare-metadata-{nodeId}.json
 ```
 
 ### 1-3. 品質スコア計算
 
 ```bash
+# XML/MCP wrapper/JSON を自動検出（format-agnostic）
 bash .claude/skills/figma-prepare/scripts/analyze-structure.sh \
   .claude/cache/figma/prepare-metadata-{nodeId}.json
 ```
@@ -711,13 +741,34 @@ nameMatchRate < 0.95 の場合: 警告表示 + 続行確認
 パターン: references/figma-plugin-api.md「Adjacent Artboard」参照
 ```
 
-#### 3-3c. リネームマップの ID 変換
+#### 3-3c. グルーピング適用（Phase 2 結果をクローンに反映 — 必須）
+
+**Phase 2 のグルーピング計画（sectioning-plan.yaml + grouping-plan.yaml）を、クローンしたアートボードに適用する。**
+**このステップを飛ばすと、フラット構造のままリネームだけが行われ、構造化が一切されない。**
+
+```
+手順:
+1. sectioning-plan.yaml と grouping-plan.yaml（または final-grouping-plan.yaml）を読み込む
+2. 2-5b の flatten_sectioning_plan() ロジックで、sectioning-plan をレベル別の grouping-plan に変換
+   ※ node_ids を clone_mapping で変換（元ID → クローンID）
+3. レベルごとにトップダウンで apply-grouping.js を実行:
+   - Level 1: ルート直下（l-header, main-content, l-footer）
+   - Level 2: main-content 内の subsections
+   - Level N: さらにネストがあれば再帰
+4. 各レベル適用後、wrappers[].id を記録して次レベルの parent_id に使用
+5. Stage A / Stage C のネストレベルグルーピングも同様に適用
+6. verify-grouping.js で構造 diff 検証
+```
+
+#### 3-3d. リネームマップの ID 変換
 
 ```
 rename-map.yaml の各 nodeId を mapping テーブルで変換:
   元 ID (例: "1:10") → 複製 ID (例: "23:55")
 
 変換できない ID は警告としてスキップ。
+※ 3-3c でグルーピングにより新しいラッパーFrameが追加されているため、
+  clone_mapping に存在しない新規IDはスキップして問題ない。
 ```
 
 #### 3-3d. バッチリネーム実行

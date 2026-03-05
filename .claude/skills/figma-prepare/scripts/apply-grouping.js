@@ -2,8 +2,8 @@
  * apply-grouping.js
  *
  * Chrome DevTools MCP evaluate_script 用テンプレート。
- * グルーピング計画（JSON）を受け取り、バッチ実行でラッパー Frame を作成し
- * 子要素を移動する。
+ * グルーピング計画（JSON）を受け取り、バッチ実行で GROUP ノードを作成し
+ * 子要素をグループ化する。
  *
  * Usage:
  *   1. Read this file
@@ -12,7 +12,6 @@
  *        {
  *          "node_ids": ["2:55", "2:56", "2:57"],
  *          "suggested_name": "section-hero",
- *          "suggested_wrapper": "section",
  *          "parent_id": "1:4"
  *        },
  *        ...
@@ -34,17 +33,20 @@
  *   }
  *
  * Algorithm per candidate:
- *   1. Validate all node_ids exist
- *   2. Compute bounding box union of all children
- *   3. Create wrapper FRAME at bounding box position
- *   4. Insert wrapper into parent at correct z-order (before first child)
- *   5. Move children into wrapper (preserving order)
- *   6. Set wrapper name from suggested_name
+ *   1. Validate all node_ids exist and share the same parent
+ *   2. Use figma.group() to create a GROUP node (no size constraints)
+ *   3. Set group name from suggested_name
+ *
+ * Why GROUP instead of FRAME:
+ *   - GROUP has no own dimensions — it auto-fits to children bounding box
+ *   - No risk of fixed height clipping content
+ *   - Both GROUP and FRAME map to div/section in code, so no practical difference
+ *   - Simpler: no need for manual bbox calculation, position adjustment, or resize
  *
  * Constraints:
  *   - Max 50 candidates per batch (timeout prevention)
  *   - Errors are per-candidate skip (batch continues)
- *   - Requires Figma Plugin API (figma.getNodeById, node.appendChild, etc.)
+ *   - Requires Figma Plugin API (figma.getNodeById, figma.group, etc.)
  */
 () => {
   const groupingPlan = __GROUPING_PLAN__;
@@ -60,7 +62,6 @@
     try {
       const nodeIds = candidate.node_ids || [];
       const name = candidate.suggested_name || "group";
-      const parentId = candidate.parent_id || "";
 
       if (nodeIds.length < 2) {
         errors.push({ index: idx, error: "need at least 2 node_ids" });
@@ -99,68 +100,19 @@
         continue;
       }
 
-      // 3. Compute bounding box union
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      for (const node of childNodes) {
-        const x = node.absoluteTransform ? node.absoluteTransform[0][2] : node.x;
-        const y = node.absoluteTransform ? node.absoluteTransform[1][2] : node.y;
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x + node.width);
-        maxY = Math.max(maxY, y + node.height);
-      }
-
-      // 4. Find insertion index (z-order: before first child in parent.children)
-      const parentChildren = parent.children;
-      let insertIndex = parentChildren.length;
-      for (let i = 0; i < parentChildren.length; i++) {
-        if (childNodes.some((cn) => cn.id === parentChildren[i].id)) {
-          insertIndex = i;
-          break;
-        }
-      }
-
-      // 5. Create wrapper FRAME
-      const wrapper = figma.createFrame();
-      wrapper.name = name;
-      wrapper.resize(Math.max(1, maxX - minX), Math.max(1, maxY - minY));
-
-      // Position wrapper at the bounding box origin
-      // Use parent-relative coordinates
-      const parentX = parent.absoluteTransform ? parent.absoluteTransform[0][2] : 0;
-      const parentY = parent.absoluteTransform ? parent.absoluteTransform[1][2] : 0;
-      wrapper.x = minX - parentX;
-      wrapper.y = minY - parentY;
-
-      // Remove default fill (white background)
-      wrapper.fills = [];
-
-      // Clip content disabled (don't clip overflowing children)
-      wrapper.clipsContent = false;
-
-      // 6. Insert wrapper into parent at correct z-order
-      parent.insertChild(insertIndex, wrapper);
-
-      // 7. Move children into wrapper (preserve original order)
-      // childNodes are already in document order from parent.children
-      for (const node of childNodes) {
-        // Convert position to wrapper-relative
-        const nodeAbsX = node.absoluteTransform ? node.absoluteTransform[0][2] : node.x;
-        const nodeAbsY = node.absoluteTransform ? node.absoluteTransform[1][2] : node.y;
-        const wrapperAbsX = wrapper.absoluteTransform ? wrapper.absoluteTransform[0][2] : wrapper.x;
-        const wrapperAbsY = wrapper.absoluteTransform ? wrapper.absoluteTransform[1][2] : wrapper.y;
-
-        wrapper.appendChild(node);
-
-        // Adjust position relative to wrapper
-        node.x = nodeAbsX - wrapperAbsX;
-        node.y = nodeAbsY - wrapperAbsY;
-      }
+      // 3. Create GROUP using figma.group()
+      // figma.group() automatically:
+      //   - Creates a GROUP node wrapping the given nodes
+      //   - Preserves children positions (no coordinate conversion needed)
+      //   - Auto-sizes to bounding box of children (no fixed dimensions)
+      //   - Maintains z-order of children within the parent
+      const group = figma.group(childNodes, parent);
+      group.name = name;
 
       wrappers.push({
-        id: wrapper.id,
-        name: wrapper.name,
-        childCount: wrapper.children.length,
+        id: group.id,
+        name: group.name,
+        childCount: group.children.length,
       });
       applied++;
     } catch (e) {

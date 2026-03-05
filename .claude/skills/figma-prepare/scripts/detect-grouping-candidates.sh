@@ -42,7 +42,7 @@ import json, sys, os
 from collections import defaultdict
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
+from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_metadata, UNNAMED_RE, yaml_str,
     compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
     get_text_children_content, to_kebab, ROW_TOLERANCE, SECTION_ROOT_WIDTH,
     detect_consecutive_similar, detect_heading_content_pairs,
@@ -59,7 +59,7 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAM
     HEADER_MAX_ELEMENT_HEIGHT, FOOTER_ZONE_MARGIN,
     HEADER_TEXT_MAX_WIDTH, HEADER_LOGO_MAX_WIDTH, HEADER_LOGO_MAX_HEIGHT, HEADER_NAV_MIN_TEXTS,
     HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO,
-    GRID_SIZE_SIMILARITY)
+    GRID_SIZE_SIMILARITY, FLAT_THRESHOLD)
 
 class UnionFind:
     def __init__(self, n):
@@ -584,6 +584,22 @@ def detect_vertical_zone_groups(root_children, page_bb):
 
     return result
 
+def _is_protected_node(node):
+    \"\"\"Check if a node's internal structure should be protected from regrouping.
+
+    Issue #221: Preserve designer-intentional groupings.
+    Protected types:
+    - GROUP with a meaningful name (designer explicitly grouped these elements)
+    - COMPONENT / INSTANCE (reusable component structure must not be altered)
+    \"\"\"
+    node_type = node.get('type', '')
+    node_name = node.get('name', '')
+    if node_type in ('COMPONENT', 'INSTANCE'):
+        return True
+    if node_type == 'GROUP' and node_name and not UNNAMED_RE.match(node_name):
+        return True
+    return False
+
 def walk_and_detect(node, all_candidates=None, is_root=True):
     \"\"\"Walk tree and detect grouping candidates at each level.\"\"\"
     if all_candidates is None:
@@ -610,6 +626,14 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
         children = [c for c in children if c.get('visible') != False]
 
     if not children:
+        return all_candidates
+
+    # Issue #221: Skip grouping detection for protected nodes (but still recurse deeper)
+    # If this non-root node is a designer-intentional GROUP or COMPONENT/INSTANCE,
+    # don't propose regrouping its children — preserve the original structure.
+    if not is_root and _is_protected_node(node):
+        for child in children:
+            walk_and_detect(child, all_candidates, is_root=False)
         return all_candidates
 
     parent_id = node.get('id', '')
@@ -680,10 +704,24 @@ def walk_and_detect(node, all_candidates=None, is_root=True):
             })
 
     # Detect at this level (all Stage A methods)
-    semantic = detect_semantic_groups(children)
-    patterns = detect_pattern_groups(children)
-    spacing = detect_spacing_groups(children)
-    proximity = detect_proximity_groups(children)
+    # Issue #222: At non-root levels, only run proximity/pattern/semantic if
+    # the parent has many children (flat structure needing organization).
+    # Well-structured nodes with few children don't need aggressive grouping.
+    # Additionally, named non-root FRAMEs with few children are considered
+    # well-structured and skip all general detection methods.
+    if is_root or len(children) >= FLAT_THRESHOLD:
+        semantic = detect_semantic_groups(children)
+        patterns = detect_pattern_groups(children)
+        spacing = detect_spacing_groups(children)
+        proximity = detect_proximity_groups(children)
+    else:
+        # Unnamed non-root with few children: only run semantic detection
+        # (cards/nav/grid are genuinely useful patterns to detect at any level)
+        # Skip proximity and pattern to prevent over-grouping
+        semantic = detect_semantic_groups(children)
+        patterns = []
+        spacing = []
+        proximity = []
 
     for g in semantic + patterns + spacing + proximity:
         g['parent_id'] = parent_id
@@ -799,9 +837,7 @@ def deduplicate_candidates(candidates, root_id=''):
     return [c for i, c in enumerate(candidates) if i not in remove]
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        data = json.load(f)
-
+    data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
     candidates = walk_and_detect(root)

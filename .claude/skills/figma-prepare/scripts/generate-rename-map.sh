@@ -24,7 +24,7 @@ python3 -c "
 import json, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import (resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab,
+from figma_utils import (resolve_absolute_coords, get_root_node, load_metadata, UNNAMED_RE, yaml_str, to_kebab,
     get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP,
     detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE,
     CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD,
@@ -409,9 +409,7 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
     return renames
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        data = json.load(f)
-
+    data = load_metadata(sys.argv[2])
     root = get_root_node(data)
     resolve_absolute_coords(root)
     renames = collect_renames(root)

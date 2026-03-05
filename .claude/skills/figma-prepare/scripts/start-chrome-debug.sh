@@ -1,50 +1,56 @@
 #!/bin/bash
 # start-chrome-debug.sh
 #
-# プロジェクト用ラッパー。
-# 汎用版 chrome-debug.sh が ~/windows-dotfiles にあればそちらを使い、
-# なければ内蔵ロジックで実行する。
+# WSL2 上のローカル Chrome をデバッグモードで起動する。
+# SSH トンネル不要。
 #
 # Usage:
 #   bash .claude/skills/figma-prepare/scripts/start-chrome-debug.sh [figma-url]
 
 set -euo pipefail
 
-GENERIC_SCRIPT="$HOME/windows-dotfiles/scripts/chrome-debug.sh"
-
-if [ -x "${GENERIC_SCRIPT}" ]; then
-  exec bash "${GENERIC_SCRIPT}" "$@"
-fi
-
-# ─── フォールバック: 汎用版がない場合 ───
 PORT=9222
-WIN_USER="${WIN_USER:-utgit}"
-SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_wsl}"
-WIN_IP=$(ip route show default | awk '{print $3}')
 URL="${1:-}"
+CHROME_BIN="${CHROME_BIN:-google-chrome-stable}"
+USER_DATA_DIR="${HOME}/.chrome-debug"
 
-echo "=== Chrome Debug Setup (embedded) ==="
+echo "=== Chrome Debug Setup (local WSL2) ==="
 
-# トンネル
-if ! lsof -i ":${PORT}" &>/dev/null; then
-  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 \
-      -i "${SSH_KEY}" -L "${PORT}:127.0.0.1:${PORT}" \
-      -N "${WIN_USER}@${WIN_IP}" &
-  sleep 2
-fi
-
-# Chrome
-if ! curl -s --max-time 3 "http://localhost:${PORT}/json/version" &>/dev/null; then
-  LAUNCH="\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --remote-debugging-port=${PORT} --user-data-dir=\"C:\\Users\\${WIN_USER}\\.chrome-debug\""
-  [ -n "${URL}" ] && LAUNCH="${LAUNCH} \"${URL}\""
-  cmd.exe /c "start \"\" ${LAUNCH}" 2>/dev/null
-  sleep 5
-fi
-
-# 確認
+# 既に接続可能か確認
 if curl -s --max-time 3 "http://localhost:${PORT}/json/version" &>/dev/null; then
+  echo "Chrome already running on port ${PORT}"
+  curl -s "http://localhost:${PORT}/json/version" | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'  Browser: {d.get(\"Browser\",\"?\")}')" 2>/dev/null || true
   echo "=== Ready ==="
-else
-  echo "ERROR: Cannot connect to Chrome"
-  exit 1
+  exit 0
 fi
+
+# Chrome をヘッドレスではなく通常モードで起動（Figma 操作に必要）
+echo "Starting Chrome on port ${PORT}..."
+CHROME_ARGS=(
+  "--remote-debugging-port=${PORT}"
+  "--user-data-dir=${USER_DATA_DIR}"
+  "--no-first-run"
+  "--no-default-browser-check"
+)
+
+[ -n "${URL}" ] && CHROME_ARGS+=("${URL}")
+
+# バックグラウンドで起動（出力を抑制）
+"${CHROME_BIN}" "${CHROME_ARGS[@]}" &>/dev/null &
+CHROME_PID=$!
+
+# 起動待機（最大 10 秒）
+for i in $(seq 1 10); do
+  if curl -s --max-time 2 "http://localhost:${PORT}/json/version" &>/dev/null; then
+    echo "Chrome started (PID: ${CHROME_PID})"
+    curl -s "http://localhost:${PORT}/json/version" | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'  Browser: {d.get(\"Browser\",\"?\")}')" 2>/dev/null || true
+    echo "=== Ready ==="
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "ERROR: Chrome failed to start within 10 seconds"
+echo "  Tried: ${CHROME_BIN} --remote-debugging-port=${PORT}"
+echo "  Check: Is DISPLAY set? (current: ${DISPLAY:-unset})"
+exit 1
