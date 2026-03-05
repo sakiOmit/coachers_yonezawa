@@ -220,12 +220,17 @@ def walk_and_infer(node, results=None):
             source = 'inferred'
 
         if layout:
+            # Issue 126: INSTANCE/COMPONENT are read-only in Figma Plugin API
+            # Include in output for informational purposes but flag as non-applicable
+            applicable = node_type == 'FRAME'
             results.append({
                 'node_id': node.get('id', ''),
                 'node_name': node.get('name', ''),
+                'node_type': node_type,
                 'child_count': len(children),
                 'layout': layout,
                 'source': source,
+                'applicable': applicable,
             })
 
     for child in children:
@@ -262,6 +267,8 @@ try:
                 f.write(f'    counter_axis_align: {r[\"layout\"][\"counter_axis_align\"]}\\n')
                 f.write(f'    confidence: {r[\"layout\"][\"confidence\"]}\\n')
                 f.write(f'    source: {r[\"source\"]}\\n')  # Issue 74: include source in YAML output
+                if not r.get('applicable', True):
+                    f.write(f'    applicable: false  # {r.get(\"node_type\", \"\")} — read-only in Plugin API\\n')
         print(json.dumps({
             'total': len(results),
             'output': output_file,

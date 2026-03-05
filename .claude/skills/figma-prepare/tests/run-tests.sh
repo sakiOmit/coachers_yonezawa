@@ -357,7 +357,8 @@ P1_UNNAMED=$(echo "$RESULT1" | python3 -c "import json,sys; print(json.load(sys.
 P3_RENAME_TOTAL=$(echo "$RESULT2" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
 
 # Phase 1の未命名数とPhase 3のリネーム数が一致（許容差±5）
-if python3 -c "assert abs($P1_UNNAMED - $P3_RENAME_TOTAL) <= 5" 2>/dev/null; then
+# Issue 130: Use sys.argv to avoid shell variable interpolation in Python code
+if python3 -c "import sys; assert abs(int(sys.argv[1]) - int(sys.argv[2])) <= 5" "$P1_UNNAMED" "$P3_RENAME_TOTAL" 2>/dev/null; then
   green "  PASS: Phase1 unnamed ($P1_UNNAMED) ≈ Phase3 renames ($P3_RENAME_TOTAL)"
   ((PASS++)) || true
 else
@@ -386,7 +387,7 @@ if [[ -f "$DIRTY_FIXTURE" ]]; then
     DIRTY_UNNAMED=$(echo "$DIRTY_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['unnamed_rate_pct'])" 2>/dev/null || echo "0")
 
     # Score should be below 80 (not grade A)
-    if python3 -c "assert float('$DIRTY_SCORE') < 80" 2>/dev/null; then
+    if python3 -c "import sys; assert float(sys.argv[1]) < 80" "$DIRTY_SCORE" 2>/dev/null; then
       green "  PASS: Dirty fixture score < 80 (got: $DIRTY_SCORE, grade: $DIRTY_GRADE)"
       ((PASS++)) || true
     else
@@ -395,7 +396,7 @@ if [[ -f "$DIRTY_FIXTURE" ]]; then
     fi
 
     # Unnamed rate should be significant (>30%)
-    if python3 -c "assert float('$DIRTY_UNNAMED') > 30" 2>/dev/null; then
+    if python3 -c "import sys; assert float(sys.argv[1]) > 30" "$DIRTY_UNNAMED" 2>/dev/null; then
       green "  PASS: Dirty fixture unnamed rate > 30% (got: ${DIRTY_UNNAMED}%)"
       ((PASS++)) || true
     else
@@ -415,7 +416,7 @@ print(f\"score={d['score']} grade={d['grade']} nodes={m['total_nodes']}, unnamed
     DIRTY_RENAME=$(bash "$SKILLS_DIR/scripts/generate-rename-map.sh" "$DIRTY_FIXTURE" 2>&1) || true
     if [[ -n "${DIRTY_RENAME:-}" ]]; then
       DIRTY_RENAME_COUNT=$(echo "$DIRTY_RENAME" | python3 -c "import json,sys; print(json.load(sys.stdin)['total'])" 2>/dev/null || echo "0")
-      if python3 -c "assert int('$DIRTY_RENAME_COUNT') > 10" 2>/dev/null; then
+      if python3 -c "import sys; assert int(sys.argv[1]) > 10" "$DIRTY_RENAME_COUNT" 2>/dev/null; then
         green "  PASS: Dirty fixture rename candidates > 10 (got: $DIRTY_RENAME_COUNT)"
         ((PASS++)) || true
       else
@@ -458,7 +459,7 @@ print(f'  PASS: is_section_root — deep_nesting={deep} < total/2={total//2}')
 
     # 2. Unnamed detection: lowercase 'image' nodes detected
     REAL_UNNAMED=$(echo "$REAL_P1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['unnamed_nodes'])" 2>/dev/null || echo "0")
-    if python3 -c "assert int('$REAL_UNNAMED') >= 5" 2>/dev/null; then
+    if python3 -c "import sys; assert int(sys.argv[1]) >= 5" "$REAL_UNNAMED" 2>/dev/null; then
       green "  PASS: Unnamed detection — $REAL_UNNAMED unnamed nodes detected (>= 5, includes lowercase image)"
       ((PASS++)) || true
     else
@@ -598,7 +599,7 @@ print(f'  PASS: Issue 16 — footer detection → {new_name}')
     if [[ -n "${REAL_P3:-}" ]]; then
       # Pattern group detection (cards should be detected)
       REAL_CANDIDATES=$(echo "$REAL_P3" | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('candidates',[])))" 2>/dev/null || echo "0")
-      if python3 -c "assert int('$REAL_CANDIDATES') >= 1" 2>/dev/null; then
+      if python3 -c "import sys; assert int(sys.argv[1]) >= 1" "$REAL_CANDIDATES" 2>/dev/null; then
         green "  PASS: Grouping — $REAL_CANDIDATES candidates detected (>= 1)"
         ((PASS++)) || true
       else
@@ -608,7 +609,7 @@ print(f'  PASS: Issue 16 — footer detection → {new_name}')
 
       # Dedup check: candidates < 50% of total nodes
       REAL_TOTAL=$(echo "$REAL_P1" | python3 -c "import json,sys; print(json.load(sys.stdin)['metrics']['total_nodes'])" 2>/dev/null || echo "100")
-      if python3 -c "assert int('$REAL_CANDIDATES') < int('$REAL_TOTAL') * 0.5" 2>/dev/null; then
+      if python3 -c "import sys; assert int(sys.argv[1]) < int(sys.argv[2]) * 0.5" "$REAL_CANDIDATES" "$REAL_TOTAL" 2>/dev/null; then
         green "  PASS: Dedup — candidates ($REAL_CANDIDATES) < 50% of nodes ($REAL_TOTAL)"
         ((PASS++)) || true
       else
@@ -840,7 +841,7 @@ if [[ -f "$REALISTIC_FIXTURE" ]] && [[ -f "$ENRICHMENT_FIXTURE" ]]; then
   if [[ -f "$ENRICHED_TMP" ]]; then
     # 1. Enrichment merge count
     ENRICHED_COUNT=$(echo "$ENRICH_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['enriched_nodes'])" 2>/dev/null || echo "0")
-    if python3 -c "assert int('$ENRICHED_COUNT') >= 5" 2>/dev/null; then
+    if python3 -c "import sys; assert int(sys.argv[1]) >= 5" "$ENRICHED_COUNT" 2>/dev/null; then
       green "  PASS: enrich-metadata — $ENRICHED_COUNT nodes enriched (>= 5)"
       ((PASS++)) || true
     else

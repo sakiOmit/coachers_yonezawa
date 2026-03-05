@@ -74,6 +74,28 @@ score = max(0, score)
 | deep_nesting_threshold | 6 levels | 深すぎるネストの閾値 |
 | batch_size | 50 nodes | Chrome DevTools実行時のバッチサイズ |
 | variance_ratio | 1.5 | Auto Layout方向判定（X分散 > Y分散 × ratio → HORIZONTAL） |
+| spatial_gap_threshold | 100px | サブグループ分割の最小ギャップ |
+| header_zone_height | 120px | ヘッダー検出ゾーン（ページ上端からの距離） |
+| footer_zone_height | 300px | フッター検出ゾーン（ページ下端からの距離） |
+| zone_overlap_item | 0.5 (50%) | 垂直ゾーンマージ：アイテム側の最小重なり率 |
+| zone_overlap_zone | 0.3 (30%) | 垂直ゾーンマージ：ゾーン側の最小重なり率 |
+| jaccard_threshold | 0.7 | パターン検出のファジーマッチ閾値 |
+| header_max_element_height | 200px | ヘッダーグループ内要素の最大高さ（Issue 125） |
+| footer_zone_margin | 50px | フッターゾーン下方マージン（ページ外要素包含用、Issue 129） |
+| divider_max_height | 5px | 水平区切り線の最大高さ（Phase 3 リネーム、Issue 124） |
+| header_y_threshold | 100px | ヘッダー検出Y位置閾値（Phase 3 リネーム、Issue 124） |
+| footer_proximity | 100px | フッター検出の親下端からの距離（Phase 3 リネーム、Issue 124） |
+| footer_max_height | 200px | フッター検出の最大高さ（Phase 3 リネーム、Issue 124） |
+| wide_element_ratio | 0.7 | 「幅広」判定の親幅比率（Phase 3 リネーム、Issue 124） |
+| wide_element_min_width | 500px | 「幅広」判定の最小絶対幅（Phase 3 リネーム、Issue 124） |
+| icon_max_size | 48px | アイコン検出の最大幅/高さ（Phase 3 リネーム、Issue 124） |
+| button_max_height | 70px | ボタン検出の最大高さ（Phase 3 リネーム、Issue 124） |
+| button_max_width | 300px | ボタン検出の最大幅（Phase 3 リネーム、Issue 124） |
+| button_text_max_len | 15 chars | ボタンテキストの最大文字数（Phase 3 リネーム、Issue 124） |
+| label_max_len | 20 chars | ラベルテキストの最大文字数（Phase 3 リネーム、Issue 124） |
+| nav_min_text_count | 4 items | ナビゲーション検出の最小TEXT子要素数（Phase 3 リネーム、Issue 124） |
+| nav_max_text_len | 20 chars | ナビゲーション項目の最大文字数（Phase 3 リネーム、Issue 124） |
+| nav_grandchild_min | 4 items | ヘッダーナビ検出の最小TEXTグランドチャイルド数（Phase 3 リネーム、Issue 124） |
 
 ## リネームロジック（優先順）
 

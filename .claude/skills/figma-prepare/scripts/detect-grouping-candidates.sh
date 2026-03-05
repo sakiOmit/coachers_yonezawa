@@ -26,20 +26,19 @@ from collections import defaultdict
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, yaml_str,
-    compute_grouping_score, structure_similarity, detect_regular_spacing,
+    compute_grouping_score, structure_hash, structure_similarity, detect_regular_spacing,
     get_text_children_content, to_kebab)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
 JACCARD_THRESHOLD = 0.7
-
-def structure_hash(node):
-    \"\"\"Calculate structure hash from child types and count.\"\"\"
-    children = node.get('children', [])
-    if not children:
-        return node.get('type', 'UNKNOWN')
-    child_types = sorted(c.get('type', '') for c in children)
-    return f\"{node.get('type', '')}:[{','.join(child_types)}]\"
+SPATIAL_GAP_THRESHOLD = 100  # px — min gap to split sub-groups (Issue 120)
+HEADER_ZONE_HEIGHT = 120  # px — elements within this from page top (Issue 123)
+FOOTER_ZONE_HEIGHT = 300  # px — elements within this from page bottom (Issue 123)
+ZONE_OVERLAP_ITEM = 0.5   # 50% overlap required for item merging (Issue 121)
+ZONE_OVERLAP_ZONE = 0.3   # 30% overlap required for zone expansion (Issue 121)
+HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for elements in header zone (Issue 125)
+FOOTER_ZONE_MARGIN = 50   # px — extra margin for footer zone bottom check (Issue 129)
 
 class UnionFind:
     def __init__(self, n):
@@ -82,7 +81,8 @@ def detect_proximity_groups(children):
                 uf.union(i, j)
 
     result = []
-    for root, indices in uf.groups().items():
+    # Issue 127: Use sequential counter instead of UF internal root index
+    for group_idx, (root, indices) in enumerate(uf.groups().items(), 1):
         if len(indices) >= 2:
             group_nodes = [children[i] for i in indices]
             result.append({
@@ -90,7 +90,7 @@ def detect_proximity_groups(children):
                 'node_ids': [n.get('id', '') for n in group_nodes],
                 'node_names': [n.get('name', '') for n in group_nodes],
                 'count': len(indices),
-                'suggested_name': f'group-proximity-{root}',
+                'suggested_name': f'group-{group_idx}',
             })
     return result
 
@@ -133,7 +133,7 @@ def detect_pattern_groups(children):
                 })
     return result
 
-def _split_by_spatial_gap(nodes, gap_threshold=100):
+def _split_by_spatial_gap(nodes, gap_threshold=SPATIAL_GAP_THRESHOLD):
     \"\"\"Split a group of nodes into sub-groups by large spatial gaps (Issue 87, 88).
 
     Sorts by primary axis (Y for vertical spread, X for horizontal) and
@@ -329,8 +329,8 @@ def detect_header_footer_groups(root_children, page_bb):
     result = []
     page_top = page_bb['y']
     page_bottom = page_bb['y'] + page_bb['h']
-    header_zone_max = page_top + 120  # elements within 120px of page top
-    footer_zone_min = page_bottom - 300  # elements within 300px of page bottom
+    header_zone_max = page_top + HEADER_ZONE_HEIGHT  # Issue 123: use named constant
+    footer_zone_min = page_bottom - FOOTER_ZONE_HEIGHT  # Issue 123: use named constant
 
     # Classify elements by zone
     header_candidates = []
@@ -346,11 +346,14 @@ def detect_header_footer_groups(root_children, page_bb):
             continue
 
         # Header zone: element starts within header zone
-        if el_top < header_zone_max and bb['h'] < 200:
+        if el_top < header_zone_max and bb['h'] < HEADER_MAX_ELEMENT_HEIGHT:
             header_candidates.append(c)
 
         # Footer zone: element bottom is near or past footer zone
-        if el_bottom > footer_zone_min and el_top > footer_zone_min - 50:
+        # Footer zone: element bottom is in footer zone, and element top is
+        # at most FOOTER_ZONE_MARGIN above the zone start (catches elements
+        # that span slightly above the footer zone boundary)
+        if el_bottom > footer_zone_min and el_top > footer_zone_min - FOOTER_ZONE_MARGIN:
             footer_candidates.append(c)
 
     # Header grouping: need 2+ elements, at least one nav-like TEXT or VECTOR/IMAGE
@@ -522,8 +525,11 @@ def detect_vertical_zone_groups(root_children, page_bb):
             overlap_bot = min(y_bot, z_bot)
             overlap = max(0, overlap_bot - overlap_top)
             item_height = y_bot - y_top
-            # Merge if element overlaps >= 50% with zone, or zone overlaps >= 50% with element
-            if item_height > 0 and (overlap / item_height >= 0.5 or overlap / (z_bot - z_top) >= 0.3):
+            # Issue 121: Merge if element overlaps >= ZONE_OVERLAP_ITEM with zone,
+            # or zone overlaps >= ZONE_OVERLAP_ZONE with element.
+            # Asymmetric thresholds: items need strong overlap (50%), but zones
+            # can expand with weaker overlap (30%) to absorb adjacent small elements.
+            if item_height > 0 and (overlap / item_height >= ZONE_OVERLAP_ITEM or overlap / (z_bot - z_top) >= ZONE_OVERLAP_ZONE):
                 z[0] = min(z_top, y_top)
                 z[1] = max(z_bot, y_bot)
                 z[2].append(node)

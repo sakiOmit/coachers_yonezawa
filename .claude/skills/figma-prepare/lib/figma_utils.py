@@ -222,6 +222,22 @@ def compute_grouping_score(a_bb, b_bb, gap=24):
     return max(0.0, 1.0 - effective / (gap * 2))
 
 
+def structure_hash(node):
+    """Calculate structure hash from child types and count.
+
+    Issue 128: Moved from detect-grouping-candidates.sh to share with
+    structure_similarity (which parses the hash format produced here).
+
+    Format: "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]" (sorted child types).
+    Leaf nodes return just "TYPE".
+    """
+    children = node.get('children', [])
+    if not children:
+        return node.get('type', 'UNKNOWN')
+    child_types = sorted(c.get('type', '') for c in children)
+    return f"{node.get('type', '')}:[{','.join(child_types)}]"
+
+
 def structure_similarity(hash_a, hash_b):
     """Compute Jaccard similarity between two structure hashes.
 

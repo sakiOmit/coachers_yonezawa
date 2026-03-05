@@ -35,8 +35,11 @@
     return { success: false, error: `Source node "${sourceNodeId}" not found` };
   }
 
-  if (source.type !== "FRAME") {
-    return { success: false, error: `Source node is "${source.type}", expected "FRAME"` };
+  // Issue 119: Support COMPONENT/INSTANCE/SECTION as valid section roots
+  // (consistent with is_section_root() in figma_utils.py)
+  const ALLOWED_TYPES = ["FRAME", "COMPONENT", "INSTANCE", "SECTION"];
+  if (!ALLOWED_TYPES.includes(source.type)) {
+    return { success: false, error: `Source node is "${source.type}", expected one of: ${ALLOWED_TYPES.join(", ")}` };
   }
 
   // 2. Deep clone

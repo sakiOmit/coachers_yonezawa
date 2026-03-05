@@ -26,6 +26,22 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children
 
+# --- Rename Thresholds (Issue 124) ---
+DIVIDER_MAX_HEIGHT = 5         # px — thin horizontal rectangle → divider
+HEADER_Y_THRESHOLD = 100      # px — position from parent top to detect header
+FOOTER_PROXIMITY = 100        # px — distance from parent bottom to detect footer
+FOOTER_MAX_HEIGHT = 200       # px — max height for footer detection
+WIDE_ELEMENT_RATIO = 0.7      # fraction of parent width to be 'wide'
+WIDE_ELEMENT_MIN_WIDTH = 500  # px — minimum absolute width for 'wide'
+ICON_MAX_SIZE = 48             # px — max width/height for icon detection
+BUTTON_MAX_HEIGHT = 70         # px — max height for button detection
+BUTTON_MAX_WIDTH = 300         # px — max width for button detection
+BUTTON_TEXT_MAX_LEN = 15       # chars — max text length for button role
+LABEL_MAX_LEN = 20             # chars — max text length for label role
+NAV_MIN_TEXT_COUNT = 4         # minimum TEXT children for nav detection
+NAV_MAX_TEXT_LEN = 20          # chars — max text length per nav item
+NAV_GRANDCHILD_MIN = 4        # minimum TEXT grandchildren for header nav detection
+
 # Prefix mapping by context
 SHAPE_PREFIXES = {
     'RECTANGLE': 'bg',
@@ -45,13 +61,13 @@ def infer_text_role(text_content, font_size=None):
     if not content:
         return None
     # Short button-like text
-    if len(content) <= 15 and any(kw in content.lower() for kw in [
+    if len(content) <= BUTTON_TEXT_MAX_LEN and any(kw in content.lower() for kw in [
         'more', '詳しく', '一覧', 'submit', '送信', '申し込', 'contact', 'click',
         '見る', '戻る', '申込', '詳細',
     ]):
         return 'btn-text'
     # Labels
-    if len(content) <= 20:
+    if len(content) <= LABEL_MAX_LEN:
         return 'label'
     return 'body'
 
@@ -86,7 +102,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
                 return f'img-{sibling_index}'
         # Thin wide rectangle → divider
         if node_type == 'RECTANGLE' and w > 0 and h > 0:
-            if w / max(h, 1) > 10 and h < 5:
+            if w / max(h, 1) > 10 and h < DIVIDER_MAX_HEIGHT:
                 return f'divider-{sibling_index}'
         return f'{prefix}-{sibling_index}'
 
@@ -96,7 +112,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     # branch is unreachable. Priority 3.1 handles header/footer in that case.
     if node_type == 'FRAME' and parent and parent.get('type') in ('PAGE', 'CANVAS'):
         y = abs_bbox.get('y', 0)
-        if sibling_index == 0 or y < 100:
+        if sibling_index == 0 or y < HEADER_Y_THRESHOLD:
             return f'section-header'
         if sibling_index == total_siblings - 1:
             return f'section-footer'
@@ -112,18 +128,18 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         parent_w = parent_bbox.get('width', 0)
         node_y = abs_bbox.get('y', 0)
         relative_y = node_y - parent_y
-        is_wide = w > max(parent_w * 0.7, 500)
+        is_wide = w > max(parent_w * WIDE_ELEMENT_RATIO, WIDE_ELEMENT_MIN_WIDTH)
 
         if is_wide:
             # Header: near top + has nav child (frame with 4+ text grandchildren)
-            if relative_y < 100:
+            if relative_y < HEADER_Y_THRESHOLD:
                 has_nav = False
                 for c in children:
                     # Issue 77: Include INSTANCE/COMPONENT for nav detection
                     if c.get('type') in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                         text_gchildren = [gc for gc in c.get('children', [])
                                           if gc.get('type') == 'TEXT']
-                        if len(text_gchildren) >= 4:
+                        if len(text_gchildren) >= NAV_GRANDCHILD_MIN:
                             has_nav = True
                             break
                 if has_nav:
@@ -133,13 +149,13 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             if parent_h > 0:
                 node_bottom = node_y + h
                 parent_bottom = parent_y + parent_h
-                if abs(node_bottom - parent_bottom) < 100 and h < 200:
+                if abs(node_bottom - parent_bottom) < FOOTER_PROXIMITY and h < FOOTER_MAX_HEIGHT:
                     text_count = sum(1 for c in children if c.get('type') == 'TEXT')
                     if text_count >= max(len(children) * 0.3, 1):
                         return 'footer'
 
     # Priority 3.2: Tiny empty frame → icon
-    if not children and w > 0 and w <= 48 and h > 0 and h <= 48:
+    if not children and w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE:
         return f'icon-{sibling_index}'
 
     # Priority 3.5+ and 4: Requires children
@@ -149,7 +165,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         # Priority 3.5: Navigation detection
         text_count = len(text_contents)
         # Navigation: 4+ short text children → nav
-        if text_count >= 4 and all(len(t) <= 20 for t in text_contents):
+        if text_count >= NAV_MIN_TEXT_COUNT and all(len(t) <= NAV_MAX_TEXT_LEN for t in text_contents):
             return f'nav-{sibling_index}'
 
         # Priority 4: Child structure analysis
@@ -174,11 +190,11 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
             return f'media-{sibling_index}'
 
         # Small icon-like: tiny frame with 0-1 children
-        if w > 0 and w <= 48 and h > 0 and h <= 48 and len(children) <= 1:
+        if w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE and len(children) <= 1:
             return f'icon-{sibling_index}'
 
         # Button/Tab: small frame with 1-2 children, short text
-        if h > 0 and h <= 70 and w > 0 and w < 300 and len(children) <= 2:
+        if h > 0 and h <= BUTTON_MAX_HEIGHT and w > 0 and w < BUTTON_MAX_WIDTH and len(children) <= 2:
             if text_contents:
                 slug = to_kebab(text_contents[0][:20])
                 if slug:

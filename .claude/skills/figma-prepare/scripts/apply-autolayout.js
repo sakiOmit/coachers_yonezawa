@@ -33,6 +33,7 @@
  *     applied: N,
  *     skipped: N,
  *     errors: [{ nodeId, error }],
+ *     total: N,
  *     batch: "1/3"
  *   }
  *
