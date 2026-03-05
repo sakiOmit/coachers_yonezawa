@@ -1,5 +1,9 @@
 # WordPress + Vite + FLOCSS Project .gitignore
 
+# Python
+__pycache__/
+*.pyc
+
 # Dependencies
 node_modules/
 vendor/
