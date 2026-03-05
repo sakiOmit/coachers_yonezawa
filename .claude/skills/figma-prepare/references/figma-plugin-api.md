@@ -345,10 +345,73 @@ Phase 2-4 のスクリプト生成時に参照する。
 **判定基準**: `matchRate >= 0.98` → 成功、`< 0.98` → 警告 + mismatch 一覧
 
 **用途**:
-- Phase 2: グルーピング後のフレーム名・子構造検証
 - Phase 3: リネーム後の名前一致検証（primary）
 
 **テンプレート**: `scripts/verify-structure.js` にプレースホルダー版あり
+
+### グルーピング適用後の検証
+
+`apply-grouping.js` 適用後に、ラッパーFRAMEの作成・子要素移動・bbox整合性を検証する。
+
+```javascript
+() => {
+  const verificationPlan = [
+    {
+      "wrapper_id": "23:55",           // apply-grouping.js 出力の wrappers[].id
+      "expected_name": "section-hero",  // グルーピング計画の suggested_name
+      "expected_child_ids": ["23:56", "23:57"]  // 計画の node_ids（クローン側ID）
+    },
+  ];
+  const BBOX_TOLERANCE = 2;
+
+  // 各ラッパーに対して:
+  // 1. ラッパーFRAMEの存在・名前一致
+  // 2. 期待される子要素がラッパー内に存在
+  // 3. ラッパーbbox ≈ 子要素union bbox（±2px許容）
+  // → { success, total, verified, issues, missing, matchRate }
+}
+```
+
+**判定基準**: `matchRate >= 0.98` → 成功、`< 0.98` → 警告 + issues 一覧
+
+**用途**:
+- Phase 2: グルーピング後のラッパーFRAME・子要素移動・bbox検証
+
+**テンプレート**: `scripts/verify-grouping.js` にプレースホルダー版あり
+
+### Auto Layout 適用後の検証
+
+`apply-autolayout.js` 適用後に、layoutMode/gap/padding/alignment が正しく設定されたか検証する。
+
+```javascript
+() => {
+  const verificationPlan = [
+    {
+      "node_id": "23:55",
+      "expected_direction": "VERTICAL",
+      "expected_gap": 24,
+      "expected_padding": { "top": 16, "right": 16, "bottom": 16, "left": 16 },
+      "expected_primary_align": "MIN",
+      "expected_counter_align": "CENTER"
+    },
+  ];
+  const VALUE_TOLERANCE = 1;
+
+  // 各ノードに対して:
+  // 1. layoutMode / layoutWrap が期待方向と一致
+  // 2. itemSpacing（gap）が期待値と一致（±1px許容）
+  // 3. padding 4辺が期待値と一致（±1px許容）
+  // 4. primaryAxisAlignItems / counterAxisAlignItems が一致
+  // → { success, total, verified, issues, missing, matchRate }
+}
+```
+
+**判定基準**: `matchRate >= 0.98` → 成功、`< 0.98` → 警告 + issues 一覧
+
+**用途**:
+- Phase 4: Auto Layout 適用後の設定値検証
+
+**テンプレート**: `scripts/verify-autolayout.js` にプレースホルダー版あり
 
 ## ユーティリティ
 

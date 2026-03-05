@@ -430,16 +430,30 @@ dry-run: grouping-plan.yaml + sectioning-plan.yaml を表示
 
 ### 2-5. --apply 後の構造 diff 検証
 
-`--apply` 実行後、verify-structure.js でクローンのツリーを読み戻し、計画との整合性を検証する。
+`--apply` 実行後、`verify-grouping.js` でラッパーFRAME・子要素移動・bbox整合性を検証する。
 
 ```
-1. グルーピング計画の name と実際のフレーム名を比較
-   - __EXPECTED_NAMES__: { "cloneChildId": "planName", ... }（グルーピング/セクショニング計画のフレーム名）
-2. 子ノードの移動先が正しいか確認
-   - 新フレーム内の子ノード数が計画と一致するか
-3. matchRate >= 0.98 → 成功、< 0.98 → 警告 + mismatch 一覧
+使用手順:
+1. scripts/verify-grouping.js を読み込み
+2. __VERIFICATION_PLAN__ を検証データJSONに置換:
+   [
+     {
+       "wrapper_id": "23:55",           // apply-grouping.js 出力の wrappers[].id
+       "expected_name": "section-hero",  // グルーピング計画の suggested_name
+       "expected_child_ids": ["23:56", "23:57"]  // 計画の node_ids（クローン側IDに変換済み）
+     },
+     ...
+   ]
+3. evaluate_script で実行 → 検証結果を取得
 
-パターン: references/figma-plugin-api.md「構造検証」参照
+検証項目:
+  a. ラッパーFRAMEの存在・名前一致
+  b. 期待される子要素がラッパー内に存在
+  c. ラッパーbbox ≈ 子要素union bbox（±2px許容）
+
+判定:
+  - matchRate >= 0.98 → 成功
+  - matchRate < 0.98 → 警告 + issues 一覧表示
 ```
 
 ## Phase 3: セマンティックリネーム
@@ -606,6 +620,39 @@ dry-run: autolayout-plan.yaml を表示
 5. evaluate_script で実行 → layoutMode/itemSpacing/padding/counterAxisAlignItems 設定
 ```
 
+### 4-3. --apply 後の Auto Layout 検証
+
+`--apply` 実行後、`verify-autolayout.js` で設定値を読み戻し、計画との整合性を検証する。
+
+```
+使用手順:
+1. scripts/verify-autolayout.js を読み込み
+2. __VERIFICATION_PLAN__ を検証データJSONに置換:
+   [
+     {
+       "node_id": "23:55",
+       "expected_direction": "VERTICAL",
+       "expected_gap": 24,
+       "expected_padding": { "top": 16, "right": 16, "bottom": 16, "left": 16 },
+       "expected_primary_align": "MIN",
+       "expected_counter_align": "CENTER"
+     },
+     ...
+   ]
+3. evaluate_script で実行 → 検証結果を取得
+
+検証項目:
+  a. ノードの存在確認
+  b. layoutMode / layoutWrap が期待方向と一致
+  c. itemSpacing（gap）が期待値と一致（±1px許容）
+  d. padding 4辺が期待値と一致（±1px許容）
+  e. primaryAxisAlignItems / counterAxisAlignItems が期待値と一致
+
+判定:
+  - matchRate >= 0.98 → 成功
+  - matchRate < 0.98 → 警告 + issues 一覧表示
+```
+
 ## Summary
 
 全フェーズ完了後:
@@ -651,7 +698,11 @@ Next steps:
 | `scripts/start-chrome-debug.sh` | Chrome 起動 + SSH トンネル + 接続確認 | Figma URL (optional) | stdout (接続状態) |
 | `scripts/clone-artboard.js` | アートボード複製 + IDマッピング | `() => { ... }` 形式、`__SOURCE_NODE_ID__` 置換 | object (clone info, mapping) |
 | `scripts/apply-renames.js` | バッチリネーム実行 | `() => { ... }` 形式、`__RENAME_MAP__` / `__BATCH_INFO__` 置換 | object (renamed, errors) |
-| `scripts/verify-structure.js` | 構造 diff 検証 | `() => { ... }` 形式、`__CLONE_NODE_ID__` / `__EXPECTED_NAMES__` 置換 | object (matched, mismatched, matchRate) |
+| `scripts/apply-grouping.js` | グルーピング適用 | `() => { ... }` 形式、`__GROUPING_PLAN__` / `__BATCH_INFO__` 置換 | object (applied, wrappers, errors) |
+| `scripts/apply-autolayout.js` | Auto Layout 適用 | `() => { ... }` 形式、`__AUTOLAYOUT_PLAN__` / `__BATCH_INFO__` / `__MIN_CONFIDENCE__` 置換 | object (applied, skipped, errors) |
+| `scripts/verify-structure.js` | リネーム diff 検証 | `() => { ... }` 形式、`__CLONE_NODE_ID__` / `__EXPECTED_NAMES__` 置換 | object (matched, mismatched, matchRate) |
+| `scripts/verify-grouping.js` | グルーピング適用検証 | `() => { ... }` 形式、`__VERIFICATION_PLAN__` 置換 | object (verified, issues, matchRate) |
+| `scripts/verify-autolayout.js` | Auto Layout 適用検証 | `() => { ... }` 形式、`__VERIFICATION_PLAN__` 置換 | object (verified, issues, matchRate) |
 
 ## Related Files
 
