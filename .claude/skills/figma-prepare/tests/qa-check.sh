@@ -194,6 +194,27 @@ check_doc_staleness() {
     found=1
   fi
 
+  # Stage A 検出メソッド: 実装の5手法がドキュメント/SKILLに反映されているか
+  local actual_methods
+  actual_methods=$(grep -c "def detect_.*_groups" "$SCRIPTS_DIR/detect-grouping-candidates.sh" 2>/dev/null || echo 0)
+  if [[ "$actual_methods" -ge 5 ]]; then
+    # SKILL.md が全メソッドカテゴリを記載しているか（"proximity + pattern のみ" は古い）
+    # "proximity + pattern" の直後に "のみ" がある（他メソッド名なし）パターンを検出
+    if grep -q "proximity.*pattern" "$SKILLS_DIR/SKILL.md" 2>/dev/null; then
+      local stale_lines
+      stale_lines=$(grep "proximity.*pattern" "$SKILLS_DIR/SKILL.md" 2>/dev/null | grep -v "spacing\|semantic\|zone" | grep "のみ" || true)
+      if [[ -n "$stale_lines" ]]; then
+        issue "doc-staleness: SKILL.md lists only proximity+pattern but implementation has $actual_methods detection methods"
+        found=1
+      fi
+    fi
+    # phase-details.md に「削除済み」の矛盾記述がないか
+    if grep -q "Stage A から削除済み" "$REFS_DIR/phase-details.md" 2>/dev/null; then
+      issue "doc-staleness: phase-details.md says feature removed from Stage A but it exists in implementation"
+      found=1
+    fi
+  fi
+
   if [[ $found -eq 0 ]]; then
     green "  PASS: Documentation up-to-date"
   fi

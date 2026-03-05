@@ -348,7 +348,7 @@ Phase 2 は2段階構成:
 
 ```
 Phase 2: グループ化 + セクショニング
-├── 2-1. Stage A: ヒューリスティック（proximity + pattern のみ）
+├── 2-1. Stage A: ヒューリスティック（proximity + pattern + spacing + semantic + zone）
 ├── 2-2. Stage B: Claude セクショニング
 │   ├── 2-2a. prepare-sectioning-context.sh でコンテキスト生成（gap_analysis + background_candidates）
 │   ├── 2-2b. get_screenshot でスクリーンショット取得
@@ -366,7 +366,7 @@ bash .claude/skills/figma-prepare/scripts/detect-grouping-candidates.sh \
   --output .claude/cache/figma/grouping-plan.yaml
 ```
 
-プロキシミティ/パターン検出のみ。ネストレベルのグルーピングを行う。セマンティック理解は Stage B（Claude 推論）に委ねる。
+5手法（proximity + pattern + spacing + semantic + zone）によるネストレベルのグルーピングを行う。トップレベルのセクション境界推論は Stage B（Claude 推論）に委ねる。
 
 ### 2-2. Stage B: Claude セクショニング
 
@@ -397,7 +397,7 @@ mcp__plugin_figma_figma__get_screenshot
 ⚠️ Stage B (Claude sectioning) をスキップしました。
    原因: スクリーンショットの取得に失敗
    影響: トップレベルのセクション分割は行われません。
-         proximity + pattern によるネストレベルのグルーピングのみ適用されます。
+         Stage A（proximity + pattern + spacing + semantic + zone）によるネストレベルのグルーピングのみ適用されます。
    推奨: Figma上で手動でセクショニングを行うか、スクリーンショット取得の問題を解決して再実行してください。
 ```
 
