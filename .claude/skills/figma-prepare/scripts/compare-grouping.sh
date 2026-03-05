@@ -44,7 +44,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
-import json, sys, os, re
+import json, sys, os
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import compare_grouping_results, _stage_a_pattern_key
 

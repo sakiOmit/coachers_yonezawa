@@ -48,6 +48,49 @@ FLAG_BG_FULL_WIDTH_RATIO = 0.95  # bg-full: width >= 95% of page width
 # bg-wide reuses BG_WIDTH_RATIO (0.8) — same semantic: "wide enough to be a background"
 FLAG_TINY_MAX_SIZE = 50  # px — tiny element: both width and height < 50px
 
+# --- Issues 207-210: detect-grouping-candidates.sh constants ---
+PROXIMITY_GAP = 24  # px — proximity grouping distance (figma-prepare.md: proximity_gap)
+REPEATED_PATTERN_MIN = 3  # occurrences — minimum for repeat pattern detection (figma-prepare.md: repeated_pattern_min)
+JACCARD_THRESHOLD = 0.7  # fuzzy match threshold for pattern detection (figma-prepare.md: jaccard_threshold)
+SPATIAL_GAP_THRESHOLD = 100  # px — min gap to split sub-groups (figma-prepare.md: spatial_gap_threshold)
+HEADER_ZONE_HEIGHT = 120  # px — header detection zone from page top (figma-prepare.md: header_zone_height)
+FOOTER_ZONE_HEIGHT = 300  # px — footer detection zone from page bottom (figma-prepare.md: footer_zone_height)
+ZONE_OVERLAP_ITEM = 0.5  # 50% — vertical zone merge: item overlap ratio (figma-prepare.md: zone_overlap_item)
+ZONE_OVERLAP_ZONE = 0.3  # 30% — vertical zone merge: zone overlap ratio (figma-prepare.md: zone_overlap_zone)
+HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for header zone elements (figma-prepare.md: header_max_element_height)
+FOOTER_ZONE_MARGIN = 50  # px — extra margin for footer zone bottom (figma-prepare.md: footer_zone_margin)
+HEADER_TEXT_MAX_WIDTH = 200  # px — max width for nav-like text in header (figma-prepare.md: header_text_max_width)
+HEADER_LOGO_MAX_WIDTH = 300  # px — max width for logo in header (figma-prepare.md: header_logo_max_width)
+HEADER_LOGO_MAX_HEIGHT = 100  # px — max height for logo in header (figma-prepare.md: header_logo_max_height)
+HEADER_NAV_MIN_TEXTS = 3  # min TEXT elements for nav detection in header (figma-prepare.md: header_nav_min_texts)
+HERO_ZONE_DISTANCE = 200  # px — max distance from page top for hero detection (figma-prepare.md: hero_zone_distance)
+LARGE_BG_WIDTH_RATIO = 0.6  # ratio of page width for large bg detection (figma-prepare.md: large_bg_width_ratio)
+
+# --- Issues 215-220: generate-rename-map.sh constants ---
+DIVIDER_MAX_HEIGHT = 5  # px — thin horizontal rectangle → divider (figma-prepare.md: divider_max_height)
+HEADER_Y_THRESHOLD = 100  # px — position from parent top to detect header (figma-prepare.md: header_y_threshold)
+FOOTER_PROXIMITY = 100  # px — distance from parent bottom to detect footer (figma-prepare.md: footer_proximity)
+FOOTER_MAX_HEIGHT = 200  # px — max height for footer detection (figma-prepare.md: footer_max_height)
+WIDE_ELEMENT_RATIO = 0.7  # fraction of parent width to be 'wide' (figma-prepare.md: wide_element_ratio)
+WIDE_ELEMENT_MIN_WIDTH = 500  # px — minimum absolute width for 'wide' (figma-prepare.md: wide_element_min_width)
+ICON_MAX_SIZE = 48  # px — max width/height for icon detection (figma-prepare.md: icon_max_size)
+BUTTON_MAX_HEIGHT = 70  # px — max height for button detection (figma-prepare.md: button_max_height)
+BUTTON_MAX_WIDTH = 300  # px — max width for button detection (figma-prepare.md: button_max_width)
+BUTTON_TEXT_MAX_LEN = 15  # chars — max text length for button role (figma-prepare.md: button_text_max_len)
+LABEL_MAX_LEN = 20  # chars — max text length for label role (figma-prepare.md: label_max_len)
+NAV_MIN_TEXT_COUNT = 4  # minimum TEXT children for nav detection (figma-prepare.md: nav_min_text_count)
+NAV_MAX_TEXT_LEN = 20  # chars — max text length per nav item (figma-prepare.md: nav_max_text_len)
+NAV_GRANDCHILD_MIN = 4  # minimum TEXT grandchildren for header nav (figma-prepare.md: nav_grandchild_min)
+
+# --- Issue 211: infer-autolayout.sh constants ---
+VARIANCE_RATIO = 1.5  # Auto Layout direction: X var > Y var × ratio → HORIZONTAL (figma-prepare.md: variance_ratio)
+
+# --- Issue 212: generate-nested-grouping-context.sh constants ---
+GRANDCHILD_THRESHOLD = 5  # Stage C: max node_ids to switch to grandchildren mode
+
+# --- Issue 214: compare_grouping_results constants ---
+COMPARE_MATCH_THRESHOLD = 0.5  # Jaccard threshold for Stage A/C group matching
+
 
 def yaml_str(value):
     """Safely encode a string for YAML double-quoted output.
@@ -706,7 +749,7 @@ def detect_consecutive_similar(children, min_count=None, similarity_threshold=No
     if min_count is None:
         min_count = CONSECUTIVE_PATTERN_MIN
     if similarity_threshold is None:
-        similarity_threshold = 0.7  # JACCARD_THRESHOLD
+        similarity_threshold = JACCARD_THRESHOLD
 
     if len(children) < min_count:
         return []
@@ -2001,7 +2044,7 @@ def compare_grouping_results(stage_a_candidates, stage_c_groups):
     jaccard_by_group = []
     matched_pairs = []
     matched_c_indices = set()
-    match_threshold = 0.5
+    match_threshold = COMPARE_MATCH_THRESHOLD
 
     for a_idx, a_set in enumerate(a_sets):
         best_jaccard = 0.0

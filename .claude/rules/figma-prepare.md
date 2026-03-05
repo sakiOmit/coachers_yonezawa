@@ -159,6 +159,8 @@ score = max(0, score)
 | flag_bg_full_width_ratio | 0.95 (95%) | フラグ判定：bg-fullの幅比率（ページ幅の95%以上、Issue 203） |
 | flag_tiny_max_size | 50px | フラグ判定：tiny要素の最大幅/高さ（Issue 203） |
 | spatial_split_min_non_leaf | 6 elements | 空間ギャップ分割：非リーフグループの最小要素数（Issue 206） |
+| grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
+| compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
 
 ## リネームロジック（優先順）
 

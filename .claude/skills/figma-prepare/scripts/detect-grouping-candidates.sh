@@ -53,26 +53,12 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAM
     detect_highlight_text, HIGHLIGHT_OVERLAP_RATIO,
     detect_horizontal_bar, HORIZONTAL_BAR_MAX_HEIGHT, HORIZONTAL_BAR_MIN_ELEMENTS,
     CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE,
-    OFF_CANVAS_MARGIN, SPATIAL_SPLIT_MIN_NON_LEAF)
-
-PROXIMITY_GAP = 24  # px
-REPEATED_PATTERN_MIN = 3
-JACCARD_THRESHOLD = 0.7
-SPATIAL_GAP_THRESHOLD = 100  # px — min gap to split sub-groups (Issue 120)
-HEADER_ZONE_HEIGHT = 120  # px — elements within this from page top (Issue 123)
-FOOTER_ZONE_HEIGHT = 300  # px — elements within this from page bottom (Issue 123)
-ZONE_OVERLAP_ITEM = 0.5   # 50% overlap required for item merging (Issue 121)
-ZONE_OVERLAP_ZONE = 0.3   # 30% overlap required for zone expansion (Issue 121)
-HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for elements in header zone (Issue 125)
-FOOTER_ZONE_MARGIN = 50   # px — extra margin for footer zone bottom check (Issue 129)
-# Issue 134: Header validation constants
-HEADER_TEXT_MAX_WIDTH = 200  # px — max width for nav-like text elements in header
-HEADER_LOGO_MAX_WIDTH = 300  # px — max width for logo-like elements in header
-HEADER_LOGO_MAX_HEIGHT = 100  # px — max height for logo-like elements in header
-HEADER_NAV_MIN_TEXTS = 3  # min number of text elements for nav detection in header
-# Issue 135: Zone semantic name constants
-HERO_ZONE_DISTANCE = 200  # px — max distance from page top for hero detection
-LARGE_BG_WIDTH_RATIO = 0.6  # ratio of page width for large background detection
+    OFF_CANVAS_MARGIN, SPATIAL_SPLIT_MIN_NON_LEAF,
+    PROXIMITY_GAP, REPEATED_PATTERN_MIN, JACCARD_THRESHOLD, SPATIAL_GAP_THRESHOLD,
+    HEADER_ZONE_HEIGHT, FOOTER_ZONE_HEIGHT, ZONE_OVERLAP_ITEM, ZONE_OVERLAP_ZONE,
+    HEADER_MAX_ELEMENT_HEIGHT, FOOTER_ZONE_MARGIN,
+    HEADER_TEXT_MAX_WIDTH, HEADER_LOGO_MAX_WIDTH, HEADER_LOGO_MAX_HEIGHT, HEADER_NAV_MIN_TEXTS,
+    HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO)
 
 class UnionFind:
     def __init__(self, n):

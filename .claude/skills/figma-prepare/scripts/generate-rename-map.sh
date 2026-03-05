@@ -24,23 +24,16 @@ python3 -c "
 import json, sys, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab, get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP, detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE, CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD, SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, OVERFLOW_BG_MIN_WIDTH, is_decoration_pattern, decoration_dominant_shape
-
-# --- Rename Thresholds (Issue 124) ---
-DIVIDER_MAX_HEIGHT = 5         # px — thin horizontal rectangle → divider
-HEADER_Y_THRESHOLD = 100      # px — position from parent top to detect header
-FOOTER_PROXIMITY = 100        # px — distance from parent bottom to detect footer
-FOOTER_MAX_HEIGHT = 200       # px — max height for footer detection
-WIDE_ELEMENT_RATIO = 0.7      # fraction of parent width to be 'wide'
-WIDE_ELEMENT_MIN_WIDTH = 500  # px — minimum absolute width for 'wide'
-ICON_MAX_SIZE = 48             # px — max width/height for icon detection
-BUTTON_MAX_HEIGHT = 70         # px — max height for button detection
-BUTTON_MAX_WIDTH = 300         # px — max width for button detection
-BUTTON_TEXT_MAX_LEN = 15       # chars — max text length for button role
-LABEL_MAX_LEN = 20             # chars — max text length for label role
-NAV_MIN_TEXT_COUNT = 4         # minimum TEXT children for nav detection
-NAV_MAX_TEXT_LEN = 20          # chars — max text length per nav item
-NAV_GRANDCHILD_MIN = 4        # minimum TEXT grandchildren for header nav detection
+from figma_utils import (resolve_absolute_coords, get_root_node, UNNAMED_RE, yaml_str, to_kebab,
+    get_text_children_content as _get_text_children, _jp_keyword_lookup, JP_KEYWORD_MAP,
+    detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE,
+    CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD,
+    SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, OVERFLOW_BG_MIN_WIDTH,
+    is_decoration_pattern, decoration_dominant_shape,
+    DIVIDER_MAX_HEIGHT, HEADER_Y_THRESHOLD, FOOTER_PROXIMITY, FOOTER_MAX_HEIGHT,
+    WIDE_ELEMENT_RATIO, WIDE_ELEMENT_MIN_WIDTH, ICON_MAX_SIZE,
+    BUTTON_MAX_HEIGHT, BUTTON_MAX_WIDTH, BUTTON_TEXT_MAX_LEN,
+    LABEL_MAX_LEN, NAV_MIN_TEXT_COUNT, NAV_MAX_TEXT_LEN, NAV_GRANDCHILD_MIN)
 
 # Prefix mapping by context
 SHAPE_PREFIXES = {

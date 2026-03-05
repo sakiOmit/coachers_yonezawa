@@ -64,7 +64,7 @@ import json, sys, os, re
 sys.setrecursionlimit(3000)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node,
-    find_node_by_id, generate_enriched_table)
+    find_node_by_id, generate_enriched_table, GRANDCHILD_THRESHOLD)
 
 METADATA_FILE = sys.argv[2]
 PLAN_FILE = sys.argv[3]
@@ -140,8 +140,6 @@ leaf_sections = collect_leaf_sections(sections_list)
 # Strategy:
 #   - If node_ids count <= 5 AND each has children -> use grandchildren (children of each node)
 #   - Otherwise -> use the node_ids themselves as the children table entries
-
-GRANDCHILD_THRESHOLD = 5
 
 def get_section_children(section):
     \"\"\"Get the children to include in the enriched table for a section.
