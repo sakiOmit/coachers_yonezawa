@@ -29,7 +29,7 @@ from figma_utils import (resolve_absolute_coords, get_root_node, UNNAMED_RE, yam
     detect_en_jp_label_pairs, EN_JP_PAIR_MAX_DISTANCE,
     CTA_SQUARE_RATIO_MIN, CTA_SQUARE_RATIO_MAX, CTA_Y_THRESHOLD,
     CTA_X_POSITION_RATIO,
-    SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, OVERFLOW_BG_MIN_WIDTH,
+    SIDE_PANEL_MAX_WIDTH, SIDE_PANEL_HEIGHT_RATIO, SECTION_ROOT_WIDTH, SECTION_ROOT_WIDTH_RATIO, OVERFLOW_BG_MIN_WIDTH,
     SIDE_PANEL_RIGHT_X_RATIO, SIDE_PANEL_LEFT_X_RATIO,
     FOOTER_TEXT_RATIO, IMAGE_WRAPPER_RATIO, HEADING_BODY_TEXT_THRESHOLD,
     is_decoration_pattern, decoration_dominant_shape,
@@ -204,14 +204,16 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
 
     # Priority 3.16: Side panel detection (Issue 192)
     # Narrow vertical frame at page edge (SNS links, scroll indicators)
+    # Only detect at root/section level — parent must be section-root-width (>= 1296px)
     if w > 0 and h > 0 and w <= SIDE_PANEL_MAX_WIDTH and h > w * SIDE_PANEL_HEIGHT_RATIO and parent:
         parent_bbox = parent.get('absoluteBoundingBox', {})
         parent_w = parent_bbox.get('width', 0) or SECTION_ROOT_WIDTH
-        node_x = abs_bbox.get('x', 0)
-        parent_x = parent_bbox.get('x', 0)
-        relative_x = node_x - parent_x
-        if relative_x > parent_w * SIDE_PANEL_RIGHT_X_RATIO or relative_x < parent_w * SIDE_PANEL_LEFT_X_RATIO:
-            return f'side-panel-{sibling_index}'
+        if parent_w >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO:
+            node_x = abs_bbox.get('x', 0)
+            parent_x = parent_bbox.get('x', 0)
+            relative_x = node_x - parent_x
+            if relative_x > parent_w * SIDE_PANEL_RIGHT_X_RATIO or relative_x < parent_w * SIDE_PANEL_LEFT_X_RATIO:
+                return f'side-panel-{sibling_index}'
 
     # Priority 3.2: Tiny empty frame → icon
     if not children and w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE:

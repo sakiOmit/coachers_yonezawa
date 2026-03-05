@@ -275,6 +275,7 @@ try:
             sorted_children,
             page_width=page_bbox['w'],
             page_height=page_bbox['h'],
+            root_x=page_bbox.get('x', 0),
         )
         result['enriched_children_table'] = enriched
 

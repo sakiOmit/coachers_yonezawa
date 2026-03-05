@@ -21,12 +21,13 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE, is_section_root, is_off_canvas, FLAT_THRESHOLD, DEEP_NESTING_THRESHOLD, OFF_CANVAS_MARGIN
 
-def count_nodes(node, depth=0, section_depth=None, page_width=0):
+def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
     \"\"\"Recursively count nodes and collect metrics.
 
     depth: absolute depth from root (for reference)
     section_depth: relative depth from nearest section root (for nesting check)
     page_width: width of the page root (for off-canvas detection, Issue 182)
+    root_x: X offset of root artboard (for off-canvas coordinate correction)
     \"\"\"
     stats = {
         'total': 0,
@@ -49,7 +50,7 @@ def count_nodes(node, depth=0, section_depth=None, page_width=0):
         return stats
 
     # Issue 182: Skip off-canvas nodes at top level (direct children of root)
-    if page_width > 0 and depth == 1 and is_off_canvas(node, page_width):
+    if page_width > 0 and depth == 1 and is_off_canvas(node, page_width, root_x=root_x):
         stats['off_canvas_nodes'] = 1
         return stats
 
@@ -96,7 +97,7 @@ def count_nodes(node, depth=0, section_depth=None, page_width=0):
     # Recurse children
     child_section_depth = (section_depth + 1) if section_depth is not None else None
     for child in children:
-        child_stats = count_nodes(child, depth + 1, child_section_depth, page_width)
+        child_stats = count_nodes(child, depth + 1, child_section_depth, page_width, root_x)
         stats['total'] += child_stats['total']
         stats['unnamed'] += child_stats['unnamed']
         stats['flat_sections'] += child_stats['flat_sections']
@@ -150,7 +151,8 @@ try:
     # Issue 182: Determine page width for off-canvas detection
     root_bb = get_bbox(root)
     page_width = root_bb.get('w', 0) if root_bb else 0
-    stats = count_nodes(root, page_width=page_width)
+    root_x = root_bb.get('x', 0) if root_bb else 0
+    stats = count_nodes(root, page_width=page_width, root_x=root_x)
     ungrouped = detect_grouping_candidates(root)
 
     # Calculate quality score

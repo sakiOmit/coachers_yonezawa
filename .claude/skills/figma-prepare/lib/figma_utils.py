@@ -264,12 +264,15 @@ def is_section_root(node):
     return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and width >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO
 
 
-def is_off_canvas(node, page_width):
+def is_off_canvas(node, page_width, root_x=0):
     """Check if a node is positioned completely outside the viewport.
 
     An element is considered off-canvas if:
     - Its left edge (x) is beyond page_width * OFF_CANVAS_MARGIN, OR
     - Its right edge (x + w) is less than 0 (completely to the left)
+
+    Coordinates are evaluated relative to root_x, so artboards placed
+    at arbitrary canvas positions (e.g., x=-5542) work correctly.
 
     These are typically unused assets or elements placed outside the
     visible design area.
@@ -279,6 +282,7 @@ def is_off_canvas(node, page_width):
     Args:
         node: Figma node dict.
         page_width: Width of the page/artboard (typically 1440px).
+        root_x: X coordinate of the root artboard (for offset correction).
 
     Returns:
         bool: True if the node is completely off-canvas.
@@ -288,11 +292,13 @@ def is_off_canvas(node, page_width):
     bb = get_bbox(node)
     if not bb or bb['w'] == 0:
         return False
+    # Convert to root-relative coordinate
+    rel_x = bb['x'] - root_x
     # Right edge is left of viewport
-    if bb['x'] + bb['w'] < 0:
+    if rel_x + bb['w'] < 0:
         return True
     # Left edge is beyond off-canvas margin
-    if bb['x'] > page_width * OFF_CANVAS_MARGIN:
+    if rel_x > page_width * OFF_CANVAS_MARGIN:
         return True
     return False
 
@@ -1821,7 +1827,7 @@ def _compute_child_types(children):
     return '+'.join(f'{v}{k}' for k, v in sorted(counts.items()))
 
 
-def _compute_flags(node, page_width, page_height):
+def _compute_flags(node, page_width, page_height, root_x=0):
     """Compute machine-readable flags for a node.
 
     Flags:
@@ -1844,12 +1850,14 @@ def _compute_flags(node, page_width, page_height):
         flags.append('hidden')
 
     # Off-canvas
-    if page_width > 0 and is_off_canvas(node, page_width):
+    if page_width > 0 and is_off_canvas(node, page_width, root_x=root_x):
         flags.append('off-canvas')
 
     # Overflow (extends beyond page on right or bottom)
+    # Use root-relative coordinates for correct detection
+    rel_x = bb['x'] - root_x
     if page_width > 0:
-        right_edge = bb['x'] + bb['w']
+        right_edge = rel_x + bb['w']
         if right_edge > page_width * FLAG_OVERFLOW_X_RATIO:
             flags.append('overflow')
         if page_height > 0 and bb['y'] + bb['h'] > page_height * FLAG_OVERFLOW_Y_RATIO:
@@ -1875,7 +1883,7 @@ def _compute_flags(node, page_width, page_height):
     return flags
 
 
-def generate_enriched_table(children, page_width=1440, page_height=0):
+def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0):
     """Generate enriched Markdown table for Phase B Claude reasoning.
 
     Produces the enriched format:
@@ -1916,7 +1924,7 @@ def generate_enriched_table(children, page_width=1440, page_height=0):
         child_types = _compute_child_types(child_nodes)
 
         # Flags
-        flags = _compute_flags(child, page_width, page_height)
+        flags = _compute_flags(child, page_width, page_height, root_x=root_x)
         flags_str = ','.join(flags) if flags else '-'
 
         # Text preview
