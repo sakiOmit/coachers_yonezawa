@@ -53,7 +53,7 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAM
     detect_highlight_text, HIGHLIGHT_OVERLAP_RATIO,
     detect_horizontal_bar, HORIZONTAL_BAR_MAX_HEIGHT, HORIZONTAL_BAR_MIN_ELEMENTS,
     CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT, LOOSE_ABSORPTION_DISTANCE,
-    OFF_CANVAS_MARGIN)
+    OFF_CANVAS_MARGIN, SPATIAL_SPLIT_MIN_NON_LEAF)
 
 PROXIMITY_GAP = 24  # px
 REPEATED_PATTERN_MIN = 3
@@ -180,8 +180,12 @@ def _split_by_spatial_gap(nodes, gap_threshold=SPATIAL_GAP_THRESHOLD):
     if len(nodes) <= REPEATED_PATTERN_MIN:
         return [nodes]
     all_leaf = all(len(n.get('children', [])) == 0 for n in nodes)
-    # Issue 88: For non-leaf, only split large groups (6+)
-    if not all_leaf and len(nodes) < 6:
+    # Issue 88/206: Non-leaf elements are often structurally cohesive (e.g. a
+    # few card frames belonging to one section). With 5 or fewer non-leaf nodes,
+    # splitting risks breaking a single logical group. At 6+ nodes, different
+    # sections' card groups may have been merged, so spatial-gap splitting
+    # becomes worthwhile to separate them.
+    if not all_leaf and len(nodes) < SPATIAL_SPLIT_MIN_NON_LEAF:
         return [nodes]
 
     bboxes = [get_bbox(n) for n in nodes]

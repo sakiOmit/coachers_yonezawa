@@ -2,14 +2,15 @@
 # /figma-prepare integration test runner
 #
 # Usage:
-#   bash .claude/skills/figma-prepare/tests/run-tests.sh                    # fixture mode
-#   bash .claude/skills/figma-prepare/tests/run-tests.sh <metadata.json>    # real data mode
+#   bash tests/figma-prepare/run-tests.sh                    # fixture mode
+#   bash tests/figma-prepare/run-tests.sh <metadata.json>    # real data mode
 #
 # Python unit tests are in test_figma_utils.py (run via pytest separately).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SKILLS_DIR="$PROJECT_ROOT/.claude/skills/figma-prepare"
 export SCRIPT_DIR SKILLS_DIR
 FIXTURE="${1:-$SCRIPT_DIR/fixture-metadata.json}"
 IS_FIXTURE=false

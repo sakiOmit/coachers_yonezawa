@@ -45,7 +45,9 @@ sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, UNNAMED_RE,
     get_text_children_content, structure_hash, structure_similarity, is_heading_like,
-    generate_enriched_table)
+    generate_enriched_table,
+    HINT_HEADER_Y_RATIO, HINT_FOOTER_Y_RATIO, HINT_WIDE_ELEMENT_RATIO,
+    HINT_BG_MIN_HEIGHT, HINT_HEADING_MAX_HEIGHT)
 
 def count_children(node):
     return len(node.get('children', []))
@@ -102,17 +104,17 @@ def detect_heuristic_hints(children, page_bbox):
 
         # Header: top area, wide container-like node
         # Include INSTANCE/COMPONENT/SECTION as headers/footers may be component instances
-        if bb['y'] < page_y + page_h * 0.05:
-            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * 0.8:
+        if bb['y'] < page_y + page_h * HINT_HEADER_Y_RATIO:
+            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * HINT_WIDE_ELEMENT_RATIO:
                 header_candidates.append(node_id)
 
         # Footer: bottom area, wide container-like node
-        if bb['y'] + bb['h'] > page_y + page_h * 0.9:
-            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * 0.8:
+        if bb['y'] + bb['h'] > page_y + page_h * HINT_FOOTER_Y_RATIO:
+            if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and bb['w'] > page_w * HINT_WIDE_ELEMENT_RATIO:
                 footer_candidates.append(node_id)
 
         # Background candidates: RECTANGLE with significant height
-        if node_type == 'RECTANGLE' and bb['h'] >= 100:
+        if node_type == 'RECTANGLE' and bb['h'] >= HINT_BG_MIN_HEIGHT:
             background_candidates.append(node_id)
 
     # Gap analysis: Y-direction gaps between consecutive children
@@ -178,12 +180,12 @@ def detect_heuristic_hints(children, page_bbox):
 
     # --- Heading candidates ---
     # Small, text-heavy frames that likely serve as section headings
-    # Height filter: headings should be compact (<=200px) to distinguish from card/content frames
+    # Height filter: headings should be compact to distinguish from card/content frames
     heading_candidates = []
     for idx, child in enumerate(sorted_children):
         bb = get_bbox(child)
         child_h = bb.get('h', 999)
-        if child_h > 200:
+        if child_h > HINT_HEADING_MAX_HEIGHT:
             continue
         if is_heading_like(child):
             heading_candidates.append({

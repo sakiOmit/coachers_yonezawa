@@ -1,8 +1,8 @@
 """
 figma_utils.py unit tests + script integration tests.
 
-Run: python3 -m pytest tests/test_figma_utils.py -v
-From: .claude/skills/figma-prepare/
+Run: python3 -m pytest tests/figma-prepare/test_figma_utils.py -v
+From: project root
 """
 import json
 import os
@@ -12,7 +12,8 @@ import tempfile
 
 import pytest
 
-SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SKILLS_DIR = os.path.join(PROJECT_ROOT, ".claude", "skills", "figma-prepare")
 sys.path.insert(0, os.path.join(SKILLS_DIR, "lib"))
 
 from figma_utils import (

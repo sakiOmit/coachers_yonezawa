@@ -11,14 +11,14 @@ scoring_parameters:
 
 cases:
   - id: fixture-metadata
-    source: .claude/skills/figma-prepare/tests/fixture-metadata.json
+    source: tests/figma-prepare/fixture-metadata.json
     expected_grade: B
     expected_score_range: [60, 80]
     tags: [fixture, regression]
     notes: "合成フィクスチャ。未命名71.9%だがフラット/ネスト問題なし"
 
   - id: fixture-dirty
-    source: .claude/skills/figma-prepare/tests/fixture-dirty.json
+    source: tests/figma-prepare/fixture-dirty.json
     expected_grade: null
     expected_score_range: [50, 80]
     tags: [fixture, unnamed-heavy]
@@ -60,7 +60,7 @@ cases:
     notes: "お知らせ一覧。141ノード、76.4/B。カードグリッド＋タブ。タブのFrame名が汚い"
 
   - id: fixture-realistic
-    source: .claude/skills/figma-prepare/tests/fixture-realistic.json
+    source: tests/figma-prepare/fixture-realistic.json
     expected_grade: A
     expected_score_range: [85, 95]
     tags: [fixture, realistic, regression]

@@ -27,6 +27,26 @@ OFF_CANVAS_MARGIN = 1.5  # multiplier — elements with x > page_width * OFF_CAN
 HORIZONTAL_BAR_MAX_HEIGHT = 100  # px — max Y-range for a horizontal bar pattern (Issue 184)
 HORIZONTAL_BAR_MIN_ELEMENTS = 4  # minimum elements in a horizontal bar (Issue 184)
 HORIZONTAL_BAR_VARIANCE_RATIO = 3  # X variance must exceed Y variance by this factor (Issue 184)
+CENTER_ALIGN_VARIANCE = 4  # Center alignment variance threshold for counter-axis (std ~2px) (Issue 202)
+ALIGN_TOLERANCE = 2  # px — alignment position tolerance for counter-axis MIN/MAX detection (Issue 202)
+CONFIDENCE_HIGH_COV = 0.15  # Gap CoV below this → high confidence (Issue 202)
+CONFIDENCE_MEDIUM_COV = 0.35  # Gap CoV below this → medium confidence (Issue 202)
+BG_LEFT_OVERFLOW_WIDTH_RATIO = 0.5  # Left-overflow bg detection: min width as ratio of parent width (Issue 204)
+SPATIAL_SPLIT_MIN_NON_LEAF = 6  # Non-leaf groups smaller than this are not split by spatial gap (Issue 206)
+
+# --- Issue 201: Stage B heuristic hint thresholds (prepare-sectioning-context.sh) ---
+HINT_HEADER_Y_RATIO = 0.05  # Header zone: top 5% of page height
+HINT_FOOTER_Y_RATIO = 0.9  # Footer zone: bottom 10% of page height (y+h > page_h * 0.9)
+HINT_WIDE_ELEMENT_RATIO = 0.8  # Header/footer width must exceed 80% of page width
+HINT_BG_MIN_HEIGHT = 100  # px — background candidate RECTANGLE minimum height
+HINT_HEADING_MAX_HEIGHT = 200  # px — heading candidate maximum height
+
+# --- Issue 203: _compute_flags thresholds ---
+FLAG_OVERFLOW_X_RATIO = 1.05  # Overflow detection: right edge > page_width * 1.05 (5% tolerance)
+FLAG_OVERFLOW_Y_RATIO = 1.02  # Overflow-y detection: bottom edge > page_height * 1.02 (2% tolerance)
+FLAG_BG_FULL_WIDTH_RATIO = 0.95  # bg-full: width >= 95% of page width
+# bg-wide reuses BG_WIDTH_RATIO (0.8) — same semantic: "wide enough to be a background"
+FLAG_TINY_MAX_SIZE = 50  # px — tiny element: both width and height < 50px
 
 
 def yaml_str(value):
@@ -801,9 +821,13 @@ def detect_heading_content_pairs(children):
         if not h_bb or not c_bb:
             continue
 
-        # Heading must be shorter than content
+        # Three-tier height ratio logic (Issue 205):
+        #   < 40% (HEADING_MAX_HEIGHT_RATIO): Clearly a heading — auto-pair
+        #   40-80% (soft zone): Ambiguous height ratio, but if is_heading_like()
+        #     passes below, treat as heading. This rescues heading frames with
+        #     decorative elements (borders, backgrounds) that inflate height.
+        #   >= 80% (HEADING_SOFT_HEIGHT_RATIO): Too tall to be a heading — skip
         if h_bb['h'] >= c_bb['h'] * HEADING_MAX_HEIGHT_RATIO:
-            # Allow headings between 40-80% height if they pass is_heading_like
             if h_bb['h'] >= c_bb['h'] * HEADING_SOFT_HEIGHT_RATIO:
                 continue
 
@@ -1335,7 +1359,7 @@ def detect_bg_content_layers(children, parent_bb):
     1. There is exactly 1 bg-candidate RECTANGLE among siblings (leaf node, no children)
        - Width >= 80% of parent width, OR
        - Width >= OVERFLOW_BG_MIN_WIDTH (1400px), OR
-       - x < 0 (left overflow) and width >= parent width * 0.5
+       - x < 0 (left overflow) and width >= parent width * BG_LEFT_OVERFLOW_WIDTH_RATIO
     2. The RECTANGLE covers >=30% of parent height (not just a thin divider)
     3. There are >=2 non-decoration siblings (content elements)
 
@@ -1370,7 +1394,7 @@ def detect_bg_content_layers(children, parent_bb):
         # Width check: original (>=80% parent) OR overflow (>=OVERFLOW_BG_MIN_WIDTH or x<0)
         is_wide_enough = bb['w'] >= parent_bb['w'] * BG_WIDTH_RATIO
         is_overflow = bb['w'] >= OVERFLOW_BG_MIN_WIDTH
-        is_left_overflow = bb['x'] < 0 and bb['w'] >= parent_bb['w'] * 0.5
+        is_left_overflow = bb['x'] < 0 and bb['w'] >= parent_bb['w'] * BG_LEFT_OVERFLOW_WIDTH_RATIO
         if not (is_wide_enough or is_overflow or is_left_overflow):
             continue
         # Height >= 30% of parent height (not a thin divider)
@@ -1776,18 +1800,18 @@ def _compute_flags(node, page_width, page_height):
     # Overflow (extends beyond page on right or bottom)
     if page_width > 0:
         right_edge = bb['x'] + bb['w']
-        if right_edge > page_width * 1.05:  # 5% tolerance
+        if right_edge > page_width * FLAG_OVERFLOW_X_RATIO:
             flags.append('overflow')
-        if page_height > 0 and bb['y'] + bb['h'] > page_height * 1.02:
+        if page_height > 0 and bb['y'] + bb['h'] > page_height * FLAG_OVERFLOW_Y_RATIO:
             flags.append('overflow-y')
 
     # Background candidates
     if is_leaf and node_type in ('RECTANGLE', 'VECTOR', 'ELLIPSE'):
         if page_width > 0:
             width_ratio = bb['w'] / page_width
-            if width_ratio >= 0.95:
+            if width_ratio >= FLAG_BG_FULL_WIDTH_RATIO:
                 flags.append('bg-full')
-            elif width_ratio >= 0.8:
+            elif width_ratio >= BG_WIDTH_RATIO:
                 flags.append('bg-wide')
 
     # Decoration pattern
@@ -1795,7 +1819,7 @@ def _compute_flags(node, page_width, page_height):
         flags.append('decoration')
 
     # Tiny element
-    if bb['w'] > 0 and bb['h'] > 0 and bb['w'] < 50 and bb['h'] < 50:
+    if bb['w'] > 0 and bb['h'] > 0 and bb['w'] < FLAG_TINY_MAX_SIZE and bb['h'] < FLAG_TINY_MAX_SIZE:
         flags.append('tiny')
 
     return flags

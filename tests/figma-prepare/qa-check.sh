@@ -18,7 +18,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SKILLS_DIR="$PROJECT_ROOT/.claude/skills/figma-prepare"
 SCRIPTS_DIR="$SKILLS_DIR/scripts"
 REFS_DIR="$SKILLS_DIR/references"
 LIB_DIR="$SKILLS_DIR/lib"

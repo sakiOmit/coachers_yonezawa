@@ -25,11 +25,10 @@ import json, sys, statistics, os
 sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, yaml_str, snap, GRID_SNAP,
-    ROW_TOLERANCE, infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency)
+    ROW_TOLERANCE, infer_direction_two_elements, detect_wrap, detect_space_between, compute_gap_consistency,
+    CENTER_ALIGN_VARIANCE, ALIGN_TOLERANCE, CONFIDENCE_HIGH_COV, CONFIDENCE_MEDIUM_COV)
 
 VARIANCE_RATIO = 1.5
-CENTER_ALIGN_VARIANCE = 4   # center alignment variance threshold (std ~2px)
-ALIGN_TOLERANCE = 2         # alignment position tolerance in px
 
 def infer_layout(frame):
     \"\"\"Infer Auto Layout settings for a frame.\"\"\"
@@ -148,9 +147,9 @@ def infer_layout(frame):
     # Confidence based on gap consistency
     if len(children) == 2:
         confidence = 'medium'
-    elif gap_cov < 0.15:
+    elif gap_cov < CONFIDENCE_HIGH_COV:
         confidence = 'high'
-    elif gap_cov < 0.35:
+    elif gap_cov < CONFIDENCE_MEDIUM_COV:
         confidence = 'medium'
     else:
         confidence = 'low'

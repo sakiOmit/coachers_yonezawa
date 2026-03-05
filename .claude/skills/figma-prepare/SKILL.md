@@ -920,11 +920,8 @@ Next steps:
 | `.claude/cache/figma/final-grouping-plan.yaml` | Phase 2 結果統合後の最終グルーピング計画 |
 | `.claude/cache/figma/rename-map.yaml` | Phase 3 リネームマップ |
 | `.claude/cache/figma/autolayout-plan.yaml` | Phase 4 AutoLayout計画 |
-| `references/chrome-devtools-setup.md` | Chrome DevTools MCP セットアップ |
-| `references/figma-plugin-api.md` | Figma Plugin API パターン集 |
-| `references/phase-details.md` | 各フェーズ詳細ロジック |
-| `references/sectioning-prompt-template.md` | Stage B Claude プロンプトテンプレート |
-| `references/nested-grouping-prompt-template.md` | Stage C Haiku プロンプトテンプレート |
+| `references/*.md` | 参照ドキュメント（**必要時に Read で遅延読み込み**、自動読み込み不要） |
+| `tests/figma-prepare/` | テスト・フィクスチャ（プロジェクトルート、スキル外） |
 | `lib/figma_utils.py` | 共通ユーティリティ（座標変換・bbox・ルートノード・未命名判定） |
 | `.claude/skills/figma-analyze/SKILL.md` | 後続スキル |
 

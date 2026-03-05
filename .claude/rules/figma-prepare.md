@@ -144,6 +144,21 @@ score = max(0, score)
 | horizontal_bar_min_elements | 4 | 水平バー検出：帯域内の最小要素数（Issue 184） |
 | horizontal_bar_variance_ratio | 3 | 水平バー検出：X分散がY分散の何倍以上で水平判定（Issue 196） |
 | heading_soft_height_ratio | 0.8 (80%) | ヘッディング検出：40-80%の中間ゾーンの上限比率（Issue 197） |
+| center_align_variance | 4 | Auto Layout反軸アライメント：CENTER判定の分散閾値（Issue 202） |
+| align_tolerance | 2px | Auto Layout反軸アライメント：MIN/MAX判定の位置許容差（Issue 202） |
+| confidence_high_cov | 0.15 | Auto Layout Gap整合性：high confidence判定のCoV閾値（Issue 202） |
+| confidence_medium_cov | 0.35 | Auto Layout Gap整合性：medium confidence判定のCoV閾値（Issue 202） |
+| bg_left_overflow_width_ratio | 0.5 (50%) | 左はみ出し背景検出：親幅に対する最小幅比率（Issue 204） |
+| hint_header_y_ratio | 0.05 (5%) | Stage Bヒント：ヘッダー判定Y位置比率（ページ高さの上位5%、Issue 201） |
+| hint_footer_y_ratio | 0.9 (90%) | Stage Bヒント：フッター判定Y位置比率（y+h > page_h × 0.9、Issue 201） |
+| hint_wide_element_ratio | 0.8 (80%) | Stage Bヒント：ヘッダー/フッター幅比率（ページ幅の80%超、Issue 201） |
+| hint_bg_min_height | 100px | Stage Bヒント：背景候補RECTANGLEの最小高さ（Issue 201） |
+| hint_heading_max_height | 200px | Stage Bヒント：ヘッディング候補の最大高さ（Issue 201） |
+| flag_overflow_x_ratio | 1.05 | フラグ判定：overflow検出の右端許容比率（5%超過、Issue 203） |
+| flag_overflow_y_ratio | 1.02 | フラグ判定：overflow-y検出の下端許容比率（2%超過、Issue 203） |
+| flag_bg_full_width_ratio | 0.95 (95%) | フラグ判定：bg-fullの幅比率（ページ幅の95%以上、Issue 203） |
+| flag_tiny_max_size | 50px | フラグ判定：tiny要素の最大幅/高さ（Issue 203） |
+| spatial_split_min_non_leaf | 6 elements | 空間ギャップ分割：非リーフグループの最小要素数（Issue 206） |
 
 ## リネームロジック（優先順）
 
