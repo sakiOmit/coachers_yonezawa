@@ -184,7 +184,13 @@ if use_groups_mode:
         print(json.dumps({'error': f'groups file must contain a JSON object, got {type(groups_data).__name__}'}), file=sys.stderr)
         sys.exit(1)
 
+    # Extract groups: support both flat 'groups' key and nested 'sections[].groups'
     groups_list = groups_data.get('groups', [])
+    if not groups_list and 'sections' in groups_data:
+        # nested-grouping-plan.yaml format: sections → [] → groups → []
+        for sec in groups_data['sections']:
+            for g in sec.get('groups', []):
+                groups_list.append(g)
 
     # Build section contexts from groups
     section_contexts = []
@@ -206,7 +212,10 @@ if use_groups_mode:
             skipped_groups.append({'name': group_name, 'reason': 'no node_ids'})
             continue
 
-        # For each node_id in the group, find the node and get its children
+        # Issue 257: Treat group's node_ids as siblings to sub-group,
+        # NOT go inside each node's children.
+        # This enables sub-grouping like left-column / right-column / dividers.
+        sibling_nodes = []
         for nid in group_node_ids:
             if not isinstance(nid, str):
                 skipped_groups.append({'name': group_name, 'reason': f'node_id {repr(nid)} is not a string'})
@@ -215,54 +224,57 @@ if use_groups_mode:
             if not node:
                 skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'node not found'})
                 continue
+            sibling_nodes.append(node)
 
-            children = [c for c in node.get('children', []) if c.get('visible') != False]
-            if not children:
-                skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'no children'})
-                continue
+        if len(sibling_nodes) < 2:
+            skipped_groups.append({'name': group_name, 'reason': f'too few sibling nodes ({len(sibling_nodes)})'})
+            continue
 
-            # Sort by Y ascending
-            children_sorted = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
+        # Sort siblings by Y ascending
+        sibling_nodes_sorted = sorted(sibling_nodes, key=lambda c: get_bbox(c).get('y', 0))
 
-            # Compute section bbox from the parent node
-            nb = get_bbox(node)
-            section_width = nb['w']
-            section_height = nb['h']
+        # Compute bounding box from all siblings
+        bboxes = [get_bbox(n) for n in sibling_nodes_sorted]
+        min_x = min(b['x'] for b in bboxes)
+        min_y = min(b['y'] for b in bboxes)
+        max_right = max(b['x'] + b['w'] for b in bboxes)
+        max_bottom = max(b['y'] + b['h'] for b in bboxes)
+        section_width = max_right - min_x
+        section_height = max_bottom - min_y
 
-            section_id = nid
+        section_id = group_node_ids[0]  # Use first node_id as representative
 
-            # Generate enriched table
-            # Issue #2: Pass root_x so off-canvas detection works for negative-X artboards
-            enriched_table = generate_enriched_table(
-                children_sorted,
-                page_width=section_width if section_width > 0 else page_width,
-                page_height=section_height if section_height > 0 else page_height,
-                root_x=nb['x'],
-                root_y=nb['y'],
-            )
+        # Generate enriched table for sibling nodes
+        enriched_table = generate_enriched_table(
+            sibling_nodes_sorted,
+            page_width=section_width if section_width > 0 else page_width,
+            page_height=section_height if section_height > 0 else page_height,
+            root_x=min_x,
+            root_y=min_y,
+        )
 
-            total_children = len(children_sorted)
+        total_children = len(sibling_nodes_sorted)
 
-            # Build prompt by substituting variables
-            prompt = prompt_template
-            prompt = prompt.replace('{section_name}', str(group_name))
-            prompt = prompt.replace('{section_id}', str(section_id))
-            prompt = prompt.replace('{section_width}', str(int(section_width)))
-            prompt = prompt.replace('{section_height}', str(int(section_height)))
-            prompt = prompt.replace('{total_children}', str(total_children))
-            prompt = prompt.replace('{enriched_children_table}', enriched_table)
+        # Build prompt by substituting variables
+        prompt = prompt_template
+        prompt = prompt.replace('{section_name}', str(group_name))
+        prompt = prompt.replace('{section_id}', str(section_id))
+        prompt = prompt.replace('{section_width}', str(int(section_width)))
+        prompt = prompt.replace('{section_height}', str(int(section_height)))
+        prompt = prompt.replace('{total_children}', str(total_children))
+        prompt = prompt.replace('{enriched_children_table}', enriched_table)
 
-            section_contexts.append({
-                'section_name': group_name,
-                'section_id': section_id,
-                'parent_group': group_name,
-                'depth': DEPTH,
-                'section_width': int(section_width),
-                'section_height': int(section_height),
-                'total_children': total_children,
-                'enriched_children_table': enriched_table,
-                'prompt': prompt,
-            })
+        section_contexts.append({
+            'section_name': group_name,
+            'section_id': section_id,
+            'parent_group': group_name,
+            'depth': DEPTH,
+            'section_width': int(section_width),
+            'section_height': int(section_height),
+            'total_children': total_children,
+            'enriched_children_table': enriched_table,
+            'prompt': prompt,
+        })
 
     # --- Output ---
     result = {

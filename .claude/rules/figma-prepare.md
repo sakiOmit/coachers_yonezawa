@@ -168,7 +168,7 @@ score = max(0, score)
 | heading_body_text_threshold | 50 chars | ヘッディングvs本文判定：この文字数超 → body、以下 → heading（Issue 219） |
 | grid_size_similarity | 0.20 (20%) | グリッド検出：幅/高さの最大変動率（Issue 220） |
 | grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
-| max_stage_c_depth | 2 levels | Stage C 再帰的ネスト処理の最大深度（Issue 224） |
+| max_stage_c_depth | 10 levels | Stage C 再帰安全上限（収束ベース、実際は3-4で終了。Issue 224, 257） |
 | compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
 | stage_c_coverage_threshold | 0.8 (80%) | Stage C採用閾値：カバレッジ >= 80% → Stage C使用、未満 → Stage Aフォールバック（Issue 214） |
 

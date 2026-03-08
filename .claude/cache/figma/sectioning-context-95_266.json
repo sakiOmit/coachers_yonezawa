@@ -1,0 +1,71 @@
+{
+  "page_name": "content-office",
+  "page_id": "95:266",
+  "page_size": {
+    "width": 490.0,
+    "height": 118.0
+  },
+  "top_level_children": [
+    {
+      "id": "92:1379",
+      "name": "Group 265",
+      "type": "FRAME",
+      "bbox": {
+        "x": 386.0,
+        "y": 5256.0,
+        "w": 252.0,
+        "h": 32.0
+      },
+      "child_count": 2,
+      "child_types_summary": "FRAME:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "太陽光パネル設置"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "95:280",
+      "name": "自社社屋に太陽光パネルを設置し、工場やオフィス等で使用する電力の一部を再生可能エネルギーから供給されるものを活用し、CO2削減に努めております。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 388.0,
+        "y": 5299.0,
+        "w": 488.0,
+        "h": 75.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    }
+  ],
+  "total_children": 2,
+  "heuristic_hints": {
+    "header_candidates": [],
+    "header_cluster_ids": [],
+    "footer_candidates": [],
+    "gap_analysis": [
+      {
+        "between": [
+          "92:1379",
+          "95:280"
+        ],
+        "gap_px": 11
+      }
+    ],
+    "background_candidates": [],
+    "consecutive_patterns": [],
+    "heading_candidates": [
+      {
+        "index": 0,
+        "id": "92:1379",
+        "name": "Group 265",
+        "height": 32.0
+      }
+    ],
+    "loose_elements": []
+  },
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 92:1379 | Group 265 | FRAME | 386 | 5256 | 252x32 | N | 1FRA+1TEX | overflow-y | 太陽光パネル設置 |\n| 2 | 95:280 | 自社社屋に太陽光パネルを設置し、工場やオフィス等で使用する電力の一部を | TEXT | 388 | 5299 | 488x75 | Y | - | overflow,overflow-y | 自社社屋に太陽光パネルを設置し、工場やオフィス等で使用する電 |"
+}

@@ -1,0 +1,13 @@
+<frame id="95:671" name="env-row-solar" x="159" y="2583" width="1123" height="416">
+  <text id="95:263" name="省エネ活動" x="822" y="2630" width="108" height="29" />
+  <frame id="95:266" name="content-office" x="193" y="2628" width="490" height="118">
+    <text id="95:267" name="太陽光パネル設置" x="249" y="2628" width="196" height="29" />
+    <frame id="95:268" name="真珠の無料アイコン3 1" x="193" y="2628" width="33" height="32" />
+    <text id="95:280" name="自社社屋に太陽光パネルを設置し、工場やオフィス等で使用する電力の一部を再生可能エネルギーから供給されるものを活用し、CO2削減に努めております。" x="195" y="2671" width="488" height="75" />
+  </frame>
+  <text id="95:327" name="社員の残業を最小限に減らし、社内の電気代削減に努めております。" x="775" y="2671" width="374" height="50" />
+  <vector id="95:352" name="icon-54" x="159" y="2583" width="1123" height="0.00009817578620641143" />
+  <vector id="95:362" name="icon-64" x="159" y="2791" width="1123" height="0.00009817578620641143" />
+  <vector id="95:389" name="icon-81" x="720" y="2583" width="0" height="416" />
+  <frame id="95:564" name="電球アイコン15 1" x="771" y="2630" width="30" height="30" />
+</frame>

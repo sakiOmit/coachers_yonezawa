@@ -97,6 +97,7 @@ from figma_utils import (
     STAGE_C_COVERAGE_THRESHOLD,
     deduplicate_candidates,
     absorb_stage_c_dividers,
+    validate_column_consistency,
     METHOD_PRIORITY,
     DIVIDER_MAX_HEIGHT,
 )
@@ -5730,7 +5731,7 @@ class TestNestedGroupingContextGroups:
         return f.name
 
     def test_groups_basic(self):
-        """--groups mode processes non-single groups and produces children context."""
+        """--groups mode treats node_ids as siblings to sub-group (Issue 257)."""
         groups = {
             "groups": [
                 {
@@ -5748,16 +5749,16 @@ class TestNestedGroupingContextGroups:
                 meta_tmp, "--groups", groups_tmp, "--depth", "1",
             )
             assert "error" not in data
-            assert data["total_sections"] == 2  # one per node_id
+            assert data["total_sections"] == 1  # one per group
             assert data["depth"] == 1
             assert data["model"] == "haiku"
 
-            # Each section should have the children of the node
-            for sec in data["sections"]:
-                assert sec["parent_group"] == "feature-cards"
-                assert sec["depth"] == 1
-                assert sec["total_children"] == 2  # Title + Image
-                assert sec["section_id"] in ("2:100", "2:101")
+            # Single section for the group; siblings are node_ids themselves
+            sec = data["sections"][0]
+            assert sec["parent_group"] == "feature-cards"
+            assert sec["depth"] == 1
+            assert sec["total_children"] == 2  # 2 sibling nodes
+            assert sec["section_id"] == "2:100"  # first node_id
         finally:
             os.unlink(meta_tmp)
             os.unlink(groups_tmp)
@@ -5774,7 +5775,7 @@ class TestNestedGroupingContextGroups:
                 {
                     "name": "feature-cards",
                     "pattern": "card",
-                    "node_ids": ["2:100"],
+                    "node_ids": ["2:100", "2:101"],
                 },
             ]
         }
@@ -5798,7 +5799,7 @@ class TestNestedGroupingContextGroups:
                 {
                     "name": "cards",
                     "pattern": "card",
-                    "node_ids": ["2:100"],
+                    "node_ids": ["2:100", "2:101"],
                 },
             ]
         }
@@ -5815,14 +5816,14 @@ class TestNestedGroupingContextGroups:
             os.unlink(meta_tmp)
             os.unlink(groups_tmp)
 
-    def test_groups_skips_childless_nodes(self):
-        """Nodes without children are skipped (no enriched table to generate)."""
+    def test_groups_skips_too_few_siblings(self):
+        """Groups with fewer than 2 resolvable node_ids are skipped (Issue 257)."""
         groups = {
             "groups": [
                 {
                     "name": "empty-group",
                     "pattern": "list",
-                    "node_ids": ["2:200"],  # has no children
+                    "node_ids": ["2:200"],  # only 1 node_id → too few siblings
                 },
             ]
         }
@@ -5845,7 +5846,7 @@ class TestNestedGroupingContextGroups:
                 {
                     "name": "cards",
                     "pattern": "card",
-                    "node_ids": ["2:100"],
+                    "node_ids": ["2:100", "2:101"],
                 },
             ]
         }
@@ -5874,7 +5875,7 @@ class TestNestedGroupingContextGroups:
                 {
                     "name": "cards",
                     "pattern": "card",
-                    "node_ids": ["2:100"],
+                    "node_ids": ["2:100", "2:101"],
                 },
             ]
         }
@@ -5939,7 +5940,7 @@ class TestNestedGroupingContextGroups:
 # ============================================================
 class TestMaxStageCDepth:
     def test_max_stage_c_depth_value(self):
-        assert MAX_STAGE_C_DEPTH == 2
+        assert MAX_STAGE_C_DEPTH == 10  # Safety upper bound, convergence-based (Issue 257)
 
     def test_max_stage_c_depth_is_positive(self):
         assert MAX_STAGE_C_DEPTH > 0
@@ -6442,8 +6443,8 @@ class TestSkippedGroupsReporting:
             os.unlink(meta_tmp)
             os.unlink(groups_tmp)
 
-    def test_childless_node_skipped(self):
-        """Groups pointing to childless nodes are reported as skipped."""
+    def test_too_few_siblings_skipped(self):
+        """Groups with <2 resolvable node_ids are reported as skipped (Issue 257)."""
         metadata = self._build_metadata()
         groups = {
             "groups": [
@@ -6458,18 +6459,18 @@ class TestSkippedGroupsReporting:
                 meta_tmp, "--groups", groups_tmp, "--depth", "0")
             assert result.get('skipped_count', 0) >= 1
             skipped = result.get('skipped_groups', [])
-            childless = [s for s in skipped if s.get('reason') == 'no children']
-            assert len(childless) >= 1
+            few_siblings = [s for s in skipped if 'too few sibling nodes' in s.get('reason', '')]
+            assert len(few_siblings) >= 1
         finally:
             os.unlink(meta_tmp)
             os.unlink(groups_tmp)
 
     def test_no_skips_when_all_valid(self):
-        """When all groups are valid, skipped_count is 0."""
+        """When all groups are valid (>=2 node_ids), skipped_count is 0."""
         metadata = self._build_metadata()
         groups = {
             "groups": [
-                {"name": "section-1", "pattern": "multi", "node_ids": ["n1"]},
+                {"name": "section-1", "pattern": "multi", "node_ids": ["n1", "n2"]},
             ]
         }
         meta_tmp = write_fixture(metadata)
@@ -7411,3 +7412,111 @@ class TestAbsorbStageCDividers:
         result = absorb_stage_c_dividers(groups, node_lookup)
         assert len(result) == 2
         assert 'line' in result[0]['node_ids']
+
+
+# ============================================================
+# validate_column_consistency
+# ============================================================
+class TestValidateColumnConsistency:
+    """Tests for validate_column_consistency (Issue 256)."""
+
+    @staticmethod
+    def _make_node(node_id, x, y=0, w=100, h=50):
+        """Create a minimal node with absoluteBoundingBox."""
+        return {
+            'id': node_id,
+            'absoluteBoundingBox': {'x': x, 'y': y, 'width': w, 'height': h},
+        }
+
+    def test_no_split_needed(self):
+        """All nodes on same side — no split needed."""
+        node_lookup = {
+            'a': self._make_node('a', x=0, w=100),
+            'b': self._make_node('b', x=50, w=100),
+            'c': self._make_node('c', x=10, w=80),
+            # Need right-side nodes to establish two-column layout
+            'd': self._make_node('d', x=800, w=100),
+        }
+        groups = [
+            {'name': 'group-left', 'pattern': 'list', 'node_ids': ['a', 'b', 'c']},
+            {'name': 'group-right', 'pattern': 'list', 'node_ids': ['d']},
+        ]
+        result = validate_column_consistency(groups, node_lookup)
+        # group-left has all nodes on left side — no split
+        # group-right has single node — no split
+        assert len(result) == 2
+        assert result[0]['name'] == 'group-left'
+        assert result[1]['name'] == 'group-right'
+
+    def test_splits_cross_column(self):
+        """Group with nodes on both L and R sides should split into -left/-right."""
+        node_lookup = {
+            'l1': self._make_node('l1', x=0, w=100),
+            'l2': self._make_node('l2', x=50, w=100),
+            'r1': self._make_node('r1', x=800, w=100),
+            'r2': self._make_node('r2', x=850, w=100),
+        }
+        groups = [
+            {'name': 'content', 'pattern': 'zone', 'node_ids': ['l1', 'l2', 'r1', 'r2']},
+        ]
+        result = validate_column_consistency(groups, node_lookup)
+        assert len(result) == 2
+        left_group = result[0]
+        right_group = result[1]
+        assert left_group['name'] == 'content-left'
+        assert right_group['name'] == 'content-right'
+        assert 'l1' in left_group['node_ids']
+        assert 'l2' in left_group['node_ids']
+        assert 'r1' in right_group['node_ids']
+        assert 'r2' in right_group['node_ids']
+
+    def test_full_width_assigned_to_left(self):
+        """Full-width elements (>80% span) go to left group."""
+        # Span: 0 to 1000 => x_span=1000, 80% = 800
+        node_lookup = {
+            'l1': self._make_node('l1', x=0, w=100),
+            'r1': self._make_node('r1', x=900, w=100),
+            'fw': self._make_node('fw', x=0, w=900),  # 900 >= 1000*0.8 = full-width
+        }
+        groups = [
+            {'name': 'section', 'pattern': 'zone', 'node_ids': ['l1', 'r1', 'fw']},
+        ]
+        result = validate_column_consistency(groups, node_lookup)
+        assert len(result) == 2
+        left_group = result[0]
+        right_group = result[1]
+        assert left_group['name'] == 'section-left'
+        assert 'fw' in left_group['node_ids']
+        assert 'l1' in left_group['node_ids']
+        assert right_group['name'] == 'section-right'
+        assert 'r1' in right_group['node_ids']
+
+    def test_empty_groups(self):
+        """Empty input returns empty (or unchanged)."""
+        assert validate_column_consistency([], {}) == []
+        assert validate_column_consistency([], {'a': {}}) == []
+
+    def test_no_node_lookup(self):
+        """None node_lookup returns groups unchanged."""
+        groups = [
+            {'name': 'g', 'pattern': 'list', 'node_ids': ['a', 'b']},
+        ]
+        result = validate_column_consistency(groups, None)
+        assert result == groups
+
+    def test_single_column_layout(self):
+        """All nodes clustered on one side — no two-column detected."""
+        # All nodes in a narrow X range — not a two-column layout
+        node_lookup = {
+            'a': self._make_node('a', x=100, w=200),
+            'b': self._make_node('b', x=120, w=180),
+            'c': self._make_node('c', x=110, w=190),
+        }
+        groups = [
+            {'name': 'content', 'pattern': 'zone', 'node_ids': ['a', 'b', 'c']},
+        ]
+        result = validate_column_consistency(groups, node_lookup)
+        # No two-column layout detected, groups returned unchanged
+        assert len(result) == 1
+        assert result[0]['name'] == 'content'
+        assert result[0]['node_ids'] == ['a', 'b', 'c']

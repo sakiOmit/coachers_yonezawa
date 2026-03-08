@@ -101,7 +101,7 @@ COMPARE_MATCH_THRESHOLD = 0.5  # Jaccard threshold for Stage A/C group matching
 STAGE_C_COVERAGE_THRESHOLD = 0.8  # Stage C adoption: coverage >= 80% → use Stage C, else Stage A fallback
 
 # --- Issue 224: Stage C recursive nesting ---
-MAX_STAGE_C_DEPTH = 2  # Maximum recursion depth for Stage C nested grouping
+MAX_STAGE_C_DEPTH = 10  # Safety upper bound for Stage C recursion (converges naturally at 3-4)
 
 # --- Issue 229: Detector disable/coverable sets ---
 # Detectors that Stage C Claude inference can potentially replace

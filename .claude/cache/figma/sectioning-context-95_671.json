@@ -1,0 +1,202 @@
+{
+  "page_name": "env-row-solar",
+  "page_id": "95:671",
+  "page_size": {
+    "width": 1123.0,
+    "height": 416.0
+  },
+  "top_level_children": [
+    {
+      "id": "95:352",
+      "name": "icon-54",
+      "type": "VECTOR",
+      "bbox": {
+        "x": 318.0,
+        "y": 5166.0,
+        "w": 1123.0,
+        "h": 9.817578620641143e-05
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:389",
+      "name": "icon-81",
+      "type": "VECTOR",
+      "bbox": {
+        "x": 879.0,
+        "y": 5166.0,
+        "w": 0.0,
+        "h": 416.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:266",
+      "name": "content-office",
+      "type": "FRAME",
+      "bbox": {
+        "x": 352.0,
+        "y": 5211.0,
+        "w": 490.0,
+        "h": 118.0
+      },
+      "child_count": 3,
+      "child_types_summary": "FRAME:1, TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "太陽光パネル設置",
+        "自社社屋に太陽光パネルを設置し、工場やオフィス等で使用する電力の一部を再生可能エネルギーから供給されるものを活用し、CO2削減に努めております。"
+      ],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:263",
+      "name": "省エネ活動",
+      "type": "TEXT",
+      "bbox": {
+        "x": 981.0,
+        "y": 5213.0,
+        "w": 108.0,
+        "h": 29.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:564",
+      "name": "電球アイコン15 1",
+      "type": "FRAME",
+      "bbox": {
+        "x": 930.0,
+        "y": 5213.0,
+        "w": 30.0,
+        "h": 30.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:327",
+      "name": "社員の残業を最小限に減らし、社内の電気代削減に努めております。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 934.0,
+        "y": 5254.0,
+        "w": 374.0,
+        "h": 50.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "95:362",
+      "name": "icon-64",
+      "type": "VECTOR",
+      "bbox": {
+        "x": 318.0,
+        "y": 5374.0,
+        "w": 1123.0,
+        "h": 9.817578620641143e-05
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    }
+  ],
+  "total_children": 7,
+  "heuristic_hints": {
+    "header_candidates": [],
+    "header_cluster_ids": [],
+    "footer_candidates": [],
+    "gap_analysis": [
+      {
+        "between": [
+          "95:352",
+          "95:389"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "95:389",
+          "95:266"
+        ],
+        "gap_px": -371
+      },
+      {
+        "between": [
+          "95:266",
+          "95:263"
+        ],
+        "gap_px": -116
+      },
+      {
+        "between": [
+          "95:263",
+          "95:564"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "95:564",
+          "95:327"
+        ],
+        "gap_px": 11
+      },
+      {
+        "between": [
+          "95:327",
+          "95:362"
+        ],
+        "gap_px": 70
+      }
+    ],
+    "background_candidates": [],
+    "consecutive_patterns": [],
+    "heading_candidates": [
+      {
+        "index": 2,
+        "id": "95:266",
+        "name": "content-office",
+        "height": 118.0
+      }
+    ],
+    "loose_elements": [
+      {
+        "index": 0,
+        "id": "95:352",
+        "name": "icon-54",
+        "type": "VECTOR",
+        "height": 9.817578620641143e-05
+      },
+      {
+        "index": 6,
+        "id": "95:362",
+        "name": "icon-64",
+        "type": "VECTOR",
+        "height": 9.817578620641143e-05
+      }
+    ]
+  },
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 95:352 | icon-54 | VECTOR | 318 | 5166 | 1123x0 | Y | - | overflow,overflow-y,bg-full | - |\n| 2 | 95:389 | icon-81 | VECTOR | 879 | 5166 | 0x416 | Y | - | overflow-y | - |\n| 3 | 95:266 | content-office | FRAME | 352 | 5211 | 490x118 | N | 1FRA+2TEX | overflow-y | 太陽光パネル設置 |\n| 4 | 95:263 | 省エネ活動 | TEXT | 981 | 5213 | 108x29 | Y | - | overflow-y | 省エネ活動 |\n| 5 | 95:564 | 電球アイコン15 1 | FRAME | 930 | 5213 | 30x30 | Y | - | overflow-y,tiny | - |\n| 6 | 95:327 | 社員の残業を最小限に減らし、社内の電気代削減に努めております。 | TEXT | 934 | 5254 | 374x50 | Y | - | overflow-y | 社員の残業を最小限に減らし、社内の電気代削減に努めております |\n| 7 | 95:362 | icon-64 | VECTOR | 318 | 5374 | 1123x0 | Y | - | overflow,overflow-y,bg-full | - |"
+}
