@@ -27,6 +27,8 @@ from .constants import (
     GROUPING_FALLBACK_MAX_SIBLINGS,
     HEADING_MAX_CHILDREN,
     HEADING_TEXT_RATIO,
+    LLM_CONFIDENCE_MAP,
+    LLM_DEFAULT_CONFIDENCE,
 )
 
 # ---------------------------------------------------------------------------
@@ -42,16 +44,9 @@ GROUPING_FALLBACK_MIN_SIBLINGS_AFTER_HEADING = 3
 # Jaccard threshold for considering siblings as structurally similar
 GROUPING_FALLBACK_STRUCTURE_SIMILARITY = 0.7
 
-# Confidence mapping for LLM self-reported levels (same as rename_llm_fallback)
-GROUPING_LLM_CONFIDENCE_MAP = {
-    '高': 92,
-    'high': 92,
-    '中': 78,
-    'medium': 78,
-    '低': 62,
-    'low': 62,
-}
-GROUPING_LLM_DEFAULT_CONFIDENCE = 78
+# Re-export from constants for backward compatibility
+GROUPING_LLM_CONFIDENCE_MAP = LLM_CONFIDENCE_MAP
+GROUPING_LLM_DEFAULT_CONFIDENCE = LLM_DEFAULT_CONFIDENCE
 
 
 # ---------------------------------------------------------------------------

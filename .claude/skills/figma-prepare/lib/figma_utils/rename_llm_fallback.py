@@ -18,24 +18,13 @@ Usage in SKILL.md workflow:
 import json
 import re
 
-from .constants import UNNAMED_RE
+from .constants import UNNAMED_RE, LLM_CONFIDENCE_MAP, LLM_DEFAULT_CONFIDENCE
 from .enrichment import _collect_text_preview, _compute_child_types
 from .geometry import filter_visible_children, get_bbox, resolve_absolute_coords
 from .metadata import find_node_by_id, get_root_node, is_unnamed, load_metadata
 
 # Default confidence threshold for LLM fallback
 LLM_FALLBACK_CONFIDENCE_THRESHOLD = 50
-
-# Confidence mapping for LLM self-reported levels (v2)
-LLM_CONFIDENCE_MAP = {
-    '高': 92,
-    'high': 92,
-    '中': 78,
-    'medium': 78,
-    '低': 62,
-    'low': 62,
-}
-LLM_DEFAULT_CONFIDENCE = 78  # Default if not specified
 
 
 def collect_low_confidence_renames(renames, threshold=LLM_FALLBACK_CONFIDENCE_THRESHOLD):

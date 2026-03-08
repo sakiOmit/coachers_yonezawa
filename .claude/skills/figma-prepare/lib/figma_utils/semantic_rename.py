@@ -37,19 +37,12 @@ from .rename_strategies import (  # noqa: F401
 from .rename_strategies import _SHAPE_PREFIXES, _CTA_KEYWORDS  # noqa: F401
 
 # ---------------------------------------------------------------------------
-# Shape prefix mapping (canonical copy, re-exported by __init__.py)
+# Shape prefix mapping — re-export from rename_strategies (single source of truth)
 # ---------------------------------------------------------------------------
+SHAPE_PREFIXES = _SHAPE_PREFIXES
 
-SHAPE_PREFIXES = {
-    'RECTANGLE': 'bg',
-    'ELLIPSE': 'circle',
-    'LINE': 'divider',
-    'VECTOR': 'icon',
-    'IMAGE': 'img',
-}
-
-# CTA keywords used in Priority 3.15
-CTA_KEYWORDS = ['お問い合わせ', '問い合わせ', 'contact', '資料請求', '相談', '申し込み', '申込']
+# CTA keywords used in Priority 3.15 — re-export from rename_strategies
+CTA_KEYWORDS = _CTA_KEYWORDS
 
 
 # ---------------------------------------------------------------------------

@@ -125,7 +125,7 @@ def detect_grouping_candidates_simple(node):
     weight in scoring (cap=10, weight=1).
     """
     candidates = 0
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
 
     if len(children) >= 3:
         # Check for repeated similar structures
