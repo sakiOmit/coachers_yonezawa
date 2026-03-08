@@ -302,6 +302,91 @@ def absorb_stage_c_dividers(groups, node_lookup=None):
     return [g for i, g in enumerate(result_groups) if i not in absorbed]
 
 
+def validate_column_consistency(groups, node_lookup):
+    """Post-validate that no group mixes left and right column elements (Issue 256).
+
+    Checks each group's node_ids: if any have x < midpoint and others x >= midpoint,
+    the group is split into left and right sub-groups.
+
+    Args:
+        groups: list of group dicts with 'node_ids', 'pattern', 'name'
+        node_lookup: dict mapping node_id -> node dict (with absoluteBoundingBox)
+
+    Returns:
+        list of groups with cross-column groups split into separate L/R groups
+    """
+    if not groups or not node_lookup:
+        return groups
+
+    # Collect all X positions to find midpoint
+    all_x = []
+    all_right = []
+    for g in groups:
+        for nid in g.get('node_ids', []):
+            node = node_lookup.get(nid)
+            if node:
+                bb = get_bbox(node)
+                all_x.append(bb['x'])
+                all_right.append(bb['x'] + bb['w'])
+
+    if len(all_x) < 2:
+        return groups
+
+    x_min = min(all_x)
+    x_max = max(all_right)
+    x_span = x_max - x_min
+    if x_span <= 0:
+        return groups
+
+    midpoint = x_min + x_span / 2
+
+    # Check if two-column layout exists
+    left_count = sum(1 for xr in all_right if xr <= midpoint + x_span * 0.1)
+    right_count = sum(1 for xp in all_x if xp >= midpoint - x_span * 0.1)
+    if left_count < 1 or right_count < 1:
+        return groups  # Not a two-column layout
+
+    result = []
+    for g in groups:
+        nids = g.get('node_ids', [])
+        left_nids = []
+        right_nids = []
+        full_nids = []
+
+        for nid in nids:
+            node = node_lookup.get(nid)
+            if not node:
+                left_nids.append(nid)  # fallback
+                continue
+            bb = get_bbox(node)
+            right_edge = bb['x'] + bb['w']
+            if bb['w'] >= x_span * 0.8:
+                full_nids.append(nid)  # Full-width element
+            elif right_edge <= midpoint:
+                left_nids.append(nid)
+            elif bb['x'] >= midpoint:
+                right_nids.append(nid)
+            else:
+                left_nids.append(nid)  # Spanning element, assign to left
+
+        if left_nids and right_nids:
+            # Cross-column detected — split
+            # Assign full-width to left group (typically dividers)
+            left_group = dict(g)
+            left_group['name'] = g['name'] + '-left'
+            left_group['node_ids'] = left_nids + full_nids
+            result.append(left_group)
+
+            right_group = dict(g)
+            right_group['name'] = g['name'] + '-right'
+            right_group['node_ids'] = right_nids
+            result.append(right_group)
+        else:
+            result.append(g)
+
+    return result
+
+
 def yaml_str(value):
     """Safely encode a string for YAML double-quoted output.
 
@@ -2322,7 +2407,9 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
     """Generate enriched Markdown table for Phase B Claude reasoning.
 
     Produces the enriched format:
-    | # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |
+    | # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |
+
+    Col column (Issue 256): L=left, R=right, F=full-width, C=center, -=no columns detected.
 
     This format provides Claude with enough structural information to detect
     patterns like cards, tables, background layers, etc. without needing
@@ -2340,9 +2427,33 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
     Returns:
         str: Markdown table string.
     """
-    header = '| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |'
-    separator = '|---|-----|------|------|---|---|-------|-------|------------|-------|------|'
+    header = '| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |'
+    separator = '|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|'
     rows = [header, separator]
+
+    # Pre-compute column classification (Issue 256)
+    # Detect two-column layout by X-coordinate clustering
+    x_positions = []
+    x_right_edges = []
+    for child in children:
+        cbb = get_bbox(child)
+        x_positions.append(int(cbb['x']))
+        x_right_edges.append(int(cbb['x'] + cbb['w']))
+
+    # Determine if two-column layout exists
+    col_midpoint = None
+    if len(x_positions) >= 2:
+        x_min = min(x_positions)
+        x_max = max(x_right_edges)
+        x_span = x_max - x_min
+        if x_span > 0:
+            # Check if elements cluster into left/right groups
+            mid = x_min + x_span / 2
+            left_count = sum(1 for xr in x_right_edges if xr <= mid + x_span * 0.1)
+            right_count = sum(1 for xp in x_positions if xp >= mid - x_span * 0.1)
+            # Need elements on both sides for two-column detection
+            if left_count >= 1 and right_count >= 1 and left_count + right_count > len(x_positions) * 0.3:
+                col_midpoint = mid
 
     for i, child in enumerate(children):
         bb = get_bbox(child)
@@ -2357,6 +2468,20 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
         is_leaf = len(child_nodes) == 0
         leaf_str = 'Y' if is_leaf else 'N'
 
+        # Column classification (Issue 256)
+        if col_midpoint is not None:
+            right_edge = x + w
+            if right_edge <= col_midpoint:
+                col = 'L'
+            elif x >= col_midpoint:
+                col = 'R'
+            elif w >= (max(x_right_edges) - min(x_positions)) * 0.8:
+                col = 'F'  # Full-width (dividers, backgrounds)
+            else:
+                col = 'C'  # Center / spanning both
+        else:
+            col = '-'
+
         # Child types summary
         child_types = _compute_child_types(child_nodes)
 
@@ -2369,7 +2494,7 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
         if not text:
             text = '-'
 
-        row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {text} |'
+        row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {col} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {text} |'
         rows.append(row)
 
     return '\n'.join(rows)

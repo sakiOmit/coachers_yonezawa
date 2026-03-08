@@ -3963,7 +3963,7 @@ class TestGenerateEnrichedTable:
         result = generate_enriched_table(children)
         lines = result.strip().split('\n')
         assert len(lines) == 3  # header + separator + 1 row
-        assert '| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |' in lines[0]
+        assert '| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |' in lines[0]
         assert lines[1].startswith('|---')
 
     def test_leaf_detection(self):
@@ -4100,7 +4100,7 @@ class TestGenerateEnrichedTable:
         lines = result.strip().split('\n')
         # Flags column should contain just '-'
         cols = [c.strip() for c in lines[2].split('|')]
-        flags_col = cols[10]  # 10th column (0-indexed, accounting for leading empty)
+        flags_col = cols[11]  # 11th column (0-indexed, accounting for leading empty + Col column)
         assert flags_col == '-'
 
     def test_model_case_blog_section(self):
