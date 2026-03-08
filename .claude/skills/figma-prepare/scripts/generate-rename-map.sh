@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
+if [[ $# -lt 1 ]]; then
   echo '{"error": "Usage: generate-rename-map.sh <metadata.json> [--output file.yaml] [--llm-fallback-context fallback.json]"}' >&2
   exit 1
 fi
@@ -36,11 +36,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIB_DIR="${SCRIPT_DIR}/../lib"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import sys, os
-sys.path.insert(0, os.path.join('${LIB_DIR}'))
+validate_input_file "$METADATA_FILE" "Usage: generate-rename-map.sh <metadata.json> [--output file.yaml] [--llm-fallback-context fallback.json]"
+
+run_figma_python "
 from figma_utils.semantic_rename import generate_rename_map
 generate_rename_map(sys.argv[1], sys.argv[2], sys.argv[3])
 " "$METADATA_FILE" "$OUTPUT_FILE" "$FALLBACK_CONTEXT"

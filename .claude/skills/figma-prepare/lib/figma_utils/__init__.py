@@ -3,7 +3,7 @@
 Package facade: re-exports all public API from submodules for backward compatibility.
 All existing imports (`from figma_utils import X`) continue to work unchanged.
 
-Submodule hierarchy (39 modules):
+Submodule hierarchy (37 modules):
 
   Foundation:
     constants           - Thresholds, regex patterns, lookup tables (106+ constants)
@@ -12,10 +12,8 @@ Submodule hierarchy (39 modules):
     naming              - Text conversion (to_kebab, _jp_keyword_lookup)
     scoring             - Proximity scoring, structure hashing, layout inference
 
-  Detection (facade chain: __init__ -> detection -> detection_patterns/detection_semantic -> leaf modules):
-    detection           - Core detection (heading, absorption) + re-exports
-    detection_patterns  - Facade -> detect_tuple_patterns, detect_consecutive, detect_highlight, detect_en_jp
-    detection_semantic  - Facade -> detect_decoration, detect_horizontal_bar, detect_bg_content, detect_table
+  Detection (2-layer: __init__ -> detection -> leaf modules):
+    detection             - Core detection (heading, absorption) + re-exports from leaf modules
     detect_tuple_patterns - Repeating tuple pattern detection
     detect_consecutive    - Consecutive similar element detection
     detect_highlight      - Highlight text (RECT+TEXT overlap) detection

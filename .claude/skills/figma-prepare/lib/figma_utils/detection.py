@@ -1,8 +1,18 @@
 """Core detection functions for figma-prepare.
 
 Heading detection, heading-content pair detection, zone bbox computation,
-loose element absorption, and re-exports from detection_patterns and
-detection_semantic for backward compatibility.
+loose element absorption, and re-exports from leaf detection modules for
+backward compatibility.
+
+Leaf modules (imported directly):
+  detect_tuple_patterns   - Repeating tuple pattern detection
+  detect_consecutive      - Consecutive similar element detection
+  detect_highlight        - Highlight text (RECT+TEXT overlap) detection
+  detect_en_jp            - EN+JP label pair detection
+  detect_decoration       - Decoration dot/pattern detection
+  detect_horizontal_bar   - Horizontal bar/news ticker detection
+  detect_bg_content       - Background-content layer separation
+  detect_table            - Table row structure detection
 """
 
 from .constants import (
@@ -15,36 +25,52 @@ from .constants import (
 )
 from .geometry import filter_visible_children, get_bbox
 
-# Re-export everything from sub-modules for backward compatibility.
+# Re-export everything from leaf detection modules for backward compatibility.
 # All internal modules that do `from .detection import X` will still work.
-from .detection_patterns import (  # noqa: F401
+
+# --- Pattern detection (formerly via detection_patterns facade) ---
+from .detect_tuple_patterns import (  # noqa: F401
     detect_repeating_tuple,
+)
+from .detect_consecutive import (  # noqa: F401
     detect_consecutive_similar,
-    detect_highlight_text,
-    detect_en_jp_label_pairs,
+)
+from .detect_highlight import (  # noqa: F401
     _check_rect_text_overlap,
     _find_rect_text_overlaps,
+    detect_highlight_text,
+)
+from .detect_en_jp import (  # noqa: F401
     _is_en_label,
     _is_jp_text,
     _pair_distance,
+    detect_en_jp_label_pairs,
 )
-from .detection_semantic import (  # noqa: F401
+
+# --- Semantic detection (formerly via detection_semantic facade) ---
+from .detect_decoration import (  # noqa: F401
     is_decoration_pattern,
     decoration_dominant_shape,
-    detect_horizontal_bar,
-    detect_bg_content_layers,
-    detect_table_rows,
+)
+from .detect_horizontal_bar import (  # noqa: F401
     _cluster_by_y_band,
     _expand_y_band,
     _infer_bar_name,
     _is_valid_horizontal_bar,
+    detect_horizontal_bar,
+)
+from .detect_bg_content import (  # noqa: F401
     _find_bg_rectangle,
     _classify_decorations,
+    detect_bg_content_layers,
+)
+from .detect_table import (  # noqa: F401
     _find_table_row_backgrounds,
     _find_table_dividers,
     _assign_members_to_rows,
     _include_table_headings,
     _infer_table_name,
+    detect_table_rows,
 )
 
 

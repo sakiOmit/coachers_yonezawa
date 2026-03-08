@@ -11,8 +11,11 @@ Split into submodules:
 Issue: Extracted from shell heredoc for maintainability.
 """
 
+from __future__ import annotations
+
 import json
 import sys
+from typing import Any
 
 from .constants import (
     UNNAMED_RE,
@@ -23,7 +26,7 @@ from .constants import (
 from .detection import (
     detect_en_jp_label_pairs,
 )
-from .geometry import filter_visible_children, resolve_absolute_coords, yaml_str
+from .geometry import FigmaNode, filter_visible_children, resolve_absolute_coords, yaml_str
 from .metadata import get_root_node, get_text_children_content as _get_text_children, load_metadata
 from .naming import _jp_keyword_lookup, to_kebab
 
@@ -142,7 +145,7 @@ def _estimate_children_confidence(name):
     return 50  # unknown pattern
 
 
-def infer_name_with_confidence(node, parent=None, sibling_index=0, total_siblings=1):
+def infer_name_with_confidence(node: FigmaNode, parent: FigmaNode | None = None, sibling_index: int = 0, total_siblings: int = 1) -> tuple[str, int]:
     """Infer semantic name with confidence score (0-100).
 
     Iterates over RENAME_STRATEGIES in priority order, invoking each
@@ -196,7 +199,7 @@ def infer_name_with_confidence(node, parent=None, sibling_index=0, total_sibling
     return (f'{type_prefix}-{sibling_index}', 10)
 
 
-def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
+def infer_name(node: FigmaNode, parent: FigmaNode | None = None, sibling_index: int = 0, total_siblings: int = 1) -> str:
     """Infer semantic name for an unnamed node.
 
     Dispatches to priority-level helpers in rename_strategies.py.
@@ -278,7 +281,7 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def generate_rename_map(metadata_path, output_file='', fallback_context_path=''):
+def generate_rename_map(metadata_path: str, output_file: str = '', fallback_context_path: str = '') -> None:
     """Generate a semantic rename map from Figma metadata.
 
     Args:

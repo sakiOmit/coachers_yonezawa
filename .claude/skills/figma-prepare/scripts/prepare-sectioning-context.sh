@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
+if [[ $# -lt 1 ]]; then
   echo '{"error": "Usage: prepare-sectioning-context.sh <metadata.json> [--output file.json] [--enriched-table]"}' >&2
   exit 1
 fi
@@ -37,16 +37,18 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import sys, os, json
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+validate_input_file "$INPUT_FILE" "Usage: prepare-sectioning-context.sh <metadata.json> [--output file.json] [--enriched-table]"
+
+run_figma_python "
+import json
 from figma_utils.sectioning import run_sectioning_context
 
 try:
-    result = run_sectioning_context(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else '', sys.argv[4] if len(sys.argv) > 4 else '')
+    result = run_sectioning_context(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else '', sys.argv[3] if len(sys.argv) > 3 else '')
     print(result)
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE" "$ENRICHED_TABLE"
+" "$INPUT_FILE" "$OUTPUT_FILE" "$ENRICHED_TABLE"

@@ -31,8 +31,11 @@ Internal (not part of public API):
    - _FigmaXmlParser            Stateful XML parser class
 """
 
+from __future__ import annotations
+
 import json
 from html import unescape
+from typing import Any
 
 from .constants import (
     UNNAMED_RE,
@@ -42,7 +45,7 @@ from .constants import (
     DEEP_NESTING_THRESHOLD,
     OFF_CANVAS_MARGIN,
 )
-from .geometry import filter_visible_children, get_bbox
+from .geometry import FigmaNode, filter_visible_children, get_bbox
 
 __all__ = [
     # I/O & Parsing
@@ -196,7 +199,7 @@ class _FigmaXmlParser:
         return self._parse_tag()
 
 
-def parse_figma_xml(xml_str):
+def parse_figma_xml(xml_str: str) -> FigmaNode | None:
     """Parse Figma Dev Mode MCP XML metadata to JSON node tree.
 
     The Figma Dev Mode MCP (get_metadata) returns XML like:
@@ -220,7 +223,7 @@ def parse_figma_xml(xml_str):
     return root
 
 
-def load_metadata(file_path):
+def load_metadata(file_path: str) -> dict[str, Any]:
     """Load Figma metadata from file, auto-detecting format.
 
     Supports:
@@ -280,7 +283,7 @@ def get_root_node(data):
     return data
 
 
-def find_node_by_id(root, node_id):
+def find_node_by_id(root: FigmaNode, node_id: str) -> FigmaNode | None:
     """Recursively search the tree and return the node with the given ID.
 
     Returns None if no node with the specified ID is found.
@@ -301,7 +304,7 @@ def find_node_by_id(root, node_id):
 # Structural Predicates
 # ============================================================
 
-def is_unnamed(name):
+def is_unnamed(name: str) -> bool:
     """Check if a node name matches unnamed (auto-generated) pattern."""
     return bool(UNNAMED_RE.match(name))
 

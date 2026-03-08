@@ -1,6 +1,9 @@
 """Enriched table generation for figma-prepare."""
 
+from __future__ import annotations
+
 from collections import Counter
+from typing import Any
 
 from .constants import (
     BG_WIDTH_RATIO,
@@ -11,7 +14,7 @@ from .constants import (
     UNNAMED_RE,
 )
 from .detection import is_decoration_pattern
-from .geometry import filter_visible_children, get_bbox
+from .geometry import FigmaNode, filter_visible_children, get_bbox
 from .metadata import is_off_canvas
 
 
@@ -144,8 +147,9 @@ def _compute_method_tag(node_id, stage_a_candidates):
     return '-'
 
 
-def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, root_y=0,
-                            stage_a_candidates=None):
+def generate_enriched_table(children: list[FigmaNode], page_width: float = 1440, page_height: float = 0,
+                            root_x: float = 0, root_y: float = 0,
+                            stage_a_candidates: list[dict[str, Any]] | None = None) -> str:
     """Generate enriched Markdown table for Phase B Claude reasoning.
 
     Produces the enriched format:

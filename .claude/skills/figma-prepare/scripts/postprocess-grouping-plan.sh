@@ -15,20 +15,16 @@ fi
 
 PLAN_FILE="$1"
 
-if [[ ! -f "$PLAN_FILE" ]]; then
-  echo "ERROR: Plan file not found: $PLAN_FILE" >&2
-  exit 1
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import sys, os
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+validate_input_file "$PLAN_FILE" "Plan file not found: $PLAN_FILE"
+
+run_figma_python "
 from figma_utils.grouping_postprocess import postprocess_plan
 
-plan_file = sys.argv[2]
+plan_file = sys.argv[1]
 output_text, total_absorbed, exit_code = postprocess_plan(plan_file)
 print(output_text)
 sys.exit(exit_code)
-" "${SCRIPT_DIR}/.." "$PLAN_FILE"
+" "$PLAN_FILE"

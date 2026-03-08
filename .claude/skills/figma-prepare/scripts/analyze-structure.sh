@@ -8,22 +8,24 @@
 
 set -euo pipefail
 
-if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
+if [[ $# -lt 1 ]]; then
   echo '{"error": "Usage: analyze-structure.sh <metadata.json>"}' >&2
   exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import sys, os, json
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+validate_input_file "$1" "Usage: analyze-structure.sh <metadata.json>"
+
+run_figma_python "
+import json
 from figma_utils.structure_analysis import run_structure_analysis
 
 try:
-    result = run_structure_analysis(sys.argv[2])
+    result = run_structure_analysis(sys.argv[1])
     print(result)
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$1"
+" "$1"

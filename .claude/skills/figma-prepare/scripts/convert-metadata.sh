@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
+if [[ $# -lt 1 ]]; then
   echo '{"error": "Usage: convert-metadata.sh <input-file> [--output <output-file>]"}' >&2
   exit 1
 fi
@@ -30,20 +30,22 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import json, sys, os
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+validate_input_file "$INPUT_FILE" "Usage: convert-metadata.sh <input-file> [--output <output-file>]"
+
+run_figma_python "
+import json
 from figma_utils import load_metadata, get_root_node
 
 try:
-    data = load_metadata(sys.argv[2])
+    data = load_metadata(sys.argv[1])
     root = get_root_node(data)
 
     # Wrap in standard format
     output = {'document': root}
 
-    output_file = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] else None
+    output_file = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else None
     result = json.dumps(output, ensure_ascii=False)
 
     if output_file:
@@ -62,4 +64,4 @@ try:
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE"
+" "$INPUT_FILE" "$OUTPUT_FILE"

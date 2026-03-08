@@ -24,27 +24,30 @@
 
 set -euo pipefail
 
-if [[ $# -lt 2 ]] || [[ ! -f "$1" ]] || [[ ! -f "$2" ]]; then
+if [[ $# -lt 2 ]]; then
   echo '{"error": "Usage: enrich-metadata.sh <metadata.json> <enrichment.json> [--output file.json]"}' >&2
   exit 1
 fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
+
+validate_input_file "$1" "Usage: enrich-metadata.sh <metadata.json> <enrichment.json> [--output file.json]"
+validate_input_file "$2" "Usage: enrich-metadata.sh <metadata.json> <enrichment.json> [--output file.json]"
 
 OUTPUT_FILE=""
 if [[ "${3:-}" == "--output" ]] && [[ -n "${4:-}" ]]; then
   OUTPUT_FILE="$4"
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-python3 -c "
-import json, sys, os
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
+run_figma_python "
+import json
 from figma_utils.metadata_enricher import enrich_metadata_from_files
 
 try:
-    result = enrich_metadata_from_files(sys.argv[2], sys.argv[3], sys.argv[4])
+    result = enrich_metadata_from_files(sys.argv[1], sys.argv[2], sys.argv[3])
     print(result)
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$1" "$2" "$OUTPUT_FILE"
+" "$1" "$2" "$OUTPUT_FILE"

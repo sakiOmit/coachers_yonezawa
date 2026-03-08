@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-if [[ $# -lt 1 ]] || [[ ! -f "$1" ]]; then
+if [[ $# -lt 1 ]]; then
   echo '{"error": "Usage: detect-grouping-candidates.sh <metadata.json> [--output file.yaml] [--skip-root] [--disable-detectors list]"}' >&2
   exit 1
 fi
@@ -41,22 +41,24 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
 
-python3 -c "
-import json, sys, os
+validate_input_file "$INPUT_FILE" "Usage: detect-grouping-candidates.sh <metadata.json> [--output file.yaml] [--skip-root] [--disable-detectors list]"
+
+run_figma_python "
+import json
 sys.setrecursionlimit(3000)
-sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
 from figma_utils.grouping_engine import detect_grouping_candidates
 
 try:
     result = detect_grouping_candidates(
-        metadata_path=sys.argv[2],
-        output_file=sys.argv[3],
-        skip_root=sys.argv[4],
-        disable_detectors=sys.argv[5] if len(sys.argv) > 5 else '',
+        metadata_path=sys.argv[1],
+        output_file=sys.argv[2],
+        skip_root=sys.argv[3],
+        disable_detectors=sys.argv[4] if len(sys.argv) > 4 else '',
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)
-" "${SCRIPT_DIR}/.." "$INPUT_FILE" "$OUTPUT_FILE" "$SKIP_ROOT" "$DISABLE_DETECTORS"
+" "$INPUT_FILE" "$OUTPUT_FILE" "$SKIP_ROOT" "$DISABLE_DETECTORS"

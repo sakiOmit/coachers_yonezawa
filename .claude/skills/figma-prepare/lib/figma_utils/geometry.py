@@ -1,8 +1,14 @@
 """Geometry and coordinate utilities for figma-prepare."""
 
+from __future__ import annotations
+
 import json
+from typing import Any
 
 from .constants import GRID_SNAP
+
+# Type alias for Figma node dict
+FigmaNode = dict[str, Any]
 
 
 def yaml_str(value):
@@ -14,7 +20,7 @@ def yaml_str(value):
     return json.dumps(str(value), ensure_ascii=False)
 
 
-def resolve_absolute_coords(node, parent_x=0, parent_y=0):
+def resolve_absolute_coords(node: FigmaNode, parent_x: float = 0, parent_y: float = 0) -> None:
     """Convert parent-relative coordinates to absolute coordinates.
 
     get_metadata returns parent-relative x/y in absoluteBoundingBox.
@@ -80,7 +86,7 @@ def _resolve_artboard_relative(root):
         _apply_offset(child)
 
 
-def get_bbox(node):
+def get_bbox(node: FigmaNode) -> dict[str, float]:
     """Get bounding box from node.
 
     Returns dict with short keys: x, y, w, h.
@@ -94,12 +100,12 @@ def get_bbox(node):
     }
 
 
-def filter_visible_children(node):
+def filter_visible_children(node: FigmaNode) -> list[FigmaNode]:
     """Return children of *node* that are not explicitly hidden (visible != False)."""
     return [c for c in node.get('children', []) if c.get('visible') != False]
 
 
-def sort_by_y(items):
+def sort_by_y(items: list[FigmaNode]) -> list[FigmaNode]:
     """Sort items by their absoluteBoundingBox Y coordinate."""
     return sorted(items, key=lambda c: get_bbox(c).get('y', 0))
 

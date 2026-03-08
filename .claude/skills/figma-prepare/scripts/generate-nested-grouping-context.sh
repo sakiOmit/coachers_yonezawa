@@ -79,7 +79,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
+source "${SCRIPT_DIR}/lib/figma-utils.sh"
+
 TEMPLATE_FILE="$SKILLS_DIR/references/nested-grouping-prompt-template.md"
 
 if [[ ! -f "$TEMPLATE_FILE" ]]; then
@@ -104,7 +105,7 @@ fi
 
 exec python3 -c "
 import sys, os, argparse
-sys.path.insert(0, os.path.join('${SKILLS_DIR}', 'lib'))
+sys.path.insert(0, '${LIB_DIR}')
 from figma_utils.nested_context import generate_nested_context
 
 parser = argparse.ArgumentParser()
