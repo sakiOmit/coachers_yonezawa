@@ -180,6 +180,8 @@ def heuristic_sub_group(group, sibling_nodes, root_node, page_width, page_height
     bboxes = {}
     for node in sibling_nodes:
         nid = node.get('id', '')
+        if not nid:
+            continue
         bboxes[nid] = get_bbox(node)
 
     if not bboxes:
@@ -250,6 +252,8 @@ def _try_heading_split(rows, bboxes, sibling_nodes, parent_name):
     node_types = {}
     for node in sibling_nodes:
         nid = node.get('id', '')
+        if not nid:
+            continue
         ntype = node.get('type', '')
         node_types[nid] = ntype
 

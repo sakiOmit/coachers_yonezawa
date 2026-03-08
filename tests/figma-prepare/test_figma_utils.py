@@ -2301,6 +2301,31 @@ class TestDetectBgContentLayers:
         assert len(result) == 1
         assert 'bg1' in result[0]['bg_node_ids']
 
+    def test_hidden_children_filtered(self):
+        """Hidden children should be excluded from bg-content detection (Issue #264)."""
+        parent_bb = {'x': 0, 'y': 0, 'w': 1440, 'h': 800}
+        children = [
+            # bg RECTANGLE (visible)
+            {"id": "bg1", "type": "RECTANGLE", "name": "Rectangle 1",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400}},
+            # Hidden RECTANGLE that would be a second bg candidate if not filtered
+            {"id": "bg2", "type": "RECTANGLE", "name": "Rectangle 2",
+             "absoluteBoundingBox": {"x": 0, "y": 0, "width": 1440, "height": 400},
+             "visible": False},
+            # Content elements
+            {"id": "c1", "type": "TEXT", "name": "text1",
+             "absoluteBoundingBox": {"x": 100, "y": 100, "width": 400, "height": 60}},
+            {"id": "c2", "type": "GROUP", "name": "content",
+             "absoluteBoundingBox": {"x": 100, "y": 200, "width": 400, "height": 60},
+             "children": [{"type": "TEXT", "children": []}]},
+        ]
+        result = detect_bg_content_layers(children, parent_bb)
+        # Without hidden filter, 2 bg RECTANGLEs would cause empty result (ambiguous).
+        # With hidden filter, only 1 visible bg RECTANGLE -> detection succeeds.
+        assert len(result) == 1
+        assert 'bg1' in result[0]['bg_node_ids']
+        assert set(result[0]['node_ids']) == {'c1', 'c2'}
+
 
 # ============================================================
 # detect_table_rows (Issue 181)
@@ -2774,6 +2799,22 @@ class TestDetectRepeatingTuple:
         children = [self._make_node("TEXT", f"t-{i}") for i in range(6)]
         result = detect_repeating_tuple(children)
         assert len(result) == 0
+
+    def test_hidden_children_filtered(self):
+        """Hidden children should be excluded from tuple detection (Issue #264)."""
+        children = []
+        for i in range(3):
+            children.append(self._make_node("RECTANGLE", f"img-{i}"))
+            children.append(self._make_node("FRAME", f"text-{i}"))
+            children.append(self._make_node("INSTANCE", f"arrow-{i}"))
+        # Insert hidden elements that would break the pattern if not filtered
+        children.insert(3, {"type": "VECTOR", "name": "hidden-el", "id": "hidden-1", "visible": False})
+        children.insert(7, {"type": "TEXT", "name": "hidden-el-2", "id": "hidden-2", "visible": False})
+        result = detect_repeating_tuple(children)
+        # Hidden elements should be filtered out; pattern should still be detected
+        assert len(result) == 1
+        assert result[0]['tuple_size'] == 3
+        assert result[0]['count'] == 3
 
 
 # ============================================================
@@ -4174,6 +4215,21 @@ class TestGenerateEnrichedTable:
         assert '222' in result
         assert '3987' in result
         assert '318x93' in result
+
+    def test_col_dash_when_all_same_x(self):
+        """All elements at same X position → x_span=0 → Col='-' for all (Issue 261)."""
+        children = [
+            self._make_node('1:1', 'FRAME', 'item-a', 100, 0, 200, 100),
+            self._make_node('1:2', 'FRAME', 'item-b', 100, 120, 200, 100),
+            self._make_node('1:3', 'FRAME', 'item-c', 100, 240, 200, 100),
+        ]
+        result = generate_enriched_table(children, page_width=1440)
+        lines = result.strip().split('\n')
+        # All 3 data rows should have Col='-'
+        for line in lines[2:]:
+            cols = [c.strip() for c in line.split('|')]
+            col_val = cols[7]  # Col column
+            assert col_val == '-', f"Expected Col='-' but got '{col_val}' in: {line}"
 
 
 class TestComputeChildTypes:
@@ -7413,6 +7469,56 @@ class TestAbsorbStageCDividers:
         assert len(result) == 2
         assert 'line' in result[0]['node_ids']
 
+    def test_all_dividers(self):
+        """All groups are dividers -> no absorption possible, return as-is."""
+        node_lookup = {
+            'div1': self._make_node('div1', 'VECTOR', 0, h=1),
+            'div2': self._make_node('div2', 'LINE', 50, h=1),
+            'div3': self._make_node('div3', 'VECTOR', 100, h=0),
+        }
+        groups = [
+            {'name': 'divider-1', 'pattern': 'single', 'node_ids': ['div1']},
+            {'name': 'divider-2', 'pattern': 'single', 'node_ids': ['div2']},
+            {'name': 'divider-3', 'pattern': 'single', 'node_ids': ['div3']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        # No non-divider groups to absorb into, so all remain
+        assert len(result) == 3
+        assert [g['name'] for g in result] == ['divider-1', 'divider-2', 'divider-3']
+
+    def test_multiple_consecutive_dividers(self):
+        """Two consecutive divider groups -> both absorbed into nearest non-divider."""
+        node_lookup = {
+            'item1': self._make_node('item1', 'FRAME', 0),
+            'div1': self._make_node('div1', 'LINE', 55, h=1),
+            'div2': self._make_node('div2', 'VECTOR', 60, h=0),
+            'item2': self._make_node('item2', 'FRAME', 100),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item1']},
+            {'name': 'divider-1', 'pattern': 'single', 'node_ids': ['div1']},
+            {'name': 'divider-2', 'pattern': 'single', 'node_ids': ['div2']},
+            {'name': 'list-item-2', 'pattern': 'list', 'node_ids': ['item2']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 2
+        names = [g['name'] for g in result]
+        assert 'divider-1' not in names
+        assert 'divider-2' not in names
+
+    def test_malformed_node_ids(self):
+        """Group with missing node_ids key -> should not crash."""
+        node_lookup = {
+            'item': self._make_node('item', 'FRAME', 0),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item']},
+            {'name': 'divider-bad', 'pattern': 'single'},  # missing node_ids
+        ]
+        # Should not raise an exception
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert isinstance(result, list)
+
 
 # ============================================================
 # validate_column_consistency
@@ -7519,4 +7625,33 @@ class TestValidateColumnConsistency:
         # No two-column layout detected, groups returned unchanged
         assert len(result) == 1
         assert result[0]['name'] == 'content'
+        assert result[0]['node_ids'] == ['a', 'b', 'c']
+
+    def test_missing_col_field(self):
+        """Nodes without 'Col' in enriched data -> should not crash."""
+        # Nodes exist in lookup but have no 'Col' metadata
+        node_lookup = {
+            'a': {'id': 'a', 'absoluteBoundingBox': {'x': 0, 'y': 0, 'width': 100, 'height': 50}},
+            'b': {'id': 'b', 'absoluteBoundingBox': {'x': 800, 'y': 0, 'width': 100, 'height': 50}},
+        }
+        groups = [
+            {'name': 'mixed', 'pattern': 'zone', 'node_ids': ['a', 'b']},
+        ]
+        # Should not raise KeyError or similar
+        result = validate_column_consistency(groups, node_lookup)
+        assert isinstance(result, list)
+
+    def test_single_group_consistent_cols(self):
+        """Single group with all nodes on one side -> no violations."""
+        node_lookup = {
+            'a': self._make_node('a', x=10, w=100),
+            'b': self._make_node('b', x=20, w=80),
+            'c': self._make_node('c', x=15, w=90),
+        }
+        groups = [
+            {'name': 'left-content', 'pattern': 'list', 'node_ids': ['a', 'b', 'c']},
+        ]
+        result = validate_column_consistency(groups, node_lookup)
+        assert len(result) == 1
+        assert result[0]['name'] == 'left-content'
         assert result[0]['node_ids'] == ['a', 'b', 'c']

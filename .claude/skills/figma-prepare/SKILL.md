@@ -375,7 +375,7 @@ bash .claude/skills/figma-prepare/scripts/enrich-metadata.sh \
 **詳細**: → [references/phase-details.md](references/phase-details.md) の「Phase 2」セクション
 
 > **⚠️ Stage A → Stage B → Stage C の3段階すべてが必須。Stage Cをスキップしてはならない。**
-> Stage B完了後、必ず Stage C（2-3a〜2-3e）を実行してから Phase 3 に進むこと。
+> Stage B完了後、必ず Stage C（2-3a〜2-3f）を実行してから Phase 3 に進むこと。
 > Stage C が未実行のまま Phase 3 に進んだ場合、ネストレベルグルーピング（2カラムレイアウト、カード分離、装飾分離）が適用されず、セクション内部がフラットなまま残る。
 
 Phase 2 は3段階構成:
@@ -396,7 +396,8 @@ Phase 2: グループ化 + セクショニング
 │   ├── 2-3b. 各セクションで Haiku 推論
 │   ├── 2-3c. 結果 YAML パース・検証
 │   ├── 2-3d. nested-grouping-plan.yaml 保存
-│   └── 2-3e. 再帰: 非single グループに対して depth+1 で繰り返し（最大 depth 2）
+│   ├── 2-3e. Divider 吸収ポストプロセス（postprocess-grouping-plan.sh）
+│   └── 2-3f. Stage C depth 再帰（run-stage-c-depth-recursion.py）
 ├── 2-4. 結果統合（Stage A + Stage C 比較 → 採用判定）
 │   ├── Stage C カバレッジ >= 80% → Stage C 結果を採用
 │   └── Stage C カバレッジ < 80% → Stage A にフォールバック
@@ -545,11 +546,6 @@ python3 .claude/skills/figma-prepare/scripts/run-stage-c-depth-recursion.py \
 | Haiku 推論失敗（個別セクション） | 該当セクションのみ Stage A にフォールバック |
 | Haiku 推論失敗（全セクション） | Stage C 全体をスキップ → Stage A のみで進行 |
 | YAML パース/検証失敗 | 該当セクションのみ Stage A にフォールバック |
-
-- Exit 0: 吸収あり（ファイル更新済み）
-- Exit 2: 吸収対象なし（変更なし）
-- 吸収対象: グループ名に "divider" を含む単一要素グループ
-- 吸収先: 直前の非 divider グループ（border-bottom セマンティクス）。前方がなければ直後
 
 ### 2-4. 結果統合（Stage A + Stage C 比較）
 
@@ -842,7 +838,7 @@ mcp__chrome-devtools__evaluate_script
   function: () => typeof figma
 → "object" 以外の場合: プラグイン開閉を案内して中止
 
-セットアップ: references/chrome-devtools-setup.md 参照
+セットアップ:（Chrome DevTools Protocol 経由で Figma Plugin API を実行）
 ```
 
 #### 3-3b. アートボード複製
@@ -1080,6 +1076,9 @@ Next steps:
 | `scripts/verify-structure.js` | リネーム diff 検証 | `() => { ... }` 形式、`__CLONE_NODE_ID__` / `__EXPECTED_NAMES__` 置換 | object (matched, mismatched, matchRate) |
 | `scripts/verify-grouping.js` | グルーピング適用検証 | `() => { ... }` 形式、`__VERIFICATION_PLAN__` 置換 | object (verified, issues, matchRate) |
 | `scripts/verify-autolayout.js` | Auto Layout 適用検証 | `() => { ... }` 形式、`__VERIFICATION_PLAN__` 置換 | object (verified, issues, matchRate) |
+| `scripts/postprocess-grouping-plan.sh` | 2-3e Divider 吸収ポストプロセス | nested-grouping-plan YAML | YAML (postprocessed plan) |
+| `scripts/run-stage-c-depth-recursion.py` | 2-3f Stage C depth 再帰 | metadata JSON + nested-grouping-plan YAML | YAML (plan with sub_groups) |
+| `scripts/convert-metadata.sh` | 1-2 メタデータ変換（手動実行用） | metadata JSON (XML/MCP wrapper) | JSON (normalized metadata) |
 
 ## Related Files
 

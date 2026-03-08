@@ -324,7 +324,7 @@ def validate_column_consistency(groups, node_lookup):
     for g in groups:
         for nid in g.get('node_ids', []):
             node = node_lookup.get(nid)
-            if node:
+            if node and node.get('visible') != False:
                 bb = get_bbox(node)
                 all_x.append(bb['x'])
                 all_right.append(bb['x'] + bb['w'])
@@ -355,7 +355,7 @@ def validate_column_consistency(groups, node_lookup):
 
         for nid in nids:
             node = node_lookup.get(nid)
-            if not node:
+            if not node or node.get('visible') == False:
                 left_nids.append(nid)  # fallback
                 continue
             bb = get_bbox(node)
@@ -1199,6 +1199,7 @@ def detect_repeating_tuple(children):
 
     Issue 186: Separated card patterns (IMAGE + FRAME + INSTANCE x 3).
     """
+    children = [c for c in children if c.get('visible') != False]
     if len(children) < TUPLE_PATTERN_MIN * 2:
         # Need at least min_reps * 2 elements (smallest tuple_size is 2)
         return []
@@ -1950,6 +1951,8 @@ def detect_bg_content_layers(children, parent_bb):
     """
     if not children or not parent_bb or parent_bb['w'] <= 0 or parent_bb['h'] <= 0:
         return []
+
+    children = [c for c in children if c.get('visible') != False]
 
     # Step 1: Find background RECTANGLE siblings (leaf node)
     # Issue 183: Also detect oversized elements (width >= OVERFLOW_BG_MIN_WIDTH or x < 0)
