@@ -204,6 +204,8 @@ sections:
 - **Col**: 2カラムレイアウト検出時の列位置（L=左, R=右, F=全幅, C=中央, -=非2カラム）
 - **Leaf?**: Y=リーフ（子なし）、N=コンテナ（背景RECTとコンテナFRAMEの区別）
 - **ChildTypes**: `2REC+1TEX` 形式の子要素構成（構造パターン検出用）
+  - **同じ ChildTypes が3+回連続** → カード/リストパターンの可能性大
+  - **TEXT型の直後に同じ ChildTypes が複数続く** → 1:N heading-content パターン（Issue #274）
 - **Flags**: `bg-full`, `overflow`, `tiny`, `decoration` 等の機械的フラグ
 - **Text**: テキストプレビュー（セマンティック推論用）
 

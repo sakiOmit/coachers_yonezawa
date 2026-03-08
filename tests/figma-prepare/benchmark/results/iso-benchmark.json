@@ -1,6 +1,6 @@
 {
   "fixture": "iso.xml",
-  "timestamp": "2026-03-08T14:29:42.203547+00:00",
+  "timestamp": "2026-03-08T16:16:30.354951+00:00",
   "phases": {
     "phase1": {
       "score": 35.8,
@@ -141,12 +141,12 @@
     }
   },
   "timings": {
-    "tree_analysis": 0.003,
-    "phase1": 0.003,
-    "phase2_stage_a": 0.009,
+    "tree_analysis": 0.004,
+    "phase1": 0.004,
+    "phase2_stage_a": 0.01,
     "phase3": 0.004,
-    "phase4": 0.004,
-    "total": 0.023
+    "phase4": 0.005,
+    "total": 0.027
   },
   "tree_structure": {
     "page_dimensions": {

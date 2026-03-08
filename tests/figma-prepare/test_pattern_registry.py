@@ -89,6 +89,40 @@ class TestBuildPatternRegistry:
         registry = build_pattern_registry(root, min_occurrences=2)
         assert any(v['node_type'] == 'INSTANCE' for v in registry.values())
 
+    def test_list_input_basic(self):
+        """build_pattern_registry() accepts a list of children (Issue #273)"""
+        card1 = _frame('c1', 'Frame 1', [_leaf('t1'), _leaf('r1', 'RECTANGLE')])
+        card2 = _frame('c2', 'Frame 2', [_leaf('t2'), _leaf('r2', 'RECTANGLE')])
+        card3 = _frame('c3', 'Frame 3', [_leaf('t3'), _leaf('r3', 'RECTANGLE')])
+        root_children = [card1, card2, card3]
+        registry = build_pattern_registry(root_children, min_occurrences=2)
+        assert len(registry) >= 1
+        assert any(v['count'] >= 2 for v in registry.values())
+
+    def test_list_input_empty(self):
+        """Empty list input returns empty registry (Issue #273)"""
+        registry = build_pattern_registry([])
+        assert registry == {}
+
+    def test_dict_input_empty(self):
+        """Empty dict with no children returns empty registry"""
+        registry = build_pattern_registry({'type': 'FRAME', 'name': 'root', 'children': []})
+        assert registry == {}
+
+    def test_list_input_with_hidden_children(self):
+        """List input filters hidden children (Issue #273)"""
+        card1 = _frame('c1', 'Frame 1', [_leaf('t1')])
+        card2 = {'id': 'c2', 'type': 'FRAME', 'name': 'Frame 2',
+                 'visible': False, 'children': [_leaf('t2')]}
+        card3 = _frame('c3', 'Frame 3', [_leaf('t3')])
+        root_children = [card1, card2, card3]
+        registry = build_pattern_registry(root_children, min_occurrences=2)
+        # card2 is hidden, so only 2 visible cards with same structure
+        assert any(v['count'] >= 2 for v in registry.values())
+        # Verify hidden node ID is not in example_ids
+        for v in registry.values():
+            assert 'c2' not in v['example_ids']
+
 
 class TestLookupPattern:
     def test_found(self):

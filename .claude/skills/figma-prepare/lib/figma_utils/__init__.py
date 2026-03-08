@@ -48,6 +48,9 @@ Submodule hierarchy (39 modules):
     rename_strategies   - Priority-based naming strategies (text/shape/position/children)
     rename_llm_fallback - LLM fallback for low-confidence renames (context, prompt, merge)
 
+  Grouping LLM Fallback:
+    grouping_llm_fallback - LLM fallback for undergrouped sections (1:N heading-content, Issue #274)
+
   Cross-Section:
     pattern_registry    - Cross-section pattern registry (frequency tracking, lookup, formatting)
 
@@ -125,6 +128,15 @@ from .sectioning import (  # noqa: F401
 from .nested_context import _format_stage_b_context  # noqa: F401
 from .structure_analysis import (  # noqa: F401
     count_nodes, detect_grouping_candidates_simple, run_structure_analysis,
+)
+from .grouping_llm_fallback import (  # noqa: F401
+    collect_undergrouped_sections, build_grouping_fallback_context,
+    format_grouping_fallback_prompt, parse_llm_grouping_suggestions,
+    merge_grouping_suggestions, generate_grouping_fallback_context_file,
+    GROUPING_FALLBACK_HEADING_MAX_HEIGHT,
+    GROUPING_FALLBACK_MIN_SIBLINGS_AFTER_HEADING,
+    GROUPING_FALLBACK_STRUCTURE_SIMILARITY,
+    GROUPING_LLM_CONFIDENCE_MAP, GROUPING_LLM_DEFAULT_CONFIDENCE,
 )
 from .pattern_registry import (  # noqa: F401
     build_pattern_registry, lookup_pattern, format_registry_summary,

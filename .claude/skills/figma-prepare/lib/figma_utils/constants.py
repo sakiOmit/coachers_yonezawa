@@ -114,6 +114,9 @@ STAGE_MERGE_TIER3 = 0.4   # coverage >= 40% → Stage A + high-confidence Stage 
 # --- Issue 224: Stage C recursive nesting ---
 MAX_STAGE_C_DEPTH = 10  # Safety upper bound for Stage C recursion (converges naturally at 3-4)
 
+# --- Issue 274: Grouping LLM fallback constants ---
+GROUPING_FALLBACK_MAX_SIBLINGS = 20  # Maximum siblings to include in LLM context
+
 # ---------------------------------------------------------------------------
 # Issue 229: Detector disable/coverable sets
 # ---------------------------------------------------------------------------

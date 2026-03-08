@@ -1,5 +1,5 @@
 # Figma Prepare Benchmark Report
-# Generated: 2026-03-08T15:27:13.641370+00:00
+# Generated: 2026-03-08T16:16:59.252550+00:00
 
 fixture: csr.xml
 
@@ -110,8 +110,8 @@ phase4_autolayout:
 
 timings:
   phase1: 0.006s
-  phase2_stage_a: 0.04s
+  phase2_stage_a: 0.039s
   phase3: 0.007s
   phase4: 0.007s
-  total: 0.066s
-  tree_analysis: 0.006s
+  total: 0.064s
+  tree_analysis: 0.005s

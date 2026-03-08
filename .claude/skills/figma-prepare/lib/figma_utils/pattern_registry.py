@@ -36,7 +36,13 @@ def build_pattern_registry(root, min_occurrences=2):
         'count': 0, 'sections': set(), 'example_ids': [], 'types': defaultdict(int)
     })
 
-    _walk_for_patterns(root, hash_data, section_name='root')
+    # Handle list input (root_children) by wrapping in a synthetic root node
+    if isinstance(root, list):
+        children = [c for c in root if c.get('visible') != False]
+        synthetic_root = {'type': 'FRAME', 'name': 'root', 'children': children}
+        _walk_for_patterns(synthetic_root, hash_data, section_name='root')
+    else:
+        _walk_for_patterns(root, hash_data, section_name='root')
 
     # Filter by min_occurrences and format
     registry = {}

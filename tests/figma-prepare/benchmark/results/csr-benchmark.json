@@ -1,6 +1,6 @@
 {
   "fixture": "csr.xml",
-  "timestamp": "2026-03-08T15:27:13.641370+00:00",
+  "timestamp": "2026-03-08T16:16:59.252550+00:00",
   "phases": {
     "phase1": {
       "score": 24.3,
@@ -143,12 +143,12 @@
     }
   },
   "timings": {
-    "tree_analysis": 0.006,
+    "tree_analysis": 0.005,
     "phase1": 0.006,
-    "phase2_stage_a": 0.04,
+    "phase2_stage_a": 0.039,
     "phase3": 0.007,
     "phase4": 0.007,
-    "total": 0.066
+    "total": 0.064
   },
   "tree_structure": {
     "page_dimensions": {

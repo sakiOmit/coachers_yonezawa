@@ -184,6 +184,14 @@ score = max(0, score)
 | llm_confidence_high | 92 | LLM回答「高」の信頼度スコア |
 | llm_confidence_medium | 78 | LLM回答「中」の信頼度スコア |
 | llm_confidence_low | 62 | LLM回答「低」の信頼度スコア |
+| grouping_fallback_heading_max_height | 200px | グルーピングLLMフォールバック：見出し候補の最大高さ（Issue 274） |
+| grouping_fallback_min_siblings | 3 | グルーピングLLMフォールバック：見出し後の最小類似兄弟数（Issue 274） |
+| grouping_fallback_structure_similarity | 0.7 | グルーピングLLMフォールバック：兄弟構造類似度閾値（Issue 274） |
+| grouping_fallback_max_siblings | 20 | グルーピングLLMフォールバック：コンテキストに含める最大兄弟数（Issue 274） |
+| grouping_fallback_max_siblings | 20 items | グルーピングLLMフォールバック：LLMコンテキストの最大兄弟数（Issue 274） |
+| grouping_fallback_heading_max_height | 200px | グルーピングLLMフォールバック：見出し候補の最大高さ（Issue 274） |
+| grouping_fallback_min_siblings_after_heading | 3 items | グルーピングLLMフォールバック：見出し後の最小類似兄弟数（Issue 274） |
+| grouping_fallback_structure_similarity | 0.7 | グルーピングLLMフォールバック：構造類似度の閾値（Issue 274） |
 
 ## リネームロジック（優先順）
 

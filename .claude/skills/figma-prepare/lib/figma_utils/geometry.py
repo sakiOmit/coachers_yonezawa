@@ -22,9 +22,21 @@ def resolve_absolute_coords(node, parent_x=0, parent_y=0):
 
     Issue 67: Mutates in-place. A marker '_abs_resolved' prevents
     double-call from corrupting coordinates.
+
+    Issue 272: When metadata comes from XML (Figma Dev Mode MCP), coordinates
+    are already relative to the artboard root, NOT to the immediate parent.
+    Detect this via '_coords_artboard_relative' flag (set by parse_figma_xml)
+    and apply only the root offset once, without recursive accumulation.
     """
     if node.get('_abs_resolved'):
         return
+
+    if node.get('_coords_artboard_relative'):
+        # XML format: all coords are relative to artboard root.
+        # Add root's page-level offset to all descendant nodes.
+        _resolve_artboard_relative(node)
+        return
+
     bbox = node.get('absoluteBoundingBox') or {}
     abs_x = parent_x + bbox.get('x', 0)
     abs_y = parent_y + bbox.get('y', 0)
@@ -34,6 +46,38 @@ def resolve_absolute_coords(node, parent_x=0, parent_y=0):
     node['_abs_resolved'] = True
     for child in node.get('children', []):
         resolve_absolute_coords(child, abs_x, abs_y)
+
+
+def _resolve_artboard_relative(root):
+    """Resolve coordinates for artboard-relative XML metadata.
+
+    Issue 272: In XML format, all nodes have x/y relative to the artboard root.
+    We add the root's page-level x/y offset to every node to get true absolute
+    coordinates, without recursive parent accumulation.
+
+    Args:
+        root: The root node with '_coords_artboard_relative' flag set.
+    """
+    root_bbox = root.get('absoluteBoundingBox') or {}
+    root_x = root_bbox.get('x', 0)
+    root_y = root_bbox.get('y', 0)
+
+    # Root itself is already at page-level absolute coords
+    root['_abs_resolved'] = True
+
+    def _apply_offset(node):
+        if node.get('_abs_resolved'):
+            return
+        bbox = node.get('absoluteBoundingBox') or {}
+        bbox['x'] = root_x + bbox.get('x', 0)
+        bbox['y'] = root_y + bbox.get('y', 0)
+        node['absoluteBoundingBox'] = bbox
+        node['_abs_resolved'] = True
+        for child in node.get('children', []):
+            _apply_offset(child)
+
+    for child in root.get('children', []):
+        _apply_offset(child)
 
 
 def get_bbox(node):

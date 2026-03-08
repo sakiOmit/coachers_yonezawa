@@ -157,8 +157,15 @@ def parse_figma_xml(xml_str):
       {"type": "FRAME", "id": "2:5364", "name": "LP-PC5",
        "absoluteBoundingBox": {"x": -5542, "y": 348, "width": 1440, "height": 10770},
        "children": [...]}
+
+    Issue 272: Sets '_coords_artboard_relative' flag on root to signal that
+    child coordinates are relative to the artboard root, not to immediate parents.
+    This prevents resolve_absolute_coords() from double-accumulating offsets.
     """
-    return _FigmaXmlParser(xml_str).parse()
+    root = _FigmaXmlParser(xml_str).parse()
+    if root is not None:
+        root['_coords_artboard_relative'] = True
+    return root
 
 
 def load_metadata(file_path):

@@ -4,11 +4,11 @@
     "score": 0.7,
     "semantic_type": "vertical-zone",
     "node_ids": [
-      "92:1227",
       "92:1199",
       "92:1262",
       "92:1263",
-      "92:1226"
+      "92:1226",
+      "92:1227"
     ],
     "node_names": [
       "Rectangle 801",
