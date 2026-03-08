@@ -11,7 +11,7 @@ Submodules:
   scoring          - Proximity scoring, structure hashing, layout inference
   detection          - Core detection (heading, absorption) + re-exports
   detection_patterns - Pattern-based detectors (tuple, consecutive, highlight, EN+JP)
-  detection_semantic - Semantic structure detectors (horizontal bar, bg-content, table, decoration)
+  detection_semantic - Facade re-exporting from detect_decoration, detect_horizontal_bar, detect_bg_content, detect_table
   enrichment       - Enriched table generation
   comparison       - Deduplication, Stage A/C comparison, validation
   stage_c          - Stage C depth recursion (YAML I/O, heuristic sub-grouping)

@@ -4,6 +4,10 @@ Extracts all Python logic previously embedded in generate-rename-map.sh.
 Provides ``generate_rename_map()`` as the main entry point, plus helper
 functions for name inference and rename collection.
 
+Split into submodules:
+  rename_strategies  - Priority-level helpers (_infer_from_text_content,
+                       _infer_from_shape, _infer_from_position, _infer_from_children)
+
 Issue: Extracted from shell heredoc for maintainability.
 """
 
@@ -12,47 +16,28 @@ import sys
 
 from .constants import (
     UNNAMED_RE,
-    BUTTON_MAX_HEIGHT,
-    BUTTON_MAX_WIDTH,
     BUTTON_TEXT_MAX_LEN,
-    CTA_SQUARE_RATIO_MIN,
-    CTA_SQUARE_RATIO_MAX,
-    CTA_X_POSITION_RATIO,
-    CTA_Y_THRESHOLD,
-    DIVIDER_MAX_HEIGHT,
-    FOOTER_MAX_HEIGHT,
-    FOOTER_PROXIMITY,
-    FOOTER_TEXT_RATIO,
-    HEADER_Y_THRESHOLD,
-    HEADING_BODY_TEXT_THRESHOLD,
-    ICON_MAX_SIZE,
     IMAGE_WRAPPER_RATIO,
     LABEL_MAX_LEN,
-    NAV_GRANDCHILD_MIN,
-    NAV_MAX_TEXT_LEN,
-    NAV_MIN_TEXT_COUNT,
-    OVERFLOW_BG_MIN_WIDTH,
-    SECTION_ROOT_WIDTH,
-    SECTION_ROOT_WIDTH_RATIO,
-    SIDE_PANEL_HEIGHT_RATIO,
-    SIDE_PANEL_LEFT_X_RATIO,
-    SIDE_PANEL_MAX_WIDTH,
-    SIDE_PANEL_RIGHT_X_RATIO,
-    WIDE_ELEMENT_MIN_WIDTH,
-    WIDE_ELEMENT_RATIO,
-    EN_JP_PAIR_MAX_DISTANCE,
 )
 from .detection import (
     detect_en_jp_label_pairs,
-    decoration_dominant_shape,
-    is_decoration_pattern,
 )
 from .geometry import resolve_absolute_coords, yaml_str
 from .metadata import get_root_node, get_text_children_content as _get_text_children, load_metadata
 from .naming import _jp_keyword_lookup, to_kebab
 
+# Re-export from rename_strategies for backward compatibility
+from .rename_strategies import (  # noqa: F401
+    _infer_from_text_content,
+    _infer_from_shape,
+    _infer_from_position,
+    _infer_from_children,
+)
+from .rename_strategies import _SHAPE_PREFIXES, _CTA_KEYWORDS  # noqa: F401
+
 # ---------------------------------------------------------------------------
-# Shape prefix mapping
+# Shape prefix mapping (canonical copy, re-exported by __init__.py)
 # ---------------------------------------------------------------------------
 
 SHAPE_PREFIXES = {
@@ -131,7 +116,11 @@ def _resolve_slug(text_contents_list):
 
 
 def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
-    """Infer semantic name for an unnamed node."""
+    """Infer semantic name for an unnamed node.
+
+    Dispatches to priority-level helpers in rename_strategies.py.
+    Returns first non-None result, or a type-based fallback.
+    """
     node_type = node.get('type', '')
     children = [c for c in node.get('children', []) if c.get('visible') != False]
     name = node.get('name', '')
@@ -139,217 +128,27 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     w = abs_bbox.get('width', 0)
     h = abs_bbox.get('height', 0)
 
-    # Priority 1: Text content
-    # Prefer enriched characters over name (Issue 38)
-    if node_type == 'TEXT':
-        text_content = node.get('characters', '') or name
-        role = infer_text_role(text_content)
-        slug = to_kebab(text_content[:30])
-        if role and slug:
-            return f'{role}-{slug}'
-        if slug:
-            return f'text-{slug}'
-        return f'text-{sibling_index}'
+    # Priority 0-1: Text content based naming
+    result = _infer_from_text_content(node, node_type, name, sibling_index)
+    if result is not None:
+        return result
 
     # Priority 2: Shape analysis
-    if node_type in SHAPE_PREFIXES and not children:
-        prefix = SHAPE_PREFIXES[node_type]
-        # Issue 17: fills-based IMAGE detection (enriched metadata)
-        fills = node.get('fills', [])
-        if fills and isinstance(fills, list):
-            if any(f.get('type') == 'IMAGE' for f in fills if isinstance(f, dict)):
-                return f'img-{sibling_index}'
-        # Thin wide rectangle → divider
-        if node_type == 'RECTANGLE' and w > 0 and h > 0:
-            if w / max(h, 1) > 10 and h < DIVIDER_MAX_HEIGHT:
-                return f'divider-{sibling_index}'
-        return f'{prefix}-{sibling_index}'
+    result = _infer_from_shape(node, node_type, children, w, h, sibling_index)
+    if result is not None:
+        return result
 
-    # Priority 3: Position analysis (top-level frames)
-    # Note (Issue 39): This fires only when metadata root is PAGE/CANVAS (page-level query).
-    if node_type == 'FRAME' and parent and parent.get('type') in ('PAGE', 'CANVAS'):
-        y = abs_bbox.get('y', 0)
-        if sibling_index == 0 or y < HEADER_Y_THRESHOLD:
-            return 'section-header'
-        if sibling_index == total_siblings - 1:
-            return 'section-footer'
-        return f'section-{sibling_index}'
+    # Priority 3-3.2: Position analysis (header/footer/CTA/side-panel/icon)
+    result = _infer_from_position(
+        node, node_type, parent, children, abs_bbox, w, h, sibling_index, total_siblings
+    )
+    if result is not None:
+        return result
 
-    # Priority 3.1: Header/Footer heuristic (Issue 16, Issue 37)
-    if node_type in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION') and parent and children:
-        parent_bbox = parent.get('absoluteBoundingBox', {})
-        parent_y = parent_bbox.get('y', 0)
-        parent_h = parent_bbox.get('height', 0)
-        parent_w = parent_bbox.get('width', 0)
-        node_y = abs_bbox.get('y', 0)
-        relative_y = node_y - parent_y
-        is_wide = w > max(parent_w * WIDE_ELEMENT_RATIO, WIDE_ELEMENT_MIN_WIDTH)
-
-        if is_wide:
-            # Header: near top + has nav child (frame with 4+ text grandchildren)
-            if relative_y < HEADER_Y_THRESHOLD:
-                has_nav = False
-                for c in children:
-                    # Issue 77: Include INSTANCE/COMPONENT for nav detection
-                    if c.get('type') in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
-                        text_gchildren = [gc for gc in c.get('children', [])
-                                          if gc.get('visible') != False and gc.get('type') == 'TEXT']
-                        if len(text_gchildren) >= NAV_GRANDCHILD_MIN:
-                            has_nav = True
-                            break
-                if has_nav:
-                    return 'header'
-
-            # Footer: near bottom + compact + text-heavy
-            if parent_h > 0:
-                node_bottom = node_y + h
-                parent_bottom = parent_y + parent_h
-                if abs(node_bottom - parent_bottom) < FOOTER_PROXIMITY and h < FOOTER_MAX_HEIGHT:
-                    text_count = sum(1 for c in children if c.get('type') == 'TEXT')
-                    if text_count >= max(len(children) * FOOTER_TEXT_RATIO, 1):
-                        return 'footer'
-
-    # Priority 3.15: CTA square button detection (Issue 193)
-    if w > 0 and h > 0 and parent:
-        wh_ratio = w / h
-        parent_bbox = parent.get('absoluteBoundingBox', {})
-        parent_w = parent_bbox.get('width', 0) or SECTION_ROOT_WIDTH
-        parent_y = parent_bbox.get('y', 0)
-        node_x = abs_bbox.get('x', 0)
-        node_y = abs_bbox.get('y', 0)
-        relative_y = node_y - parent_y
-        if (CTA_SQUARE_RATIO_MIN <= wh_ratio <= CTA_SQUARE_RATIO_MAX
-                and node_x > parent_w * CTA_X_POSITION_RATIO
-                and relative_y < CTA_Y_THRESHOLD):
-            # Check for CTA keyword text in children or self
-            cta_texts = []
-            if node_type == 'TEXT':
-                cta_texts = [node.get('characters', '') or name]
-            elif children:
-                cta_texts = get_text_children_content(children)
-                if not cta_texts:
-                    for c in children[:5]:
-                        for gc in c.get('children', []):
-                            if gc.get('type') == 'TEXT':
-                                content = gc.get('characters', '') or gc.get('name', '')
-                                if content:
-                                    cta_texts.append(content)
-            for ct in cta_texts:
-                ct_lower = ct.lower().strip()
-                if any(kw in ct_lower for kw in CTA_KEYWORDS):
-                    slug = to_kebab(ct[:20])
-                    return f'cta-{slug}' if slug and slug != 'content' else f'cta-{sibling_index}'
-
-    # Priority 3.16: Side panel detection (Issue 192)
-    if w > 0 and h > 0 and w <= SIDE_PANEL_MAX_WIDTH and h > w * SIDE_PANEL_HEIGHT_RATIO and parent:
-        parent_bbox = parent.get('absoluteBoundingBox', {})
-        parent_w = parent_bbox.get('width', 0) or SECTION_ROOT_WIDTH
-        if parent_w >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO:
-            node_x = abs_bbox.get('x', 0)
-            parent_x = parent_bbox.get('x', 0)
-            relative_x = node_x - parent_x
-            if relative_x > parent_w * SIDE_PANEL_RIGHT_X_RATIO or relative_x < parent_w * SIDE_PANEL_LEFT_X_RATIO:
-                return f'side-panel-{sibling_index}'
-
-    # Priority 3.2: Tiny empty frame → icon
-    if not children and w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE:
-        return f'icon-{sibling_index}'
-
-    # Priority 3.5+ and 4: Requires children
-    if children:
-        text_contents = get_text_children_content(children)
-
-        # Priority 3.5: Navigation detection
-        text_count = len(text_contents)
-        if text_count >= NAV_MIN_TEXT_COUNT and all(len(t) <= NAV_MAX_TEXT_LEN for t in text_contents):
-            return f'nav-{sibling_index}'
-
-        # Priority 4.0: Decoration pattern detection (Issue 189)
-        if is_decoration_pattern(node):
-            dominant = decoration_dominant_shape(node)
-            if dominant == 'ELLIPSE':
-                return f'decoration-dots-{sibling_index}'
-            else:
-                return f'decoration-pattern-{sibling_index}'
-
-        # Priority 4: Child structure analysis
-        child_types = [c.get('type', '') for c in children]
-        child_count = len(children)
-        has_direct_image = 'IMAGE' in child_types
-        has_direct_rect = 'RECTANGLE' in child_types and 2 <= child_count <= 6
-        has_rect_with_fill = any(
-            c.get('type') == 'RECTANGLE'
-            and c.get('fills') and isinstance(c.get('fills'), list)
-            and any(f.get('type') == 'IMAGE' for f in c['fills'] if isinstance(f, dict))
-            for c in children if isinstance(c, dict)
-        )
-        has_image_wrap = has_image_wrapper(children)
-        has_image = has_direct_image or has_rect_with_fill or has_image_wrap or has_direct_rect
-        has_text = 'TEXT' in child_types
-        text_type_count = len([ct for ct in child_types if ct == 'TEXT'])
-        has_button = any(
-            c.get('type') == 'FRAME' and len(c.get('children', [])) <= 2
-            and any(gc.get('type') == 'TEXT' for gc in c.get('children', []))
-            for c in children if isinstance(c, dict)
-        )
-
-        # Card-like: image/rectangle + text, exclude section-root-width frames
-        if has_image and has_text and w < OVERFLOW_BG_MIN_WIDTH:
-            slug = _resolve_slug(text_contents)
-            if not slug:
-                slug = str(sibling_index)
-            return f'card-{slug}'
-
-        # Small icon-like: tiny frame with 0-1 children
-        if w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE and len(children) <= 1:
-            return f'icon-{sibling_index}'
-
-        # Button/Tab: small frame with 1-2 children, short text
-        if h > 0 and h <= BUTTON_MAX_HEIGHT and w > 0 and w < BUTTON_MAX_WIDTH and len(children) <= 2:
-            if text_contents:
-                slug = to_kebab(text_contents[0][:20])
-                if slug:
-                    return f'btn-{slug}'
-            return f'btn-{sibling_index}'
-
-        # Heading vs Content: check TEXT children length (Issue 14)
-        if text_type_count <= 2 and len(text_contents) >= 1 and not has_image and not has_image_wrap and len(children) <= 3:
-            max_text_len = max(len(t) for t in text_contents)
-            slug = _resolve_slug(text_contents)
-            if max_text_len > HEADING_BODY_TEXT_THRESHOLD:
-                has_non_text = any(ct != 'TEXT' for ct in child_types)
-                prefix = 'content' if has_non_text else 'body'
-                if slug:
-                    return f'{prefix}-{slug}'
-                return f'{prefix}-text-{text_type_count}'
-            if slug:
-                return f'heading-{slug}'
-            return f'heading-{sibling_index}'
-
-        # text-block with slug
-        if has_text and len(children) <= 3:
-            slug = _resolve_slug(text_contents)
-            if slug:
-                return f'text-block-{slug}'
-            return f'text-block-{sibling_index}'
-
-        # Issue 174: Try semantic naming from child text content
-        all_texts = text_contents if text_contents else []
-        if not all_texts:
-            for c in children[:10]:
-                for gc in [g for g in c.get('children', []) if g.get('visible') != False]:
-                    if gc.get('type') == 'TEXT':
-                        content = gc.get('characters', '') or gc.get('name', '')
-                        if content and not UNNAMED_RE.match(content):
-                            all_texts.append(content)
-                            if len(all_texts) >= 3:
-                                break
-                if len(all_texts) >= 3:
-                    break
-        slug = _resolve_slug(all_texts) if all_texts else ''
-        if len(children) > 5:
-            return f'container-{slug}' if slug else f'container-{sibling_index}'
-        return f'group-{slug}' if slug else f'group-{sibling_index}'
+    # Priority 3.5-4: Children-based analysis (nav/decoration/card/button/heading/container)
+    result = _infer_from_children(node, node_type, children, w, h, sibling_index)
+    if result is not None:
+        return result
 
     # Priority 5: Fallback
     type_prefix = node_type.lower().replace('_', '-')
