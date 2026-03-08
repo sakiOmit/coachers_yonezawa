@@ -5,7 +5,7 @@ Provides heuristic_sub_group() and its strategy helpers:
   _try_heading_split(), _try_column_split(), _try_spatial_split(), _try_yband_split().
 """
 
-from .geometry import get_bbox
+from .geometry import get_bbox, sort_by_y
 from .enrichment import generate_enriched_table
 from .stage_c_yaml import parse_enriched_table
 
@@ -49,7 +49,7 @@ def heuristic_sub_group(group, sibling_nodes, root_node, page_width, page_height
         return []
 
     # Generate enriched table to get Col column
-    sibling_sorted = sorted(sibling_nodes, key=lambda c: get_bbox(c).get('y', 0))
+    sibling_sorted = sort_by_y(sibling_nodes)
     enriched = generate_enriched_table(
         sibling_sorted,
         page_width=group_width if group_width > 0 else page_width,

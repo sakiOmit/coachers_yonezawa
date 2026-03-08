@@ -4,6 +4,7 @@ import statistics
 from collections import Counter
 
 from .constants import CV_THRESHOLD, ROW_TOLERANCE
+from .geometry import filter_visible_children
 
 
 def alignment_bonus(a_bb, b_bb, tolerance=2):
@@ -90,7 +91,7 @@ def structure_hash(node):
     Format: "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]" (sorted child types).
     Leaf nodes return just "TYPE".
     """
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     if not children:
         return node.get('type', 'UNKNOWN')
     child_types = sorted(c.get('type', '') for c in children)

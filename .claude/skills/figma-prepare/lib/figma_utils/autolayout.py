@@ -16,7 +16,7 @@ from .constants import (
     CONFIDENCE_MEDIUM_COV,
     VARIANCE_RATIO,
 )
-from .geometry import get_bbox, snap, resolve_absolute_coords, yaml_str
+from .geometry import filter_visible_children, get_bbox, snap, resolve_absolute_coords, yaml_str
 from .metadata import get_root_node, load_metadata
 from .scoring import (
     infer_direction_two_elements,
@@ -26,56 +26,39 @@ from .scoring import (
 )
 
 
-def infer_layout(frame):
-    """Infer Auto Layout settings for a frame."""
-    # Filter out hidden children (visible: false) to avoid skewing calculations
-    children = [c for c in frame.get('children', []) if c.get('visible') != False]
-    if len(children) < 2:
-        return None
+def _infer_direction(child_bboxes):
+    """Infer layout direction (HORIZONTAL/VERTICAL/WRAP) from child bounding boxes.
 
-    frame_bb = get_bbox(frame)
-    child_bboxes = [get_bbox(c) for c in children]
-
-    # Skip if frame has no meaningful size
-    if frame_bb['w'] <= 0 or frame_bb['h'] <= 0:
-        return None
-
-    # Direction inference
+    Returns (direction, is_wrap) tuple, or None if direction cannot be determined.
+    """
     xs = [bb['x'] for bb in child_bboxes]
     ys = [bb['y'] for bb in child_bboxes]
 
     if len(set(xs)) <= 1 and len(set(ys)) <= 1:
         return None  # All at same position, can't infer
 
-    # Use specialized 2-element direction inference
-    if len(children) == 2:
+    if len(child_bboxes) == 2:
         direction = infer_direction_two_elements(child_bboxes[0], child_bboxes[1])
     else:
         x_var = statistics.variance(xs) if len(xs) > 1 else 0
         y_var = statistics.variance(ys) if len(ys) > 1 else 0
+        direction = 'HORIZONTAL' if x_var > y_var * VARIANCE_RATIO else 'VERTICAL'
 
-        if x_var > y_var * VARIANCE_RATIO:
-            direction = 'HORIZONTAL'
-        else:
-            direction = 'VERTICAL'
-
-    # Sort by primary axis
-    if direction == 'HORIZONTAL':
-        sorted_bboxes = sorted(child_bboxes, key=lambda b: b['x'])
-    else:
-        sorted_bboxes = sorted(child_bboxes, key=lambda b: b['y'])
-
-    # Check for WRAP (before gap calculation)
     is_wrap = detect_wrap(child_bboxes, direction)
     if is_wrap:
         direction = 'WRAP'
+    return direction, is_wrap
 
-    # Gap inference
+
+def _infer_gap(child_bboxes, direction, is_wrap):
+    """Infer gap between children, with WRAP-aware row grouping.
+
+    Returns (item_gap, gap_cov) tuple.
+    """
     if is_wrap:
-        # For WRAP, calculate gap within rows only
         rows = {}
         for bb in child_bboxes:
-            row_key = round(bb['y'] / ROW_TOLERANCE)  # Issue 131: use shared constant
+            row_key = round(bb['y'] / ROW_TOLERANCE)  # Issue 131
             rows.setdefault(row_key, []).append(bb)
         gaps = []
         for row_bbs in rows.values():
@@ -84,6 +67,10 @@ def infer_layout(frame):
                 g = row_sorted[i+1]['x'] - (row_sorted[i]['x'] + row_sorted[i]['w'])
                 gaps.append(max(0, g))
     else:
+        sorted_bboxes = sorted(
+            child_bboxes,
+            key=lambda b: b['x'] if direction == 'HORIZONTAL' else b['y'],
+        )
         gaps = []
         for i in range(len(sorted_bboxes) - 1):
             curr = sorted_bboxes[i]
@@ -95,29 +82,37 @@ def infer_layout(frame):
             gaps.append(max(0, gap))
 
     item_gap = snap(statistics.median(gaps)) if gaps else 0
-
-    # Gap consistency for confidence
     gap_cov = compute_gap_consistency(gaps)
+    return item_gap, gap_cov
 
-    # Padding inference
+
+def _infer_padding(frame_bb, child_bboxes):
+    """Infer padding on all 4 sides from frame and child bounding boxes.
+
+    Returns dict with top/right/bottom/left keys.
+    """
     min_child_x = min(bb['x'] for bb in child_bboxes)
     min_child_y = min(bb['y'] for bb in child_bboxes)
     max_child_x = max(bb['x'] + bb['w'] for bb in child_bboxes)
     max_child_y = max(bb['y'] + bb['h'] for bb in child_bboxes)
 
-    padding_top = snap(max(0, min_child_y - frame_bb['y']))
-    padding_left = snap(max(0, min_child_x - frame_bb['x']))
-    padding_bottom = snap(max(0, (frame_bb['y'] + frame_bb['h']) - max_child_y))
-    padding_right = snap(max(0, (frame_bb['x'] + frame_bb['w']) - max_child_x))
+    return {
+        'top': snap(max(0, min_child_y - frame_bb['y'])),
+        'right': snap(max(0, (frame_bb['x'] + frame_bb['w']) - max_child_x)),
+        'bottom': snap(max(0, (frame_bb['y'] + frame_bb['h']) - max_child_y)),
+        'left': snap(max(0, min_child_x - frame_bb['x'])),
+    }
 
-    # Primary axis alignment
-    primary_align = 'MIN'  # default
-    if detect_space_between(child_bboxes, direction, frame_bb):
-        primary_align = 'SPACE_BETWEEN'
+
+def _infer_alignment(child_bboxes, direction, frame_bb):
+    """Infer primary and counter-axis alignment.
+
+    Issue 104: Uses MIN/CENTER/MAX to match Figma Plugin API terminology.
+    Returns (primary_align, counter_align) tuple.
+    """
+    primary_align = 'SPACE_BETWEEN' if detect_space_between(child_bboxes, direction, frame_bb) else 'MIN'
 
     # Counter axis alignment
-    # Issue 104: Use 'MAX' instead of 'END' to match Figma Plugin API terminology
-    # Figma's counterAxisAlignItems only accepts: MIN, CENTER, MAX
     if direction in ('HORIZONTAL', 'WRAP'):
         centers = [bb['y'] + bb['h'] / 2 for bb in child_bboxes]
         center_var = statistics.variance(centers) if len(centers) > 1 else 0
@@ -141,6 +136,31 @@ def infer_layout(frame):
         else:
             counter_align = 'MIN'
 
+    return primary_align, counter_align
+
+
+def infer_layout(frame):
+    """Infer Auto Layout settings for a frame."""
+    # Filter out hidden children (visible: false) to avoid skewing calculations
+    children = filter_visible_children(frame)
+    if len(children) < 2:
+        return None
+
+    frame_bb = get_bbox(frame)
+    child_bboxes = [get_bbox(c) for c in children]
+
+    if frame_bb['w'] <= 0 or frame_bb['h'] <= 0:
+        return None
+
+    result = _infer_direction(child_bboxes)
+    if result is None:
+        return None
+    direction, is_wrap = result
+
+    item_gap, gap_cov = _infer_gap(child_bboxes, direction, is_wrap)
+    padding = _infer_padding(frame_bb, child_bboxes)
+    primary_align, counter_align = _infer_alignment(child_bboxes, direction, frame_bb)
+
     # Confidence based on gap consistency
     if len(children) == 2:
         confidence = 'medium'
@@ -154,12 +174,7 @@ def infer_layout(frame):
     return {
         'direction': direction,
         'gap': item_gap,
-        'padding': {
-            'top': padding_top,
-            'right': padding_right,
-            'bottom': padding_bottom,
-            'left': padding_left,
-        },
+        'padding': padding,
         'primary_axis_align': primary_align,
         'counter_axis_align': counter_align,
         'confidence': confidence,
@@ -206,7 +221,7 @@ def walk_and_infer(node, results=None):
 
     node_type = node.get('type', '')
     # Filter out hidden children (visible: false) before processing
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
 
     # Issue 69: Include INSTANCE/COMPONENT nodes for Auto Layout inference
     if node_type in ('FRAME', 'INSTANCE', 'COMPONENT', 'SECTION') and len(children) >= 2:

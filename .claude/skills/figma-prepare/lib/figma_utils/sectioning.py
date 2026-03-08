@@ -23,7 +23,7 @@ from .constants import (
     CONSECUTIVE_PATTERN_MIN,
     LOOSE_ELEMENT_MAX_HEIGHT,
 )
-from .geometry import get_bbox, resolve_absolute_coords
+from .geometry import filter_visible_children, get_bbox, resolve_absolute_coords, sort_by_y
 from .metadata import get_root_node, load_metadata, get_text_children_content
 from .detection import is_heading_like
 from .scoring import structure_hash, structure_similarity
@@ -32,12 +32,12 @@ from .enrichment import generate_enriched_table
 
 def count_children(node):
     """Count visible children of a node."""
-    return len([c for c in node.get('children', []) if c.get('visible') != False])
+    return len(filter_visible_children(node))
 
 
 def get_child_types_summary(node):
     """Get summary of child types like 'RECTANGLE:2, FRAME:2'."""
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     if not children:
         return ''
     types = Counter(c.get('type', 'UNKNOWN') for c in children)
@@ -46,7 +46,7 @@ def get_child_types_summary(node):
 
 def has_text_children(node):
     """Check if node has any direct TEXT children."""
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     return any(c.get('type') == 'TEXT' for c in children)
 
 
@@ -56,36 +56,14 @@ def get_text_children_preview(node, max_items=5):
     return get_text_children_content(node.get('children', []), max_items=max_items)
 
 
-def detect_heuristic_hints(children, page_bbox):
-    """Detect header/footer candidates, gap analysis, and background candidates.
+def _detect_header_footer_bg(sorted_children, page_y, page_h, page_w):
+    """Detect header, footer, and background RECTANGLE candidates by position.
 
-    Semantic understanding (page-kv, section boundaries) is delegated to Stage B Claude reasoning.
-    This function provides mechanical hints to support Claude's decision-making.
+    Returns (header_candidates, footer_candidates, background_candidates) lists of node IDs.
     """
-    page_h = page_bbox['h']
-    page_y = page_bbox['y']
-    page_w = page_bbox['w']
-    if page_h <= 0:
-        return {
-            'header_candidates': [],
-            'header_cluster_ids': [],
-            'footer_candidates': [],
-            'gap_analysis': [],
-            'background_candidates': [],
-            'consecutive_patterns': [],
-            'heading_candidates': [],
-            'loose_elements': [],
-        }
-
     header_candidates = []
     footer_candidates = []
     background_candidates = []
-
-    # Sort by Y for analysis
-    sorted_children = sorted(
-        [c for c in children if c.get('visible') != False],
-        key=lambda c: get_bbox(c).get('y', 0)
-    )
 
     for child in sorted_children:
         bb = get_bbox(child)
@@ -107,39 +85,40 @@ def detect_heuristic_hints(children, page_bbox):
         if node_type == 'RECTANGLE' and bb['h'] >= HINT_BG_MIN_HEIGHT:
             background_candidates.append(node_id)
 
-    # Gap analysis: Y-direction gaps between consecutive children
-    gap_analysis = []
-    for i in range(len(sorted_children) - 1):
-        curr = sorted_children[i]
-        next_child = sorted_children[i + 1]
-        curr_bb = get_bbox(curr)
-        next_bb = get_bbox(next_child)
-        curr_bottom = curr_bb['y'] + curr_bb['h']
-        gap_px = round(next_bb['y'] - curr_bottom)
-        gap_analysis.append({
-            'between': [curr.get('id', ''), next_child.get('id', '')],
-            'gap_px': gap_px,
-        })
+    return header_candidates, footer_candidates, background_candidates
 
-    # --- Header cluster detection for flat structures (Issue 179) ---
-    header_cluster_ids = []
+
+def _detect_header_cluster(sorted_children, page_y):
+    """Detect header cluster IDs for flat structures (Issue 179).
+
+    Looks for nav-like TEXT elements within the header zone.
+    Returns list of node IDs forming the header cluster, or empty list.
+    """
     header_zone_top = page_y
     header_zone_bottom = page_y + HEADER_ZONE_HEIGHT
     header_zone_elements = []
     header_zone_texts = 0
+
     for child in sorted_children:
         bb_c = get_bbox(child)
-        # Element must start within header zone and bottom within zone + margin
         if bb_c['y'] >= header_zone_top and bb_c['y'] + bb_c['h'] <= header_zone_bottom + HEADER_ZONE_MARGIN:
             header_zone_elements.append(child.get('id', ''))
             if child.get('type') == 'TEXT':
                 text_content = child.get('characters', child.get('name', ''))
                 if len(text_content) < NAV_MAX_TEXT_LEN:
                     header_zone_texts += 1
-    if header_zone_texts >= HEADER_NAV_MIN_TEXTS and len(header_zone_elements) >= HEADER_NAV_MIN_TEXTS + 1:
-        header_cluster_ids = header_zone_elements
 
-    # --- Consecutive similar patterns ---
+    if header_zone_texts >= HEADER_NAV_MIN_TEXTS and len(header_zone_elements) >= HEADER_NAV_MIN_TEXTS + 1:
+        return header_zone_elements
+    return []
+
+
+def _detect_consecutive_patterns(sorted_children):
+    """Detect consecutive runs of structurally similar children.
+
+    Uses Jaccard similarity on structure hashes.
+    Returns list of pattern dicts with indices/ids/names/hash.
+    """
     hashes = [structure_hash(c) for c in sorted_children]
     consecutive_patterns = []
     i = 0
@@ -163,8 +142,14 @@ def detect_heuristic_hints(children, page_bbox):
             i = j
         else:
             i += 1
+    return consecutive_patterns
 
-    # --- Heading candidates ---
+
+def _detect_heading_and_loose(sorted_children):
+    """Detect heading candidates and loose elements (dividers, small leaf nodes).
+
+    Returns (heading_candidates, loose_elements) tuple.
+    """
     heading_candidates = []
     for idx, child in enumerate(sorted_children):
         bb = get_bbox(child)
@@ -179,7 +164,6 @@ def detect_heuristic_hints(children, page_bbox):
                 'height': child_h,
             })
 
-    # --- Loose elements ---
     loose_elements = []
     for idx, child in enumerate(sorted_children):
         bb = get_bbox(child)
@@ -193,12 +177,58 @@ def detect_heuristic_hints(children, page_bbox):
                 'height': bb.get('h', 0),
             })
 
+    return heading_candidates, loose_elements
+
+
+def detect_heuristic_hints(children, page_bbox):
+    """Detect header/footer candidates, gap analysis, and background candidates.
+
+    Semantic understanding (page-kv, section boundaries) is delegated to Stage B Claude reasoning.
+    This function provides mechanical hints to support Claude's decision-making.
+    """
+    page_h = page_bbox['h']
+    page_y = page_bbox['y']
+    page_w = page_bbox['w']
+    empty_result = {
+        'header_candidates': [], 'header_cluster_ids': [],
+        'footer_candidates': [], 'gap_analysis': [],
+        'background_candidates': [], 'consecutive_patterns': [],
+        'heading_candidates': [], 'loose_elements': [],
+    }
+    if page_h <= 0:
+        return empty_result
+
+    # Sort by Y for analysis
+    sorted_children = sorted(
+        [c for c in children if c.get('visible') != False],
+        key=lambda c: get_bbox(c).get('y', 0)
+    )
+
+    header_cands, footer_cands, bg_cands = _detect_header_footer_bg(sorted_children, page_y, page_h, page_w)
+
+    # Gap analysis: Y-direction gaps between consecutive children
+    gap_analysis = []
+    for i in range(len(sorted_children) - 1):
+        curr = sorted_children[i]
+        next_child = sorted_children[i + 1]
+        curr_bb = get_bbox(curr)
+        next_bb = get_bbox(next_child)
+        gap_px = round(next_bb['y'] - (curr_bb['y'] + curr_bb['h']))
+        gap_analysis.append({
+            'between': [curr.get('id', ''), next_child.get('id', '')],
+            'gap_px': gap_px,
+        })
+
+    header_cluster_ids = _detect_header_cluster(sorted_children, page_y)
+    consecutive_patterns = _detect_consecutive_patterns(sorted_children)
+    heading_candidates, loose_elements = _detect_heading_and_loose(sorted_children)
+
     return {
-        'header_candidates': header_candidates,
+        'header_candidates': header_cands,
         'header_cluster_ids': header_cluster_ids,
-        'footer_candidates': footer_candidates,
+        'footer_candidates': footer_cands,
         'gap_analysis': gap_analysis,
-        'background_candidates': background_candidates,
+        'background_candidates': bg_cands,
         'consecutive_patterns': consecutive_patterns,
         'heading_candidates': heading_candidates,
         'loose_elements': loose_elements,
@@ -227,7 +257,7 @@ def run_sectioning_context(metadata_path, output_file='', enriched_flag=''):
     children = root.get('children', [])
 
     # Sort by Y ascending
-    sorted_children = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
+    sorted_children = sort_by_y(children)
 
     # Build top_level_children summary
     top_level = []

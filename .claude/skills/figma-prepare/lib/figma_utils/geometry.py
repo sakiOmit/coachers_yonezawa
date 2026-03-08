@@ -50,6 +50,16 @@ def get_bbox(node):
     }
 
 
+def filter_visible_children(node):
+    """Return children of *node* that are not explicitly hidden (visible != False)."""
+    return [c for c in node.get('children', []) if c.get('visible') != False]
+
+
+def sort_by_y(items):
+    """Sort items by their absoluteBoundingBox Y coordinate."""
+    return sorted(items, key=lambda c: get_bbox(c).get('y', 0))
+
+
 def snap(value, grid=GRID_SNAP):
     """Snap a numeric value to the nearest grid multiple.
 

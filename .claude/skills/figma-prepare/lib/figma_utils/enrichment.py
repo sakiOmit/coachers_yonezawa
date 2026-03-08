@@ -11,7 +11,7 @@ from .constants import (
     UNNAMED_RE,
 )
 from .detection import is_decoration_pattern
-from .geometry import get_bbox
+from .geometry import filter_visible_children, get_bbox
 from .metadata import is_off_canvas
 
 
@@ -26,7 +26,7 @@ def _collect_text_preview(node, max_depth=3, max_len=30):
             return text[:max_len]
     if max_depth <= 0:
         return ''
-    for c in [ch for ch in node.get('children', []) if ch.get('visible') != False]:
+    for c in filter_visible_children(node):
         result = _collect_text_preview(c, max_depth - 1, max_len)
         if result:
             return result
@@ -80,7 +80,7 @@ def _compute_flags(node, page_width, page_height, root_x=0, root_y=0):
     flags = []
     bb = get_bbox(node)
     node_type = node.get('type', '')
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     is_leaf = len(children) == 0
 
     # Visibility
@@ -183,7 +183,7 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
         node_type = child.get('type', '')
         name = (child.get('name', '') or '')[:35]
         node_id = child.get('id', '')
-        child_nodes = [c for c in child.get('children', []) if c.get('visible') != False]
+        child_nodes = filter_visible_children(child)
         is_leaf = len(child_nodes) == 0
         leaf_str = 'Y' if is_leaf else 'N'
 

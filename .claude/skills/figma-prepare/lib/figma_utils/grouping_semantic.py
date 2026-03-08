@@ -11,14 +11,14 @@ from .constants import (
     HEADER_TEXT_MAX_WIDTH,
     ROW_TOLERANCE,
 )
-from .geometry import get_bbox
+from .geometry import filter_visible_children, get_bbox
 
 
 def is_card_like(node):
     """Detect card-like structure: FRAME/COMPONENT/INSTANCE with 2-6 children including IMAGE+TEXT."""
     if node.get('type') not in ('FRAME', 'COMPONENT', 'INSTANCE'):
         return False
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     if not (2 <= len(children) <= 6):
         return False
     types = [c.get('type', '') for c in children]
@@ -28,7 +28,7 @@ def is_card_like(node):
     if not has_text:
         for c in children:
             if c.get('type') in ('FRAME', 'GROUP'):
-                sub_types = [sc.get('type', '') for sc in c.get('children', []) if sc.get('visible') != False]
+                sub_types = [sc.get('type', '') for sc in filter_visible_children(c)]
                 if 'TEXT' in sub_types:
                     has_text = True
                     break

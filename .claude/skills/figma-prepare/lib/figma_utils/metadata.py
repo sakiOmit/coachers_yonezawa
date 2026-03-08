@@ -11,7 +11,7 @@ from .constants import (
     DEEP_NESTING_THRESHOLD,
     OFF_CANVAS_MARGIN,
 )
-from .geometry import get_bbox
+from .geometry import filter_visible_children, get_bbox
 
 
 _TAG_TYPE_MAP = {
@@ -309,7 +309,7 @@ def count_nested_flat(node, threshold=FLAT_THRESHOLD):
         int: Number of nodes with > threshold visible children inside section roots.
     """
     count = 0
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
 
     if is_section_root(node):
         # Inside a section root: count flat descendants (but not the root itself)
@@ -339,14 +339,14 @@ def _count_flat_descendants(node, threshold=FLAT_THRESHOLD):
         int: Number of flat descendant nodes.
     """
     count = 0
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     for child in children:
         if is_section_root(child):
             # Skip counting this child (flat_sections handles it),
             # but recurse into its subtree
             count += _count_flat_descendants(child, threshold)
         else:
-            child_children = [c for c in child.get('children', []) if c.get('visible') != False]
+            child_children = filter_visible_children(child)
             if child.get('type') in ('FRAME', 'GROUP', 'COMPONENT', 'INSTANCE', 'SECTION') and len(child_children) > threshold:
                 count += 1
             count += _count_flat_descendants(child, threshold)

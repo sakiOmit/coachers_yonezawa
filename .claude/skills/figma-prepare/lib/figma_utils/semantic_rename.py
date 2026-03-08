@@ -23,7 +23,7 @@ from .constants import (
 from .detection import (
     detect_en_jp_label_pairs,
 )
-from .geometry import resolve_absolute_coords, yaml_str
+from .geometry import filter_visible_children, resolve_absolute_coords, yaml_str
 from .metadata import get_root_node, get_text_children_content as _get_text_children, load_metadata
 from .naming import _jp_keyword_lookup, to_kebab
 
@@ -89,7 +89,7 @@ def has_image_wrapper(children):
         c_type = c.get('type', '')
         if c_type not in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
             continue
-        sub_children = [sc for sc in c.get('children', []) if sc.get('visible') != False]
+        sub_children = filter_visible_children(c)
         if not sub_children:
             continue
         rect_count = sum(1 for sc in sub_children if sc.get('type', '') in ('RECTANGLE', 'IMAGE', 'ELLIPSE'))
@@ -122,7 +122,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     Returns first non-None result, or a type-based fallback.
     """
     node_type = node.get('type', '')
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     name = node.get('name', '')
     abs_bbox = node.get('absoluteBoundingBox', {})
     w = abs_bbox.get('width', 0)
@@ -188,7 +188,7 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
                 'inference_method': 'auto',
             }
 
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
 
     # Issue 185: Detect EN+JP label pairs among children
     child_overrides = {}

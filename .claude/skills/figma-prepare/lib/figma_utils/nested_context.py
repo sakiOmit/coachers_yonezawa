@@ -12,7 +12,7 @@ import re
 import sys
 
 from .constants import GRANDCHILD_THRESHOLD, MAX_STAGE_C_DEPTH
-from .geometry import get_bbox, resolve_absolute_coords
+from .geometry import filter_visible_children, get_bbox, resolve_absolute_coords, sort_by_y
 from .metadata import find_node_by_id, get_root_node, load_metadata
 from .enrichment import generate_enriched_table
 
@@ -194,7 +194,7 @@ def _resolve_group_siblings(root, group, skipped_groups):
         })
         return []
 
-    return sorted(sibling_nodes, key=lambda c: get_bbox(c).get('y', 0))
+    return sort_by_y(sibling_nodes)
 
 
 def _build_group_context(sibling_nodes_sorted, group, page_width, page_height,
@@ -307,7 +307,7 @@ def _get_section_children(root, section):
             grandchildren = []
             for n in nodes:
                 grandchildren.extend(
-                    [c for c in n.get('children', []) if c.get('visible') != False]
+                    filter_visible_children(n)
                 )
             if grandchildren:
                 return grandchildren, None

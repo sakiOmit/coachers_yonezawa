@@ -7,6 +7,7 @@ Merges enrichment data (fills, layoutMode, characters, etc.) into metadata tree.
 import json
 import sys
 
+from .geometry import filter_visible_children
 from .metadata import get_root_node
 
 # Properties to merge from enrichment into metadata nodes
@@ -41,7 +42,7 @@ def enrich_node(node, enrichment_map, stats):
             stats['enriched_nodes'] += 1
             stats['merged_keys'] += len(merged_keys)
 
-    for child in [c for c in node.get('children', []) if c.get('visible') != False]:
+    for child in filter_visible_children(node):
         enrich_node(child, enrichment_map, stats)
 
 

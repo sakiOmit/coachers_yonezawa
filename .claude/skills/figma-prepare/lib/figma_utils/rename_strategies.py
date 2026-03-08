@@ -38,6 +38,7 @@ from .detection import (
     decoration_dominant_shape,
     is_decoration_pattern,
 )
+from .geometry import filter_visible_children
 from .naming import to_kebab
 
 __all__ = [
@@ -91,7 +92,7 @@ def _has_image_wrapper_local(children):
         c_type = c.get('type', '')
         if c_type not in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
             continue
-        sub_children = [sc for sc in c.get('children', []) if sc.get('visible') != False]
+        sub_children = filter_visible_children(c)
         if not sub_children:
             continue
         rect_count = sum(1 for sc in sub_children if sc.get('type', '') in ('RECTANGLE', 'IMAGE', 'ELLIPSE'))
@@ -351,7 +352,7 @@ def _detect_container_or_group(children, text_contents, sibling_index):
     all_texts = text_contents if text_contents else []
     if not all_texts:
         for c in children[:10]:
-            for gc in [g for g in c.get('children', []) if g.get('visible') != False]:
+            for gc in filter_visible_children(c):
                 if gc.get('type') == 'TEXT':
                     content = gc.get('characters', '') or gc.get('name', '')
                     if content and not UNNAMED_RE.match(content):

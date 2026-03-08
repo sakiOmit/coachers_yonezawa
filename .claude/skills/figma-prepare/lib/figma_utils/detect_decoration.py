@@ -10,6 +10,7 @@ from .constants import (
     DECORATION_MIN_SHAPES,
     DECORATION_SHAPE_RATIO,
 )
+from .geometry import filter_visible_children
 
 
 def is_decoration_pattern(node):
@@ -37,7 +38,7 @@ def is_decoration_pattern(node):
     if node_type not in ('FRAME', 'GROUP'):
         return False
 
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     if not children:
         return False
 
@@ -52,7 +53,7 @@ def is_decoration_pattern(node):
     shape_types = {'ELLIPSE', 'RECTANGLE', 'VECTOR'}
 
     def count_leaves(n):
-        ch = [c for c in n.get('children', []) if c.get('visible') != False]
+        ch = filter_visible_children(n)
         if not ch:
             return (1 if n.get('type', '') in shape_types else 0, 1)
         shape_total = 0
@@ -91,7 +92,7 @@ def decoration_dominant_shape(node):
     counts = {'ELLIPSE': 0, 'RECTANGLE': 0, 'VECTOR': 0}
 
     def count_shapes(n):
-        ch = [c for c in n.get('children', []) if c.get('visible') != False]
+        ch = filter_visible_children(n)
         if not ch:
             t = n.get('type', '')
             if t in shape_types:

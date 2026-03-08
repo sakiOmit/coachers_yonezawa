@@ -13,7 +13,7 @@ from .constants import (
     LOOSE_ABSORPTION_DISTANCE,
     LOOSE_ELEMENT_MAX_HEIGHT,
 )
-from .geometry import get_bbox
+from .geometry import filter_visible_children, get_bbox
 
 # Re-export everything from sub-modules for backward compatibility.
 # All internal modules that do `from .detection import X` will still work.
@@ -60,7 +60,7 @@ def is_heading_like(node):
     Returns:
         bool: True if node appears to be a heading frame.
     """
-    children = [c for c in node.get('children', []) if c.get('visible') != False]
+    children = filter_visible_children(node)
     if not children:
         return False
     if len(children) > HEADING_MAX_CHILDREN:
@@ -68,7 +68,7 @@ def is_heading_like(node):
 
     # Count leaf descendants by type
     def count_leaves(n):
-        ch = [c for c in n.get('children', []) if c.get('visible') != False]
+        ch = filter_visible_children(n)
         if not ch:
             return {n.get('type', 'UNKNOWN'): 1}
         counts = {}

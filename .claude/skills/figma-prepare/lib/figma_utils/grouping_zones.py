@@ -19,7 +19,7 @@ from .constants import (
     ZONE_OVERLAP_ITEM,
     ZONE_OVERLAP_ZONE,
 )
-from .geometry import get_bbox
+from .geometry import filter_visible_children, get_bbox
 from .grouping_semantic import is_card_like, is_grid_like, is_navigation_like
 from .metadata import get_text_children_content
 
@@ -86,7 +86,7 @@ def detect_header_footer_groups(root_children, page_bb):
                     has_logo = True
             elif t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                 # Check if it contains nav-like elements
-                sub_children = [sc for sc in c.get('children', []) if sc.get('visible') != False]
+                sub_children = filter_visible_children(c)
                 sub_texts = [sc for sc in sub_children if sc.get('type') == 'TEXT']
                 if len(sub_texts) >= HEADER_NAV_MIN_TEXTS:  # Issue 134
                     has_nav_text = True
@@ -161,11 +161,11 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
             has_text = True
         # Check children of FRAME/GROUP for text
         if t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
-            child_texts = get_text_children_content([c for c in n.get('children', []) if c.get('visible') != False], max_items=3)
+            child_texts = get_text_children_content(filter_visible_children(n), max_items=3)
             if child_texts:
                 has_text = True
             # Nested large background
-            for child in [c for c in n.get('children', []) if c.get('visible') != False]:
+            for child in filter_visible_children(n):
                 ct = child.get('type', '')
                 cbb = get_bbox(child)
                 if ct in ('RECTANGLE', 'IMAGE') and (cbb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO or cbb['w'] > SECTION_ROOT_WIDTH):  # Issue 183
