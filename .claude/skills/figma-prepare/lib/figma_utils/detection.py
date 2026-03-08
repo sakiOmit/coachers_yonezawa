@@ -25,6 +25,21 @@ from .constants import (
 )
 from .geometry import filter_visible_children, get_bbox
 
+__all__ = [
+    "decoration_dominant_shape",
+    "detect_bg_content_layers",
+    "detect_consecutive_similar",
+    "detect_en_jp_label_pairs",
+    "detect_heading_content_pairs",
+    "detect_highlight_text",
+    "detect_horizontal_bar",
+    "detect_repeating_tuple",
+    "detect_table_rows",
+    "find_absorbable_elements",
+    "is_decoration_pattern",
+    "is_heading_like",
+]
+
 # Re-export everything from leaf detection modules for backward compatibility.
 # All internal modules that do `from .detection import X` will still work.
 

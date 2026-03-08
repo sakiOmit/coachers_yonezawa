@@ -236,6 +236,7 @@ Phase 2 構造:
 | `infer-autolayout.sh` | Auto Layout推論 | metadata JSON | YAML (autolayout plan) |
 | `start-chrome-debug.sh` | Chrome 起動 + SSH | Figma URL | stdout (接続状態) |
 | `convert-metadata.sh` | メタデータ変換 | metadata JSON | JSON (normalized) |
+| `lib/figma-utils.sh` | 共通シェルユーティリティ | - | (source で読み込み) |
 | `clone-artboard.js` | アートボード複製 | `__SOURCE_NODE_ID__` | object (clone, mapping) |
 | `apply-renames.js` | バッチリネーム | `__RENAME_MAP__` | object (renamed, errors) |
 | `apply-grouping.js` | グルーピング適用 | `__GROUPING_PLAN__` | object (wrappers, errors) |
@@ -256,7 +257,7 @@ Phase 2 構造:
 | `.claude/cache/figma/final-grouping-plan.yaml` | 結果統合後の最終計画 |
 | `.claude/cache/figma/rename-map.yaml` | Phase 3 リネームマップ |
 | `.claude/cache/figma/autolayout-plan.yaml` | Phase 4 AutoLayout計画 |
-| `lib/figma_utils/` | 共通ユーティリティパッケージ（38モジュール） |
+| `lib/figma_utils/` | 共通ユーティリティパッケージ（39モジュール） |
 | `tests/figma-prepare/` | テスト・フィクスチャ |
 
 ## Satellite Documents

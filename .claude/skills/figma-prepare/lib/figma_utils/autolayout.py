@@ -25,6 +25,13 @@ from .scoring import (
     compute_gap_consistency,
 )
 
+__all__ = [
+    "infer_layout",
+    "layout_from_enrichment",
+    "run_autolayout_inference",
+    "walk_and_infer",
+]
+
 
 # Name patterns that strongly suggest a layout direction (Phase 3 → Phase 4 integration)
 _NAME_DIRECTION_HINTS = {

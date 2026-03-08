@@ -41,6 +41,14 @@ from .comparison_matching import (  # noqa: F401
     _aggregate_section_metrics,
 )
 
+__all__ = [
+    "absorb_stage_c_dividers",
+    "compare_grouping_by_section",
+    "compare_grouping_results",
+    "deduplicate_candidates",
+    "validate_column_consistency",
+]
+
 
 def compare_grouping_results(stage_a_candidates, stage_c_groups, parent_id=None):
     """Compare Stage A and Stage C grouping results and return metrics.

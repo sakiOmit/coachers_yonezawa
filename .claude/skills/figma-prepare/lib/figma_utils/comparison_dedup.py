@@ -10,6 +10,11 @@ from .constants import (
 )
 from .geometry import get_bbox
 
+__all__ = [
+    "absorb_stage_c_dividers",
+    "deduplicate_candidates",
+]
+
 
 def _should_absorb_into_higher(lower_group, higher_group, trim_loss_ratio=0.3):
     """Decide if a lower-priority group should be absorbed into a higher-priority one.

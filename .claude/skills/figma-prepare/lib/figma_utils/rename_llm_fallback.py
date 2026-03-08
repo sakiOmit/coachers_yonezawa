@@ -28,6 +28,15 @@ from .enrichment import _collect_text_preview, _compute_child_types
 from .geometry import filter_visible_children, get_bbox, resolve_absolute_coords
 from .metadata import find_node_by_id, get_root_node, is_unnamed, load_metadata
 
+__all__ = [
+    "build_fallback_context",
+    "collect_low_confidence_renames",
+    "format_fallback_prompt",
+    "generate_fallback_context_file",
+    "merge_llm_suggestions",
+    "parse_llm_suggestions",
+]
+
 
 def collect_low_confidence_renames(renames, threshold=LLM_FALLBACK_CONFIDENCE_THRESHOLD):
     """Filter renames to only those below the confidence threshold.

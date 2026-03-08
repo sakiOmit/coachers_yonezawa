@@ -5,6 +5,8 @@ from .constants import (
     _STAGE_A_TO_C_PATTERN_MAP,
 )
 
+__all__: list[str] = []
+
 
 def _stage_a_pattern_key(candidate):
     """Derive a canonical pattern key from a Stage A candidate.

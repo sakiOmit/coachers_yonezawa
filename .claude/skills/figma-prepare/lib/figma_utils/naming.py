@@ -6,6 +6,10 @@ import re
 # Use a lazy import inside _jp_keyword_lookup to avoid circular imports
 # since __init__.py may import from this module.
 
+__all__ = [
+    "to_kebab",
+]
+
 
 def to_kebab(text):
     """Convert text to kebab-case safe name.

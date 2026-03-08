@@ -20,6 +20,13 @@ ENRICHMENT_KEYS = [
     'characters', 'style',
 ]
 
+__all__ = [
+    "ENRICHMENT_KEYS",
+    "enrich_metadata",
+    "enrich_metadata_from_files",
+    "enrich_node",
+]
+
 
 def enrich_node(node, enrichment_map, stats):
     """Recursively walk metadata tree and merge enrichment data.

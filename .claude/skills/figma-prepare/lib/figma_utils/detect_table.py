@@ -15,6 +15,10 @@ from .geometry import get_bbox
 from .metadata import get_text_children_content
 from .naming import to_kebab
 
+__all__ = [
+    "detect_table_rows",
+]
+
 
 def _find_table_row_backgrounds(children, min_width):
     """Find full-width RECTANGLE leaf nodes that serve as table row backgrounds.

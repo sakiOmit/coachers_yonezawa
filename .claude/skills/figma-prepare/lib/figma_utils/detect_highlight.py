@@ -15,6 +15,10 @@ from .constants import (
 )
 from .geometry import get_bbox
 
+__all__ = [
+    "detect_highlight_text",
+]
+
 
 def _check_rect_text_overlap(r_bb, t_bb, text_content):
     """Check if a RECTANGLE and TEXT node form a valid highlight pair.

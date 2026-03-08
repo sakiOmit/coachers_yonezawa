@@ -16,6 +16,10 @@ from .constants import (
 from .geometry import get_bbox
 from .metadata import get_text_children_content
 
+__all__ = [
+    "detect_horizontal_bar",
+]
+
 
 def _cluster_by_y_band(bboxes, max_height):
     """Find the next Y-band cluster starting from elements sorted by Y-center.

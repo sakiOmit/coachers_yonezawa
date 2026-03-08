@@ -7,6 +7,16 @@ from typing import Any
 
 from .constants import GRID_SNAP
 
+__all__ = [
+    "FigmaNode",
+    "filter_visible_children",
+    "get_bbox",
+    "resolve_absolute_coords",
+    "snap",
+    "sort_by_y",
+    "yaml_str",
+]
+
 # Type alias for Figma node dict
 FigmaNode = dict[str, Any]
 

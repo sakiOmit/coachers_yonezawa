@@ -38,6 +38,17 @@ from .constants import (
 GROUPING_LLM_CONFIDENCE_MAP = LLM_CONFIDENCE_MAP
 GROUPING_LLM_DEFAULT_CONFIDENCE = LLM_DEFAULT_CONFIDENCE
 
+__all__ = [
+    "GROUPING_LLM_CONFIDENCE_MAP",
+    "GROUPING_LLM_DEFAULT_CONFIDENCE",
+    "build_grouping_fallback_context",
+    "collect_undergrouped_sections",
+    "format_grouping_fallback_prompt",
+    "generate_grouping_fallback_context_file",
+    "merge_grouping_suggestions",
+    "parse_llm_grouping_suggestions",
+]
+
 
 # ---------------------------------------------------------------------------
 # Internal helpers

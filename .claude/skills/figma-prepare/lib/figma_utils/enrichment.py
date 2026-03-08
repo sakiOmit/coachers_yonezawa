@@ -17,6 +17,10 @@ from .detection import is_decoration_pattern
 from .geometry import FigmaNode, filter_visible_children, get_bbox
 from .metadata import is_off_canvas
 
+__all__ = [
+    "generate_enriched_table",
+]
+
 
 def _collect_text_preview(node, max_depth=3, max_len=30):
     """Recursively collect text content for preview.

@@ -10,6 +10,12 @@ import sys
 
 from .comparison import absorb_stage_c_dividers
 
+__all__ = [
+    "format_plan_yaml",
+    "parse_plan_yaml",
+    "postprocess_plan",
+]
+
 
 def parse_plan_yaml(lines):
     """Parse nested-grouping-plan.yaml into section structures.

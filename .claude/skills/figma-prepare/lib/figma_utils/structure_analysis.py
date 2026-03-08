@@ -21,6 +21,12 @@ from .metadata import (
     count_nested_flat,
 )
 
+__all__ = [
+    "count_nodes",
+    "detect_grouping_candidates_simple",
+    "run_structure_analysis",
+]
+
 
 def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
     """Recursively count nodes and collect metrics.

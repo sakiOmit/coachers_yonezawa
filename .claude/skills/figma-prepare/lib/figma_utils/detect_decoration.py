@@ -12,6 +12,11 @@ from .constants import (
 )
 from .geometry import filter_visible_children
 
+__all__ = [
+    "decoration_dominant_shape",
+    "is_decoration_pattern",
+]
+
 
 def is_decoration_pattern(node):
     """Check if a node is a decorative dot/shape pattern frame.

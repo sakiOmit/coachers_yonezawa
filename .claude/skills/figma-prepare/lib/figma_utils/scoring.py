@@ -6,6 +6,19 @@ from collections import Counter
 from .constants import CV_THRESHOLD, ROW_TOLERANCE
 from .geometry import filter_visible_children
 
+__all__ = [
+    "alignment_bonus",
+    "compute_gap_consistency",
+    "compute_grouping_score",
+    "detect_regular_spacing",
+    "detect_space_between",
+    "detect_wrap",
+    "infer_direction_two_elements",
+    "size_similarity_bonus",
+    "structure_hash",
+    "structure_similarity",
+]
+
 
 def alignment_bonus(a_bb, b_bb, tolerance=2):
     """Check if two bounding boxes share an alignment axis.

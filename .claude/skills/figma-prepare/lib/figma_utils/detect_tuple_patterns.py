@@ -10,6 +10,10 @@ from .constants import (
     TUPLE_PATTERN_MIN,
 )
 
+__all__ = [
+    "detect_repeating_tuple",
+]
+
 
 def detect_repeating_tuple(children):
     """Detect repeating tuple patterns in flat sibling lists.

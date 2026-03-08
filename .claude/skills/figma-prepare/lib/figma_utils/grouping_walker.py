@@ -24,6 +24,10 @@ from .grouping_semantic import detect_semantic_groups, detect_variant_groups
 from .metadata import get_text_children_content, is_off_canvas
 from .naming import to_kebab
 
+__all__ = [
+    "walk_and_detect",
+]
+
 
 def _is_protected_node(node):
     """Check if a node's internal structure should be protected from regrouping.

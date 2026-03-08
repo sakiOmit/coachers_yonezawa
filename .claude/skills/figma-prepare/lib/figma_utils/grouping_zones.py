@@ -26,6 +26,12 @@ from .geometry import filter_visible_children, get_bbox
 from .grouping_semantic import is_card_like, is_grid_like, is_navigation_like
 from .metadata import get_text_children_content
 
+__all__ = [
+    "detect_header_footer_groups",
+    "detect_vertical_zone_groups",
+    "infer_zone_semantic_name",
+]
+
 
 def detect_header_footer_groups(root_children, page_bb, viewport_scale=None):
     """Detect header/footer grouping at the page root level (Issue 85).

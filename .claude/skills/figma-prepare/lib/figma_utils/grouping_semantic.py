@@ -13,6 +13,14 @@ from .constants import (
 )
 from .geometry import filter_visible_children, get_bbox
 
+__all__ = [
+    "detect_semantic_groups",
+    "detect_variant_groups",
+    "is_card_like",
+    "is_grid_like",
+    "is_navigation_like",
+]
+
 
 def is_card_like(node):
     """Detect card-like structure: FRAME/COMPONENT/INSTANCE with 2-6 children including IMAGE+TEXT."""

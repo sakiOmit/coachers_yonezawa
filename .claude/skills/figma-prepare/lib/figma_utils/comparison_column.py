@@ -2,6 +2,10 @@
 
 from .geometry import get_bbox
 
+__all__ = [
+    "validate_column_consistency",
+]
+
 
 def _compute_col_for_nodes(node_ids, node_lookup, midpoint, x_span):
     """Classify node IDs into left, right, and full-width columns (Issue 256).

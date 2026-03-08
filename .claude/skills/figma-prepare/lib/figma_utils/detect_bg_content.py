@@ -16,6 +16,10 @@ from .constants import (
 )
 from .geometry import get_bbox
 
+__all__ = [
+    "detect_bg_content_layers",
+]
+
 
 def _find_bg_rectangle(children, parent_bb):
     """Find a single background RECTANGLE among siblings.

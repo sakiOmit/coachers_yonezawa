@@ -40,6 +40,19 @@ from .rename_strategies import (  # noqa: F401
 )
 from .rename_strategies import _SHAPE_PREFIXES, _CTA_KEYWORDS  # noqa: F401
 
+__all__ = [
+    "CTA_KEYWORDS",
+    "RENAME_STRATEGIES",
+    "SHAPE_PREFIXES",
+    "collect_renames",
+    "generate_rename_map",
+    "get_text_children_content",
+    "has_image_wrapper",
+    "infer_name",
+    "infer_name_with_confidence",
+    "infer_text_role",
+]
+
 # ---------------------------------------------------------------------------
 # Shape prefix mapping — re-export from rename_strategies (single source of truth)
 # ---------------------------------------------------------------------------
@@ -348,6 +361,9 @@ def generate_rename_map(metadata_path: str, output_file: str = '', fallback_cont
                 result['fallback_context'] = fallback_context_path
             print(json.dumps(result, indent=2, ensure_ascii=False))
 
-    except Exception as e:
+    except (OSError, json.JSONDecodeError, ValueError, KeyError, TypeError) as e:
+        # OSError: file read/write failures
+        # json.JSONDecodeError/ValueError: metadata parsing errors
+        # KeyError/TypeError: unexpected metadata structure or missing fields
         print(json.dumps({'error': str(e)}), file=sys.stderr)
         sys.exit(1)

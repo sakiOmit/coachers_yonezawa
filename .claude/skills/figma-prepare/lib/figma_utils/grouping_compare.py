@@ -8,6 +8,13 @@ import json
 
 from .comparison import compare_grouping_results, _stage_a_pattern_key  # noqa: F401
 
+__all__ = [
+    "format_report",
+    "parse_stage_a_yaml",
+    "parse_stage_c_yaml",
+    "run_comparison",
+]
+
 
 def parse_stage_a_yaml(filepath):
     """Parse the YAML output from detect-grouping-candidates.sh."""

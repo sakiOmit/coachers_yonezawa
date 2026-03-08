@@ -18,6 +18,12 @@ from .constants import (
 from .geometry import get_bbox, snap
 from .scoring import compute_grouping_score
 
+__all__ = [
+    "UnionFind",
+    "compute_adaptive_gap",
+    "detect_proximity_groups",
+]
+
 
 # ---------------------------------------------------------------------------
 # UnionFind (proximity grouping helper)

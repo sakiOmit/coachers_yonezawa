@@ -31,6 +31,16 @@ from .detection import is_heading_like
 from .scoring import structure_hash, structure_similarity
 from .enrichment import generate_enriched_table
 
+__all__ = [
+    "classify_section_type",
+    "count_children",
+    "detect_heuristic_hints",
+    "get_child_types_summary",
+    "get_text_children_preview",
+    "has_text_children",
+    "run_sectioning_context",
+]
+
 
 def count_children(node):
     """Count visible children of a node."""

@@ -73,7 +73,8 @@ def _load_yaml_or_json(file_path, file_label="file"):
         if yaml_available:
             try:
                 return yaml.safe_load(text)
-            except Exception:
+            except yaml.YAMLError:
+                # YAML parse failed — fall back to JSON parsing
                 return json.loads(text)
         else:
             return json.loads(text)

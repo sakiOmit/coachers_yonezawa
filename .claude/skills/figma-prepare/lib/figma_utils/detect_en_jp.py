@@ -14,6 +14,10 @@ from .constants import (
 )
 from .geometry import get_bbox
 
+__all__ = [
+    "detect_en_jp_label_pairs",
+]
+
 
 def _is_en_label(text):
     """Check if text is a short uppercase or title-case ASCII label.

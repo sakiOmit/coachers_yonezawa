@@ -3,7 +3,7 @@
 Package facade: re-exports all public API from submodules for backward compatibility.
 All existing imports (`from figma_utils import X`) continue to work unchanged.
 
-Submodule hierarchy (37 modules):
+Submodule hierarchy (39 modules):
 
   Foundation:
     constants           - Thresholds, regex patterns, lookup tables (106+ constants)

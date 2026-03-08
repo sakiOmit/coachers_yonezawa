@@ -13,6 +13,12 @@ from collections import defaultdict
 from .geometry import filter_visible_children
 from .scoring import structure_hash
 
+__all__ = [
+    "build_pattern_registry",
+    "format_registry_summary",
+    "lookup_pattern",
+]
+
 
 def build_pattern_registry(root, min_occurrences=2):
     """Build a registry of recurring structural patterns across all sections.

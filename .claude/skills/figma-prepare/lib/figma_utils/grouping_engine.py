@@ -50,6 +50,25 @@ from .grouping_walker import (  # noqa: F401
     walk_and_detect,
 )
 
+__all__ = [
+    "ALL_DETECTOR_METHODS",
+    "UnionFind",
+    "compute_adaptive_gap",
+    "detect_grouping_candidates",
+    "detect_header_footer_groups",
+    "detect_pattern_groups",
+    "detect_proximity_groups",
+    "detect_semantic_groups",
+    "detect_spacing_groups",
+    "detect_variant_groups",
+    "detect_vertical_zone_groups",
+    "infer_zone_semantic_name",
+    "is_card_like",
+    "is_grid_like",
+    "is_navigation_like",
+    "walk_and_detect",
+]
+
 
 # ---------------------------------------------------------------------------
 # Pattern / spacing detectors (remain here as entry-point-adjacent logic)

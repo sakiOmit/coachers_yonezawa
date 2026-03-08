@@ -9,6 +9,10 @@ from .constants import (
 )
 from .scoring import structure_hash, structure_similarity
 
+__all__ = [
+    "detect_consecutive_similar",
+]
+
 
 def detect_consecutive_similar(children, min_count=None, similarity_threshold=None):
     """Detect runs of 3+ consecutive siblings with similar structure_hash.
