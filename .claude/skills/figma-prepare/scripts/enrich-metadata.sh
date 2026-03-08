@@ -38,67 +38,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 python3 -c "
 import json, sys, os
-sys.setrecursionlimit(3000)  # Guard against deeply nested Figma files (Issue 48)
 sys.path.insert(0, os.path.join(sys.argv[1], 'lib'))
-from figma_utils import get_root_node
-
-# Properties to merge from enrichment into metadata nodes
-ENRICHMENT_KEYS = [
-    'fills', 'strokes', 'effects',
-    'layoutMode', 'layoutWrap',  # Issue 137: layoutWrap for WRAP detection
-    'itemSpacing',
-    'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-    'primaryAxisAlignItems', 'counterAxisAlignItems',
-    'characters', 'style',
-]
-
-def enrich_node(node, enrichment_map, stats):
-    \"\"\"Recursively walk metadata tree and merge enrichment data.\"\"\"
-    node_id = node.get('id', '')
-
-    if node_id in enrichment_map:
-        enrich_data = enrichment_map[node_id]
-        merged_keys = []
-        for key in ENRICHMENT_KEYS:
-            if key in enrich_data and enrich_data[key] is not None:
-                node[key] = enrich_data[key]
-                merged_keys.append(key)
-        if merged_keys:
-            stats['enriched_nodes'] += 1
-            stats['merged_keys'] += len(merged_keys)
-
-    for child in [c for c in node.get('children', []) if c.get('visible') != False]:
-        enrich_node(child, enrichment_map, stats)
+from figma_utils.metadata_enricher import enrich_metadata_from_files
 
 try:
-    with open(sys.argv[2], 'r') as f:
-        metadata = json.load(f)
-
-    with open(sys.argv[3], 'r') as f:
-        enrichment = json.load(f)
-
-    root = get_root_node(metadata)
-
-    stats = {'enriched_nodes': 0, 'merged_keys': 0}
-    enrich_node(root, enrichment, stats)
-
-    output_file = sys.argv[4] if len(sys.argv) > 4 else ''
-
-    if output_file:
-        # Write enriched metadata to file
-        with open(output_file, 'w') as f:
-            json.dump(metadata, f, indent=2, ensure_ascii=False)
-        print(json.dumps({
-            'enriched_nodes': stats['enriched_nodes'],
-            'merged_keys': stats['merged_keys'],
-            'total_enrichment_entries': len(enrichment),
-            'output': output_file,
-            'status': 'success'
-        }, indent=2))
-    else:
-        # Write enriched metadata to stdout
-        print(json.dumps(metadata, indent=2, ensure_ascii=False))
-
+    result = enrich_metadata_from_files(sys.argv[2], sys.argv[3], sys.argv[4])
+    print(result)
 except Exception as e:
     print(json.dumps({'error': str(e)}), file=sys.stderr)
     sys.exit(1)

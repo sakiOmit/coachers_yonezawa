@@ -9,12 +9,20 @@ Submodules:
   metadata         - I/O, parsing, node lookup, structural predicates
   naming           - Text conversion (to_kebab, _jp_keyword_lookup)
   scoring          - Proximity scoring, structure hashing, layout inference
-  detection        - Semantic/pattern detection (13 detectors)
+  detection          - Core detection (heading, absorption) + re-exports
+  detection_patterns - Pattern-based detectors (tuple, consecutive, highlight, EN+JP)
+  detection_semantic - Semantic structure detectors (horizontal bar, bg-content, table, decoration)
   enrichment       - Enriched table generation
   comparison       - Deduplication, Stage A/C comparison, validation
   stage_c          - Stage C depth recursion (YAML I/O, heuristic sub-grouping)
   nested_context   - Nested grouping context generation (plan/groups modes)
   grouping_engine  - Phase 2 grouping candidate detection pipeline
+  grouping_compare - Stage A vs Stage C comparison (YAML parsing, report generation)
+  metadata_enricher - Metadata enrichment (merge design context into tree)
+  grouping_postprocess - Grouping plan post-processing (divider absorption)
+  autolayout         - Auto Layout inference (Phase 4)
+  sectioning         - Sectioning context preparation (Phase 2 Stage B)
+  structure_analysis - Structure quality analysis (Phase 1)
 """
 
 from .constants import *  # noqa: F401,F403
@@ -47,4 +55,22 @@ from .grouping_engine import (  # noqa: F401
 from .semantic_rename import (  # noqa: F401
     generate_rename_map, collect_renames, infer_name, infer_text_role,
     has_image_wrapper, SHAPE_PREFIXES, CTA_KEYWORDS,
+)
+from .grouping_compare import (  # noqa: F401
+    parse_stage_a_yaml, parse_stage_c_yaml, run_comparison, format_report,
+)
+from .metadata_enricher import (  # noqa: F401
+    enrich_node, enrich_metadata, enrich_metadata_from_files, ENRICHMENT_KEYS,
+)
+from .grouping_postprocess import (  # noqa: F401
+    parse_plan_yaml, format_plan_yaml, postprocess_plan,
+)
+from .autolayout import (  # noqa: F401
+    infer_layout, layout_from_enrichment, walk_and_infer, run_autolayout_inference,
+)
+from .sectioning import (  # noqa: F401
+    detect_heuristic_hints, run_sectioning_context,
+)
+from .structure_analysis import (  # noqa: F401
+    count_nodes, detect_grouping_candidates_simple, run_structure_analysis,
 )
