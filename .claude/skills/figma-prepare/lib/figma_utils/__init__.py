@@ -4,15 +4,17 @@ Package facade: re-exports all public API from submodules for backward compatibi
 All existing imports (`from figma_utils import X`) continue to work unchanged.
 
 Submodules:
-  constants   - Thresholds, regex patterns, lookup tables
-  geometry    - Coordinate/bbox utilities (get_bbox, snap, resolve_absolute_coords)
-  metadata    - I/O, parsing, node lookup, structural predicates
-  naming      - Text conversion (to_kebab, _jp_keyword_lookup)
-  scoring     - Proximity scoring, structure hashing, layout inference
-  detection   - Semantic/pattern detection (13 detectors)
-  enrichment  - Enriched table generation
-  comparison  - Deduplication, Stage A/C comparison, validation
-  stage_c     - Stage C depth recursion (YAML I/O, heuristic sub-grouping)
+  constants        - Thresholds, regex patterns, lookup tables
+  geometry         - Coordinate/bbox utilities (get_bbox, snap, resolve_absolute_coords)
+  metadata         - I/O, parsing, node lookup, structural predicates
+  naming           - Text conversion (to_kebab, _jp_keyword_lookup)
+  scoring          - Proximity scoring, structure hashing, layout inference
+  detection        - Semantic/pattern detection (13 detectors)
+  enrichment       - Enriched table generation
+  comparison       - Deduplication, Stage A/C comparison, validation
+  stage_c          - Stage C depth recursion (YAML I/O, heuristic sub-grouping)
+  nested_context   - Nested grouping context generation (plan/groups modes)
+  grouping_engine  - Phase 2 grouping candidate detection pipeline
 """
 
 from .constants import *  # noqa: F401,F403
@@ -33,3 +35,16 @@ from .comparison import _stage_a_pattern_key  # noqa: F401
 from .stage_c import *  # noqa: F401,F403
 from .stage_c import _write_group_yaml, _try_heading_split, _try_column_split  # noqa: F401
 from .stage_c import _try_spatial_split, _try_yband_split, _collect_from_groups  # noqa: F401
+from .nested_context import *  # noqa: F401,F403
+from .grouping_engine import (  # noqa: F401
+    UnionFind, detect_grouping_candidates, detect_proximity_groups,
+    detect_pattern_groups, detect_spacing_groups, detect_semantic_groups,
+    detect_header_footer_groups, detect_vertical_zone_groups,
+    infer_zone_semantic_name, walk_and_detect,
+    is_card_like, is_navigation_like, is_grid_like,
+    _is_protected_node, _split_by_spatial_gap,
+)
+from .semantic_rename import (  # noqa: F401
+    generate_rename_map, collect_renames, infer_name, infer_text_role,
+    has_image_wrapper, SHAPE_PREFIXES, CTA_KEYWORDS,
+)
