@@ -294,6 +294,78 @@ def _try_cta(node, node_type, parent, children, abs_bbox, w, h, name, sibling_in
 # Priority 3.5, 4: Children structure analysis
 # ---------------------------------------------------------------------------
 
+def _detect_card_pattern(children, child_types, text_contents, w, sibling_index):
+    """Detect card-like pattern: image/rectangle + text.
+
+    Returns inferred name or None.
+    """
+    child_count = len(children)
+    has_direct_image = 'IMAGE' in child_types
+    has_direct_rect = 'RECTANGLE' in child_types and 2 <= child_count <= 6
+    has_rect_with_fill = any(
+        c.get('type') == 'RECTANGLE'
+        and c.get('fills') and isinstance(c.get('fills'), list)
+        and any(f.get('type') == 'IMAGE' for f in c['fills'] if isinstance(f, dict))
+        for c in children if isinstance(c, dict)
+    )
+    has_image_wrap = _has_image_wrapper_local(children)
+    has_image = has_direct_image or has_rect_with_fill or has_image_wrap or has_direct_rect
+    has_text = 'TEXT' in child_types
+
+    if has_image and has_text and w < OVERFLOW_BG_MIN_WIDTH:
+        slug = _resolve_slug_local(text_contents)
+        if not slug:
+            slug = str(sibling_index)
+        return f'card-{slug}'
+    return None
+
+
+def _detect_heading_or_body(children, child_types, text_contents, text_type_count, sibling_index):
+    """Detect heading vs body/content patterns.
+
+    Returns inferred name or None.
+    """
+    has_image_wrap = _has_image_wrapper_local(children)
+    has_image = 'IMAGE' in child_types or has_image_wrap
+    if text_type_count > 2 or not text_contents or has_image or len(children) > 3:
+        return None
+
+    max_text_len = max(len(t) for t in text_contents)
+    slug = _resolve_slug_local(text_contents)
+    if max_text_len > HEADING_BODY_TEXT_THRESHOLD:
+        has_non_text = any(ct != 'TEXT' for ct in child_types)
+        prefix = 'content' if has_non_text else 'body'
+        if slug:
+            return f'{prefix}-{slug}'
+        return f'{prefix}-text-{text_type_count}'
+    if slug:
+        return f'heading-{slug}'
+    return f'heading-{sibling_index}'
+
+
+def _detect_container_or_group(children, text_contents, sibling_index):
+    """Fallback: infer container/group name from grandchild text content (Issue 174).
+
+    Returns inferred name.
+    """
+    all_texts = text_contents if text_contents else []
+    if not all_texts:
+        for c in children[:10]:
+            for gc in [g for g in c.get('children', []) if g.get('visible') != False]:
+                if gc.get('type') == 'TEXT':
+                    content = gc.get('characters', '') or gc.get('name', '')
+                    if content and not UNNAMED_RE.match(content):
+                        all_texts.append(content)
+                        if len(all_texts) >= 3:
+                            break
+            if len(all_texts) >= 3:
+                break
+    slug = _resolve_slug_local(all_texts) if all_texts else ''
+    if len(children) > 5:
+        return f'container-{slug}' if slug else f'container-{sibling_index}'
+    return f'group-{slug}' if slug else f'group-{sibling_index}'
+
+
 def _infer_from_children(node, node_type, children, w, h, sibling_index):
     """Priorities 3.5-4: Navigation, decoration, card, button, heading, container.
 
@@ -319,26 +391,12 @@ def _infer_from_children(node, node_type, children, w, h, sibling_index):
 
     # Priority 4: Child structure analysis
     child_types = [c.get('type', '') for c in children]
-    child_count = len(children)
-    has_direct_image = 'IMAGE' in child_types
-    has_direct_rect = 'RECTANGLE' in child_types and 2 <= child_count <= 6
-    has_rect_with_fill = any(
-        c.get('type') == 'RECTANGLE'
-        and c.get('fills') and isinstance(c.get('fills'), list)
-        and any(f.get('type') == 'IMAGE' for f in c['fills'] if isinstance(f, dict))
-        for c in children if isinstance(c, dict)
-    )
-    has_image_wrap = _has_image_wrapper_local(children)
-    has_image = has_direct_image or has_rect_with_fill or has_image_wrap or has_direct_rect
-    has_text = 'TEXT' in child_types
     text_type_count = len([ct for ct in child_types if ct == 'TEXT'])
 
-    # Card-like: image/rectangle + text, exclude section-root-width frames
-    if has_image and has_text and w < OVERFLOW_BG_MIN_WIDTH:
-        slug = _resolve_slug_local(text_contents)
-        if not slug:
-            slug = str(sibling_index)
-        return f'card-{slug}'
+    # Card-like detection
+    result = _detect_card_pattern(children, child_types, text_contents, w, sibling_index)
+    if result:
+        return result
 
     # Small icon-like: tiny frame with 0-1 children
     if w > 0 and w <= ICON_MAX_SIZE and h > 0 and h <= ICON_MAX_SIZE and len(children) <= 1:
@@ -352,41 +410,17 @@ def _infer_from_children(node, node_type, children, w, h, sibling_index):
                 return f'btn-{slug}'
         return f'btn-{sibling_index}'
 
-    # Heading vs Content: check TEXT children length (Issue 14)
-    if text_type_count <= 2 and len(text_contents) >= 1 and not has_image and not has_image_wrap and len(children) <= 3:
-        max_text_len = max(len(t) for t in text_contents)
-        slug = _resolve_slug_local(text_contents)
-        if max_text_len > HEADING_BODY_TEXT_THRESHOLD:
-            has_non_text = any(ct != 'TEXT' for ct in child_types)
-            prefix = 'content' if has_non_text else 'body'
-            if slug:
-                return f'{prefix}-{slug}'
-            return f'{prefix}-text-{text_type_count}'
-        if slug:
-            return f'heading-{slug}'
-        return f'heading-{sibling_index}'
+    # Heading vs Content (Issue 14)
+    result = _detect_heading_or_body(children, child_types, text_contents, text_type_count, sibling_index)
+    if result:
+        return result
 
     # text-block with slug
-    if has_text and len(children) <= 3:
+    if 'TEXT' in child_types and len(children) <= 3:
         slug = _resolve_slug_local(text_contents)
         if slug:
             return f'text-block-{slug}'
         return f'text-block-{sibling_index}'
 
-    # Issue 174: Try semantic naming from child text content
-    all_texts = text_contents if text_contents else []
-    if not all_texts:
-        for c in children[:10]:
-            for gc in [g for g in c.get('children', []) if g.get('visible') != False]:
-                if gc.get('type') == 'TEXT':
-                    content = gc.get('characters', '') or gc.get('name', '')
-                    if content and not UNNAMED_RE.match(content):
-                        all_texts.append(content)
-                        if len(all_texts) >= 3:
-                            break
-            if len(all_texts) >= 3:
-                break
-    slug = _resolve_slug_local(all_texts) if all_texts else ''
-    if len(children) > 5:
-        return f'container-{slug}' if slug else f'container-{sibling_index}'
-    return f'group-{slug}' if slug else f'group-{sibling_index}'
+    # Fallback: container or group
+    return _detect_container_or_group(children, text_contents, sibling_index)

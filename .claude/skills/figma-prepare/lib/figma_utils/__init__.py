@@ -3,26 +3,59 @@
 Package facade: re-exports all public API from submodules for backward compatibility.
 All existing imports (`from figma_utils import X`) continue to work unchanged.
 
-Submodules:
-  constants        - Thresholds, regex patterns, lookup tables
-  geometry         - Coordinate/bbox utilities (get_bbox, snap, resolve_absolute_coords)
-  metadata         - I/O, parsing, node lookup, structural predicates
-  naming           - Text conversion (to_kebab, _jp_keyword_lookup)
-  scoring          - Proximity scoring, structure hashing, layout inference
-  detection          - Core detection (heading, absorption) + re-exports
-  detection_patterns - Pattern-based detectors (tuple, consecutive, highlight, EN+JP)
-  detection_semantic - Facade re-exporting from detect_decoration, detect_horizontal_bar, detect_bg_content, detect_table
-  enrichment       - Enriched table generation
-  comparison       - Deduplication, Stage A/C comparison, validation
-  stage_c          - Stage C depth recursion (YAML I/O, heuristic sub-grouping)
-  nested_context   - Nested grouping context generation (plan/groups modes)
-  grouping_engine  - Phase 2 grouping candidate detection pipeline
-  grouping_compare - Stage A vs Stage C comparison (YAML parsing, report generation)
-  metadata_enricher - Metadata enrichment (merge design context into tree)
-  grouping_postprocess - Grouping plan post-processing (divider absorption)
-  autolayout         - Auto Layout inference (Phase 4)
-  sectioning         - Sectioning context preparation (Phase 2 Stage B)
-  structure_analysis - Structure quality analysis (Phase 1)
+Submodule hierarchy (39 modules):
+
+  Foundation:
+    constants           - Thresholds, regex patterns, lookup tables (106+ constants)
+    geometry            - Coordinate/bbox utilities (get_bbox, snap, resolve_absolute_coords)
+    metadata            - I/O, parsing, node lookup, structural predicates
+    naming              - Text conversion (to_kebab, _jp_keyword_lookup)
+    scoring             - Proximity scoring, structure hashing, layout inference
+
+  Detection (facade chain: __init__ → detection → detection_patterns/detection_semantic → leaf modules):
+    detection           - Core detection (heading, absorption) + re-exports
+    detection_patterns  - Facade → detect_tuple_patterns, detect_consecutive, detect_highlight, detect_en_jp
+    detection_semantic  - Facade → detect_decoration, detect_horizontal_bar, detect_bg_content, detect_table
+    detect_tuple_patterns - Repeating tuple pattern detection
+    detect_consecutive    - Consecutive similar element detection
+    detect_highlight      - Highlight text (RECT+TEXT overlap) detection
+    detect_en_jp          - EN+JP label pair detection
+    detect_decoration     - Decoration dot/pattern detection
+    detect_horizontal_bar - Horizontal bar/news ticker detection
+    detect_bg_content     - Background-content layer separation
+    detect_table          - Table row structure detection
+
+  Grouping (facade: __init__ → grouping_engine → leaf modules):
+    grouping_engine     - Entry point + pattern/spacing detectors
+    grouping_proximity  - UnionFind, proximity groups, spatial gap splitting
+    grouping_semantic   - Card/navigation/grid semantic detectors
+    grouping_zones      - Header/footer/vertical zone detection
+    grouping_walker     - Tree walking (_is_protected_node, walk_and_detect)
+
+  Comparison (facade: __init__ → comparison → leaf modules):
+    comparison          - Stage A/C comparison entry points
+    comparison_dedup    - Deduplication, divider absorption
+    comparison_column   - Two-column layout validation
+    comparison_matching - Jaccard matching, coverage metrics
+
+  Stage C (facade: __init__ → stage_c → leaf modules):
+    stage_c             - Recursion target collection
+    stage_c_yaml        - YAML I/O (parse/write plan, enriched table)
+    stage_c_strategies  - Heuristic sub-grouping (heading/column/spatial/yband split)
+
+  Rename (facade: __init__ → semantic_rename → rename_strategies):
+    semantic_rename     - Name inference dispatcher, rename collection, entry point
+    rename_strategies   - Priority-based naming strategies (text/shape/position/children)
+
+  Enrichment & Analysis:
+    enrichment          - Enriched table generation
+    nested_context      - Nested grouping context (plan/groups modes)
+    grouping_compare    - Stage A vs Stage C comparison (YAML parsing, report)
+    metadata_enricher   - Metadata enrichment (merge design context into tree)
+    grouping_postprocess - Grouping plan post-processing (divider absorption)
+    autolayout          - Auto Layout inference (Phase 4)
+    sectioning          - Sectioning context preparation (Phase 2 Stage B)
+    structure_analysis  - Structure quality analysis (Phase 1)
 """
 
 from .constants import *  # noqa: F401,F403

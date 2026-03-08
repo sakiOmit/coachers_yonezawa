@@ -117,15 +117,14 @@ def _build_prompt(prompt_template, section_name, section_id, section_width,
 # Groups mode (Issue 225)
 # ---------------------------------------------------------------------------
 
-def _process_groups_mode(root, page_width, page_height, groups_file,
-                         prompt_template, depth):
-    """Process --groups mode: generate context from nested-grouping-result groups.
+def _load_and_validate_groups(groups_file, depth):
+    """Load groups file and validate structure.
 
-    Returns the result dict.
+    Returns (groups_list, depth_skip_result) where depth_skip_result is
+    a result dict if depth exceeds MAX_STAGE_C_DEPTH, or None otherwise.
     """
-    # Enforce MAX_STAGE_C_DEPTH
     if depth >= MAX_STAGE_C_DEPTH:
-        return {
+        return [], {
             'sections': [],
             'total_sections': 0,
             'depth': depth,
@@ -141,98 +140,133 @@ def _process_groups_mode(root, page_width, page_height, groups_file,
         }), file=sys.stderr)
         sys.exit(1)
 
-    # Extract groups: support both flat 'groups' key and nested 'sections[].groups'
     groups_list = groups_data.get('groups', [])
     if not groups_list and 'sections' in groups_data:
         for sec in groups_data['sections']:
             for g in sec.get('groups', []):
                 groups_list.append(g)
 
+    return groups_list, None
+
+
+def _resolve_group_siblings(root, group, skipped_groups):
+    """Resolve node_ids to sibling nodes for a single group.
+
+    Returns list of resolved sibling nodes (sorted by Y), or empty list
+    if the group should be skipped. Appends skip reasons to skipped_groups.
+    """
+    group_pattern = group.get('pattern', '')
+    group_name = group.get('name', 'unknown')
+    group_node_ids = group.get('node_ids', [])
+
+    # Skip groups with pattern 'single' AND fewer than 3 node_ids (Issue 255)
+    if group_pattern == 'single' and len(group_node_ids) < 3:
+        skipped_groups.append({'name': group_name, 'reason': 'pattern=single, children<3'})
+        return []
+
+    if not group_node_ids:
+        skipped_groups.append({'name': group_name, 'reason': 'no node_ids'})
+        return []
+
+    # Issue 257: Treat group's node_ids as siblings to sub-group
+    sibling_nodes = []
+    for nid in group_node_ids:
+        if not isinstance(nid, str):
+            skipped_groups.append({
+                'name': group_name,
+                'reason': f'node_id {repr(nid)} is not a string'
+            })
+            continue
+        node = find_node_by_id(root, nid)
+        if not node:
+            skipped_groups.append({
+                'name': group_name,
+                'node_id': nid,
+                'reason': 'node not found'
+            })
+            continue
+        sibling_nodes.append(node)
+
+    if len(sibling_nodes) < 2:
+        skipped_groups.append({
+            'name': group_name,
+            'reason': f'too few sibling nodes ({len(sibling_nodes)})'
+        })
+        return []
+
+    return sorted(sibling_nodes, key=lambda c: get_bbox(c).get('y', 0))
+
+
+def _build_group_context(sibling_nodes_sorted, group, page_width, page_height,
+                         prompt_template, depth):
+    """Build a section context entry for a single group.
+
+    Returns the section context dict.
+    """
+    group_name = group.get('name', 'unknown')
+    group_node_ids = group.get('node_ids', [])
+
+    bboxes = [get_bbox(n) for n in sibling_nodes_sorted]
+    min_x = min(b['x'] for b in bboxes)
+    min_y = min(b['y'] for b in bboxes)
+    max_right = max(b['x'] + b['w'] for b in bboxes)
+    max_bottom = max(b['y'] + b['h'] for b in bboxes)
+    section_width = max_right - min_x
+    section_height = max_bottom - min_y
+
+    section_id = group_node_ids[0]
+
+    enriched_table = generate_enriched_table(
+        sibling_nodes_sorted,
+        page_width=section_width if section_width > 0 else page_width,
+        page_height=section_height if section_height > 0 else page_height,
+        root_x=min_x,
+        root_y=min_y,
+    )
+
+    total_children = len(sibling_nodes_sorted)
+
+    prompt = _build_prompt(
+        prompt_template, group_name, section_id,
+        section_width, section_height, total_children, enriched_table,
+    )
+
+    return {
+        'section_name': group_name,
+        'section_id': section_id,
+        'parent_group': group_name,
+        'depth': depth,
+        'section_width': int(section_width),
+        'section_height': int(section_height),
+        'total_children': total_children,
+        'enriched_children_table': enriched_table,
+        'prompt': prompt,
+    }
+
+
+def _process_groups_mode(root, page_width, page_height, groups_file,
+                         prompt_template, depth):
+    """Process --groups mode: generate context from nested-grouping-result groups.
+
+    Returns the result dict.
+    """
+    groups_list, skip_result = _load_and_validate_groups(groups_file, depth)
+    if skip_result is not None:
+        return skip_result
+
     section_contexts = []
     skipped_groups = []
 
     for group in groups_list:
-        group_pattern = group.get('pattern', '')
-        group_name = group.get('name', 'unknown')
-        group_node_ids = group.get('node_ids', [])
-
-        # Skip groups with pattern 'single' AND fewer than 3 node_ids (Issue 255)
-        if group_pattern == 'single' and len(group_node_ids) < 3:
-            skipped_groups.append({'name': group_name, 'reason': 'pattern=single, children<3'})
+        sibling_nodes_sorted = _resolve_group_siblings(root, group, skipped_groups)
+        if not sibling_nodes_sorted:
             continue
 
-        if not group_node_ids:
-            skipped_groups.append({'name': group_name, 'reason': 'no node_ids'})
-            continue
-
-        # Issue 257: Treat group's node_ids as siblings to sub-group
-        sibling_nodes = []
-        for nid in group_node_ids:
-            if not isinstance(nid, str):
-                skipped_groups.append({
-                    'name': group_name,
-                    'reason': f'node_id {repr(nid)} is not a string'
-                })
-                continue
-            node = find_node_by_id(root, nid)
-            if not node:
-                skipped_groups.append({
-                    'name': group_name,
-                    'node_id': nid,
-                    'reason': 'node not found'
-                })
-                continue
-            sibling_nodes.append(node)
-
-        if len(sibling_nodes) < 2:
-            skipped_groups.append({
-                'name': group_name,
-                'reason': f'too few sibling nodes ({len(sibling_nodes)})'
-            })
-            continue
-
-        # Sort siblings by Y ascending
-        sibling_nodes_sorted = sorted(
-            sibling_nodes, key=lambda c: get_bbox(c).get('y', 0)
+        context = _build_group_context(
+            sibling_nodes_sorted, group, page_width, page_height,
+            prompt_template, depth,
         )
-
-        # Compute bounding box from all siblings
-        bboxes = [get_bbox(n) for n in sibling_nodes_sorted]
-        min_x = min(b['x'] for b in bboxes)
-        min_y = min(b['y'] for b in bboxes)
-        max_right = max(b['x'] + b['w'] for b in bboxes)
-        max_bottom = max(b['y'] + b['h'] for b in bboxes)
-        section_width = max_right - min_x
-        section_height = max_bottom - min_y
-
-        section_id = group_node_ids[0]
-
-        enriched_table = generate_enriched_table(
-            sibling_nodes_sorted,
-            page_width=section_width if section_width > 0 else page_width,
-            page_height=section_height if section_height > 0 else page_height,
-            root_x=min_x,
-            root_y=min_y,
-        )
-
-        total_children = len(sibling_nodes_sorted)
-
-        prompt = _build_prompt(
-            prompt_template, group_name, section_id,
-            section_width, section_height, total_children, enriched_table,
-        )
-
-        section_contexts.append({
-            'section_name': group_name,
-            'section_id': section_id,
-            'parent_group': group_name,
-            'depth': depth,
-            'section_width': int(section_width),
-            'section_height': int(section_height),
-            'total_children': total_children,
-            'enriched_children_table': enriched_table,
-            'prompt': prompt,
-        })
+        section_contexts.append(context)
 
     return {
         'sections': section_contexts,
@@ -281,6 +315,25 @@ def _get_section_children(root, section):
     return nodes, None
 
 
+def _compute_section_bbox(root, node_ids, children_sorted, page_width, page_bbox):
+    """Compute bounding box for a plan section.
+
+    Returns (section_width, section_height, section_root_x, section_root_y).
+    """
+    if len(node_ids) == 1:
+        wrapper = find_node_by_id(root, node_ids[0])
+        if wrapper:
+            sb = get_bbox(wrapper)
+            return sb['w'], sb['h'], sb['x'], sb['y']
+        return page_width, 0, page_bbox['x'], page_bbox.get('y', 0)
+
+    min_x = min(get_bbox(c)['x'] for c in children_sorted)
+    min_y = min(get_bbox(c)['y'] for c in children_sorted)
+    max_x = max(get_bbox(c)['x'] + get_bbox(c)['w'] for c in children_sorted)
+    max_y = max(get_bbox(c)['y'] + get_bbox(c)['h'] for c in children_sorted)
+    return max_x - min_x, max_y - min_y, min_x, min_y
+
+
 def _process_plan_mode(root, page_width, page_height, page_bbox,
                        plan_file, prompt_template):
     """Process plan mode: generate context from sectioning-plan.yaml.
@@ -305,34 +358,12 @@ def _process_plan_mode(root, page_width, page_height, page_bbox,
         if not children:
             continue
 
-        # Sort by Y ascending
         children_sorted = sorted(
             children, key=lambda c: get_bbox(c).get('y', 0)
         )
 
-        # Compute section bbox
-        if len(node_ids) == 1:
-            wrapper = find_node_by_id(root, node_ids[0])
-            if wrapper:
-                sb = get_bbox(wrapper)
-                section_width = sb['w']
-                section_height = sb['h']
-                section_root_x = sb['x']
-                section_root_y = sb['y']
-            else:
-                section_width = page_width
-                section_height = 0
-                section_root_x = page_bbox['x']
-                section_root_y = page_bbox.get('y', 0)
-        else:
-            min_x = min(get_bbox(c)['x'] for c in children_sorted)
-            min_y = min(get_bbox(c)['y'] for c in children_sorted)
-            max_x = max(get_bbox(c)['x'] + get_bbox(c)['w'] for c in children_sorted)
-            max_y = max(get_bbox(c)['y'] + get_bbox(c)['h'] for c in children_sorted)
-            section_width = max_x - min_x
-            section_height = max_y - min_y
-            section_root_x = min_x
-            section_root_y = min_y
+        section_width, section_height, section_root_x, section_root_y = \
+            _compute_section_bbox(root, node_ids, children_sorted, page_width, page_bbox)
 
         section_id = node_ids[0]
 

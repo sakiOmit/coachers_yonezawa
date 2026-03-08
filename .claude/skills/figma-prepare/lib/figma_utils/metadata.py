@@ -14,6 +14,136 @@ from .constants import (
 from .geometry import get_bbox
 
 
+_TAG_TYPE_MAP = {
+    'frame': 'FRAME', 'text': 'TEXT', 'rectangle': 'RECTANGLE',
+    'rounded-rectangle': 'RECTANGLE', 'ellipse': 'ELLIPSE',
+    'vector': 'VECTOR', 'line': 'LINE', 'group': 'GROUP',
+    'component': 'COMPONENT', 'instance': 'INSTANCE',
+    'image': 'IMAGE', 'polygon': 'POLYGON', 'star': 'STAR',
+    'section': 'SECTION', 'boolean-operation': 'BOOLEAN_OPERATION',
+    'svg': 'VECTOR',
+}
+
+
+def _apply_xml_attribute(node, bbox, attr_name, attr_val):
+    """Apply a parsed XML attribute to the node or bbox dict."""
+    if attr_name == 'name':
+        node['name'] = attr_val
+    elif attr_name == 'id':
+        node['id'] = attr_val
+    elif attr_name in ('x', 'y', 'width', 'height'):
+        try:
+            bbox[attr_name] = float(attr_val)
+        except ValueError:
+            bbox[attr_name] = 0
+    elif attr_name == 'visible' and attr_val == 'false':
+        node['visible'] = False
+    elif attr_name == 'characters':
+        node['characters'] = attr_val
+
+
+class _FigmaXmlParser:
+    """Stateful XML parser for Figma Dev Mode MCP metadata."""
+
+    def __init__(self, xml_str):
+        self._s = xml_str
+        self._pos = 0
+        self._len = len(xml_str)
+
+    def _skip_ws(self):
+        s, length = self._s, self._len
+        pos = self._pos
+        while pos < length and s[pos] in ' \t\n\r':
+            pos += 1
+        self._pos = pos
+
+    def _parse_attrs(self, node, bbox):
+        """Parse attributes until self-close or tag-close. Returns True if self-closed."""
+        s, length = self._s, self._len
+        while self._pos < length:
+            self._skip_ws()
+            if self._pos >= length:
+                break
+            if s[self._pos] == '/' and self._pos + 1 < length and s[self._pos + 1] == '>':
+                self._pos += 2
+                return True
+            if s[self._pos] == '>':
+                self._pos += 1
+                return False
+
+            attr_start = self._pos
+            while self._pos < length and s[self._pos] not in '= \t\n\r/>':
+                self._pos += 1
+            attr_name = s[attr_start:self._pos]
+
+            self._skip_ws()
+            if self._pos < length and s[self._pos] == '=':
+                self._pos += 1
+                self._skip_ws()
+                if self._pos < length and s[self._pos] == '"':
+                    self._pos += 1
+                    val_start = self._pos
+                    while self._pos < length and s[self._pos] != '"':
+                        self._pos += 1
+                    attr_val = unescape(s[val_start:self._pos])
+                    self._pos += 1
+                    _apply_xml_attribute(node, bbox, attr_name, attr_val)
+        return False
+
+    def _parse_children(self):
+        """Parse child elements until closing tag. Returns list of children."""
+        children = []
+        while self._pos < self._len:
+            self._skip_ws()
+            if self._pos >= self._len:
+                break
+            if self._s[self._pos:self._pos + 2] == '</':
+                end = self._s.find('>', self._pos)
+                if end >= 0:
+                    self._pos = end + 1
+                break
+            if self._s[self._pos] == '<':
+                child = self._parse_tag()
+                if child:
+                    children.append(child)
+            else:
+                self._pos += 1
+        return children
+
+    def _parse_tag(self):
+        """Parse a single XML tag with its attributes and children."""
+        self._skip_ws()
+        if self._pos >= self._len or self._s[self._pos] != '<':
+            return None
+        if self._s[self._pos:self._pos + 2] == '</':
+            return None
+
+        self._pos += 1  # skip <
+        tag_start = self._pos
+        while self._pos < self._len and self._s[self._pos] not in ' \t\n\r/>':
+            self._pos += 1
+        tag_name = self._s[tag_start:self._pos]
+
+        node = {'type': _TAG_TYPE_MAP.get(tag_name, tag_name.upper())}
+        bbox = {}
+
+        self_closed = self._parse_attrs(node, bbox)
+        if bbox:
+            node['absoluteBoundingBox'] = bbox
+        if self_closed:
+            return node
+
+        children = self._parse_children()
+        if children:
+            node['children'] = children
+
+        return node
+
+    def parse(self):
+        """Parse the XML string and return the root node."""
+        return self._parse_tag()
+
+
 def parse_figma_xml(xml_str):
     """Parse Figma Dev Mode MCP XML metadata to JSON node tree.
 
@@ -28,113 +158,7 @@ def parse_figma_xml(xml_str):
        "absoluteBoundingBox": {"x": -5542, "y": 348, "width": 1440, "height": 10770},
        "children": [...]}
     """
-    TAG_TYPE_MAP = {
-        'frame': 'FRAME', 'text': 'TEXT', 'rectangle': 'RECTANGLE',
-        'rounded-rectangle': 'RECTANGLE', 'ellipse': 'ELLIPSE',
-        'vector': 'VECTOR', 'line': 'LINE', 'group': 'GROUP',
-        'component': 'COMPONENT', 'instance': 'INSTANCE',
-        'image': 'IMAGE', 'polygon': 'POLYGON', 'star': 'STAR',
-        'section': 'SECTION', 'boolean-operation': 'BOOLEAN_OPERATION',
-        'svg': 'VECTOR',
-    }
-
-    pos = 0
-    length = len(xml_str)
-
-    def skip_ws():
-        nonlocal pos
-        while pos < length and xml_str[pos] in ' \t\n\r':
-            pos += 1
-
-    def parse_tag():
-        nonlocal pos
-        skip_ws()
-        if pos >= length or xml_str[pos] != '<':
-            return None
-        if xml_str[pos:pos + 2] == '</':
-            return None
-
-        pos += 1  # skip <
-        tag_start = pos
-        while pos < length and xml_str[pos] not in ' \t\n\r/>':
-            pos += 1
-        tag_name = xml_str[tag_start:pos]
-
-        node = {'type': TAG_TYPE_MAP.get(tag_name, tag_name.upper())}
-        bbox = {}
-
-        # Parse attributes
-        while pos < length:
-            skip_ws()
-            if pos >= length:
-                break
-            if xml_str[pos] == '/' and pos + 1 < length and xml_str[pos + 1] == '>':
-                pos += 2
-                if bbox:
-                    node['absoluteBoundingBox'] = bbox
-                return node
-            if xml_str[pos] == '>':
-                pos += 1
-                break
-
-            attr_start = pos
-            while pos < length and xml_str[pos] not in '= \t\n\r/>':
-                pos += 1
-            attr_name = xml_str[attr_start:pos]
-
-            skip_ws()
-            if pos < length and xml_str[pos] == '=':
-                pos += 1
-                skip_ws()
-                if pos < length and xml_str[pos] == '"':
-                    pos += 1
-                    val_start = pos
-                    while pos < length and xml_str[pos] != '"':
-                        pos += 1
-                    attr_val = unescape(xml_str[val_start:pos])
-                    pos += 1
-
-                    if attr_name == 'name':
-                        node['name'] = attr_val
-                    elif attr_name == 'id':
-                        node['id'] = attr_val
-                    elif attr_name in ('x', 'y', 'width', 'height'):
-                        try:
-                            bbox[attr_name] = float(attr_val)
-                        except ValueError:
-                            bbox[attr_name] = 0
-                    elif attr_name == 'visible' and attr_val == 'false':
-                        node['visible'] = False
-                    elif attr_name == 'characters':
-                        node['characters'] = attr_val
-
-        if bbox:
-            node['absoluteBoundingBox'] = bbox
-
-        # Parse children
-        children = []
-        while pos < length:
-            skip_ws()
-            if pos >= length:
-                break
-            if xml_str[pos:pos + 2] == '</':
-                end = xml_str.find('>', pos)
-                if end >= 0:
-                    pos = end + 1
-                break
-            if xml_str[pos] == '<':
-                child = parse_tag()
-                if child:
-                    children.append(child)
-            else:
-                pos += 1
-
-        if children:
-            node['children'] = children
-
-        return node
-
-    return parse_tag()
+    return _FigmaXmlParser(xml_str).parse()
 
 
 def load_metadata(file_path):

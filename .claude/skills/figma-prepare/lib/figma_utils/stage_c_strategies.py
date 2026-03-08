@@ -85,30 +85,17 @@ def heuristic_sub_group(group, sibling_nodes, root_node, page_width, page_height
     return []
 
 
-def _try_heading_split(rows, bboxes, sibling_nodes, parent_name):
-    """Split top heading elements from content below (Issue #258).
+def _build_heading_items(rows, bboxes, sibling_nodes):
+    """Build sorted items list with (id, y_top, y_bottom, type) for heading detection.
 
-    Detects a heading pattern at the top of a group:
-    - 1-3 elements at the smallest Y positions
-    - Heading elements are TEXT or small ELLIPSE/VECTOR (decorations)
-    - Clear separation from content below (any gap or divider between)
+    Returns sorted items list, or empty list if insufficient data.
     """
-    HEADING_MAX_ELEMENTS = 3
-    HEADING_GAP_MIN = 10  # px - minimum gap between heading bottom and content top
-
-    if len(rows) < 4:  # Need at least heading(1-3) + content(1+) = 4
-        return []
-
-    # Build node type lookup from sibling_nodes
     node_types = {}
     for node in sibling_nodes:
         nid = node.get('id', '')
-        if not nid:
-            continue
-        ntype = node.get('type', '')
-        node_types[nid] = ntype
+        if nid:
+            node_types[nid] = node.get('type', '')
 
-    # Sort by Y position
     items = []
     for row in rows:
         nid = row.get('ID', '')
@@ -119,15 +106,22 @@ def _try_heading_split(rows, bboxes, sibling_nodes, parent_name):
     if len(items) < 4:
         return []
 
-    items.sort(key=lambda x: x[1])  # Sort by y_top
+    items.sort(key=lambda x: x[1])
+    return items
 
-    # Try heading sizes 1, 2, 3
-    best_split = None
+
+def _find_heading_split_index(items):
+    """Find the optimal heading split index (1-3 heading elements).
+
+    Returns the heading size (number of heading elements), or None if no valid split.
+    """
+    HEADING_MAX_ELEMENTS = 3
+    HEADING_GAP_MIN = 10  # px
+
     for heading_size in range(1, min(HEADING_MAX_ELEMENTS + 1, len(items) - 1)):
         heading_candidates = items[:heading_size]
         content_start = items[heading_size]
 
-        # Check heading candidates are heading-like (TEXT, ELLIPSE, small VECTOR)
         heading_types = [c[3] for c in heading_candidates]
         has_text = any(t == 'TEXT' for t in heading_types)
         all_heading_like = all(
@@ -137,23 +131,36 @@ def _try_heading_split(rows, bboxes, sibling_nodes, parent_name):
         if not has_text or not all_heading_like:
             continue
 
-        # Check heading elements are small (not content blocks)
         heading_max_h = max(c[2] - c[1] for c in heading_candidates)
-        if heading_max_h > 60:  # Heading text shouldn't be taller than 60px
+        if heading_max_h > 60:
             continue
 
-        # Check gap between heading bottom and content top
         heading_bottom = max(c[2] for c in heading_candidates)
         content_top = content_start[1]
-        gap = content_top - heading_bottom
-
-        if gap < HEADING_GAP_MIN:
+        if content_top - heading_bottom < HEADING_GAP_MIN:
             continue
 
-        # Found a valid heading split
-        best_split = heading_size
-        break
+        return heading_size
 
+    return None
+
+
+def _try_heading_split(rows, bboxes, sibling_nodes, parent_name):
+    """Split top heading elements from content below (Issue #258).
+
+    Detects a heading pattern at the top of a group:
+    - 1-3 elements at the smallest Y positions
+    - Heading elements are TEXT or small ELLIPSE/VECTOR (decorations)
+    - Clear separation from content below (any gap or divider between)
+    """
+    if len(rows) < 4:
+        return []
+
+    items = _build_heading_items(rows, bboxes, sibling_nodes)
+    if not items:
+        return []
+
+    best_split = _find_heading_split_index(items)
     if best_split is None:
         return []
 
