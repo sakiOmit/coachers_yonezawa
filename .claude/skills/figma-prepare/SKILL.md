@@ -256,7 +256,7 @@ Phase 2 構造:
 | `.claude/cache/figma/final-grouping-plan.yaml` | 結果統合後の最終計画 |
 | `.claude/cache/figma/rename-map.yaml` | Phase 3 リネームマップ |
 | `.claude/cache/figma/autolayout-plan.yaml` | Phase 4 AutoLayout計画 |
-| `lib/figma_utils.py` | 共通ユーティリティ |
+| `lib/figma_utils/` | 共通ユーティリティパッケージ（38モジュール） |
 | `tests/figma-prepare/` | テスト・フィクスチャ |
 
 ## Satellite Documents
