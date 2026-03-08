@@ -315,6 +315,104 @@ def _compute_zone_bboxes(children, candidate_groups):
     return zone_bboxes
 
 
+def _classify_loose_element(child, bb):
+    """Check if a child element qualifies as a "loose" element for absorption.
+
+    Loose elements are LINE nodes, small leaf shapes, or small rectangles
+    that float between grouped sections.
+
+    Args:
+        child: Figma node dict.
+        bb: Bounding box dict with x, y, w, h.
+
+    Returns:
+        tuple: (is_loose: bool, reason: str)
+    """
+    child_type = child.get('type', '')
+
+    # 1. LINE type (always loose)
+    if child_type == 'LINE':
+        return True, 'LINE element'
+    # 2. Small height element (divider-like) without children
+    if bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and not child.get('children'):
+        return True, f'small leaf (h={bb["h"]}px)'
+    # 3. Small shape element (RECTANGLE/VECTOR)
+    if bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and child_type in ('RECTANGLE', 'VECTOR'):
+        return True, f'small shape (h={bb["h"]}px)'
+
+    return False, ''
+
+
+def _find_nearest_group(i, bb, zone_bboxes, group_indices_set, children):
+    """Find the nearest group for a loose element using zone-level and member-level checks.
+
+    Two-pass approach (Issue 167 fix):
+    1. Zone-level: Check if the element's Y-center falls within a zone's bbox.
+    2. Member-level: Check distance to individual group members.
+
+    Args:
+        i: Index of the loose element in children.
+        bb: Bounding box of the loose element.
+        zone_bboxes: Pre-computed zone bounding boxes (may be empty).
+        group_indices_set: Set of indices already in groups.
+        children: List of all sibling nodes.
+
+    Returns:
+        tuple: (best_group_idx, best_distance, zone_matched)
+    """
+    best_group_idx = None
+    best_distance = float('inf')
+    zone_matched = False
+
+    # --- Pass 1: Zone-level bounding box check ---
+    # If the loose element's Y-center falls within any zone's vertical
+    # extent, absorb it into that zone (distance=0).
+    if zone_bboxes:
+        elem_cy = bb['y'] + bb['h'] / 2
+        for zb in zone_bboxes:
+            if i in zb['member_indices']:
+                continue  # skip if already a member
+            # Check if element center is within zone bbox
+            if zb['y_top'] <= elem_cy <= zb['y_bot']:
+                # Element is inside the zone's vertical span
+                if 0.0 < best_distance:
+                    best_distance = 0.0
+                    best_group_idx = zb['representative_idx']
+                    zone_matched = True
+            else:
+                # Vertical distance to zone bbox edges
+                if elem_cy < zb['y_top']:
+                    dist = zb['y_top'] - (bb['y'] + bb['h'])
+                else:
+                    dist = bb['y'] - zb['y_bot']
+                dist = max(0.0, dist)
+                if dist < best_distance:
+                    best_distance = dist
+                    best_group_idx = zb['representative_idx']
+                    zone_matched = (dist < LOOSE_ABSORPTION_DISTANCE)
+
+    # --- Pass 2: Member-level fallback ---
+    # Also check individual members; a closer member overrides zone result.
+    for gi in group_indices_set:
+        g_bb = get_bbox(children[gi])
+        if not g_bb:
+            continue
+
+        # Vertical distance between element and group member
+        if bb['y'] + bb['h'] <= g_bb['y']:
+            dist = g_bb['y'] - (bb['y'] + bb['h'])
+        elif g_bb['y'] + g_bb['h'] <= bb['y']:
+            dist = bb['y'] - (g_bb['y'] + g_bb['h'])
+        else:
+            dist = 0  # overlapping
+
+        if dist < best_distance:
+            best_distance = dist
+            best_group_idx = gi
+
+    return best_group_idx, best_distance, zone_matched
+
+
 def find_absorbable_elements(children, group_indices_set, candidate_groups=None):
     """Find loose elements (dividers, small frames) that should be absorbed
     into nearby groups.
@@ -356,77 +454,13 @@ def find_absorbable_elements(children, group_indices_set, candidate_groups=None)
         if not bb:
             continue
 
-        child_type = child.get('type', '')
-
-        # Criteria for "loose" element:
-        # 1. LINE type (always loose)
-        # 2. Small height element (divider-like) without children
-        # 3. Small shape element (RECTANGLE/VECTOR)
-        is_loose = False
-        reason = ''
-
-        if child_type == 'LINE':
-            is_loose = True
-            reason = 'LINE element'
-        elif bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and not child.get('children'):
-            is_loose = True
-            reason = f'small leaf (h={bb["h"]}px)'
-        elif bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT and child_type in ('RECTANGLE', 'VECTOR'):
-            is_loose = True
-            reason = f'small shape (h={bb["h"]}px)'
-
+        is_loose, reason = _classify_loose_element(child, bb)
         if not is_loose:
             continue
 
-        # --- Pass 1: Zone-level bounding box check ---
-        # If the loose element's Y-center falls within any zone's vertical
-        # extent, absorb it into that zone (distance=0).
-        best_group_idx = None
-        best_distance = float('inf')
-        zone_matched = False
-
-        if zone_bboxes:
-            elem_cy = bb['y'] + bb['h'] / 2
-            for zb in zone_bboxes:
-                if i in zb['member_indices']:
-                    continue  # skip if already a member
-                # Check if element center is within zone bbox
-                if zb['y_top'] <= elem_cy <= zb['y_bot']:
-                    # Element is inside the zone's vertical span
-                    if 0.0 < best_distance:
-                        best_distance = 0.0
-                        best_group_idx = zb['representative_idx']
-                        zone_matched = True
-                else:
-                    # Vertical distance to zone bbox edges
-                    if elem_cy < zb['y_top']:
-                        dist = zb['y_top'] - (bb['y'] + bb['h'])
-                    else:
-                        dist = bb['y'] - zb['y_bot']
-                    dist = max(0.0, dist)
-                    if dist < best_distance:
-                        best_distance = dist
-                        best_group_idx = zb['representative_idx']
-                        zone_matched = (dist < LOOSE_ABSORPTION_DISTANCE)
-
-        # --- Pass 2: Member-level fallback ---
-        # Also check individual members; a closer member overrides zone result.
-        for gi in group_indices_set:
-            g_bb = get_bbox(children[gi])
-            if not g_bb:
-                continue
-
-            # Vertical distance between element and group member
-            if bb['y'] + bb['h'] <= g_bb['y']:
-                dist = g_bb['y'] - (bb['y'] + bb['h'])
-            elif g_bb['y'] + g_bb['h'] <= bb['y']:
-                dist = bb['y'] - (g_bb['y'] + g_bb['h'])
-            else:
-                dist = 0  # overlapping
-
-            if dist < best_distance:
-                best_distance = dist
-                best_group_idx = gi
+        best_group_idx, best_distance, zone_matched = _find_nearest_group(
+            i, bb, zone_bboxes, group_indices_set, children
+        )
 
         # Accept if:
         # - zone_matched (element center is within a zone's vertical span), OR
@@ -534,6 +568,104 @@ def decoration_dominant_shape(node):
     return max(counts, key=counts.get)
 
 
+def _check_rect_text_overlap(r_bb, t_bb, text_content):
+    """Check if a RECTANGLE and TEXT node form a valid highlight pair.
+
+    Validates height ratio, Y overlap, X overlap, and text length constraints.
+
+    Args:
+        r_bb: Bounding box of the RECTANGLE node.
+        t_bb: Bounding box of the TEXT node.
+        text_content: Text content string.
+
+    Returns:
+        bool: True if the pair qualifies as a highlight.
+    """
+    # Check text length
+    if len(text_content) > HIGHLIGHT_TEXT_MAX_LEN:
+        return False
+
+    # Check height ratio
+    if t_bb['h'] <= 0:
+        return False
+    height_ratio = r_bb['h'] / t_bb['h']
+    if height_ratio < HIGHLIGHT_HEIGHT_RATIO_MIN or height_ratio > HIGHLIGHT_HEIGHT_RATIO_MAX:
+        return False
+
+    # Check Y overlap
+    y_overlap_top = max(r_bb['y'], t_bb['y'])
+    y_overlap_bot = min(r_bb['y'] + r_bb['h'], t_bb['y'] + t_bb['h'])
+    y_overlap = max(0, y_overlap_bot - y_overlap_top)
+    smaller_h = min(r_bb['h'], t_bb['h'])
+    if smaller_h <= 0:
+        return False
+    y_overlap_ratio = y_overlap / smaller_h
+    if y_overlap_ratio < HIGHLIGHT_OVERLAP_RATIO:
+        return False
+
+    # Check X overlap
+    x_overlap_left = max(r_bb['x'], t_bb['x'])
+    x_overlap_right = min(r_bb['x'] + r_bb['w'], t_bb['x'] + t_bb['w'])
+    x_overlap = max(0, x_overlap_right - x_overlap_left)
+    smaller_w = min(r_bb['w'], t_bb['w'])
+    if smaller_w <= 0:
+        return False
+    x_overlap_ratio = x_overlap / smaller_w
+    if x_overlap_ratio < HIGHLIGHT_X_OVERLAP_RATIO:
+        return False
+
+    return True
+
+
+def _find_rect_text_overlaps(children, rect_indices, text_indices):
+    """Find RECTANGLE + TEXT pairs that form highlight overlaps.
+
+    For each RECTANGLE, finds the first matching TEXT with valid overlap criteria.
+    Each RECTANGLE and TEXT can only be used once.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        rect_indices: List of indices pointing to leaf RECTANGLE nodes.
+        text_indices: List of indices pointing to TEXT nodes.
+
+    Returns:
+        list: [{'rect_idx': i, 'text_idx': j, 'text_content': '...'}]
+    """
+    results = []
+    used_rects = set()
+    used_texts = set()
+
+    for ri in rect_indices:
+        rect = children[ri]
+        r_bb = get_bbox(rect)
+        if r_bb['w'] <= 0 or r_bb['h'] <= 0:
+            continue
+        if ri in used_rects:
+            continue
+
+        for ti in text_indices:
+            if ti in used_texts:
+                continue
+            text_node = children[ti]
+            t_bb = get_bbox(text_node)
+            if t_bb['w'] <= 0 or t_bb['h'] <= 0:
+                continue
+
+            text_content = text_node.get('characters', '') or text_node.get('name', '')
+
+            if _check_rect_text_overlap(r_bb, t_bb, text_content):
+                results.append({
+                    'rect_idx': ri,
+                    'text_idx': ti,
+                    'text_content': text_content,
+                })
+                used_rects.add(ri)
+                used_texts.add(ti)
+                break  # Move to next RECTANGLE
+
+    return results
+
+
 def detect_highlight_text(children):
     """Detect RECTANGLE + TEXT highlight pairs among siblings.
 
@@ -573,70 +705,109 @@ def detect_highlight_text(children):
     if not rect_indices or not text_indices:
         return []
 
-    results = []
-    used_rects = set()
-    used_texts = set()
+    return _find_rect_text_overlaps(children, rect_indices, text_indices)
 
-    for ri in rect_indices:
-        rect = children[ri]
-        r_bb = get_bbox(rect)
-        if r_bb['w'] <= 0 or r_bb['h'] <= 0:
+
+def _cluster_by_y_band(bboxes, max_height):
+    """Find the next Y-band cluster starting from elements sorted by Y-center.
+
+    Sorts elements by Y-center and greedily expands a band from each unused
+    starting element, collecting all elements that fit within max_height.
+
+    Args:
+        bboxes: List of bounding box dicts (parallel to children).
+        max_height: Maximum Y-band height (HORIZONTAL_BAR_MAX_HEIGHT).
+
+    Returns:
+        list of int: Indices sorted by Y-center for iteration.
+    """
+    return sorted(range(len(bboxes)), key=lambda i: bboxes[i]['y'] + bboxes[i]['h'] / 2)
+
+
+def _expand_y_band(start_pos, indexed, bboxes, max_height, used):
+    """Expand a Y-band from a starting position, collecting fitting elements.
+
+    Args:
+        start_pos: Position in the indexed list to start from.
+        indexed: Y-center-sorted list of element indices.
+        bboxes: List of bounding box dicts.
+        max_height: Maximum Y-band height.
+        used: Set of already-used indices to skip.
+
+    Returns:
+        list of int: Element indices forming the band.
+    """
+    band_indices = [indexed[start_pos]]
+    band_y_min = bboxes[indexed[start_pos]]['y']
+    band_y_max = bboxes[indexed[start_pos]]['y'] + bboxes[indexed[start_pos]]['h']
+
+    for j in range(start_pos + 1, len(indexed)):
+        if indexed[j] in used:
             continue
-        if ri in used_rects:
-            continue
+        idx = indexed[j]
+        el_y = bboxes[idx]['y']
+        el_bottom = el_y + bboxes[idx]['h']
+        new_y_min = min(band_y_min, el_y)
+        new_y_max = max(band_y_max, el_bottom)
+        if new_y_max - new_y_min <= max_height:
+            band_indices.append(idx)
+            band_y_min = new_y_min
+            band_y_max = new_y_max
 
-        for ti in text_indices:
-            if ti in used_texts:
-                continue
-            text_node = children[ti]
-            t_bb = get_bbox(text_node)
-            if t_bb['w'] <= 0 or t_bb['h'] <= 0:
-                continue
+    return band_indices
 
-            # Check text length
-            text_content = text_node.get('characters', '') or text_node.get('name', '')
-            if len(text_content) > HIGHLIGHT_TEXT_MAX_LEN:
-                continue
 
-            # Check height ratio
-            if t_bb['h'] <= 0:
-                continue
-            height_ratio = r_bb['h'] / t_bb['h']
-            if height_ratio < HIGHLIGHT_HEIGHT_RATIO_MIN or height_ratio > HIGHLIGHT_HEIGHT_RATIO_MAX:
-                continue
+def _infer_bar_name(band_nodes):
+    """Infer a semantic name for a horizontal bar from its text content.
 
-            # Check Y overlap
-            y_overlap_top = max(r_bb['y'], t_bb['y'])
-            y_overlap_bot = min(r_bb['y'] + r_bb['h'], t_bb['y'] + t_bb['h'])
-            y_overlap = max(0, y_overlap_bot - y_overlap_top)
-            smaller_h = min(r_bb['h'], t_bb['h'])
-            if smaller_h <= 0:
-                continue
-            y_overlap_ratio = y_overlap / smaller_h
-            if y_overlap_ratio < HIGHLIGHT_OVERLAP_RATIO:
-                continue
+    Args:
+        band_nodes: List of Figma nodes in the bar.
 
-            # Check X overlap
-            x_overlap_left = max(r_bb['x'], t_bb['x'])
-            x_overlap_right = min(r_bb['x'] + r_bb['w'], t_bb['x'] + t_bb['w'])
-            x_overlap = max(0, x_overlap_right - x_overlap_left)
-            smaller_w = min(r_bb['w'], t_bb['w'])
-            if smaller_w <= 0:
-                continue
-            x_overlap_ratio = x_overlap / smaller_w
-            if x_overlap_ratio < HIGHLIGHT_X_OVERLAP_RATIO:
-                continue
+    Returns:
+        str: 'news-bar', 'blog-bar', or 'horizontal-bar' (default).
+    """
+    texts = get_text_children_content(band_nodes, max_items=5)
+    for t in texts:
+        t_lower = t.lower()
+        if 'ニュース' in t_lower or 'news' in t_lower or 'お知らせ' in t_lower:
+            return 'news-bar'
+        if 'ブログ' in t_lower or 'blog' in t_lower:
+            return 'blog-bar'
+    return 'horizontal-bar'
 
-            results.append({
-                'rect_idx': ri,
-                'text_idx': ti,
-                'text_content': text_content,
-            })
-            used_rects.add(ri)
-            used_texts.add(ti)
-            break  # Move to next RECTANGLE
 
-    return results
+def _is_valid_horizontal_bar(band_indices, children, bboxes):
+    """Validate that a Y-band cluster qualifies as a horizontal bar.
+
+    Checks:
+    1. At least 1 background RECTANGLE (leaf node) exists in the band.
+    2. Elements are horizontally distributed (X variance > Y variance * ratio).
+
+    Args:
+        band_indices: List of element indices in the band.
+        children: List of all sibling nodes.
+        bboxes: List of bounding box dicts (parallel to children).
+
+    Returns:
+        bool: True if the band qualifies as a horizontal bar.
+    """
+    # Check for at least 1 background RECTANGLE (leaf node)
+    has_rect_bg = any(
+        children[idx].get('type') == 'RECTANGLE' and not children[idx].get('children')
+        for idx in band_indices
+    )
+    if not has_rect_bg:
+        return False
+
+    # Check horizontal distribution: X variance > Y variance * HORIZONTAL_BAR_VARIANCE_RATIO
+    band_bboxes = [bboxes[i] for i in band_indices]
+    x_centers = [b['x'] + b['w'] / 2 for b in band_bboxes]
+    y_centers = [b['y'] + b['h'] / 2 for b in band_bboxes]
+    if len(x_centers) < 2:
+        return False
+    x_var = statistics.variance(x_centers)
+    y_var = statistics.variance(y_centers)
+    return x_var > y_var * HORIZONTAL_BAR_VARIANCE_RATIO
 
 
 def detect_horizontal_bar(children, parent_bb):
@@ -665,71 +836,26 @@ def detect_horizontal_bar(children, parent_bb):
         return []
 
     bboxes = [get_bbox(c) for c in children]
-
-    # Find clusters of elements in narrow Y bands
-    # Sort by Y center
-    indexed = sorted(range(len(children)), key=lambda i: bboxes[i]['y'] + bboxes[i]['h'] / 2)
-
     results = []
     used = set()
+
+    # Sort indices by Y-center for band clustering
+    indexed = _cluster_by_y_band(bboxes, HORIZONTAL_BAR_MAX_HEIGHT)
 
     for start in range(len(indexed)):
         if indexed[start] in used:
             continue
-        band_indices = [indexed[start]]
-        band_y_min = bboxes[indexed[start]]['y']
-        band_y_max = bboxes[indexed[start]]['y'] + bboxes[indexed[start]]['h']
 
-        for j in range(start + 1, len(indexed)):
-            if indexed[j] in used:
-                continue
-            idx = indexed[j]
-            el_y = bboxes[idx]['y']
-            el_bottom = el_y + bboxes[idx]['h']
-            new_y_min = min(band_y_min, el_y)
-            new_y_max = max(band_y_max, el_bottom)
-            if new_y_max - new_y_min <= HORIZONTAL_BAR_MAX_HEIGHT:
-                band_indices.append(idx)
-                band_y_min = new_y_min
-                band_y_max = new_y_max
+        band_indices = _expand_y_band(start, indexed, bboxes, HORIZONTAL_BAR_MAX_HEIGHT, used)
 
         if len(band_indices) < HORIZONTAL_BAR_MIN_ELEMENTS:
             continue
 
-        # Check for at least 1 background RECTANGLE (leaf node)
-        has_rect_bg = False
-        for idx in band_indices:
-            c = children[idx]
-            if c.get('type') == 'RECTANGLE' and not c.get('children'):
-                has_rect_bg = True
-                break
-
-        if not has_rect_bg:
+        if not _is_valid_horizontal_bar(band_indices, children, bboxes):
             continue
 
-        # Check horizontal distribution: X variance > Y variance * HORIZONTAL_BAR_VARIANCE_RATIO
-        band_bboxes = [bboxes[i] for i in band_indices]
-        x_centers = [b['x'] + b['w'] / 2 for b in band_bboxes]
-        y_centers = [b['y'] + b['h'] / 2 for b in band_bboxes]
-        if len(x_centers) < 2:
-            continue
-        x_var = statistics.variance(x_centers)
-        y_var = statistics.variance(y_centers)
-        if x_var <= y_var * HORIZONTAL_BAR_VARIANCE_RATIO:
-            continue
-
-        # Infer name from text content
         band_nodes = [children[i] for i in band_indices]
-        texts = get_text_children_content(band_nodes, max_items=5)
-        suggested_name = 'horizontal-bar'
-        for t in texts:
-            t_lower = t.lower()
-            if 'ニュース' in t_lower or 'news' in t_lower or 'お知らせ' in t_lower:
-                suggested_name = 'news-bar'
-                break
-            if 'ブログ' in t_lower or 'blog' in t_lower:
-                suggested_name = 'blog-bar'
-                break
+        suggested_name = _infer_bar_name(band_nodes)
 
         for idx in band_indices:
             used.add(idx)
@@ -745,6 +871,97 @@ def detect_horizontal_bar(children, parent_bb):
         })
 
     return results
+
+
+def _find_bg_rectangle(children, parent_bb):
+    """Find a single background RECTANGLE among siblings.
+
+    A background candidate is a leaf RECTANGLE that is:
+    - Width >= 80% of parent width, OR
+    - Width >= OVERFLOW_BG_MIN_WIDTH (1400px), OR
+    - x < 0 (left overflow) and width >= parent width * BG_LEFT_OVERFLOW_WIDTH_RATIO
+    And height >= 30% of parent height (not a thin divider).
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        parent_bb: Parent bounding box dict with x, y, w, h.
+
+    Returns:
+        tuple or None: (bg_idx, bg_node, bg_bb) if exactly 1 candidate found, else None.
+
+    Issue 183: Also detect oversized elements (width >= OVERFLOW_BG_MIN_WIDTH or x < 0).
+    """
+    bg_candidates = []
+    for i, child in enumerate(children):
+        if child.get('type') != 'RECTANGLE':
+            continue
+        # Must be a leaf node (no children)
+        if child.get('children'):
+            continue
+        bb = get_bbox(child)
+        if bb['w'] <= 0 or bb['h'] <= 0:
+            continue
+        # Width check: original (>=80% parent) OR overflow (>=OVERFLOW_BG_MIN_WIDTH or x<0)
+        is_wide_enough = bb['w'] >= parent_bb['w'] * BG_WIDTH_RATIO
+        is_overflow = bb['w'] >= OVERFLOW_BG_MIN_WIDTH
+        is_left_overflow = bb['x'] < 0 and bb['w'] >= parent_bb['w'] * BG_LEFT_OVERFLOW_WIDTH_RATIO
+        if not (is_wide_enough or is_overflow or is_left_overflow):
+            continue
+        # Height >= 30% of parent height (not a thin divider)
+        if bb['h'] < parent_bb['h'] * BG_MIN_HEIGHT_RATIO:
+            continue
+        bg_candidates.append((i, child, bb))
+
+    # Must be exactly 1 bg candidate (ambiguous if multiple)
+    if len(bg_candidates) != 1:
+        return None
+
+    return bg_candidates[0]
+
+
+def _classify_decorations(children, bg_idx, bg_bb):
+    """Separate decoration elements from content elements relative to a background RECTANGLE.
+
+    Decoration elements are small VECTOR/ELLIPSE leaf nodes that overlap the
+    background RECTANGLE (area < 5% of bg area). Everything else is content.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        bg_idx: Index of the background RECTANGLE in children.
+        bg_bb: Bounding box of the background RECTANGLE.
+
+    Returns:
+        tuple: (decoration_indices: set, content_indices: list)
+    """
+    bg_area = bg_bb['w'] * bg_bb['h']
+
+    decoration_indices = set()
+    decoration_indices.add(bg_idx)
+
+    for i, child in enumerate(children):
+        if i == bg_idx:
+            continue
+        child_type = child.get('type', '')
+        if child_type not in ('VECTOR', 'ELLIPSE'):
+            continue
+        # Must be a leaf node
+        if child.get('children'):
+            continue
+        cb = get_bbox(child)
+        if cb['w'] <= 0 or cb['h'] <= 0:
+            continue
+        child_area = cb['w'] * cb['h']
+        # "small" = area < 5% of bg RECTANGLE area
+        if bg_area > 0 and child_area / bg_area >= BG_DECORATION_MAX_AREA_RATIO:
+            continue
+        # Must overlap the bg RECTANGLE's bounding box
+        overlap_x = max(0, min(bg_bb['x'] + bg_bb['w'], cb['x'] + cb['w']) - max(bg_bb['x'], cb['x']))
+        overlap_y = max(0, min(bg_bb['y'] + bg_bb['h'], cb['y'] + cb['h']) - max(bg_bb['y'], cb['y']))
+        if overlap_x > 0 and overlap_y > 0:
+            decoration_indices.add(i)
+
+    content_indices = [i for i in range(len(children)) if i not in decoration_indices]
+    return decoration_indices, content_indices
 
 
 def detect_bg_content_layers(children, parent_bb):
@@ -782,64 +999,15 @@ def detect_bg_content_layers(children, parent_bb):
 
     children = [c for c in children if c.get('visible') != False]
 
-    # Step 1: Find background RECTANGLE siblings (leaf node)
-    # Issue 183: Also detect oversized elements (width >= OVERFLOW_BG_MIN_WIDTH or x < 0)
-    bg_candidates = []
-    for i, child in enumerate(children):
-        if child.get('type') != 'RECTANGLE':
-            continue
-        # Must be a leaf node (no children)
-        if child.get('children'):
-            continue
-        bb = get_bbox(child)
-        if bb['w'] <= 0 or bb['h'] <= 0:
-            continue
-        # Width check: original (>=80% parent) OR overflow (>=OVERFLOW_BG_MIN_WIDTH or x<0)
-        is_wide_enough = bb['w'] >= parent_bb['w'] * BG_WIDTH_RATIO
-        is_overflow = bb['w'] >= OVERFLOW_BG_MIN_WIDTH
-        is_left_overflow = bb['x'] < 0 and bb['w'] >= parent_bb['w'] * BG_LEFT_OVERFLOW_WIDTH_RATIO
-        if not (is_wide_enough or is_overflow or is_left_overflow):
-            continue
-        # Height >= 30% of parent height (not a thin divider)
-        if bb['h'] < parent_bb['h'] * BG_MIN_HEIGHT_RATIO:
-            continue
-        bg_candidates.append((i, child, bb))
-
-    # Must be exactly 1 bg candidate (ambiguous if multiple)
-    if len(bg_candidates) != 1:
+    # Step 1: Find background RECTANGLE (exactly 1)
+    bg_result = _find_bg_rectangle(children, parent_bb)
+    if bg_result is None:
         return []
 
-    bg_idx, bg_node, bg_bb = bg_candidates[0]
-    bg_area = bg_bb['w'] * bg_bb['h']
+    bg_idx, bg_node, bg_bb = bg_result
 
-    # Step 2: Find decoration elements (small VECTOR/ELLIPSE overlapping the bg)
-    decoration_indices = set()
-    decoration_indices.add(bg_idx)
-
-    for i, child in enumerate(children):
-        if i == bg_idx:
-            continue
-        child_type = child.get('type', '')
-        if child_type not in ('VECTOR', 'ELLIPSE'):
-            continue
-        # Must be a leaf node
-        if child.get('children'):
-            continue
-        cb = get_bbox(child)
-        if cb['w'] <= 0 or cb['h'] <= 0:
-            continue
-        child_area = cb['w'] * cb['h']
-        # "small" = area < 5% of bg RECTANGLE area
-        if bg_area > 0 and child_area / bg_area >= BG_DECORATION_MAX_AREA_RATIO:
-            continue
-        # Must overlap the bg RECTANGLE's bounding box
-        overlap_x = max(0, min(bg_bb['x'] + bg_bb['w'], cb['x'] + cb['w']) - max(bg_bb['x'], cb['x']))
-        overlap_y = max(0, min(bg_bb['y'] + bg_bb['h'], cb['y'] + cb['h']) - max(bg_bb['y'], cb['y']))
-        if overlap_x > 0 and overlap_y > 0:
-            decoration_indices.add(i)
-
-    # Step 3: Content = everything else
-    content_indices = [i for i in range(len(children)) if i not in decoration_indices]
+    # Step 2: Classify decorations vs content
+    decoration_indices, content_indices = _classify_decorations(children, bg_idx, bg_bb)
 
     # Must have >= 2 content elements
     if len(content_indices) < 2:
@@ -861,6 +1029,76 @@ def detect_bg_content_layers(children, parent_bb):
         'suggested_name': 'content-layer',
         'suggested_wrapper': 'content-group',
     }]
+
+
+def _is_en_label(text):
+    """Check if text is a short uppercase ASCII label.
+
+    Args:
+        text: Text string to check.
+
+    Returns:
+        bool: True if text is a short (1-3 word) uppercase ASCII label.
+
+    Issue 185: EN+JP label pair detection.
+    """
+    ascii_only = re.sub(r'[^\x00-\x7f]', '', text).strip()
+    if not ascii_only or ascii_only != text.strip():
+        return False
+    words = ascii_only.split()
+    if len(words) < 1 or len(words) > EN_LABEL_MAX_WORDS:
+        return False
+    # Must be uppercase (allow minor punctuation)
+    alpha_chars = re.sub(r'[^a-zA-Z]', '', ascii_only)
+    if not alpha_chars:
+        return False
+    return alpha_chars == alpha_chars.upper()
+
+
+def _is_jp_text(text):
+    """Check if text contains non-ASCII (Japanese) characters.
+
+    Args:
+        text: Text string to check.
+
+    Returns:
+        bool: True if text contains non-ASCII characters.
+
+    Issue 185: EN+JP label pair detection.
+    """
+    non_ascii = re.sub(r'[\x00-\x7f]', '', text).strip()
+    return len(non_ascii) > 0
+
+
+def _pair_distance(node_a, node_b):
+    """Compute minimum distance between two nodes (Y-range or X-range proximity).
+
+    Args:
+        node_a: First Figma node dict with absoluteBoundingBox.
+        node_b: Second Figma node dict with absoluteBoundingBox.
+
+    Returns:
+        float: Minimum edge-to-edge distance between the two nodes.
+
+    Issue 185: EN+JP label pair detection.
+    """
+    bb_a = get_bbox(node_a)
+    bb_b = get_bbox(node_b)
+    # Y distance
+    if bb_a['y'] + bb_a['h'] < bb_b['y']:
+        dy = bb_b['y'] - (bb_a['y'] + bb_a['h'])
+    elif bb_b['y'] + bb_b['h'] < bb_a['y']:
+        dy = bb_a['y'] - (bb_b['y'] + bb_b['h'])
+    else:
+        dy = 0
+    # X distance
+    if bb_a['x'] + bb_a['w'] < bb_b['x']:
+        dx = bb_b['x'] - (bb_a['x'] + bb_a['w'])
+    elif bb_b['x'] + bb_b['w'] < bb_a['x']:
+        dx = bb_a['x'] - (bb_b['x'] + bb_b['w'])
+    else:
+        dx = 0
+    return min(dx, dy) if dx > 0 and dy > 0 else max(dx, dy)
 
 
 def detect_en_jp_label_pairs(children):
@@ -895,45 +1133,6 @@ def detect_en_jp_label_pairs(children):
     if len(text_nodes) < 2:
         return []
 
-    def _is_en_label(text):
-        """Check if text is a short uppercase ASCII label."""
-        ascii_only = re.sub(r'[^\x00-\x7f]', '', text).strip()
-        if not ascii_only or ascii_only != text.strip():
-            return False
-        words = ascii_only.split()
-        if len(words) < 1 or len(words) > EN_LABEL_MAX_WORDS:
-            return False
-        # Must be uppercase (allow minor punctuation)
-        alpha_chars = re.sub(r'[^a-zA-Z]', '', ascii_only)
-        if not alpha_chars:
-            return False
-        return alpha_chars == alpha_chars.upper()
-
-    def _is_jp_text(text):
-        """Check if text contains non-ASCII (Japanese) characters."""
-        non_ascii = re.sub(r'[\x00-\x7f]', '', text).strip()
-        return len(non_ascii) > 0
-
-    def _pair_distance(node_a, node_b):
-        """Compute minimum distance between two nodes (Y-range or X-range proximity)."""
-        bb_a = get_bbox(node_a)
-        bb_b = get_bbox(node_b)
-        # Y distance
-        if bb_a['y'] + bb_a['h'] < bb_b['y']:
-            dy = bb_b['y'] - (bb_a['y'] + bb_a['h'])
-        elif bb_b['y'] + bb_b['h'] < bb_a['y']:
-            dy = bb_a['y'] - (bb_b['y'] + bb_b['h'])
-        else:
-            dy = 0
-        # X distance
-        if bb_a['x'] + bb_a['w'] < bb_b['x']:
-            dx = bb_b['x'] - (bb_a['x'] + bb_a['w'])
-        elif bb_b['x'] + bb_b['w'] < bb_a['x']:
-            dx = bb_a['x'] - (bb_b['x'] + bb_b['w'])
-        else:
-            dx = 0
-        return min(dx, dy) if dx > 0 and dy > 0 else max(dx, dy)
-
     # Find all EN labels and JP texts
     en_indices = [(i, node, text) for i, node, text in text_nodes if _is_en_label(text)]
     jp_indices = [(i, node, text) for i, node, text in text_nodes if _is_jp_text(text)]
@@ -964,6 +1163,130 @@ def detect_en_jp_label_pairs(children):
             used_jp.add(jp_i)
 
     return pairs
+
+
+def _find_table_row_backgrounds(children, min_width):
+    """Find full-width RECTANGLE leaf nodes that serve as table row backgrounds.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        min_width: Minimum width threshold (parent_w * TABLE_ROW_WIDTH_RATIO).
+
+    Returns:
+        list: RECTANGLE nodes whose width >= min_width and have no children.
+    """
+    full_width_rects = []
+    for c in children:
+        if (c.get('type') == 'RECTANGLE'
+                and not c.get('children')
+                and get_bbox(c)['w'] >= min_width):
+            full_width_rects.append(c)
+    return full_width_rects
+
+
+def _find_table_dividers(children, min_width):
+    """Find full-width VECTOR/LINE elements that act as table dividers.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        min_width: Minimum width threshold (parent_w * TABLE_ROW_WIDTH_RATIO).
+
+    Returns:
+        list: VECTOR/LINE nodes with width >= min_width and height <= TABLE_DIVIDER_MAX_HEIGHT.
+    """
+    dividers = []
+    for c in children:
+        if c.get('type') in ('VECTOR', 'LINE'):
+            bb = get_bbox(c)
+            if bb['w'] >= min_width and bb['h'] <= TABLE_DIVIDER_MAX_HEIGHT:
+                dividers.append(c)
+    return dividers
+
+
+def _assign_members_to_rows(full_width_rects, children, rect_ids, divider_ids):
+    """Assign non-rect, non-divider children to table rows by Y-center overlap.
+
+    For each RECTANGLE, finds sibling nodes whose Y-center falls within
+    [rect.y, rect.y + rect.h].
+
+    Args:
+        full_width_rects: List of background RECTANGLE nodes.
+        children: All sibling nodes (already filtered for visibility).
+        rect_ids: Set of RECTANGLE node IDs.
+        divider_ids: Set of divider node IDs.
+
+    Returns:
+        tuple: (all_row_member_ids: set, row_count: int)
+    """
+    all_row_member_ids = set()
+    row_count = 0
+    for rect in full_width_rects:
+        rect_bb = get_bbox(rect)
+        rect_y_top = rect_bb['y']
+        rect_y_bot = rect_bb['y'] + rect_bb['h']
+        row_members = [rect]
+
+        for c in children:
+            c_id = c.get('id', '')
+            if c_id in rect_ids or c_id in divider_ids:
+                continue
+            c_bb = get_bbox(c)
+            c_cy = c_bb['y'] + c_bb['h'] / 2
+            if rect_y_top <= c_cy <= rect_y_bot:
+                row_members.append(c)
+
+        # Only count as a row if there's at least one text/content element
+        if len(row_members) > 1:
+            row_count += 1
+        for m in row_members:
+            all_row_member_ids.add(m.get('id', ''))
+
+    return all_row_member_ids, row_count
+
+
+def _include_table_headings(children, all_row_member_ids, first_rect_y):
+    """Include heading elements that appear above the first table row background.
+
+    Scans children for FRAME/GROUP/TEXT/INSTANCE/COMPONENT nodes positioned
+    entirely above first_rect_y and adds them to the member set.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        all_row_member_ids: Set of node IDs already in the table (mutated in-place).
+        first_rect_y: Y position of the topmost row background RECTANGLE.
+    """
+    for c in children:
+        c_id = c.get('id', '')
+        if c_id in all_row_member_ids:
+            continue
+        c_bb = get_bbox(c)
+        # Heading must be above first row background
+        if c_bb['y'] + c_bb['h'] <= first_rect_y:
+            c_type = c.get('type', '')
+            # Accept FRAME/GROUP/TEXT as potential headings
+            if c_type in ('FRAME', 'GROUP', 'TEXT', 'INSTANCE', 'COMPONENT'):
+                all_row_member_ids.add(c_id)
+
+
+def _infer_table_name(children, first_rect_y):
+    """Infer a table name slug from heading text above the first row.
+
+    Args:
+        children: List of sibling nodes (already filtered for visibility).
+        first_rect_y: Y position of the topmost row background RECTANGLE.
+
+    Returns:
+        str: Kebab-case slug for the table name, or 'data' as fallback.
+    """
+    for c in children:
+        c_bb = get_bbox(c)
+        if c_bb['y'] + c_bb['h'] <= first_rect_y:
+            texts = get_text_children_content([c], max_items=1)
+            if not texts:
+                texts = get_text_children_content(c.get('children', []), max_items=1)
+            if texts:
+                return to_kebab(texts[0])
+    return 'data'
 
 
 def detect_table_rows(children, parent_bb):
@@ -1000,53 +1323,20 @@ def detect_table_rows(children, parent_bb):
     min_width = parent_bb['w'] * TABLE_ROW_WIDTH_RATIO
 
     # Step 1: Find full-width RECTANGLE leaves (row backgrounds)
-    full_width_rects = []
-    for c in children:
-        if (c.get('type') == 'RECTANGLE'
-                and not c.get('children')
-                and get_bbox(c)['w'] >= min_width):
-            full_width_rects.append(c)
-
+    full_width_rects = _find_table_row_backgrounds(children, min_width)
     if len(full_width_rects) < TABLE_MIN_ROWS:
         return []
 
     # Step 2: Find full-width dividers (VECTOR/LINE, height <= 2px)
-    dividers = []
-    for c in children:
-        if c.get('type') in ('VECTOR', 'LINE'):
-            bb = get_bbox(c)
-            if bb['w'] >= min_width and bb['h'] <= TABLE_DIVIDER_MAX_HEIGHT:
-                dividers.append(c)
+    dividers = _find_table_dividers(children, min_width)
 
     rect_ids = {c.get('id', '') for c in full_width_rects}
     divider_ids = {c.get('id', '') for c in dividers}
 
-    # Step 3: For each RECTANGLE, find TEXT siblings whose Y-center
-    # falls within [rect.y, rect.y + rect.h]
-    all_row_member_ids = set()
-    row_count = 0
-    for rect in full_width_rects:
-        rect_bb = get_bbox(rect)
-        rect_y_top = rect_bb['y']
-        rect_y_bot = rect_bb['y'] + rect_bb['h']
-        row_members = [rect]
-
-        for c in children:
-            c_id = c.get('id', '')
-            if c_id in rect_ids or c_id in divider_ids:
-                continue
-            c_bb = get_bbox(c)
-            c_cy = c_bb['y'] + c_bb['h'] / 2
-            if rect_y_top <= c_cy <= rect_y_bot:
-                row_members.append(c)
-
-        # Only count as a row if there's at least one text/content element
-        if len(row_members) > 1:
-            row_count += 1
-        for m in row_members:
-            all_row_member_ids.add(m.get('id', ''))
-
-    # Need at least TABLE_MIN_ROWS actual content rows
+    # Step 3: Assign members to rows by Y-center overlap
+    all_row_member_ids, row_count = _assign_members_to_rows(
+        full_width_rects, children, rect_ids, divider_ids
+    )
     if row_count < TABLE_MIN_ROWS:
         return []
 
@@ -1054,51 +1344,22 @@ def detect_table_rows(children, parent_bb):
     for d in dividers:
         all_row_member_ids.add(d.get('id', ''))
 
-    # Step 5: Check for heading element before first RECTANGLE (by Y position)
+    # Step 5: Include heading elements above first row
     rects_sorted = sorted(full_width_rects, key=lambda c: get_bbox(c)['y'])
     first_rect_y = get_bbox(rects_sorted[0])['y']
-    for c in children:
-        c_id = c.get('id', '')
-        if c_id in all_row_member_ids:
-            continue
-        c_bb = get_bbox(c)
-        # Heading must be above first row background
-        if c_bb['y'] + c_bb['h'] <= first_rect_y:
-            c_type = c.get('type', '')
-            # Accept FRAME/GROUP/TEXT as potential headings
-            if c_type in ('FRAME', 'GROUP', 'TEXT', 'INSTANCE', 'COMPONENT'):
-                all_row_member_ids.add(c_id)
+    _include_table_headings(children, all_row_member_ids, first_rect_y)
 
-    # Step 6: Infer name from heading or first text content
-    slug = ''
-    # Try heading text first (elements above first rect)
-    for c in children:
-        c_bb = get_bbox(c)
-        if c_bb['y'] + c_bb['h'] <= first_rect_y:
-            texts = get_text_children_content([c], max_items=1)
-            if not texts:
-                texts = get_text_children_content(c.get('children', []), max_items=1)
-            if texts:
-                slug = to_kebab(texts[0])
-                break
-
-    if not slug:
-        slug = 'data'
-
-    suggested_name = f'table-{slug}'
-
-    # Collect all member node IDs and names preserving child order
+    # Step 6: Infer name and build result
+    slug = _infer_table_name(children, first_rect_y)
     ordered_members = [c for c in children if c.get('id', '') in all_row_member_ids]
-    ordered_ids = [c.get('id', '') for c in ordered_members]
-    ordered_names = [c.get('name', '') for c in ordered_members]
 
     return [{
         'method': 'semantic',
         'semantic_type': 'table',
-        'node_ids': ordered_ids,
-        'node_names': ordered_names,
-        'count': len(ordered_ids),
-        'suggested_name': suggested_name,
+        'node_ids': [c.get('id', '') for c in ordered_members],
+        'node_names': [c.get('name', '') for c in ordered_members],
+        'count': len(ordered_members),
+        'suggested_name': f'table-{slug}',
         'suggested_wrapper': 'table-container',
         'row_count': row_count,
     }]

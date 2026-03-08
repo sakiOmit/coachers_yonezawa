@@ -12,6 +12,7 @@ Submodules:
   detection   - Semantic/pattern detection (13 detectors)
   enrichment  - Enriched table generation
   comparison  - Deduplication, Stage A/C comparison, validation
+  stage_c     - Stage C depth recursion (YAML I/O, heuristic sub-grouping)
 """
 
 from .constants import *  # noqa: F401,F403
@@ -29,3 +30,6 @@ from .enrichment import *  # noqa: F401,F403
 from .enrichment import _collect_text_preview, _compute_child_types, _compute_flags  # noqa: F401
 from .comparison import *  # noqa: F401,F403
 from .comparison import _stage_a_pattern_key  # noqa: F401
+from .stage_c import *  # noqa: F401,F403
+from .stage_c import _write_group_yaml, _try_heading_split, _try_column_split  # noqa: F401
+from .stage_c import _try_spatial_split, _try_yband_split, _collect_from_groups  # noqa: F401
