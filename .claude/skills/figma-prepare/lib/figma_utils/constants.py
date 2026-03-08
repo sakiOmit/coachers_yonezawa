@@ -125,8 +125,14 @@ LLM_CONFIDENCE_MAP = {
 }
 LLM_DEFAULT_CONFIDENCE = 78  # Default if LLM does not specify a level
 
+# --- LLM fallback confidence threshold (shared between rename and grouping) ---
+LLM_FALLBACK_CONFIDENCE_THRESHOLD = 50  # Score below which LLM fallback is triggered (figma-prepare.md: llm_fallback_confidence_threshold)
+
 # --- Issue 274: Grouping LLM fallback constants ---
 GROUPING_FALLBACK_MAX_SIBLINGS = 20  # Maximum siblings to include in LLM context
+GROUPING_FALLBACK_HEADING_MAX_HEIGHT = 200  # px — heading candidate max height (figma-prepare.md: grouping_fallback_heading_max_height)
+GROUPING_FALLBACK_MIN_SIBLINGS_AFTER_HEADING = 3  # Min siblings after heading to trigger fallback (figma-prepare.md: grouping_fallback_min_siblings)
+GROUPING_FALLBACK_STRUCTURE_SIMILARITY = 0.7  # Jaccard threshold for sibling structure similarity (figma-prepare.md: grouping_fallback_structure_similarity)
 
 # ---------------------------------------------------------------------------
 # Issue 229: Detector disable/coverable sets

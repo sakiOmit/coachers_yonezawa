@@ -13,6 +13,13 @@ __all__ = [
     'heuristic_sub_group',
 ]
 
+# ---------------------------------------------------------------------------
+# Module-level constants (only used in this file)
+# ---------------------------------------------------------------------------
+
+_HEADING_MAX_ELEMENTS = 3  # Max heading elements to try splitting (1, 2, or 3)
+_HEADING_GAP_MIN = 10  # px — minimum vertical gap between heading and content
+
 
 # ---------------------------------------------------------------------------
 # Heuristic sub-grouping strategies
@@ -115,10 +122,7 @@ def _find_heading_split_index(items):
 
     Returns the heading size (number of heading elements), or None if no valid split.
     """
-    HEADING_MAX_ELEMENTS = 3
-    HEADING_GAP_MIN = 10  # px
-
-    for heading_size in range(1, min(HEADING_MAX_ELEMENTS + 1, len(items) - 1)):
+    for heading_size in range(1, min(_HEADING_MAX_ELEMENTS + 1, len(items) - 1)):
         heading_candidates = items[:heading_size]
         content_start = items[heading_size]
 
@@ -137,7 +141,7 @@ def _find_heading_split_index(items):
 
         heading_bottom = max(c[2] for c in heading_candidates)
         content_top = content_start[1]
-        if content_top - heading_bottom < HEADING_GAP_MIN:
+        if content_top - heading_bottom < _HEADING_GAP_MIN:
             continue
 
         return heading_size

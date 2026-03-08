@@ -1,4 +1,35 @@
-"""Metadata I/O, node lookup, and structural predicates for figma-prepare."""
+"""Metadata I/O, node lookup, and structural predicates for figma-prepare.
+
+This module provides the foundational metadata operations used throughout
+the figma-prepare pipeline. Functions are organized into five categories:
+
+Categories
+----------
+1. I/O & Parsing
+   - parse_figma_xml        Parse Figma Dev Mode MCP XML to JSON node tree
+   - load_metadata          Load metadata from file (JSON/XML auto-detect)
+
+2. Node Lookup
+   - get_root_node          Extract root node from various data formats
+   - find_node_by_id        Recursive tree search by node ID
+
+3. Structural Predicates
+   - is_unnamed             Check if name matches auto-generated pattern
+   - is_section_root        Detect section-level frames (width >= 90% of 1440px)
+   - is_off_canvas          Check if node is outside the visible viewport
+
+4. Content Extraction
+   - get_text_children_content  Extract text content from TEXT children
+
+5. Counting & Analysis
+   - count_nested_flat          Count over-flat nodes inside section roots
+   - _count_flat_descendants    Helper: count flat descendants in a subtree
+
+Internal (not part of public API):
+   - _TAG_TYPE_MAP              XML tag to Figma type mapping table
+   - _apply_xml_attribute       Apply a parsed XML attribute to node/bbox
+   - _FigmaXmlParser            Stateful XML parser class
+"""
 
 import json
 from html import unescape
@@ -13,6 +44,27 @@ from .constants import (
 )
 from .geometry import filter_visible_children, get_bbox
 
+__all__ = [
+    # I/O & Parsing
+    'parse_figma_xml',
+    'load_metadata',
+    # Node Lookup
+    'get_root_node',
+    'find_node_by_id',
+    # Structural Predicates
+    'is_unnamed',
+    'is_section_root',
+    'is_off_canvas',
+    # Content Extraction
+    'get_text_children_content',
+    # Counting & Analysis
+    'count_nested_flat',
+]
+
+
+# ============================================================
+# I/O & Parsing
+# ============================================================
 
 _TAG_TYPE_MAP = {
     'frame': 'FRAME', 'text': 'TEXT', 'rectangle': 'RECTANGLE',
@@ -203,6 +255,10 @@ def load_metadata(file_path):
     raise ValueError(f"Unknown metadata format in {file_path}")
 
 
+# ============================================================
+# Node Lookup
+# ============================================================
+
 def get_root_node(data):
     """Extract root node from various data formats.
 
@@ -241,10 +297,80 @@ def find_node_by_id(root, node_id):
     return None
 
 
+# ============================================================
+# Structural Predicates
+# ============================================================
+
 def is_unnamed(name):
     """Check if a node name matches unnamed (auto-generated) pattern."""
     return bool(UNNAMED_RE.match(name))
 
+
+def is_section_root(node):
+    """Detect section-level frames (width >= 90% of 1440px).
+
+    Issue 53: Extracted from analyze-structure.sh to share with other scripts.
+    Issue 191: Relaxed width check from |width - 1440| < 10 to width >= 1296
+    to catch oversized footer wrappers (e.g. 2433px wide Group).
+
+    Args:
+        node: Figma node dict.
+
+    Returns:
+        bool: True if node is a section root frame.
+    """
+    bbox = node.get('absoluteBoundingBox') or {}
+    width = bbox.get('width', 0)
+    # Issue 116: Include COMPONENT/INSTANCE/SECTION types as section roots
+    # (consistent with Issue 69/72 type extensions in other scripts)
+    # Issue 191: Relaxed width check — width >= SECTION_ROOT_WIDTH * 0.9 (1296px)
+    # catches both exact-match (~1440) and oversized wrappers (e.g. 2433px)
+    return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and width >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO
+
+
+def is_off_canvas(node, page_width, root_x=0, root_y=0):
+    """Check if a node is positioned completely outside the viewport.
+
+    An element is considered off-canvas if:
+    - Its left edge (x) is beyond page_width * OFF_CANVAS_MARGIN, OR
+    - Its right edge (x + w) is less than 0 (completely to the left)
+
+    Coordinates are evaluated relative to root_x, so artboards placed
+    at arbitrary canvas positions (e.g., x=-5542) work correctly.
+
+    These are typically unused assets or elements placed outside the
+    visible design area.
+
+    Issue 182: Elements outside viewport should not affect scoring or grouping.
+
+    Args:
+        node: Figma node dict.
+        page_width: Width of the page/artboard (typically 1440px).
+        root_x: X coordinate of the root artboard (for offset correction).
+        root_y: Y coordinate of the root artboard (for offset correction, Issue 265).
+
+    Returns:
+        bool: True if the node is completely off-canvas.
+    """
+    if page_width <= 0:
+        return False
+    bb = get_bbox(node)
+    if not bb or bb['w'] == 0:
+        return False
+    # Convert to root-relative coordinate
+    rel_x = bb['x'] - root_x
+    # Right edge is left of viewport
+    if rel_x + bb['w'] < 0:
+        return True
+    # Left edge is beyond off-canvas margin
+    if rel_x > page_width * OFF_CANVAS_MARGIN:
+        return True
+    return False
+
+
+# ============================================================
+# Content Extraction
+# ============================================================
 
 def get_text_children_content(children, max_items=None, filter_unnamed=False):
     """Extract text content from TEXT children.
@@ -278,27 +404,9 @@ def get_text_children_content(children, max_items=None, filter_unnamed=False):
     return texts
 
 
-def is_section_root(node):
-    """Detect section-level frames (width >= 90% of 1440px).
-
-    Issue 53: Extracted from analyze-structure.sh to share with other scripts.
-    Issue 191: Relaxed width check from |width - 1440| < 10 to width >= 1296
-    to catch oversized footer wrappers (e.g. 2433px wide Group).
-
-    Args:
-        node: Figma node dict.
-
-    Returns:
-        bool: True if node is a section root frame.
-    """
-    bbox = node.get('absoluteBoundingBox') or {}
-    width = bbox.get('width', 0)
-    # Issue 116: Include COMPONENT/INSTANCE/SECTION types as section roots
-    # (consistent with Issue 69/72 type extensions in other scripts)
-    # Issue 191: Relaxed width check — width >= SECTION_ROOT_WIDTH * 0.9 (1296px)
-    # catches both exact-match (~1440) and oversized wrappers (e.g. 2433px)
-    return node.get('type') in ('FRAME', 'COMPONENT', 'INSTANCE', 'SECTION') and width >= SECTION_ROOT_WIDTH * SECTION_ROOT_WIDTH_RATIO
-
+# ============================================================
+# Counting & Analysis
+# ============================================================
 
 def count_nested_flat(node, threshold=FLAT_THRESHOLD):
     """Count FRAME/GROUP nodes with > threshold visible children, below section roots only.
@@ -358,43 +466,3 @@ def _count_flat_descendants(node, threshold=FLAT_THRESHOLD):
                 count += 1
             count += _count_flat_descendants(child, threshold)
     return count
-
-
-def is_off_canvas(node, page_width, root_x=0, root_y=0):
-    """Check if a node is positioned completely outside the viewport.
-
-    An element is considered off-canvas if:
-    - Its left edge (x) is beyond page_width * OFF_CANVAS_MARGIN, OR
-    - Its right edge (x + w) is less than 0 (completely to the left)
-
-    Coordinates are evaluated relative to root_x, so artboards placed
-    at arbitrary canvas positions (e.g., x=-5542) work correctly.
-
-    These are typically unused assets or elements placed outside the
-    visible design area.
-
-    Issue 182: Elements outside viewport should not affect scoring or grouping.
-
-    Args:
-        node: Figma node dict.
-        page_width: Width of the page/artboard (typically 1440px).
-        root_x: X coordinate of the root artboard (for offset correction).
-        root_y: Y coordinate of the root artboard (for offset correction, Issue 265).
-
-    Returns:
-        bool: True if the node is completely off-canvas.
-    """
-    if page_width <= 0:
-        return False
-    bb = get_bbox(node)
-    if not bb or bb['w'] == 0:
-        return False
-    # Convert to root-relative coordinate
-    rel_x = bb['x'] - root_x
-    # Right edge is left of viewport
-    if rel_x + bb['w'] < 0:
-        return True
-    # Left edge is beyond off-canvas margin
-    if rel_x > page_width * OFF_CANVAS_MARGIN:
-        return True
-    return False

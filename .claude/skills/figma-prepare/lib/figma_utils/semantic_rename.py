@@ -29,6 +29,7 @@ from .naming import _jp_keyword_lookup, to_kebab
 
 # Re-export from rename_strategies for backward compatibility
 from .rename_strategies import (  # noqa: F401
+    RENAME_STRATEGIES,
     _infer_from_text_content,
     _infer_from_shape,
     _infer_from_position,
@@ -144,15 +145,19 @@ def _estimate_children_confidence(name):
 def infer_name_with_confidence(node, parent=None, sibling_index=0, total_siblings=1):
     """Infer semantic name with confidence score (0-100).
 
+    Iterates over RENAME_STRATEGIES in priority order, invoking each
+    strategy function with the appropriate arguments.  Returns the first
+    non-None result together with its confidence score.
+
     Returns (name, confidence) tuple. Higher confidence means the heuristic
     is more certain about the inferred name.
 
-    Confidence guidelines:
-      90  - Text content match (Priority 0-1)
-      85  - Shape analysis match (Priority 2)
-      75  - Position analysis match (Priority 3)
+    Confidence guidelines (see RENAME_STRATEGIES for canonical values):
+      90     - Text content match (Priority 0-1)
+      85     - Shape analysis match (Priority 2)
+      75     - Position analysis match (Priority 3)
       varies - Children-based match (Priority 3.5-4), depends on pattern
-      10  - Fallback (type-index)
+      10     - Fallback (type-index)
     """
     node_type = node.get('type', '')
     children = filter_visible_children(node)
@@ -161,30 +166,32 @@ def infer_name_with_confidence(node, parent=None, sibling_index=0, total_sibling
     w = abs_bbox.get('width', 0)
     h = abs_bbox.get('height', 0)
 
-    # Priority 0-1: Text content based naming
-    result = _infer_from_text_content(node, node_type, name, sibling_index)
-    if result is not None:
-        return (result, 90)
+    # Dispatch through RENAME_STRATEGIES in priority order
+    for _priority, strategy_fn, _desc, confidence in RENAME_STRATEGIES:
+        if strategy_fn is _infer_from_text_content:
+            result = strategy_fn(node, node_type, name, sibling_index)
+        elif strategy_fn is _infer_from_shape:
+            result = strategy_fn(node, node_type, children, w, h, sibling_index)
+        elif strategy_fn is _infer_from_position:
+            result = strategy_fn(
+                node, node_type, parent, children, abs_bbox, w, h,
+                sibling_index, total_siblings,
+            )
+        elif strategy_fn is _infer_from_children:
+            result = strategy_fn(node, node_type, children, w, h, sibling_index)
+        else:
+            # Unknown strategy — log warning and skip
+            import warnings
+            warnings.warn(f"Unknown rename strategy: {strategy_fn.__name__}", stacklevel=2)
+            continue
 
-    # Priority 2: Shape analysis
-    result = _infer_from_shape(node, node_type, children, w, h, sibling_index)
-    if result is not None:
-        return (result, 85)
+        if result is not None:
+            if confidence is None:
+                # Dynamic confidence (children-based strategies)
+                confidence = _estimate_children_confidence(result)
+            return (result, confidence)
 
-    # Priority 3-3.2: Position analysis (header/footer/CTA/side-panel/icon)
-    result = _infer_from_position(
-        node, node_type, parent, children, abs_bbox, w, h, sibling_index, total_siblings
-    )
-    if result is not None:
-        return (result, 75)
-
-    # Priority 3.5-4: Children-based analysis (nav/decoration/card/button/heading/container)
-    result = _infer_from_children(node, node_type, children, w, h, sibling_index)
-    if result is not None:
-        conf = _estimate_children_confidence(result)
-        return (result, conf)
-
-    # Priority 5: Fallback
+    # Priority 5: Fallback — no strategy matched
     type_prefix = node_type.lower().replace('_', '-')
     return (f'{type_prefix}-{sibling_index}', 10)
 

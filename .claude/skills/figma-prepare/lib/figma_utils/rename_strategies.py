@@ -44,6 +44,7 @@ from .geometry import filter_visible_children
 from .naming import to_kebab
 
 __all__ = [
+    'RENAME_STRATEGIES',
     '_infer_from_text_content',
     '_infer_from_shape',
     '_infer_from_position',
@@ -440,3 +441,25 @@ def _infer_from_children(node, node_type, children, w, h, sibling_index):
 
     # Fallback: container or group
     return _detect_container_or_group(children, text_contents, sibling_index)
+
+
+# ---------------------------------------------------------------------------
+# Strategy dispatch table — executed in priority order by infer_name()
+# in semantic_rename.py.  Each entry documents a priority group, the
+# function that implements it, a human-readable description, and the
+# default confidence score assigned when the strategy matches.
+#
+# Entries whose confidence is None use a dynamic calculation
+# (_estimate_children_confidence) instead of a fixed value.
+#
+# See .claude/rules/figma-prepare.md "リネームロジック（優先順）" for the
+# authoritative priority table.
+# ---------------------------------------------------------------------------
+
+RENAME_STRATEGIES = (
+    # (priority, function, description, confidence)
+    (0,   _infer_from_text_content, "EN+JP label pair / text content-based naming",  90),
+    (2,   _infer_from_shape,        "Shape analysis for leaf nodes (divider/bg/icon/bullet)", 85),
+    (3,   _infer_from_position,     "Position-based inference (header/footer/CTA/side-panel/icon)", 75),
+    (3.5, _infer_from_children,     "Children structure analysis (nav/decoration/card/btn/heading/container)", None),
+)

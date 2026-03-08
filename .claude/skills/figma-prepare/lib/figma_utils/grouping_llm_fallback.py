@@ -24,25 +24,15 @@ import os
 import re
 
 from .constants import (
+    GROUPING_FALLBACK_HEADING_MAX_HEIGHT,
     GROUPING_FALLBACK_MAX_SIBLINGS,
+    GROUPING_FALLBACK_MIN_SIBLINGS_AFTER_HEADING,
+    GROUPING_FALLBACK_STRUCTURE_SIMILARITY,
     HEADING_MAX_CHILDREN,
     HEADING_TEXT_RATIO,
     LLM_CONFIDENCE_MAP,
     LLM_DEFAULT_CONFIDENCE,
 )
-
-# ---------------------------------------------------------------------------
-# Constants (Issue 274)
-# ---------------------------------------------------------------------------
-
-# Max height for a heading candidate element (px)
-GROUPING_FALLBACK_HEADING_MAX_HEIGHT = 200
-
-# Minimum siblings after heading to trigger fallback
-GROUPING_FALLBACK_MIN_SIBLINGS_AFTER_HEADING = 3
-
-# Jaccard threshold for considering siblings as structurally similar
-GROUPING_FALLBACK_STRUCTURE_SIMILARITY = 0.7
 
 # Re-export from constants for backward compatibility
 GROUPING_LLM_CONFIDENCE_MAP = LLM_CONFIDENCE_MAP
