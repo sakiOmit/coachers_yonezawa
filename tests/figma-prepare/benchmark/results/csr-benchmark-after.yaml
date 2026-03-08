@@ -1,0 +1,50 @@
+# Figma Prepare Benchmark Report — After Apply
+# Design: CSR (LP-PC)
+# Apply date: 2026-03-09
+# Clone artboard: /csr [prepared] (114:4908)
+
+fixture: csr.xml
+
+before:
+  phase1_quality:
+    score: 24.3
+    grade: D
+  tree_structure:
+    root_children: 127
+    max_depth: 9
+    total_nodes: 302
+    unnamed_rate_pct: 45.4
+
+apply_results:
+  grouping:
+    total_candidates: 52
+    applied: 51
+    skipped: 1
+    skip_reason: parent conflict
+  rename:
+    total_renames: 93
+    verification_match: 100%
+  structure:
+    before_flat_children: 127
+    after_top_level: 3
+    top_level_sections:
+      - header
+      - main
+      - footer
+    subsections: 8
+  visual_breakage: false
+
+after:
+  phase1_quality:
+    score: ~80
+    grade: A
+    recommendation: Proceed to /figma-analyze
+  tree_structure:
+    root_children: 3
+    subsections: 8
+    unnamed_rate_pct: ~0
+  improvements:
+    flat_children_reduction: "127 -> 3 (97.6%)"
+    unnamed_nodes_reduction: "93 renames applied (100% verified)"
+    grouping_wrappers: "51 wrappers applied"
+    structure: "Flat -> header/main(8 subsections)/footer"

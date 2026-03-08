@@ -4,16 +4,18 @@ Contains UnionFind data structure and proximity/spatial-gap splitting logic.
 Extracted from grouping_engine.py for modularity.
 """
 
+import statistics
 from collections import defaultdict
 
 from .constants import (
+    GRID_SNAP,
     PROXIMITY_GAP,
     REPEATED_PATTERN_MIN,
     ROW_TOLERANCE,
     SPATIAL_GAP_THRESHOLD,
     SPATIAL_SPLIT_MIN_NON_LEAF,
 )
-from .geometry import get_bbox
+from .geometry import get_bbox, snap
 from .scoring import compute_grouping_score
 
 
@@ -51,30 +53,109 @@ class UnionFind:
 
 
 # ---------------------------------------------------------------------------
+# Adaptive proximity gap
+# ---------------------------------------------------------------------------
+
+def compute_adaptive_gap(children, default_gap=None):
+    """Compute adaptive proximity gap based on actual inter-sibling spacing.
+
+    Instead of using a fixed 24px gap for all designs, analyze the actual
+    spacing between sibling elements and use median * 0.8 as the gap threshold.
+
+    Args:
+        children: List of visible sibling nodes with absoluteBoundingBox.
+        default_gap: Fallback gap if spacing can't be computed.
+                     Defaults to PROXIMITY_GAP constant.
+
+    Returns:
+        int: Adaptive gap value in pixels (snapped to GRID_SNAP).
+    """
+    if default_gap is None:
+        default_gap = PROXIMITY_GAP
+
+    if len(children) < 3:
+        return default_gap
+
+    bboxes = [get_bbox(c) for c in children]
+
+    # Sort by Y position first (most layouts are vertical at section level)
+    sorted_bbs = sorted(bboxes, key=lambda b: (b['y'], b['x']))
+
+    gaps = []
+    for i in range(len(sorted_bbs) - 1):
+        a = sorted_bbs[i]
+        b = sorted_bbs[i + 1]
+        # Vertical gap
+        v_gap = b['y'] - (a['y'] + a['h'])
+        if v_gap > 0:
+            gaps.append(v_gap)
+        # Horizontal gap (for horizontal layouts)
+        h_gap = b['x'] - (a['x'] + a['w'])
+        if h_gap > 0:
+            gaps.append(h_gap)
+
+    if len(gaps) < 2:
+        return default_gap
+
+    # Use median * 0.8 (conservative: slightly smaller than typical gap)
+    median_gap = statistics.median(gaps)
+
+    # Don't go below 8px or above 200px
+    adaptive = max(8, min(200, int(median_gap * 0.8)))
+
+    # Snap to GRID_SNAP
+    adaptive = snap(adaptive, GRID_SNAP)
+
+    return adaptive
+
+
+# ---------------------------------------------------------------------------
 # Proximity detector
 # ---------------------------------------------------------------------------
 
-def detect_proximity_groups(children):
-    """Detect groups of nearby elements using Union-Find with scoring."""
+def detect_proximity_groups(children, gap=None):
+    """Detect groups of nearby elements using Union-Find with scoring.
+
+    Args:
+        children: List of visible sibling nodes.
+        gap: Proximity gap threshold in px. If None, uses adaptive computation.
+    """
     n = len(children)
     if n < 2:
         return []
+
+    if gap is None:
+        gap = compute_adaptive_gap(children)
 
     bboxes = [get_bbox(c) for c in children]
     uf = UnionFind(n)
     for i in range(n):
         for j in range(i + 1, n):
-            score = compute_grouping_score(bboxes[i], bboxes[j], PROXIMITY_GAP)
+            score = compute_grouping_score(bboxes[i], bboxes[j], gap)
             if score > 0.5:
                 uf.union(i, j)
+
+    # Pre-compute all pairwise scores for group score calculation
+    pairwise_scores = {}
+    for i in range(n):
+        for j in range(i + 1, n):
+            pairwise_scores[(i, j)] = compute_grouping_score(bboxes[i], bboxes[j], gap)
 
     result = []
     # Issue 127: Use sequential counter instead of UF internal root index
     for group_idx, (root, indices) in enumerate(uf.groups().items(), 1):
         if len(indices) >= 2:
             group_nodes = [children[i] for i in indices]
+            # Compute group score as mean of pairwise scores within the group
+            group_scores = []
+            for a in range(len(indices)):
+                for b in range(a + 1, len(indices)):
+                    key = (min(indices[a], indices[b]), max(indices[a], indices[b]))
+                    group_scores.append(pairwise_scores.get(key, 0.0))
+            mean_score = sum(group_scores) / len(group_scores) if group_scores else 0.0
             result.append({
                 'method': 'proximity',
+                'score': round(mean_score, 4),
                 'node_ids': [n.get('id', '') for n in group_nodes],
                 'node_names': [n.get('name', '') for n in group_nodes],
                 'count': len(indices),

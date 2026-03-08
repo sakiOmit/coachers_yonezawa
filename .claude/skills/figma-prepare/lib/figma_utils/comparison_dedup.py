@@ -11,6 +11,44 @@ from .constants import (
 from .geometry import get_bbox
 
 
+def _should_absorb_into_higher(lower_group, higher_group, trim_loss_ratio=0.3):
+    """Decide if a lower-priority group should be absorbed into a higher-priority one.
+
+    When trimming would remove > 30% of the lower group's nodes, it's better
+    to absorb the remaining nodes into the higher-priority group rather than
+    leave them as orphans.
+
+    Only applies to small groups (<=6 nodes) as an additional safeguard.
+    The caller (deduplicate_candidates) further restricts absorption to
+    low-priority methods (proximity/spacing) only.
+
+    Args:
+        lower_group: The lower-priority candidate dict.
+        higher_group: The higher-priority candidate dict.
+        trim_loss_ratio: Threshold for triggering absorption (default 0.3 = 30%).
+
+    Returns:
+        bool: True if lower group should be absorbed (not just trimmed).
+    """
+    lower_ids = set(lower_group.get('node_ids', []))
+    higher_ids = set(higher_group.get('node_ids', []))
+
+    if not lower_ids:
+        return False
+
+    overlap = lower_ids & higher_ids
+    remaining = lower_ids - higher_ids
+
+    # If trimming removes > 30% of nodes AND remaining is < 3 nodes → absorb
+    # But only if the original group was small enough that the remainder is
+    # truly orphaned (not a fragment of a large heterogeneous group).
+    loss = len(overlap) / len(lower_ids)
+    if loss > trim_loss_ratio and len(remaining) < 3 and len(lower_ids) <= 6:
+        return True
+
+    return False
+
+
 def deduplicate_candidates(candidates, root_id=''):
     """Remove duplicate/overlapping grouping candidates (Issue 7+9+22+236).
 
@@ -18,6 +56,8 @@ def deduplicate_candidates(candidates, root_id=''):
     - Rule 1: If same node appears in both lower and higher-priority method,
       trim the overlapping node from the lower-priority candidate.
       Only remove the candidate entirely if all its nodes are claimed (Issue 236).
+      If trimming leaves < 3 nodes (fragmented group), absorb the remainder
+      into the higher-priority group instead of leaving orphans.
     - Rule 2: If a parent node already has a semantic (non-auto-generated) name,
       skip proximity/spacing (exception: root-level parents are exempt)
     """
@@ -50,29 +90,88 @@ def deduplicate_candidates(candidates, root_id=''):
                 remove_by_rule2.add(i)
 
     # Build result: apply trims and removals
-    result = []
+    # First pass: compute trimmed candidates and collect absorption info
+    trimmed_candidates = []  # (index, candidate_or_None, original_ids, remaining_ids)
     for i, c in enumerate(candidates):
         if i in remove_by_rule2:
+            trimmed_candidates.append((i, None, set(), set()))
             continue
         if i in nodes_to_trim:
             trim_set = nodes_to_trim[i]
-            original_ids = c.get('node_ids', [])
+            original_ids = set(c.get('node_ids', []))
+            original_id_list = c.get('node_ids', [])
             original_names = c.get('node_names', [])
             remaining_ids = []
             remaining_names = []
-            for j, nid in enumerate(original_ids):
+            for j, nid in enumerate(original_id_list):
                 if nid not in trim_set:
                     remaining_ids.append(nid)
                     if j < len(original_names):
                         remaining_names.append(original_names[j])
             if not remaining_ids:
+                trimmed_candidates.append((i, None, original_ids, set()))
                 continue  # fully subsumed by higher-priority — remove
             c = dict(c)  # shallow copy to avoid mutating original
             c['node_ids'] = remaining_ids
             if original_names:
                 c['node_names'] = remaining_names
             c['count'] = len(remaining_ids)
-        result.append(c)
+            trimmed_candidates.append((i, c, original_ids, set(remaining_ids)))
+        else:
+            trimmed_candidates.append((i, c, set(c.get('node_ids', [])), set(c.get('node_ids', []))))
+
+    # Second pass: merge-aware absorption for fragmented groups
+    # Build index of higher-priority candidates for absorption lookup
+    absorption_targets = {}  # lower_index -> higher_candidate_index_in_trimmed
+    absorbed_indices = set()
+    for ti, (i, cand, original_ids, remaining_ids) in enumerate(trimmed_candidates):
+        if cand is None:
+            continue
+        if i not in nodes_to_trim:
+            continue
+        # Check if remaining group is too small and should be absorbed.
+        # Only for low-priority methods (proximity/spacing) which are prone
+        # to fragmentation. Higher-level methods (heading-content, pattern,
+        # consecutive) have intentional groupings that shouldn't be absorbed.
+        method = cand.get('method', '')
+        if 0 < len(remaining_ids) < 3 and method in ('proximity', 'spacing'):
+            # Find which higher-priority group took our nodes
+            trimmed_away = original_ids - remaining_ids
+            best_higher_ti = None
+            best_overlap = 0
+            for hti, (hi, hcand, _, _) in enumerate(trimmed_candidates):
+                if hcand is None or hti == ti:
+                    continue
+                higher_ids = set(hcand.get('node_ids', []))
+                overlap = len(trimmed_away & higher_ids)
+                if overlap > best_overlap:
+                    best_overlap = overlap
+                    best_higher_ti = hti
+
+            if best_higher_ti is not None:
+                # Absorb remaining nodes into the higher group
+                _, hcand, h_orig, h_rem = trimmed_candidates[best_higher_ti]
+                if hcand is not None:
+                    hcand_copy = dict(hcand)
+                    higher_node_ids = set(hcand_copy.get('node_ids', []))
+                    merged_ids = higher_node_ids | remaining_ids
+                    hcand_copy['node_ids'] = list(merged_ids)
+                    hcand_copy['count'] = len(merged_ids)
+                    trimmed_candidates[best_higher_ti] = (
+                        trimmed_candidates[best_higher_ti][0],
+                        hcand_copy,
+                        h_orig,
+                        merged_ids,
+                    )
+                    # Mark lower group for removal
+                    trimmed_candidates[ti] = (i, None, original_ids, set())
+                    absorbed_indices.add(ti)
+
+    # Build final result
+    result = []
+    for ti, (i, cand, _, _) in enumerate(trimmed_candidates):
+        if cand is not None:
+            result.append(cand)
 
     return result
 

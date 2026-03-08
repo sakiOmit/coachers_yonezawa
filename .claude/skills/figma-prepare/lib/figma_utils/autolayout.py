@@ -26,8 +26,92 @@ from .scoring import (
 )
 
 
-def _infer_direction(child_bboxes):
+# Name patterns that strongly suggest a layout direction (Phase 3 → Phase 4 integration)
+_NAME_DIRECTION_HINTS = {
+    # Horizontal patterns
+    'nav': 'HORIZONTAL',
+    'navigation': 'HORIZONTAL',
+    'breadcrumb': 'HORIZONTAL',
+    'toolbar': 'HORIZONTAL',
+    'horizontal-bar': 'HORIZONTAL',
+    'news-bar': 'HORIZONTAL',
+    'pagination': 'HORIZONTAL',
+    # Vertical patterns
+    'sidebar': 'VERTICAL',
+    'text-column': 'VERTICAL',
+    'menu': 'VERTICAL',
+    'footer-links': 'VERTICAL',
+    # WRAP patterns
+    'card-list': 'WRAP',
+    'grid': 'WRAP',
+    'tag-list': 'WRAP',
+    'badge-list': 'WRAP',
+}
+
+
+def _direction_hint_from_name(frame_name):
+    """Infer direction hint from frame/group name.
+
+    Returns (direction, confidence) or (None, 0) if no hint.
+    Confidence: 0.7 for name-based hints (moderate, can be overridden by strong geometry).
+    """
+    if not frame_name:
+        return None, 0
+
+    name_lower = frame_name.lower()
+
+    # Check exact and partial matches
+    for pattern, direction in _NAME_DIRECTION_HINTS.items():
+        if pattern in name_lower:
+            return direction, 0.7
+
+    # Check suffix patterns
+    if name_lower.endswith('-list') or name_lower.endswith('-items'):
+        return 'HORIZONTAL', 0.6  # lists are often horizontal, but lower confidence
+
+    if name_lower.startswith('two-column') or name_lower.startswith('2col'):
+        return 'HORIZONTAL', 0.8
+
+    return None, 0
+
+
+def _infer_direction_by_grid(child_bboxes):
+    """Fallback direction inference by counting rows vs columns.
+
+    When variance ratio is ambiguous (square-ish layout), count how many
+    distinct rows and columns exist. Fewer rows -> HORIZONTAL (items in a row),
+    fewer columns -> VERTICAL (items in a column).
+    """
+    # Group by Y (rows)
+    sorted_ys = sorted(set(bb['y'] for bb in child_bboxes))
+    row_count = 1
+    for i in range(1, len(sorted_ys)):
+        if sorted_ys[i] - sorted_ys[i - 1] > ROW_TOLERANCE:
+            row_count += 1
+
+    # Group by X (columns)
+    sorted_xs = sorted(set(bb['x'] for bb in child_bboxes))
+    col_count = 1
+    for i in range(1, len(sorted_xs)):
+        if sorted_xs[i] - sorted_xs[i - 1] > ROW_TOLERANCE:
+            col_count += 1
+
+    if row_count < col_count:
+        return 'HORIZONTAL'  # Fewer rows = items arranged horizontally
+    elif col_count < row_count:
+        return 'VERTICAL'    # Fewer columns = items arranged vertically
+    else:
+        return 'HORIZONTAL'  # Equal rows/cols (perfect grid) -> default HORIZONTAL
+
+
+def _infer_direction(child_bboxes, frame_name=''):
     """Infer layout direction (HORIZONTAL/VERTICAL/WRAP) from child bounding boxes.
+
+    Uses a multi-stage fallback with name-based priming:
+    1. Clear variance separation (ratio > VARIANCE_RATIO) -> HORIZONTAL or VERTICAL
+    1.5. Name-based hint when geometry is ambiguous (Phase 3 → Phase 4 integration)
+    2. Ambiguous variance -> count rows vs columns via _infer_direction_by_grid()
+    3. Two-element special case uses dx vs dy comparison
 
     Returns (direction, is_wrap) tuple, or None if direction cannot be determined.
     """
@@ -42,7 +126,20 @@ def _infer_direction(child_bboxes):
     else:
         x_var = statistics.variance(xs) if len(xs) > 1 else 0
         y_var = statistics.variance(ys) if len(ys) > 1 else 0
-        direction = 'HORIZONTAL' if x_var > y_var * VARIANCE_RATIO else 'VERTICAL'
+
+        # Stage 1: Clear variance separation
+        if x_var > y_var * VARIANCE_RATIO:
+            direction = 'HORIZONTAL'
+        elif y_var > x_var * VARIANCE_RATIO:
+            direction = 'VERTICAL'
+        else:
+            # Stage 1.5: Name-based hint (Phase 3 → Phase 4 integration)
+            hint_dir, hint_conf = _direction_hint_from_name(frame_name)
+            if hint_dir and hint_conf >= 0.6:
+                direction = hint_dir
+            else:
+                # Stage 2: Ambiguous — count rows vs columns
+                direction = _infer_direction_by_grid(child_bboxes)
 
     is_wrap = detect_wrap(child_bboxes, direction)
     if is_wrap:
@@ -148,11 +245,12 @@ def infer_layout(frame):
 
     frame_bb = get_bbox(frame)
     child_bboxes = [get_bbox(c) for c in children]
+    frame_name = frame.get('name', '')
 
     if frame_bb['w'] <= 0 or frame_bb['h'] <= 0:
         return None
 
-    result = _infer_direction(child_bboxes)
+    result = _infer_direction(child_bboxes, frame_name=frame_name)
     if result is None:
         return None
     direction, is_wrap = result

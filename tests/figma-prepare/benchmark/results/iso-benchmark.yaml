@@ -1,0 +1,113 @@
+# Figma Prepare Benchmark Report
+# Generated: 2026-03-08T14:29:42.203547+00:00
+
+fixture: iso.xml
+
+tree_structure:
+  page_width: 1440.0
+  page_height: 5851.0
+  root_children: 35
+  max_depth: 9
+  repeated_patterns: 4
+  unique_hashes: 29
+  node_types:
+    TEXT: 65
+    FRAME: 49
+    RECTANGLE: 36
+    VECTOR: 11
+    ELLIPSE: 6
+
+phase1_quality:
+  score: 35.8
+  grade: D
+  recommendation: All phases recommended
+  metrics:
+    deep_nesting_count: 1
+    flat_sections: 2
+    hidden_nodes: 0
+    max_depth: 9
+    max_section_depth: 8
+    named_rate_pct: 48.5
+    nested_flat_count: 0
+    no_autolayout_frames: 49
+    off_canvas_nodes: 0
+    total_frames: 49
+    total_nodes: 167
+    ungrouped_candidates: 11
+    unnamed_nodes: 86
+    unnamed_rate_pct: 51.5
+  score_breakdown:
+    autolayout_penalty: 0
+    flat_penalty: 25.5
+    nesting_penalty: 3
+    ungrouped_penalty: 10
+    unnamed_penalty: 25.7
+
+phase2_grouping:
+  total_candidates: 18
+  methods:
+    heading-content:
+      count: 1
+      avg_score: 0.7
+      min_score: 0.7
+      max_score: 0.7
+    highlight:
+      count: 6
+      avg_score: 0.8
+      min_score: 0.8
+      max_score: 0.8
+    pattern:
+      count: 4
+      avg_score: 1.0
+      min_score: 1.0
+      max_score: 1.0
+    semantic:
+      count: 6
+      avg_score: 0.9
+      min_score: 0.9
+      max_score: 0.9
+    zone:
+      count: 1
+      avg_score: 0.7
+      min_score: 0.7
+      max_score: 0.7
+
+phase3_rename:
+  total_renames: 86
+  en_jp_pairs: 4
+  confidence:
+    high (80-100): 52
+    medium (50-79): 21
+    low (20-49): 13
+    very_low (0-19): 0
+  methods:
+    auto: 86
+  top_prefixes:
+    bg-: 23
+    section-: 12
+    group-: 11
+    icon-: 11
+    btn-: 9
+    card-: 7
+    bullet-: 6
+    heading-: 5
+    container-: 2
+
+phase4_autolayout:
+  total_frames: 35
+  directions:
+    HORIZONTAL: 24
+    VERTICAL: 7
+    WRAP: 4
+  confidence:
+    medium: 23
+    low: 9
+    high: 3
+
+timings:
+  phase1: 0.003s
+  phase2_stage_a: 0.009s
+  phase3: 0.004s
+  phase4: 0.004s
+  total: 0.023s
+  tree_analysis: 0.003s

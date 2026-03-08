@@ -115,11 +115,51 @@ def _resolve_slug(text_contents_list):
     return ''
 
 
-def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
-    """Infer semantic name for an unnamed node.
+def _estimate_children_confidence(name):
+    """Estimate confidence of a children-based inference result.
 
-    Dispatches to priority-level helpers in rename_strategies.py.
-    Returns first non-None result, or a type-based fallback.
+    Returns a score 0-100 based on the name prefix and whether the name
+    has a meaningful slug (vs just a numeric index).
+    """
+    if name.startswith('nav-'):
+        return 80
+    if name.startswith('decoration-'):
+        return 90
+    if name.startswith('card-') and not name.endswith(('-0', '-1', '-2', '-3', '-4', '-5')):
+        return 70  # has slug
+    if name.startswith('card-'):
+        return 55  # index-only
+    if name.startswith('icon-'):
+        return 85
+    if name.startswith('btn-') and not name.endswith(('-0', '-1', '-2', '-3', '-4', '-5')):
+        return 75  # has slug
+    if name.startswith('btn-'):
+        return 60
+    if name.startswith('heading-') and not name.endswith(('-0', '-1', '-2', '-3', '-4', '-5')):
+        return 70
+    if name.startswith(('body-', 'content-')):
+        return 60
+    if name.startswith('text-block-') and not name.endswith(('-0', '-1', '-2', '-3', '-4', '-5')):
+        return 65
+    if name.startswith(('container-', 'group-')) and not any(name.endswith(f'-{i}') for i in range(20)):
+        return 40  # has slug but weak
+    if name.startswith(('container-', 'group-')):
+        return 20  # index-only, very weak
+    return 50  # unknown pattern
+
+
+def infer_name_with_confidence(node, parent=None, sibling_index=0, total_siblings=1):
+    """Infer semantic name with confidence score (0-100).
+
+    Returns (name, confidence) tuple. Higher confidence means the heuristic
+    is more certain about the inferred name.
+
+    Confidence guidelines:
+      90  - Text content match (Priority 0-1)
+      85  - Shape analysis match (Priority 2)
+      75  - Position analysis match (Priority 3)
+      varies - Children-based match (Priority 3.5-4), depends on pattern
+      10  - Fallback (type-index)
     """
     node_type = node.get('type', '')
     children = filter_visible_children(node)
@@ -131,28 +171,41 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     # Priority 0-1: Text content based naming
     result = _infer_from_text_content(node, node_type, name, sibling_index)
     if result is not None:
-        return result
+        return (result, 90)
 
     # Priority 2: Shape analysis
     result = _infer_from_shape(node, node_type, children, w, h, sibling_index)
     if result is not None:
-        return result
+        return (result, 85)
 
     # Priority 3-3.2: Position analysis (header/footer/CTA/side-panel/icon)
     result = _infer_from_position(
         node, node_type, parent, children, abs_bbox, w, h, sibling_index, total_siblings
     )
     if result is not None:
-        return result
+        return (result, 75)
 
     # Priority 3.5-4: Children-based analysis (nav/decoration/card/button/heading/container)
     result = _infer_from_children(node, node_type, children, w, h, sibling_index)
     if result is not None:
-        return result
+        conf = _estimate_children_confidence(result)
+        return (result, conf)
 
     # Priority 5: Fallback
     type_prefix = node_type.lower().replace('_', '-')
-    return f'{type_prefix}-{sibling_index}'
+    return (f'{type_prefix}-{sibling_index}', 10)
+
+
+def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
+    """Infer semantic name for an unnamed node.
+
+    Dispatches to priority-level helpers in rename_strategies.py.
+    Returns first non-None result, or a type-based fallback.
+
+    Note: For (name, confidence) tuple, use infer_name_with_confidence().
+    """
+    name, _confidence = infer_name_with_confidence(node, parent, sibling_index, total_siblings)
+    return name
 
 
 def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, renames=None, en_jp_overrides=None):
@@ -179,13 +232,14 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
                 'inference_method': 'en_jp_pair',
             }
     elif UNNAMED_RE.match(name) and node_id:
-        new_name = infer_name(node, parent, sibling_index, total_siblings)
+        new_name, confidence = infer_name_with_confidence(node, parent, sibling_index, total_siblings)
         if new_name and new_name != name:
             renames[node_id] = {
                 'old_name': name,
                 'new_name': new_name,
                 'type': node.get('type', ''),
                 'inference_method': 'auto',
+                'confidence': confidence,
             }
 
     children = filter_visible_children(node)
@@ -224,13 +278,15 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def generate_rename_map(metadata_path, output_file=''):
+def generate_rename_map(metadata_path, output_file='', fallback_context_path=''):
     """Generate a semantic rename map from Figma metadata.
 
     Args:
         metadata_path: Path to Figma metadata JSON file.
         output_file: If non-empty, write YAML to this path and print summary JSON.
                      If empty, print full rename JSON to stdout.
+        fallback_context_path: If non-empty, generate LLM fallback context JSON
+                               for low-confidence renames at this path.
 
     Returns:
         None (output goes to stdout/file).
@@ -246,6 +302,14 @@ def generate_rename_map(metadata_path, output_file=''):
         resolve_absolute_coords(root)
         renames = collect_renames(root)
 
+        # Generate LLM fallback context if requested
+        low_confidence_count = 0
+        if fallback_context_path:
+            from .rename_llm_fallback import generate_fallback_context_file
+            low_confidence_count = generate_fallback_context_file(
+                renames, metadata_path, fallback_context_path
+            )
+
         if output_file:
             # YAML output
             with open(output_file, 'w') as f:
@@ -259,18 +323,27 @@ def generate_rename_map(metadata_path, output_file=''):
                     f.write(f'    old: {yaml_str(info["old_name"])}\n')
                     f.write(f'    new: {yaml_str(info["new_name"])}\n')
                     f.write(f'    type: {yaml_str(info["type"])}\n')
-            print(json.dumps({
+                    f.write(f'    confidence: {info.get("confidence", 100)}\n')
+            summary = {
                 'total': len(renames),
                 'output': output_file,
-                'status': 'dry-run'
-            }, indent=2))
+                'status': 'dry-run',
+            }
+            if fallback_context_path and low_confidence_count > 0:
+                summary['low_confidence_count'] = low_confidence_count
+                summary['fallback_context'] = fallback_context_path
+            print(json.dumps(summary, indent=2))
         else:
             # JSON to stdout
-            print(json.dumps({
+            result = {
                 'total': len(renames),
                 'renames': renames,
-                'status': 'dry-run'
-            }, indent=2, ensure_ascii=False))
+                'status': 'dry-run',
+            }
+            if fallback_context_path and low_confidence_count > 0:
+                result['low_confidence_count'] = low_confidence_count
+                result['fallback_context'] = fallback_context_path
+            print(json.dumps(result, indent=2, ensure_ascii=False))
 
     except Exception as e:
         print(json.dumps({'error': str(e)}), file=sys.stderr)

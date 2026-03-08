@@ -20,6 +20,7 @@ __all__ = [
     'generate_nested_context',
     'load_prompt_template',
     'collect_leaf_sections',
+    '_format_stage_b_context',
 ]
 
 
@@ -82,6 +83,67 @@ def _load_yaml_or_json(file_path, file_label="file"):
 
 
 # ---------------------------------------------------------------------------
+# Stage B → Stage C context formatting
+# ---------------------------------------------------------------------------
+
+def _format_stage_b_context(stage_b_hints):
+    """Format Stage B hints as text for Stage C prompt injection.
+
+    Converts structured hint data from Stage B (sectioning) into a
+    human-readable text block that can be prepended to Stage C prompts,
+    giving Claude additional context about the section being processed.
+
+    Args:
+        stage_b_hints: Optional dict with keys like 'section_type',
+            'consecutive_patterns', 'header_candidates', 'footer_candidates',
+            'has_hero_bg', 'gap_analysis'. May be None or empty.
+
+    Returns:
+        str: Formatted text block, or empty string if no hints provided.
+    """
+    if not stage_b_hints:
+        return ''
+
+    lines = ['## Section Context (from Stage B)']
+
+    section_type = stage_b_hints.get('section_type', 'unknown')
+    lines.append(f'- Section type: **{section_type}**')
+
+    if stage_b_hints.get('consecutive_patterns'):
+        patterns = stage_b_hints['consecutive_patterns']
+        lines.append(f'- Consecutive patterns detected: {len(patterns)} group(s)')
+        for p in patterns[:3]:  # limit to 3
+            count = p.get('count', len(p.get('ids', [])))
+            lines.append(f'  - {count} similar elements (structure hash match)')
+
+    if stage_b_hints.get('header_candidates'):
+        lines.append('- Header elements detected in this section')
+
+    if stage_b_hints.get('footer_candidates'):
+        lines.append('- Footer elements detected in this section')
+
+    if stage_b_hints.get('has_hero_bg'):
+        lines.append('- Hero background detected (large image/rectangle at top)')
+
+    if stage_b_hints.get('heading_candidates'):
+        count = len(stage_b_hints['heading_candidates'])
+        lines.append(f'- Heading candidates: {count}')
+
+    if stage_b_hints.get('loose_elements'):
+        count = len(stage_b_hints['loose_elements'])
+        lines.append(f'- Loose elements (dividers/small): {count}')
+
+    if stage_b_hints.get('gap_analysis'):
+        gap = stage_b_hints['gap_analysis']
+        if isinstance(gap, dict):
+            lines.append(f'- Median gap between elements: {gap.get("median", "?")}px')
+            lines.append(f'- Gap consistency: {gap.get("consistency", "?")}')
+
+    lines.append('')
+    return '\n'.join(lines)
+
+
+# ---------------------------------------------------------------------------
 # Leaf section collection (plan mode)
 # ---------------------------------------------------------------------------
 
@@ -101,8 +163,20 @@ def collect_leaf_sections(sections, depth=0):
 # ---------------------------------------------------------------------------
 
 def _build_prompt(prompt_template, section_name, section_id, section_width,
-                  section_height, total_children, enriched_table):
-    """Substitute variables into the prompt template."""
+                  section_height, total_children, enriched_table,
+                  stage_b_context=''):
+    """Substitute variables into the prompt template.
+
+    Args:
+        prompt_template: Template string with {placeholders}.
+        section_name: Section name.
+        section_id: Section node ID.
+        section_width: Section width in px.
+        section_height: Section height in px.
+        total_children: Number of children.
+        enriched_table: Enriched children table string.
+        stage_b_context: Optional Stage B context text to prepend.
+    """
     prompt = prompt_template
     prompt = prompt.replace('{section_name}', str(section_name))
     prompt = prompt.replace('{section_id}', str(section_id))
@@ -110,6 +184,11 @@ def _build_prompt(prompt_template, section_name, section_id, section_width,
     prompt = prompt.replace('{section_height}', str(int(section_height)))
     prompt = prompt.replace('{total_children}', str(total_children))
     prompt = prompt.replace('{enriched_children_table}', enriched_table)
+
+    # Prepend Stage B context if available
+    if stage_b_context:
+        prompt = stage_b_context + '\n' + prompt
+
     return prompt
 
 
@@ -198,8 +277,17 @@ def _resolve_group_siblings(root, group, skipped_groups):
 
 
 def _build_group_context(sibling_nodes_sorted, group, page_width, page_height,
-                         prompt_template, depth):
+                         prompt_template, depth, stage_b_hints=None):
     """Build a section context entry for a single group.
+
+    Args:
+        sibling_nodes_sorted: Sorted list of sibling nodes.
+        group: Group dict with name, node_ids, pattern etc.
+        page_width: Page width in px.
+        page_height: Page height in px.
+        prompt_template: Prompt template string.
+        depth: Recursion depth.
+        stage_b_hints: Optional Stage B hints dict for this section.
 
     Returns the section context dict.
     """
@@ -226,9 +314,12 @@ def _build_group_context(sibling_nodes_sorted, group, page_width, page_height,
 
     total_children = len(sibling_nodes_sorted)
 
+    stage_b_context = _format_stage_b_context(stage_b_hints)
+
     prompt = _build_prompt(
         prompt_template, group_name, section_id,
         section_width, section_height, total_children, enriched_table,
+        stage_b_context=stage_b_context,
     )
 
     return {
@@ -245,8 +336,18 @@ def _build_group_context(sibling_nodes_sorted, group, page_width, page_height,
 
 
 def _process_groups_mode(root, page_width, page_height, groups_file,
-                         prompt_template, depth):
+                         prompt_template, depth, stage_b_hints=None):
     """Process --groups mode: generate context from nested-grouping-result groups.
+
+    Args:
+        root: Root Figma node.
+        page_width: Page width in px.
+        page_height: Page height in px.
+        groups_file: Path to nested-grouping-result.json.
+        prompt_template: Prompt template string.
+        depth: Recursion depth.
+        stage_b_hints: Optional dict mapping section names to Stage B hint dicts.
+            Used to inject section context into Stage C prompts.
 
     Returns the result dict.
     """
@@ -262,9 +363,15 @@ def _process_groups_mode(root, page_width, page_height, groups_file,
         if not sibling_nodes_sorted:
             continue
 
+        # Look up Stage B hints for this group by name
+        group_hints = None
+        if stage_b_hints:
+            group_name = group.get('name', 'unknown')
+            group_hints = stage_b_hints.get(group_name)
+
         context = _build_group_context(
             sibling_nodes_sorted, group, page_width, page_height,
-            prompt_template, depth,
+            prompt_template, depth, stage_b_hints=group_hints,
         )
         section_contexts.append(context)
 
@@ -335,8 +442,17 @@ def _compute_section_bbox(root, node_ids, children_sorted, page_width, page_bbox
 
 
 def _process_plan_mode(root, page_width, page_height, page_bbox,
-                       plan_file, prompt_template):
+                       plan_file, prompt_template, stage_b_hints=None):
     """Process plan mode: generate context from sectioning-plan.yaml.
+
+    Args:
+        root: Root Figma node.
+        page_width: Page width in px.
+        page_height: Page height in px.
+        page_bbox: Page bounding box dict.
+        plan_file: Path to sectioning-plan.yaml.
+        prompt_template: Prompt template string.
+        stage_b_hints: Optional dict mapping section names to Stage B hint dicts.
 
     Returns the result dict.
     """
@@ -377,9 +493,14 @@ def _process_plan_mode(root, page_width, page_height, page_bbox,
 
         total_children = len(children_sorted)
 
+        # Look up Stage B hints for this section by name
+        section_hints = stage_b_hints.get(section_name) if stage_b_hints else None
+        stage_b_context = _format_stage_b_context(section_hints)
+
         prompt = _build_prompt(
             prompt_template, section_name, section_id,
             section_width, section_height, total_children, enriched_table,
+            stage_b_context=stage_b_context,
         )
 
         section_contexts.append({
@@ -405,7 +526,8 @@ def _process_plan_mode(root, page_width, page_height, page_bbox,
 
 def generate_nested_context(metadata_file, template_file,
                             plan_file='', groups_file='',
-                            output_file='', depth=0):
+                            output_file='', depth=0,
+                            stage_b_hints=None):
     """Generate nested grouping context for Stage C.
 
     Args:
@@ -415,6 +537,8 @@ def generate_nested_context(metadata_file, template_file,
         groups_file: Path to nested-grouping-result.json (groups mode).
         output_file: Optional output file path for result JSON.
         depth: Recursion depth (groups mode only).
+        stage_b_hints: Optional dict mapping section names to Stage B hint dicts.
+            When provided, section context is injected into Stage C prompts.
 
     Prints JSON result to stdout.
     """
@@ -436,11 +560,13 @@ def generate_nested_context(metadata_file, template_file,
         result = _process_groups_mode(
             root, page_width, page_height,
             groups_file, prompt_template, depth,
+            stage_b_hints=stage_b_hints,
         )
     else:
         result = _process_plan_mode(
             root, page_width, page_height, page_bbox,
             plan_file, prompt_template,
+            stage_b_hints=stage_b_hints,
         )
 
     # Output

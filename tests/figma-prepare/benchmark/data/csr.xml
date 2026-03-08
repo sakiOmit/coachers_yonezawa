@@ -1,0 +1,369 @@
+<frame id="92:252" name="/csr" x="2" y="1285" width="1440" height="9392">
+  <text id="92:253" name="環境への取り組み" x="160" y="2450" width="218" height="36" />
+  <text id="92:254" name="社会への取り組み" x="160" y="3782" width="218" height="36" />
+  <text id="92:255" name="人材への取り組み" x="160" y="5024" width="218" height="36" />
+  <text id="92:256" name="事業組織への取り組み" x="160" y="7324" width="218" height="36" />
+  <frame id="92:257" name="Group 69" x="-14" y="310" width="1455" height="1817">
+    <rounded-rectangle id="92:258" name="Rectangle 105" x="0" y="310" width="1440" height="1817" />
+    <vector id="92:259" name="Vector 115" x="-14" y="1195" width="1318" height="0" />
+    <frame id="92:260" name="Group 263" x="123" y="741" width="1318" height="0">
+      <vector id="92:261" name="Vector 114" x="123" y="741" width="1318" height="0" />
+      <vector id="92:262" name="Vector 117" x="1116" y="741" width="325" height="0" />
+    </frame>
+    <frame id="92:263" name="Group 264" x="1318" y="1195" width="1318" height="0">
+      <vector id="92:264" name="Vector 114" x="1318" y="1195" width="1318" height="0" />
+      <vector id="92:265" name="Vector 117" x="325" y="1195" width="325" height="0" />
+    </frame>
+  </frame>
+  <text id="92:266" name="Environment" x="157" y="2388" width="246" height="48" />
+  <text id="92:267" name="Social" x="157" y="3727" width="119" height="48" />
+  <text id="92:268" name="Human resources" x="157" y="4969" width="346" height="48" />
+  <text id="92:269" name="Business organization" x="157" y="7269" width="433" height="48" />
+  <text id="92:270" name="VISION" x="614" y="2091" width="212" height="31" />
+  <text id="92:271" name="全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する" x="397" y="2153" width="646" height="78" />
+  <vector id="92:272" name="Vector 108" x="157" y="2183" width="194" height="0" />
+  <vector id="92:273" name="Vector 109" x="1090" y="2183" width="194" height="0" />
+  <text id="92:274" name="気候変動対策" x="195" y="2531" width="167" height="39" />
+  <text id="92:275" name="CSR活動" x="195" y="3863" width="167" height="39" />
+  <text id="92:276" name="人材育成" x="195" y="5112" width="167" height="39" />
+  <text id="92:277" name="事業活動" x="195" y="7412" width="167" height="39" />
+  <text id="92:278" name="品質/安全" x="195" y="7757" width="167" height="39" />
+  <ellipse id="92:279" name="Ellipse 68" x="166" y="7772" width="10" height="10" />
+  <text id="92:280" name="水質環境保全" x="195" y="3076" width="167" height="39" />
+  <text id="92:281" name="地域活性化" x="193" y="4508" width="167" height="39" />
+  <text id="92:282" name="健康経営" x="193" y="6755" width="167" height="39" />
+  <text id="92:283" name="働き方/多様な人材の活躍" x="193" y="5838" width="326" height="39" />
+  <text id="92:284" name="発電結果の共有" x="249" y="2848" width="171" height="29" />
+  <text id="92:285" name="切手回収" x="249" y="4255" width="171" height="29" />
+  <text id="92:286" name="労働環境の改善" x="251" y="3393" width="171" height="29" />
+  <text id="92:287" name="省エネ活動" x="822" y="2630" width="108" height="29" />
+  <text id="92:288" name="プルタブ/ペットボトルキャップ回収" x="822" y="3962" width="360" height="29" />
+  <text id="92:289" name="ISO14001取得" x="822" y="3169" width="149" height="29" />
+  <frame id="92:290" name="Group 169" x="193" y="2628" width="490" height="118">
+    <text id="92:291" name="太陽光パネル設置" x="249" y="2628" width="196" height="29" />
+    <frame id="92:292" name="真珠の無料アイコン3 1" x="193" y="2628" width="33" height="32" />
+    <text id="92:304" name="自社社屋に太陽光パネルを設置し..." x="195" y="2671" width="488" height="75" />
+  </frame>
+  <frame id="92:305" name="Group 171" x="195" y="3960" width="488" height="168">
+    <text id="92:306" name="社内献血活動" x="249" y="3960" width="196" height="29" />
+    <text id="92:307" name="赤十字血液センターにより..." x="195" y="4003" width="488" height="125" />
+  </frame>
+  <frame id="92:308" name="献血アイコン2 1" x="195" y="3960" width="30" height="30" />
+  <frame id="92:312" name="Group 174" x="190" y="5209" width="488" height="143">
+    <text id="92:313" name="次世代リーダー育成" x="244" y="5209" width="254" height="29" />
+    <text id="92:314" name="内部コミュニケーションにて..." x="190" y="5252" width="488" height="100" />
+  </frame>
+  <frame id="92:315" name="Group 183" x="190" y="7509" width="944" height="93">
+    <text id="92:316" name="医療用・工業用機器に用いる..." x="244" y="7509" width="873" height="29" />
+    <text id="92:317" name="自社ステンレスチューブは..." x="190" y="7552" width="944" height="50" />
+  </frame>
+  <frame id="92:318" name="Group 184" x="190" y="7854" width="944" height="93">
+    <text id="92:319" name="環境・品質方針の策定" x="244" y="7854" width="873" height="29" />
+    <text id="92:320" name="事業を通じて..." x="190" y="7897" width="944" height="50" />
+  </frame>
+  <frame id="92:321" name="Group 170" x="194" y="3173" width="475" height="118">
+    <text id="92:322" name="洗浄機と水溶性引き抜き油の開発" x="248" y="3173" width="334" height="29" />
+    <text id="92:323" name="従来トリクロロエチレンを..." x="194" y="3216" width="475" height="75" />
+  </frame>
+  <frame id="92:324" name="Group 172" x="195" y="4607" width="485" height="119">
+    <text id="92:325" name="地域の製品調達" x="249" y="4607" width="334" height="29" />
+    <text id="92:326" name="コロナウイルス感染対策として..." x="195" y="4651" width="485" height="75" />
+  </frame>
+  <frame id="92:327" name="Group 181" x="195" y="6854" width="494" height="194">
+    <text id="92:328" name="労働安全衛生" x="249" y="6854" width="334" height="29" />
+    <text id="92:329" name="当社で一部使用している..." x="195" y="6898" width="494" height="150" />
+  </frame>
+  <frame id="92:330" name="Group 175" x="195" y="5937" width="485" height="94">
+    <text id="92:331" name="子育て支援" x="249" y="5937" width="334" height="29" />
+    <text id="92:332" name="2018年9月くるみん認定..." x="195" y="5981" width="485" height="50" />
+  </frame>
+  <frame id="92:333" name="Group 178" x="195" y="6145" width="485" height="144">
+    <text id="92:334" name="ハラスメント対策" x="249" y="6145" width="334" height="29" />
+    <text id="92:335" name="社内でハラスメント窓口を設置..." x="195" y="6189" width="485" height="100" />
+  </frame>
+  <frame id="92:336" name="Group 180" x="195" y="6381" width="485" height="219">
+    <text id="92:337" name="障がい者雇用/教育" x="249" y="6381" width="334" height="29" />
+    <text id="92:338" name="2018年6月より..." x="195" y="6425" width="485" height="175" />
+  </frame>
+  <text id="92:339" name="月報として全社員に..." x="195" y="2891" width="480" height="50" />
+  <text id="92:340" name="社内で切手を回収し..." x="195" y="4298" width="475" height="50" />
+  <frame id="92:341" name="お札を受け取る手のフリーアイコン 1" x="199" y="4252" width="36" height="36" />
+  <text id="92:346" name="作業員の健康被害リスクが..." x="197" y="3436" width="468" height="50" />
+  <frame id="92:347" name="ウォーキングアイコン3 1" x="194" y="3392" width="32" height="32" />
+  <text id="92:351" name="社員の残業を最小限に..." x="775" y="2671" width="374" height="50" />
+  <text id="92:352" name="社内に回収箱を設置し..." x="773" y="4003" width="465" height="125" />
+  <frame id="92:353" name="Group 177" x="773" y="5209" width="465" height="191">
+    <text id="92:354" name="e-ラーニング導入" x="822" y="5209" width="175" height="29" />
+    <text id="92:355" name="ベネフィットワンを全従業員に..." x="773" y="5250" width="465" height="150" />
+  </frame>
+  <text id="92:356" name="作業環境測定結果の管理区分が..." x="773" y="3212" width="425" height="50" />
+  <frame id="92:357" name="Group 173" x="773" y="4607" width="460" height="141">
+    <text id="92:358" name="地域のパートナーシップ" x="822" y="4607" width="240" height="29" />
+    <text id="92:359" name="新・群馬県総合計画..." x="773" y="4648" width="460" height="100" />
+  </frame>
+  <frame id="92:360" name="Group 182" x="773" y="6854" width="460" height="191">
+    <text id="92:361" name="ストレスチェックの実施" x="822" y="6854" width="240" height="29" />
+    <text id="92:362" name="全社員のメンタル不調の..." x="773" y="6895" width="460" height="150" />
+  </frame>
+  <frame id="92:363" name="Group 176" x="773" y="5934" width="460" height="119">
+    <text id="92:364" name="育児休暇の取得推進" x="822" y="5937" width="196" height="29" />
+    <frame id="92:365" name="哺乳瓶のアイコン2 1" x="773" y="5934" width="32" height="32" />
+    <text id="92:372" name="男女・ジェンダーに関わらず..." x="773" y="5978" width="460" height="75" />
+  </frame>
+  <frame id="92:373" name="Group 179" x="773" y="6145" width="460" height="141">
+    <text id="92:374" name="福利厚生の充実" x="822" y="6145" width="152" height="29" />
+    <text id="92:375" name="社内全員に働きやすい環境を..." x="773" y="6186" width="460" height="100" />
+  </frame>
+  <vector id="92:376" name="Vector 48" x="159" y="2583" width="1123" height="0" />
+  <vector id="92:377" name="Vector 114" x="159" y="3915" width="1123" height="0" />
+  <vector id="92:378" name="Vector 122" x="159" y="5164" width="1123" height="0" />
+  <vector id="92:379" name="Vector 134" x="159" y="7464" width="1123" height="0" />
+  <vector id="92:380" name="Vector 136" x="159" y="7809" width="1123" height="0" />
+  <vector id="92:381" name="Vector 110" x="159" y="3128" width="1123" height="0" />
+  <vector id="92:382" name="Vector 115" x="157" y="4560" width="1123" height="0" />
+  <vector id="92:383" name="Vector 131" x="157" y="6807" width="1123" height="0" />
+  <vector id="92:384" name="Vector 123" x="157" y="5890" width="1123" height="0" />
+  <vector id="92:385" name="Vector 129" x="158" y="6334" width="1123" height="0" />
+  <vector id="92:386" name="Vector 49" x="159" y="2791" width="1123" height="0" />
+  <vector id="92:387" name="Vector 116" x="159" y="4173" width="1123" height="0" />
+  <vector id="92:388" name="Vector 124" x="159" y="5445" width="1123" height="0" />
+  <vector id="92:389" name="Vector 135" x="159" y="7647" width="1123" height="0" />
+  <vector id="92:390" name="Vector 137" x="159" y="7992" width="1123" height="0" />
+  <vector id="92:391" name="Vector 111" x="159" y="3336" width="1123" height="0" />
+  <vector id="92:392" name="Vector 117" x="157" y="4793" width="1123" height="0" />
+  <vector id="92:393" name="Vector 132" x="156" y="7093" width="1123" height="0" />
+  <vector id="92:394" name="Vector 125" x="157" y="6098" width="1123" height="0" />
+  <vector id="92:395" name="Vector 130" x="160" y="6645" width="1123" height="0" />
+  <vector id="92:396" name="Vector 50" x="159" y="2999" width="1123" height="0" />
+  <vector id="92:397" name="Vector 118" x="159" y="4431" width="1123" height="0" />
+  <vector id="92:398" name="Vector 126" x="158" y="5728" width="1123" height="0" />
+  <vector id="92:399" name="Vector 112" x="159" y="3544" width="1123" height="0" />
+  <frame id="92:400" name="署名アイコン (1) 1" x="192" y="2848" width="31" height="31" />
+  <text id="92:411" name="SDGs研修/啓蒙活動" x="249" y="5490" width="238" height="29" />
+  <text id="92:412" name="イマココラボカードゲーム..." x="195" y="5533" width="475" height="150" />
+  <vector id="92:413" name="Vector 51" x="720" y="2583" width="0" height="416" />
+  <vector id="92:414" name="Vector 120" x="720" y="3915" width="0" height="516" />
+  <vector id="92:415" name="Vector 127" x="720" y="5164" width="0" height="564" />
+  <vector id="92:416" name="Vector 113" x="720" y="3128" width="0" height="422" />
+  <vector id="92:417" name="Vector 121" x="718" y="4560" width="0" height="233" />
+  <vector id="92:418" name="Vector 133" x="718" y="6807" width="0" height="286" />
+  <vector id="92:419" name="Vector 128" x="718" y="5890" width="0" height="755" />
+  <frame id="92:420" name="visual" x="0" y="62" width="1441" height="266">
+    <frame id="92:421" name="Mask group" x="0" y="62" width="1440" height="266">
+      <rounded-rectangle id="92:422" name="Rectangle 43" x="0" y="62" width="1440" height="266" />
+      <rounded-rectangle id="92:423" name="image 22" x="542" y="-209" width="1100" height="826" />
+    </frame>
+    <rounded-rectangle id="92:424" name="Rectangle 771" x="0" y="62" width="1441" height="266" />
+    <frame id="92:425" name="Group 99" x="118" y="112" width="918" height="167">
+      <text id="92:426" name="Social contributions" x="118" y="112" width="918" height="115" />
+      <vector id="92:427" name="Vector 91" x="118" y="228" width="190" height="0" />
+      <text id="92:428" name="手島精管の社会貢献の在り方" x="120" y="245" width="289" height="34" />
+    </frame>
+  </frame>
+  <frame id="92:429" name="Mask group" x="0" y="1716" width="1440" height="266">
+    <rounded-rectangle id="92:430" name="Rectangle 43" x="0" y="1716" width="1440" height="266" />
+    <rounded-rectangle id="92:431" name="pixta_85072735_M 1" x="-131" y="1550" width="1793" height="1007" />
+  </frame>
+  <rounded-rectangle id="92:432" name="Rectangle 772" x="0" y="1716" width="1441" height="266" />
+  <frame id="92:433" name="Group 100" x="158" y="1766" width="918" height="167">
+    <text id="92:434" name="Sustainability" x="158" y="1766" width="918" height="115" />
+    <vector id="92:435" name="Vector 91" x="158" y="1882" width="190" height="0" />
+    <text id="92:436" name="サスティナビリティ" x="160" y="1899" width="289" height="34" />
+  </frame>
+  <frame id="92:437" name="csr1" x="122" y="386" width="1076" height="301">
+    <frame id="92:438" name="Group 119" x="122" y="436" width="585" height="204">
+      <text id="92:439" name="結婚、出産などの..." x="150" y="531" width="557" height="48" />
+      <text id="92:440" name="少子化に向かう..." x="150" y="593" width="557" height="47" />
+      <frame id="92:441" name="Group 65" x="122" y="436" width="562" height="65">
+        <text id="92:442" name="社員の人生の節目においても..." x="122" y="436" width="562" height="65" />
+      </frame>
+      <ellipse id="92:443" name="Ellipse 30" x="127" y="542" width="9" height="9" />
+      <ellipse id="92:444" name="Ellipse 31" x="127" y="601" width="9" height="9" />
+    </frame>
+    <frame id="92:445" name="Mask group" x="779" y="386" width="419" height="301">
+      <rounded-rectangle id="92:446" name="Rectangle 109" x="779" y="386" width="419" height="301" />
+      <rounded-rectangle id="92:447" name="pixta_99601119_M 1" x="552" y="234" width="928" height="619" />
+    </frame>
+  </frame>
+  <frame id="92:448" name="csr3" x="201" y="812" width="1083" height="301">
+    <frame id="92:449" name="Group 102" x="201" y="851" width="582" height="213">
+      <frame id="92:450" name="Group 115" x="201" y="851" width="582" height="213">
+        <text id="92:451" name="館林で就職したい..." x="224" y="947" width="559" height="117" />
+        <frame id="92:452" name="Group 65" x="201" y="851" width="556" height="65">
+          <text id="92:453" name="館林市内の中学生及び..." x="201" y="851" width="556" height="65" />
+        </frame>
+        <ellipse id="92:454" name="Ellipse 30" x="201" y="955" width="9" height="9" />
+      </frame>
+    </frame>
+    <frame id="92:455" name="Mask group" x="865" y="812" width="419" height="301">
+      <rounded-rectangle id="92:456" name="Rectangle 109" x="865" y="812" width="419" height="301" />
+      <rounded-rectangle id="92:457" name="pixta_53646639_M 1" x="823" y="813" width="504" height="300" />
+    </frame>
+  </frame>
+  <frame id="92:458" name="csr4" x="161" y="1264" width="1138" height="301">
+    <frame id="92:459" name="Group 103" x="161" y="1264" width="419" height="301">
+      <rounded-rectangle id="92:460" name="Rectangle 105" x="4" y="1205" width="1440" height="646" hidden="true" />
+      <frame id="92:461" name="Mask group" x="161" y="1264" width="419" height="301">
+        <rounded-rectangle id="92:462" name="Rectangle 109" x="161" y="1264" width="419" height="301" />
+        <rounded-rectangle id="92:463" name="pixta_55443012_M 1" x="125" y="1264" width="478" height="318" />
+      </frame>
+    </frame>
+    <frame id="92:464" name="Group 120" x="652" y="1305" width="647" height="235">
+      <text id="92:465" name="手島精管では、会社を..." x="682" y="1371" width="617" height="41" />
+      <text id="92:466" name="手島精管では、各自の受講したい..." x="682" y="1440" width="602" height="100" />
+      <frame id="92:467" name="Group 65" x="652" y="1305" width="614" height="57">
+        <text id="92:468" name="社員に対する教育を強化..." x="652" y="1305" width="614" height="57" />
+      </frame>
+      <ellipse id="92:469" name="Ellipse 38" x="657" y="1382" width="9" height="9" />
+      <ellipse id="92:470" name="Ellipse 39" x="657" y="1449" width="9" height="9" />
+    </frame>
+  </frame>
+  <frame id="92:471" name="Group 124" x="397" y="2286" width="75" height="25">
+    <text id="92:472" name="環境" x="422" y="2286" width="50" height="25" />
+    <ellipse id="92:473" name="Ellipse 56" x="397" y="2293" width="9" height="9" />
+  </frame>
+  <frame id="92:474" name="Group 122" x="747" y="2286" width="75" height="29">
+    <text id="92:475" name="人材" x="772" y="2286" width="50" height="29" />
+    <ellipse id="92:476" name="Ellipse 58" x="747" y="2293" width="9" height="9" />
+  </frame>
+  <frame id="92:477" name="Group 121" x="572" y="2286" width="75" height="25">
+    <text id="92:478" name="社会" x="597" y="2286" width="50" height="25" />
+    <ellipse id="92:479" name="Ellipse 57" x="572" y="2293" width="9" height="9" />
+  </frame>
+  <frame id="92:480" name="Group 123" x="922" y="2286" width="122" height="25">
+    <text id="92:481" name="事業組織" x="947" y="2286" width="97" height="25" />
+    <ellipse id="92:482" name="Ellipse 59" x="922" y="2293" width="9" height="9" />
+  </frame>
+  <ellipse id="92:483" name="Ellipse 60" x="171" y="2546" width="10" height="10" />
+  <ellipse id="92:484" name="Ellipse 61" x="171" y="3092" width="10" height="10" />
+  <ellipse id="92:485" name="Ellipse 62" x="166" y="3879" width="10" height="10" />
+  <ellipse id="92:486" name="Ellipse 64" x="166" y="5128" width="10" height="10" />
+  <ellipse id="92:487" name="Ellipse 63" x="166" y="4524" width="10" height="10" />
+  <ellipse id="92:488" name="Ellipse 66" x="166" y="6770" width="10" height="10" />
+  <ellipse id="92:489" name="Ellipse 65" x="166" y="5853" width="10" height="10" />
+  <ellipse id="92:490" name="Ellipse 67" x="166" y="7427" width="10" height="10" />
+  <frame id="92:491" name="menubar" x="-1" y="0" width="1442" height="62">
+    <frame id="92:492" name="menubar" x="-1" y="0" width="1442" height="62">
+      <rounded-rectangle id="92:493" name="Rectangle 45" x="-1" y="0" width="1442" height="62" />
+    </frame>
+    <frame id="92:494" name="menubar" x="28" y="13" width="1383" height="36">
+      <frame id="92:495" name="menu" x="511" y="21" width="708" height="20">
+        <text id="92:496" name="会社情報" x="511" y="21" width="62" height="20" />
+        <text id="92:497" name="製品 / 技術" x="636" y="21" width="80" height="20" />
+        <text id="92:498" name="ブログ" x="1029" y="21" width="46" height="20" />
+        <text id="92:499" name="ニュース" x="779" y="21" width="62" height="20" />
+        <text id="92:500" name="メディア" x="904" y="21" width="62" height="20" />
+        <frame id="92:501" name="Group 97" x="1138" y="21" width="81" height="20">
+          <text id="92:502" name="採用案内" x="1138" y="21" width="62" height="20" />
+          <frame id="92:503" name="新しいウィンドウで開くボタン　1 3" x="1205" y="24" width="14" height="14" />
+        </frame>
+      </frame>
+      <rounded-rectangle id="92:508" name="image 1" x="28" y="18" width="106" height="27" />
+      <frame id="92:509" name="Group 2" x="1287" y="13" width="124" height="36">
+        <frame id="92:510" name="Group 98" x="1287" y="13" width="124" height="36">
+          <rounded-rectangle id="92:511" name="Rectangle 2" x="1287" y="13" width="124" height="36" />
+          <text id="92:512" name="CONTACT" x="1307" y="20" width="86" height="22" />
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+  <frame id="92:513" name="footer" x="0" y="8754" width="1440" height="638">
+    <rounded-rectangle id="92:514" name="Rectangle 769" x="0" y="8754" width="1440" height="312" />
+    <rounded-rectangle id="92:515" name="Rectangle 788" x="0" y="9065" width="1440" height="327" />
+    <vector id="92:516" name="Vector 89" x="166" y="9176" width="23" height="0" />
+    <vector id="92:517" name="Vector 86" x="165" y="8945" width="1110" height="0" />
+    <vector id="92:518" name="Vector 87" x="165" y="9021" width="1110" height="0" />
+    <text id="92:519" name="群馬県館林市下早川田町306-1" x="576" y="8875" width="279" height="32" />
+    <text id="92:520" name="手島精管株式会社" x="582" y="8797" width="268" height="32" />
+    <text id="92:521" name="TESHIMASEIKAN Co., Ltd" x="597" y="8836" width="238" height="32" />
+    <vector id="92:522" name="Vector 90" x="463" y="9176" width="23" height="0" />
+    <rounded-rectangle id="92:523" name="image 1" x="1083" y="9254" width="151" height="39" />
+    <text id="92:524" name="会社情報" x="166" y="9135" width="70" height="32" />
+    <text id="92:525" name="製品/技術" x="464" y="9135" width="79" height="32" />
+    <text id="92:526" name="ブログ" x="754" y="9182" width="52" height="32" />
+    <text id="92:527" name="お問い合せ" x="754" y="9232" width="88" height="32" />
+    <text id="92:528" name="プライバシーポリシー" x="1082" y="9298" width="158" height="32" />
+    <text id="92:529" name="ニュース" x="754" y="9135" width="70" height="32" />
+    <text id="92:530" name="私たちの強み" x="166" y="9230" width="101" height="32" />
+    <text id="92:531" name="会社案内" x="166" y="9196" width="67" height="32" />
+    <text id="92:532" name="製品情報" x="464" y="9196" width="67" height="32" />
+    <text id="92:533" name="CSR/SDGs" x="166" y="9264" width="83" height="32" />
+    <text id="92:534" name="規格・国際規格" x="464" y="9230" width="118" height="32" />
+    <text id="92:535" name="グローバルサプライチェーン" x="166" y="9298" width="220" height="32" />
+    <text id="92:536" name="工程・技術" x="464" y="9264" width="84" height="32" />
+    <text id="92:537" name="ISO・認証・特許・登録証" x="464" y="9298" width="199" height="32" />
+    <frame id="92:538" name="Group 95" x="606" y="8960" width="229" height="44">
+      <frame id="92:539" name="icons8-facebookの新しい 1" x="695" y="8960" width="45" height="44" />
+      <frame id="92:541" name="icons8-プレイ動画 1" x="791" y="8960" width="44" height="44" />
+      <frame id="92:543" name="icons8-ツイッター 1" x="606" y="8963" width="38" height="38" />
+    </frame>
+    <frame id="92:545" name="Group 220" x="754" y="8910" width="193" height="415">
+      <rounded-rectangle id="92:546" name="Rectangle 869" x="754" y="9284" width="193" height="41" />
+      <vector id="92:547" name="Vector" x="917" y="8910" width="8" height="8" />
+      <text id="92:548" name="English Website" x="772" y="9295" width="158" height="19" />
+    </frame>
+  </frame>
+  <frame id="92:549" name="contact" x="0" y="8202" width="1440" height="552">
+    <frame id="92:550" name="Group 145" x="0" y="8202" width="1440" height="552">
+      <frame id="92:551" name="Mask group" x="0" y="8202" width="1440" height="552">
+        <rounded-rectangle id="92:552" name="Rectangle 42" x="0" y="8202" width="1440" height="552" />
+        <rounded-rectangle id="92:553" name="image 18" x="-108" y="7948" width="1568" height="1046" />
+      </frame>
+    </frame>
+    <rounded-rectangle id="92:554" name="Rectangle 40" x="0" y="8202" width="1440" height="552" />
+    <frame id="92:555" name="Group 38" x="618" y="8278" width="203" height="73">
+      <text id="92:556" name="CONTACT" x="618" y="8278" width="203" height="46" />
+      <text id="92:557" name="お問い合わせ" x="661" y="8324" width="123" height="27" />
+    </frame>
+    <vector id="92:558" name="Vector 19" x="720" y="8404" width="0" height="260" />
+    <frame id="92:559" name="Group 144" x="166" y="8404" width="1108" height="259">
+      <rounded-rectangle id="92:560" name="Rectangle 41" x="166" y="8404" width="1108" height="259" />
+      <frame id="92:561" name="Group 53" x="243" y="8465" width="395" height="123">
+        <frame id="92:562" name="Group 83" x="243" y="8465" width="395" height="123">
+          <text id="92:563" name="WEBからのお問い合わせ" x="329" y="8465" width="223" height="26" />
+          <frame id="92:564" name="Group 51" x="243" y="8514" width="395" height="74">
+            <frame id="92:565" name="Group 50" x="243" y="8514" width="395" height="74">
+              <frame id="92:566" name="Group 143" x="243" y="8514" width="395" height="74">
+                <rounded-rectangle id="92:567" name="Rectangle 42" x="243" y="8514" width="395" height="74" />
+                <frame id="92:568" name="Group 142" x="290" y="8532" width="301" height="38">
+                  <text id="92:569" name="お問い合わせフォーム" x="328" y="8532" width="263" height="38" />
+                  <vector id="92:570" name="Vector" x="290" y="8541" width="27" height="21" />
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+      <frame id="92:571" name="Group 52" x="842" y="8445" width="302" height="183">
+        <text id="92:572" name="お電話でのお問い合わせ" x="884" y="8445" width="218" height="26" />
+        <text id="92:573" name="FAXでのお問い合わせ" x="903" y="8565" width="176" height="23" />
+        <text id="92:574" name="（営業時間 8:00-17:00）" x="881" y="8519" width="211" height="23" />
+        <frame id="92:575" name="Group 29" x="842" y="8472" width="302" height="50">
+          <frame id="92:576" name="電話の受話器のアイコン素材 1" x="842" y="8479" width="34" height="34" />
+          <text id="92:579" name="0276-73-1173" x="883" y="8472" width="261" height="50" />
+        </frame>
+        <frame id="92:580" name="Group 30" x="879" y="8590" width="224" height="38">
+          <frame id="92:581" name="プリンターの無料アイコン4 1" x="879" y="8590" width="34" height="34" />
+          <text id="92:587" name="0276-74-8069" x="924" y="8593" width="179" height="35" />
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+  <frame id="92:588" name="電球アイコン15 1" x="771" y="2630" width="30" height="30" />
+  <frame id="92:594" name="水滴アイコン4 1" x="224" y="3173" width="30" height="30" />
+  <frame id="92:598" name="受験勉強アイコン 1" x="773" y="3169" width="30" height="30" />
+  <frame id="92:606" name="リサイクルマーク付きのゴミ箱イラスト 1" x="773" y="3961" width="30" height="30" />
+  <frame id="92:609" name="インフルエンザ対策のマスクの無料アイコン素材 2 1" x="197" y="4607" width="30" height="30" />
+  <frame id="92:617" name="握手のフリーアイコン 1" x="773" y="4604" width="36" height="36" />
+  <frame id="92:622" name="人物アイコン　チーム 1" x="190" y="5206" width="36" height="36" />
+  <frame id="92:627" name="ノートのアイコン素材7 1" x="773" y="5208" width="32" height="32" />
+  <frame id="92:630" name="新芽のアイコン 1" x="195" y="5490" width="31" height="31" />
+  <frame id="92:633" name="ベビー服のフリーアイコン 1" x="195" y="5936" width="32" height="32" />
+  <frame id="92:640" name="シールドアイコン5 1" x="195" y="6145" width="32" height="32" />
+  <frame id="92:644" name="ナイフ、お皿、フォークのお食事アイコン2 1" x="773" y="6145" width="32" height="32" />
+  <frame id="92:651" name="プレゼンテーションアイコン 1" x="195" y="6380" width="32" height="32" />
+  <frame id="92:661" name="キラキラ 3 1" x="193" y="6853" width="31" height="31" />
+  <frame id="92:666" name="ハートの心電図のアイコン素材 1 1" x="773" y="6853" width="32" height="32" />
+  <frame id="92:669" name="注射器のアイコン素材 (1) 1" x="193" y="7507" width="32" height="32" />
+  <frame id="92:679" name="地球アイコン9 1" x="190" y="7854" width="32" height="32" />
+</frame>

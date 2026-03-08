@@ -206,6 +206,7 @@ def detect_table_rows(children, parent_bb):
 
     return [{
         'method': 'semantic',
+        'score': 0.9,
         'semantic_type': 'table',
         'node_ids': [c.get('id', '') for c in ordered_members],
         'node_names': [c.get('name', '') for c in ordered_members],

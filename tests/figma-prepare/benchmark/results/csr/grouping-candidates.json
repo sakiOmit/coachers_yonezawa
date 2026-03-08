@@ -1,0 +1,731 @@
+[
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:257",
+      "92:448",
+      "92:458",
+      "92:429",
+      "92:432",
+      "92:270"
+    ],
+    "node_names": [
+      "Group 69",
+      "csr3",
+      "csr4",
+      "Mask group",
+      "Rectangle 772",
+      "VISION"
+    ],
+    "count": 6,
+    "suggested_name": "section-content-1",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:471",
+      "92:474",
+      "92:477",
+      "92:480"
+    ],
+    "node_names": [
+      "Group 124",
+      "Group 122",
+      "Group 121",
+      "Group 123"
+    ],
+    "count": 4,
+    "suggested_name": "section-nav-1",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:413",
+      "92:287",
+      "92:588",
+      "92:351",
+      "92:284",
+      "92:400",
+      "92:339"
+    ],
+    "node_names": [
+      "Vector 51",
+      "省エネ活動",
+      "電球アイコン15 1",
+      "社員の残業を最小限に...",
+      "発電結果の共有",
+      "署名アイコン (1) 1",
+      "月報として全社員に..."
+    ],
+    "count": 7,
+    "suggested_name": "section-content-2",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:416",
+      "92:289",
+      "92:598",
+      "92:594",
+      "92:356",
+      "92:347",
+      "92:286",
+      "92:346"
+    ],
+    "node_names": [
+      "Vector 113",
+      "ISO14001取得",
+      "受験勉強アイコン 1",
+      "水滴アイコン4 1",
+      "作業環境測定結果の管理区分が...",
+      "ウォーキングアイコン3 1",
+      "労働環境の改善",
+      "作業員の健康被害リスクが..."
+    ],
+    "count": 8,
+    "suggested_name": "section-content-3",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:414",
+      "92:308",
+      "92:606",
+      "92:288",
+      "92:352",
+      "92:341",
+      "92:285",
+      "92:340"
+    ],
+    "node_names": [
+      "Vector 120",
+      "献血アイコン2 1",
+      "リサイクルマーク付きのゴミ箱イラスト 1",
+      "プルタブ/ペットボトルキャップ回収",
+      "社内に回収箱を設置し...",
+      "お札を受け取る手のフリーアイコン 1",
+      "切手回収",
+      "社内で切手を回収し..."
+    ],
+    "count": 8,
+    "suggested_name": "section-content-4",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:417",
+      "92:617",
+      "92:609"
+    ],
+    "node_names": [
+      "Vector 121",
+      "握手のフリーアイコン 1",
+      "インフルエンザ対策のマスクの無料アイコン素材 2 1"
+    ],
+    "count": 3,
+    "suggested_name": "section-content-5",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:415",
+      "92:622",
+      "92:627",
+      "92:312",
+      "92:353",
+      "92:411",
+      "92:630",
+      "92:412"
+    ],
+    "node_names": [
+      "Vector 127",
+      "人物アイコン　チーム 1",
+      "ノートのアイコン素材7 1",
+      "Group 174",
+      "Group 177",
+      "SDGs研修/啓蒙活動",
+      "新芽のアイコン 1",
+      "イマココラボカードゲーム..."
+    ],
+    "count": 8,
+    "suggested_name": "section-content-6",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:419",
+      "92:363",
+      "92:633",
+      "92:373",
+      "92:640",
+      "92:644",
+      "92:651",
+      "92:336"
+    ],
+    "node_names": [
+      "Vector 128",
+      "Group 176",
+      "ベビー服のフリーアイコン 1",
+      "Group 179",
+      "シールドアイコン5 1",
+      "ナイフ、お皿、フォークのお食事アイコン2 1",
+      "プレゼンテーションアイコン 1",
+      "Group 180"
+    ],
+    "count": 8,
+    "suggested_name": "section-content-7",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:418",
+      "92:661",
+      "92:666"
+    ],
+    "node_names": [
+      "Vector 133",
+      "キラキラ 3 1",
+      "ハートの心電図のアイコン素材 1 1"
+    ],
+    "count": 3,
+    "suggested_name": "section-content-8",
+    "suggested_wrapper": "section",
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "node_ids": [
+      "92:253",
+      "92:254",
+      "92:255",
+      "92:256"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-content",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 4,
+    "structure_hash": "TEXT"
+  },
+  {
+    "node_ids": [
+      "92:266",
+      "92:267",
+      "92:268",
+      "92:269",
+      "92:271"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-environment",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 5,
+    "structure_hash": "TEXT"
+  },
+  {
+    "node_ids": [
+      "92:275",
+      "92:276",
+      "92:274",
+      "92:279",
+      "92:278",
+      "92:277"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-content",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 6,
+    "structure_hash": "TEXT"
+  },
+  {
+    "node_ids": [
+      "92:280",
+      "92:281",
+      "92:282",
+      "92:283"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-content",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 4,
+    "structure_hash": "TEXT"
+  },
+  {
+    "node_ids": [
+      "92:315"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-group-174",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 1,
+    "structure_hash": "FRAME:[TEXT,TEXT]"
+  },
+  {
+    "node_ids": [
+      "92:376",
+      "92:377",
+      "92:378",
+      "92:379",
+      "92:380",
+      "92:381",
+      "92:382",
+      "92:383",
+      "92:384",
+      "92:385",
+      "92:386",
+      "92:387",
+      "92:388",
+      "92:389",
+      "92:390",
+      "92:391",
+      "92:392",
+      "92:393",
+      "92:394",
+      "92:395",
+      "92:396",
+      "92:397",
+      "92:398",
+      "92:399"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-vector-48",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 24,
+    "structure_hash": "VECTOR"
+  },
+  {
+    "node_ids": [
+      "92:483",
+      "92:484",
+      "92:485",
+      "92:486",
+      "92:487",
+      "92:488",
+      "92:489",
+      "92:490"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-ellipse-60",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 8,
+    "structure_hash": "ELLIPSE"
+  },
+  {
+    "node_ids": [
+      "92:669",
+      "92:679"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "list-15-1",
+    "method": "consecutive",
+    "score": 0.85,
+    "priority": 2.5,
+    "count": 2,
+    "structure_hash": "FRAME"
+  },
+  {
+    "node_ids": [
+      "92:290",
+      "92:305"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-content",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:318",
+      "92:321"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-content",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:324",
+      "92:327"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-content",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:330",
+      "92:333"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-content",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:357",
+      "92:360"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-content",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:433",
+      "92:437"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-sustainability",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "node_ids": [
+      "92:491",
+      "92:513"
+    ],
+    "parent_id": "92:252",
+    "parent_name": "/csr",
+    "suggested_name": "section-section",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 2,
+    "structure_hash": ""
+  },
+  {
+    "method": "pattern",
+    "score": 0.76,
+    "structure_hash": "FRAME:[FRAME,FRAME,RECTANGLE,VECTOR]|GC:4:VECTOR",
+    "node_ids": [
+      "92:420",
+      "92:549"
+    ],
+    "node_names": [
+      "visual",
+      "contact"
+    ],
+    "count": 2,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": true,
+    "parent_id": "92:252",
+    "parent_name": "/csr"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:259",
+      "92:260",
+      "92:263"
+    ],
+    "node_names": [
+      "Vector 115",
+      "Group 263",
+      "Group 264"
+    ],
+    "bg_node_ids": [
+      "92:258"
+    ],
+    "bg_node_names": [
+      "Rectangle 105"
+    ],
+    "count": 3,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:257",
+    "parent_name": "Group 69"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:421",
+      "92:425"
+    ],
+    "node_names": [
+      "Mask group",
+      "Group 99"
+    ],
+    "bg_node_ids": [
+      "92:424"
+    ],
+    "bg_node_names": [
+      "Rectangle 771"
+    ],
+    "count": 2,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:420",
+    "parent_name": "visual"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "navigation",
+    "node_ids": [
+      "92:496",
+      "92:497",
+      "92:498",
+      "92:499",
+      "92:500",
+      "92:501"
+    ],
+    "node_names": [
+      "会社情報",
+      "製品 / 技術",
+      "ブログ",
+      "ニュース",
+      "メディア",
+      "Group 97"
+    ],
+    "count": 6,
+    "suggested_name": "nav-items",
+    "suggested_wrapper": "nav-container",
+    "parent_id": "92:495",
+    "parent_name": "menu"
+  },
+  {
+    "node_ids": [
+      "92:511",
+      "92:512"
+    ],
+    "parent_id": "92:510",
+    "parent_name": "Group 98",
+    "suggested_name": "highlight-contact",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "RECTANGLE",
+    "node_ids": [
+      "92:514",
+      "92:515",
+      "92:523"
+    ],
+    "node_names": [
+      "Rectangle 769",
+      "Rectangle 788",
+      "image 1"
+    ],
+    "count": 3,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:513",
+    "parent_name": "footer"
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "TEXT",
+    "node_ids": [
+      "92:520",
+      "92:521",
+      "92:519"
+    ],
+    "node_names": [
+      "手島精管株式会社",
+      "TESHIMASEIKAN Co., Ltd",
+      "群馬県館林市下早川田町306-1"
+    ],
+    "count": 3,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:513",
+    "parent_name": "footer"
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "TEXT",
+    "node_ids": [
+      "92:524",
+      "92:525",
+      "92:529",
+      "92:526",
+      "92:531",
+      "92:532",
+      "92:530",
+      "92:534",
+      "92:527",
+      "92:533",
+      "92:536",
+      "92:535",
+      "92:537",
+      "92:528"
+    ],
+    "node_names": [
+      "会社情報",
+      "製品/技術",
+      "ニュース",
+      "ブログ",
+      "会社案内",
+      "製品情報",
+      "私たちの強み",
+      "規格・国際規格",
+      "お問い合せ",
+      "CSR/SDGs",
+      "工程・技術",
+      "グローバルサプライチェーン",
+      "ISO・認証・特許・登録証",
+      "プライバシーポリシー"
+    ],
+    "count": 14,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:513",
+    "parent_name": "footer"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:550",
+      "92:555",
+      "92:558",
+      "92:559"
+    ],
+    "node_names": [
+      "Group 145",
+      "Group 38",
+      "Vector 19",
+      "Group 144"
+    ],
+    "bg_node_ids": [
+      "92:554"
+    ],
+    "bg_node_names": [
+      "Rectangle 40"
+    ],
+    "count": 4,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:549",
+    "parent_name": "contact"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:561",
+      "92:571"
+    ],
+    "node_names": [
+      "Group 53",
+      "Group 52"
+    ],
+    "bg_node_ids": [
+      "92:560"
+    ],
+    "bg_node_names": [
+      "Rectangle 41"
+    ],
+    "count": 2,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:559",
+    "parent_name": "Group 144"
+  }
+]

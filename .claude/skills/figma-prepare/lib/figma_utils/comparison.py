@@ -12,7 +12,9 @@ Submodules:
 
 from .constants import (
     COMPARE_MATCH_THRESHOLD,
-    STAGE_C_COVERAGE_THRESHOLD,
+    STAGE_MERGE_TIER1,
+    STAGE_MERGE_TIER2,
+    STAGE_MERGE_TIER3,
 )
 
 # Re-export from comparison_dedup
@@ -21,6 +23,7 @@ from .comparison_dedup import (  # noqa: F401
     absorb_stage_c_dividers,
     _is_divider_candidate,
     _find_adjacent_list_item,
+    _should_absorb_into_higher,
 )
 
 # Re-export from comparison_column
@@ -133,12 +136,91 @@ def compare_grouping_results(stage_a_candidates, stage_c_groups, parent_id=None)
     )
 
 
+def _merge_stage_c_with_a_remainder(c_groups, a_cands, comparison_result):
+    """Tier 2: Use Stage C groups + add unmatched Stage A candidates.
+
+    Stage C is primary. For Stage A candidates that have no Stage C match
+    (coverage gap), add them as supplementary groups.
+
+    Args:
+        c_groups: Stage C groups (primary)
+        a_cands: Stage A candidates (supplement unmatched ones)
+        comparison_result: dict from compare_grouping_results with 'stage_a_only'
+
+    Returns:
+        list: merged candidates (Stage C + unmatched Stage A)
+    """
+    # Start with all Stage C groups
+    merged = list(c_groups)
+
+    # Collect node IDs already covered by Stage C
+    c_node_ids = set()
+    for g in c_groups:
+        c_node_ids.update(g.get('node_ids', []))
+
+    # Add unmatched Stage A candidates whose nodes aren't in Stage C
+    for a_idx in comparison_result.get('stage_a_only', []):
+        if a_idx < len(a_cands):
+            cand = a_cands[a_idx]
+            cand_nodes = set(cand.get('node_ids', []))
+            # Only add if majority of nodes are not already covered
+            if len(cand_nodes) > 0:
+                overlap = len(cand_nodes & c_node_ids)
+                if overlap / len(cand_nodes) < 0.5:
+                    merged.append(cand)
+                    c_node_ids.update(cand_nodes)
+
+    return merged
+
+
+def _merge_stage_a_with_c_confident(a_cands, c_groups, comparison_result):
+    """Tier 3: Use Stage A candidates + add high-confidence Stage C groups.
+
+    Stage A is primary. Only adopt Stage C groups that:
+    1. Have 3+ node_ids (substantial groups, not over-split)
+    2. Don't conflict with existing Stage A coverage
+
+    Args:
+        a_cands: Stage A candidates (primary)
+        c_groups: Stage C groups (supplement high-confidence ones)
+        comparison_result: dict from compare_grouping_results with 'stage_c_only'
+
+    Returns:
+        list: merged candidates (Stage A + high-confidence Stage C)
+    """
+    # Start with all Stage A candidates
+    merged = list(a_cands)
+
+    # Collect node IDs already covered by Stage A
+    a_node_ids = set()
+    for c in a_cands:
+        a_node_ids.update(c.get('node_ids', []))
+
+    # Add Stage C groups that are novel and substantial
+    for c_idx in comparison_result.get('stage_c_only', []):
+        if c_idx < len(c_groups):
+            group = c_groups[c_idx]
+            group_nodes = set(group.get('node_ids', []))
+            # Only add if: 3+ nodes AND majority not already covered
+            if len(group_nodes) >= 3:
+                overlap = len(group_nodes & a_node_ids)
+                if len(group_nodes) > 0 and overlap / len(group_nodes) < 0.5:
+                    merged.append(group)
+                    a_node_ids.update(group_nodes)
+
+    return merged
+
+
 def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
     """Compare Stage A and Stage C results section-by-section.
 
     Groups Stage A candidates by parent_id, matches them against Stage C
-    sections, and decides per-section whether to adopt Stage C or fall back
-    to Stage A based on STAGE_C_COVERAGE_THRESHOLD.
+    sections, and decides per-section adoption using graduated merging:
+
+    - Tier 1 (coverage >= 80%): Stage C fully adopted
+    - Tier 2 (coverage >= 60%): Stage C + unmatched Stage A merged
+    - Tier 3 (coverage >= 40%): Stage A + high-confidence Stage C
+    - Tier 4 (coverage < 40%):  Stage A only
 
     Args:
         stage_a_candidates: List of Stage A grouping candidates (with parent_id field)
@@ -150,7 +232,7 @@ def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
             'sections': [
                 {
                     'section_id': '2:8320',
-                    'source': 'stage_c' | 'stage_a',
+                    'source': 'stage_c' | 'stage_a' | 'merged_c_priority' | 'merged_a_priority',
                     'coverage': 0.95,
                     'mean_jaccard': 0.82,
                     'candidates': [...]  # adopted candidates for this section
@@ -159,6 +241,7 @@ def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
             'overall_coverage': 0.88,
             'stage_a_sections': int,
             'stage_c_sections': int,
+            'merged_sections': int,
             'total_sections': int
         }
     """
@@ -168,6 +251,7 @@ def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
             'overall_coverage': 1.0,
             'stage_a_sections': 0,
             'stage_c_sections': 0,
+            'merged_sections': 0,
             'total_sections': 0,
         }
 
@@ -199,11 +283,25 @@ def compare_grouping_by_section(stage_a_candidates, stage_c_sections):
         coverage = result['coverage']
         mean_jaccard = result['mean_jaccard']
 
-        # Decision: adopt Stage C if coverage >= threshold, else fall back to Stage A
-        if coverage >= STAGE_C_COVERAGE_THRESHOLD:
+        # Graduated adoption (4 tiers)
+        if coverage >= STAGE_MERGE_TIER1:
+            # Tier 1: High coverage -> Stage C fully adopted
             source = 'stage_c'
             candidates = c_groups
+        elif coverage >= STAGE_MERGE_TIER2:
+            # Tier 2: Medium coverage -> Stage C + unmatched Stage A merged
+            source = 'merged_c_priority'
+            candidates = _merge_stage_c_with_a_remainder(
+                c_groups, a_cands, result
+            )
+        elif coverage >= STAGE_MERGE_TIER3:
+            # Tier 3: Low coverage -> Stage A base + high-confidence Stage C
+            source = 'merged_a_priority'
+            candidates = _merge_stage_a_with_c_confident(
+                a_cands, c_groups, result
+            )
         else:
+            # Tier 4: Very low coverage -> Stage A only
             source = 'stage_a'
             candidates = a_cands
 

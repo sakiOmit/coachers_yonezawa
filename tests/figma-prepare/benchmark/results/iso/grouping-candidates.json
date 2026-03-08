@@ -1,0 +1,420 @@
+[
+  {
+    "method": "zone",
+    "score": 0.7,
+    "semantic_type": "vertical-zone",
+    "node_ids": [
+      "92:1227",
+      "92:1199",
+      "92:1262",
+      "92:1263",
+      "92:1226"
+    ],
+    "node_names": [
+      "Rectangle 801",
+      "Group 151",
+      "名称未設定のデザイン (9) 1"
+    ],
+    "count": 5,
+    "suggested_name": "section-content-4",
+    "suggested_wrapper": "section",
+    "parent_id": "92:1192",
+    "parent_name": "/iso"
+  },
+  {
+    "node_ids": [
+      "92:1295"
+    ],
+    "parent_id": "92:1192",
+    "parent_name": "/iso",
+    "suggested_name": "section-section",
+    "method": "heading-content",
+    "score": 0.7,
+    "priority": 3.5,
+    "count": 1,
+    "structure_hash": ""
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "card-list",
+    "node_ids": [
+      "92:1195",
+      "92:1238",
+      "92:1253",
+      "92:1257",
+      "92:1334"
+    ],
+    "node_names": [
+      "Group 149",
+      "Group 148",
+      "Group 146",
+      "Group 150",
+      "contact"
+    ],
+    "count": 5,
+    "suggested_name": "card-list",
+    "suggested_wrapper": "card-container",
+    "parent_id": "92:1192",
+    "parent_name": "/iso"
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "RECTANGLE",
+    "node_ids": [
+      "92:1261"
+    ],
+    "node_names": [
+      "Rectangle 800"
+    ],
+    "count": 1,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:1192",
+    "parent_name": "/iso"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "table",
+    "node_ids": [
+      "92:1193",
+      "92:1194",
+      "92:1195",
+      "92:1198",
+      "92:1200",
+      "92:1201",
+      "92:1202",
+      "92:1203",
+      "92:1206",
+      "92:1209",
+      "92:1212",
+      "92:1215",
+      "92:1218",
+      "92:1221",
+      "92:1224",
+      "92:1225",
+      "92:1228",
+      "92:1238",
+      "92:1243",
+      "92:1253",
+      "92:1256",
+      "92:1257",
+      "92:1260",
+      "92:1273",
+      "92:1331",
+      "92:1332",
+      "92:1333"
+    ],
+    "node_names": [
+      "Rectangle 95",
+      "Rectangle 96",
+      "Group 149",
+      "当社は、社員が仕事と子育てを両立できる企業として、厚生労働大臣よりくるみんの認定を取得いたしました。また、群馬県の発行する「群馬県いきいきGカンパニー認証書」も取得しております。",
+      "Rectangle 97",
+      "文章入れます",
+      "image 5",
+      "Group 47",
+      "Group 152",
+      "Group 48",
+      "Group 154",
+      "Group 153",
+      "Group 46",
+      "Group 230",
+      "image 6",
+      "image 7",
+      "Group 141",
+      "Group 148",
+      "Group 147",
+      "Group 146",
+      "製造業では類似製品の存在がつきものです。特にステンレスチューブにおいては、医療や自動車など人々の命に関わるもののため、手島品質をお約束するための商標を登録しております。 なお、ロゴのTesimaに関しては、創業当初の想いを大切にする意味も含め、創業時より利用している\"h\"のないロゴを利用しております。",
+      "Group 150",
+      "金属細管の製造方法の特許を取得いたしました。 日本だけではなく、韓国・中国においても特許を取得しております。",
+      "menubar",
+      "image 14",
+      "image 15",
+      "image 16"
+    ],
+    "count": 27,
+    "suggested_name": "table-content",
+    "suggested_wrapper": "table-container",
+    "row_count": 3,
+    "parent_id": "92:1192",
+    "parent_name": "/iso"
+  },
+  {
+    "node_ids": [
+      "92:1196",
+      "92:1197"
+    ],
+    "parent_id": "92:1195",
+    "parent_name": "Group 149",
+    "suggested_name": "highlight-content",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "node_ids": [
+      "92:1240",
+      "92:1241"
+    ],
+    "parent_id": "92:1238",
+    "parent_name": "Group 148",
+    "suggested_name": "highlight-sd-gs",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:1245",
+      "92:1248",
+      "92:1249",
+      "92:1250",
+      "92:1251",
+      "92:1252"
+    ],
+    "node_names": [
+      "Group 146",
+      "ISO認証とは、審査登録機関が、組織のマネジメントシステムを、顧客や国、自治体などに代わって規格に基づいて審査し、適合と判断した場合に認証することをいいます。ISO認証合格となれば審査登録機関のリストに登録され、機関はその組織に対して認証書（登録証）を発行します。",
+      "当社では品質におけるマネジメントシステムの国際規格であるISO9001を取得しています。 技術開発、品質向上の為のマネジメントシステムを確立し、その活動を継続する事で世界のお客様のご期待に応えるべく、経営の維持発展に専心する所存でございます。",
+      "image 12",
+      "image 13",
+      "Vector 46"
+    ],
+    "bg_node_ids": [
+      "92:1244"
+    ],
+    "bg_node_names": [
+      "Rectangle 94"
+    ],
+    "count": 6,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:1243",
+    "parent_name": "Group 147"
+  },
+  {
+    "node_ids": [
+      "92:1246",
+      "92:1247"
+    ],
+    "parent_id": "92:1245",
+    "parent_name": "Group 146",
+    "suggested_name": "highlight-iso",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "node_ids": [
+      "92:1254",
+      "92:1255"
+    ],
+    "parent_id": "92:1253",
+    "parent_name": "Group 146",
+    "suggested_name": "highlight-content",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "node_ids": [
+      "92:1258",
+      "92:1259"
+    ],
+    "parent_id": "92:1257",
+    "parent_name": "Group 150",
+    "suggested_name": "highlight-content",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "navigation",
+    "node_ids": [
+      "92:1278",
+      "92:1279",
+      "92:1280",
+      "92:1281",
+      "92:1282",
+      "92:1283"
+    ],
+    "node_names": [
+      "会社情報",
+      "製品 / 技術",
+      "ブログ",
+      "ニュース",
+      "メディア",
+      "Group 97"
+    ],
+    "count": 6,
+    "suggested_name": "nav-items",
+    "suggested_wrapper": "nav-container",
+    "parent_id": "92:1277",
+    "parent_name": "menu"
+  },
+  {
+    "node_ids": [
+      "92:1293",
+      "92:1294"
+    ],
+    "parent_id": "92:1292",
+    "parent_name": "Group 98",
+    "suggested_name": "highlight-contact",
+    "method": "highlight",
+    "score": 0.8,
+    "semantic_type": "highlight",
+    "count": 2
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "RECTANGLE",
+    "node_ids": [
+      "92:1296",
+      "92:1297",
+      "92:1305"
+    ],
+    "node_names": [
+      "Rectangle 769",
+      "Rectangle 788",
+      "image 1"
+    ],
+    "count": 3,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:1295",
+    "parent_name": "footer"
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "TEXT",
+    "node_ids": [
+      "92:1302",
+      "92:1303",
+      "92:1301"
+    ],
+    "node_names": [
+      "手島精管株式会社",
+      "TESHIMASEIKAN Co., Ltd",
+      "群馬県館林市下早川田町306-1"
+    ],
+    "count": 3,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:1295",
+    "parent_name": "footer"
+  },
+  {
+    "method": "pattern",
+    "score": 1.0,
+    "structure_hash": "TEXT",
+    "node_ids": [
+      "92:1306",
+      "92:1307",
+      "92:1311",
+      "92:1308",
+      "92:1313",
+      "92:1314",
+      "92:1312",
+      "92:1316",
+      "92:1309",
+      "92:1315",
+      "92:1318",
+      "92:1317",
+      "92:1319",
+      "92:1310"
+    ],
+    "node_names": [
+      "会社情報",
+      "製品/技術",
+      "ニュース",
+      "ブログ",
+      "会社案内",
+      "製品情報",
+      "私たちの強み",
+      "規格・国際規格",
+      "お問い合せ",
+      "CSR/SDGs",
+      "工程・技術",
+      "グローバルサプライチェーン",
+      "ISO・認証・特許・登録証",
+      "プライバシーポリシー"
+    ],
+    "count": 14,
+    "suggested_name": "list-items",
+    "suggested_wrapper": "list-container",
+    "fuzzy_match": false,
+    "parent_id": "92:1295",
+    "parent_name": "footer"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:1335",
+      "92:1340",
+      "92:1343",
+      "92:1344"
+    ],
+    "node_names": [
+      "Group 145",
+      "Group 38",
+      "Vector 19",
+      "Group 144"
+    ],
+    "bg_node_ids": [
+      "92:1339"
+    ],
+    "bg_node_names": [
+      "Rectangle 40"
+    ],
+    "count": 4,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:1334",
+    "parent_name": "contact"
+  },
+  {
+    "method": "semantic",
+    "score": 0.9,
+    "semantic_type": "bg-content",
+    "node_ids": [
+      "92:1346",
+      "92:1356"
+    ],
+    "node_names": [
+      "Group 53",
+      "Group 52"
+    ],
+    "bg_node_ids": [
+      "92:1345"
+    ],
+    "bg_node_names": [
+      "Rectangle 41"
+    ],
+    "count": 2,
+    "suggested_name": "content-layer",
+    "suggested_wrapper": "content-group",
+    "parent_id": "92:1344",
+    "parent_name": "Group 144"
+  }
+]

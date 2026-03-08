@@ -170,11 +170,12 @@ def _aggregate_section_metrics(section_results):
 
     Returns:
         dict with 'sections', 'overall_coverage', 'stage_a_sections',
-        'stage_c_sections', 'total_sections'
+        'stage_c_sections', 'merged_sections', 'total_sections'
     """
     total_sections = len(section_results)
     stage_a_count = sum(1 for s in section_results if s['source'] == 'stage_a')
     stage_c_count = sum(1 for s in section_results if s['source'] == 'stage_c')
+    merged_count = sum(1 for s in section_results if s['source'].startswith('merged'))
     total_coverage_sum = sum(s['coverage'] for s in section_results)
     overall_coverage = (total_coverage_sum / total_sections) if total_sections > 0 else 1.0
 
@@ -183,5 +184,6 @@ def _aggregate_section_metrics(section_results):
         'overall_coverage': overall_coverage,
         'stage_a_sections': stage_a_count,
         'stage_c_sections': stage_c_count,
+        'merged_sections': merged_count,
         'total_sections': total_sections,
     }

@@ -20,7 +20,7 @@ from .detection import (
 )
 from .geometry import get_bbox
 from .grouping_proximity import detect_proximity_groups
-from .grouping_semantic import detect_semantic_groups
+from .grouping_semantic import detect_semantic_groups, detect_variant_groups
 from .metadata import get_text_children_content, is_off_canvas
 from .naming import to_kebab
 
@@ -85,6 +85,7 @@ def _run_consecutive_detectors(children, parent_id, parent_name, disabled, all_c
                     'parent_name': parent_name,
                     'suggested_name': f"list-{to_kebab(children[cg['indices'][0]].get('name', 'item'))}",
                     'method': 'consecutive',
+                    'score': 0.85,
                     'priority': 2.5,
                     'count': len(node_ids),
                     'structure_hash': cg['hash'],
@@ -104,6 +105,7 @@ def _run_consecutive_detectors(children, parent_id, parent_name, disabled, all_c
                 'parent_name': parent_name,
                 'suggested_name': f'section-{slug}',
                 'method': 'heading-content',
+                'score': 0.7,
                 'priority': 3.5,
                 'count': 2,
                 'structure_hash': '',
@@ -140,7 +142,8 @@ def _run_structural_detectors(children, node, parent_id, parent_name, is_root, d
                 'node_ids': node_ids, 'parent_id': parent_id,
                 'parent_name': parent_name,
                 'suggested_name': f'card-list-{slug}',
-                'method': 'tuple', 'count': len(node_ids),
+                'method': 'tuple', 'score': 0.85,
+                'count': len(node_ids),
                 'tuple_size': tg['tuple_size'],
                 'repetitions': tg['count'],
                 'suggested_wrapper': 'card-container',
@@ -157,8 +160,8 @@ def _run_structural_detectors(children, node, parent_id, parent_name, is_root, d
                 'node_ids': [r_id, t_id], 'parent_id': parent_id,
                 'parent_name': parent_name,
                 'suggested_name': f'highlight-{slug}',
-                'method': 'highlight', 'semantic_type': 'highlight',
-                'count': 2,
+                'method': 'highlight', 'score': 0.8,
+                'semantic_type': 'highlight', 'count': 2,
             })
 
 
@@ -173,11 +176,12 @@ def _run_stage_a_detectors(children, parent_id, parent_name, is_root, disabled, 
 
     run_all = is_root or len(children) >= FLAT_THRESHOLD
     semantic = detect_semantic_groups(children) if 'semantic' not in disabled else []
+    variants = detect_variant_groups(children) if 'variant' not in disabled else []
     patterns = detect_pattern_groups(children) if run_all and 'pattern' not in disabled else []
     spacing = detect_spacing_groups(children) if run_all and 'spacing' not in disabled else []
     proximity = detect_proximity_groups(children) if run_all and 'proximity' not in disabled else []
 
-    _append_with_parent(semantic + patterns + spacing + proximity,
+    _append_with_parent(semantic + variants + patterns + spacing + proximity,
                         parent_id, parent_name, all_candidates)
 
 

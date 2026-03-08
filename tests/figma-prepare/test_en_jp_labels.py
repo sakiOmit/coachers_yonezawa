@@ -128,14 +128,16 @@ class TestDetectEnJpLabelPairs:
         pairs = detect_en_jp_label_pairs(children)
         assert len(pairs) == 1
 
-    def test_mixed_case_not_upper(self):
-        """Mixed case (not all upper) -> not an EN label."""
+    def test_title_case_is_label(self):
+        """Title case (first letter upper) -> detected as EN label (benchmark fix)."""
         children = [
             self._make_text("Company", x=100, y=100, w=200, h=30),
             self._make_text("会社情報", x=100, y=140, w=200, h=30),
         ]
         pairs = detect_en_jp_label_pairs(children)
-        assert len(pairs) == 0
+        assert len(pairs) == 1
+        assert pairs[0]['en_text'] == "Company"
+        assert pairs[0]['jp_text'] == "会社情報"
 
 
 # ============================================================

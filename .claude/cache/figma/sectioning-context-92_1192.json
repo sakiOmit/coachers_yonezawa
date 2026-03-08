@@ -1,0 +1,988 @@
+{
+  "page_name": "/iso",
+  "page_id": "92:1192",
+  "page_size": {
+    "width": 1440.0,
+    "height": 5851.0
+  },
+  "top_level_children": [
+    {
+      "id": "92:1273",
+      "name": "menubar",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8543.0,
+        "y": 1285.0,
+        "w": 1442.0,
+        "h": 62.0
+      },
+      "child_count": 2,
+      "child_types_summary": "FRAME:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1228",
+      "name": "Group 141",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8544.0,
+        "y": 1347.0,
+        "w": 1441.0,
+        "h": 284.0
+      },
+      "child_count": 2,
+      "child_types_summary": "FRAME:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1203",
+      "name": "Group 47",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8833.0,
+        "y": 1723.0,
+        "w": 97.0,
+        "h": 24.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "ISO認証"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1206",
+      "name": "Group 152",
+      "type": "FRAME",
+      "bbox": {
+        "x": 9128.0,
+        "y": 1723.0,
+        "w": 55.0,
+        "h": 24.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "認定"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1209",
+      "name": "Group 48",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8971.0,
+        "y": 1723.0,
+        "w": 108.0,
+        "h": 24.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "商標登録証"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1212",
+      "name": "Group 154",
+      "type": "FRAME",
+      "bbox": {
+        "x": 9356.0,
+        "y": 1723.0,
+        "w": 140.0,
+        "h": 24.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "環境・品質方針"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1215",
+      "name": "Group 153",
+      "type": "FRAME",
+      "bbox": {
+        "x": 9242.0,
+        "y": 1723.0,
+        "w": 55.0,
+        "h": 24.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "特許"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1218",
+      "name": "Group 46",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8671.0,
+        "y": 1723.0,
+        "w": 121.0,
+        "h": 27.0
+      },
+      "child_count": 2,
+      "child_types_summary": "ELLIPSE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "SDGs認定書"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1221",
+      "name": "Group 230",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8662.0,
+        "y": 1778.999755859375,
+        "w": 1167.0,
+        "h": 0.00020404477254487574
+      },
+      "child_count": 2,
+      "child_types_summary": "VECTOR:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1238",
+      "name": "Group 148",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8662.0,
+        "y": 1891.0,
+        "w": 996.0,
+        "h": 383.0
+      },
+      "child_count": 4,
+      "child_types_summary": "RECTANGLE:2, TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "当社ではサステナビリティ化を目指し、SDGsへの活動に日々取り組んでおります。 その結果、「noharm®認証」更新審査を通過し、SDGs認定書をいただくことができました。2020年のnoharm®認証ではSDGｓの17あるゴールのうち、9項目の認証となりました。 今後も更なるサステナビリティ化を目指し、全社一丸となって努めてまいります。",
+        "SDGs認定書"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1243",
+      "name": "Group 147",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8544.0,
+        "y": 2386.0,
+        "w": 1440.0,
+        "h": 607.0
+      },
+      "child_count": 7,
+      "child_types_summary": "FRAME:1, RECTANGLE:3, TEXT:2, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "ISO認証とは、審査登録機関が、組織のマネジメントシステムを、顧客や国、自治体などに代わって規格に基づいて審査し、適合と判断した場合に認証することをいいます。ISO認証合格となれば審査登録機関のリストに登録され、機関はその組織に対して認証書（登録証）を発行します。",
+        "当社では品質におけるマネジメントシステムの国際規格であるISO9001を取得しています。 技術開発、品質向上の為のマネジメントシステムを確立し、その活動を継続する事で世界のお客様のご期待に応えるべく、経営の維持発展に専心する所存でございます。"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1201",
+      "name": "文章入れます",
+      "type": "TEXT",
+      "bbox": {
+        "x": 8907.0,
+        "y": 2949.0,
+        "w": 571.0,
+        "h": 24.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1193",
+      "name": "Rectangle 95",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8544.0,
+        "y": 2993.0,
+        "w": 1440.0,
+        "h": 607.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1224",
+      "name": "image 6",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 9372.0,
+        "y": 3103.0,
+        "w": 265.0,
+        "h": 361.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1253",
+      "name": "Group 146",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8662.0,
+        "y": 3108.0,
+        "w": 448.276123046875,
+        "h": 66.0
+      },
+      "child_count": 2,
+      "child_types_summary": "RECTANGLE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "商標登録証"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1256",
+      "name": "製造業では類似製品の存在がつきものです。特にステンレスチューブにおいては、医療や自動車など人々の命に関わるもののため、手島品質をお約束するための商標を登録しております。 なお、ロゴのTesimaに関しては、創業当初の想いを大切にする意味も含め、創業時より利用している\"h\"のないロゴを利用しております。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 8663.0,
+        "y": 3240.0,
+        "w": 586.0,
+        "h": 150.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1194",
+      "name": "Rectangle 96",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8544.0,
+        "y": 3600.0,
+        "w": 1440.0,
+        "h": 607.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1202",
+      "name": "image 5",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8684.0,
+        "y": 3727.0,
+        "w": 259.0,
+        "h": 353.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1195",
+      "name": "Group 149",
+      "type": "FRAME",
+      "bbox": {
+        "x": 9336.0,
+        "y": 3735.0,
+        "w": 436.0,
+        "h": 66.0
+      },
+      "child_count": 2,
+      "child_types_summary": "RECTANGLE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "認定"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1225",
+      "name": "image 7",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8963.0,
+        "y": 3803.0,
+        "w": 271.0,
+        "h": 277.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1198",
+      "name": "当社は、社員が仕事と子育てを両立できる企業として、厚生労働大臣よりくるみんの認定を取得いたしました。また、群馬県の発行する「群馬県いきいきGカンパニー認証書」も取得しております。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 9336.0,
+        "y": 3862.0,
+        "w": 531.0,
+        "h": 72.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1200",
+      "name": "Rectangle 97",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8544.0,
+        "y": 4207.0,
+        "w": 1440.0,
+        "h": 533.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1257",
+      "name": "Group 150",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8661.0,
+        "y": 4321.0,
+        "w": 444.5709533691406,
+        "h": 66.0
+      },
+      "child_count": 2,
+      "child_types_summary": "RECTANGLE:1, TEXT:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "特許"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1331",
+      "name": "image 14",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 9644.0,
+        "y": 4321.0,
+        "w": 220.0,
+        "h": 305.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1332",
+      "name": "image 15",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 9409.0,
+        "y": 4321.0,
+        "w": 220.0,
+        "h": 305.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1333",
+      "name": "image 16",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 9175.0,
+        "y": 4321.0,
+        "w": 220.0,
+        "h": 305.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1260",
+      "name": "金属細管の製造方法の特許を取得いたしました。 日本だけではなく、韓国・中国においても特許を取得しております。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 8662.0,
+        "y": 4421.0,
+        "w": 502.0,
+        "h": 72.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1227",
+      "name": "手島精管株式会社 環境・品質方針",
+      "type": "TEXT",
+      "bbox": {
+        "x": 8991.0,
+        "y": 4885.0,
+        "w": 547.0,
+        "h": 24.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1261",
+      "name": "Rectangle 800",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8662.0,
+        "y": 4965.0,
+        "w": 1205.0,
+        "h": 166.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1262",
+      "name": "当社は､医療用・工業用機器に用いるステンレスチューブ製品の設計､製造の事業活動を行う企業です。当社は、事業を通じて、「品質向上」により顧客満足度を高め、「環境負荷の低減」活動により、地域、地球環境に配慮し、継続的に改善活動を実施する事が当社のミッションです。",
+      "type": "TEXT",
+      "bbox": {
+        "x": 8808.0,
+        "y": 5004.0,
+        "w": 913.0,
+        "h": 87.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1226",
+      "name": "Rectangle 801",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8662.0,
+        "y": 5186.0,
+        "w": 1205.0,
+        "h": 652.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1263",
+      "name": "Group 151",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8777.0,
+        "y": 5239.0,
+        "w": 974.890625,
+        "h": 546.0
+      },
+      "child_count": 9,
+      "child_types_summary": "TEXT:9",
+      "has_text_children": true,
+      "text_children_preview": [
+        "当社は､以下の品質/環境目標の枠組みでQMS/EMSを推進します。 ① 社員が安全に働ける職場環境づくりを進めます｡ ② ",
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:1199",
+      "name": "名称未設定のデザイン (9) 1",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 8846.0,
+        "y": 5395.0,
+        "w": 836.0,
+        "h": 814.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1334",
+      "name": "contact",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8544.0,
+        "y": 5946.0,
+        "w": 1440.0,
+        "h": 552.0
+      },
+      "child_count": 5,
+      "child_types_summary": "FRAME:3, RECTANGLE:1, VECTOR:1",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "92:1295",
+      "name": "footer",
+      "type": "FRAME",
+      "bbox": {
+        "x": 8544.0,
+        "y": 6498.0,
+        "w": 1440.0,
+        "h": 638.0
+      },
+      "child_count": 26,
+      "child_types_summary": "FRAME:2, RECTANGLE:3, TEXT:17, VECTOR:4",
+      "has_text_children": true,
+      "text_children_preview": [
+        "群馬県館林市下早川田町306-1",
+        "手島精管株式会社",
+        "TESHIMASEIKAN Co., Ltd",
+        "会社情報",
+        "製品/技術"
+      ],
+      "is_unnamed": false
+    }
+  ],
+  "total_children": 35,
+  "heuristic_hints": {
+    "header_candidates": [
+      "92:1273",
+      "92:1228"
+    ],
+    "header_cluster_ids": [],
+    "footer_candidates": [
+      "92:1295"
+    ],
+    "gap_analysis": [
+      {
+        "between": [
+          "92:1273",
+          "92:1228"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:1228",
+          "92:1203"
+        ],
+        "gap_px": 92
+      },
+      {
+        "between": [
+          "92:1203",
+          "92:1206"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:1206",
+          "92:1209"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:1209",
+          "92:1212"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:1212",
+          "92:1215"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:1215",
+          "92:1218"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:1218",
+          "92:1221"
+        ],
+        "gap_px": 29
+      },
+      {
+        "between": [
+          "92:1221",
+          "92:1238"
+        ],
+        "gap_px": 112
+      },
+      {
+        "between": [
+          "92:1238",
+          "92:1243"
+        ],
+        "gap_px": 112
+      },
+      {
+        "between": [
+          "92:1243",
+          "92:1201"
+        ],
+        "gap_px": -44
+      },
+      {
+        "between": [
+          "92:1201",
+          "92:1193"
+        ],
+        "gap_px": 20
+      },
+      {
+        "between": [
+          "92:1193",
+          "92:1224"
+        ],
+        "gap_px": -497
+      },
+      {
+        "between": [
+          "92:1224",
+          "92:1253"
+        ],
+        "gap_px": -356
+      },
+      {
+        "between": [
+          "92:1253",
+          "92:1256"
+        ],
+        "gap_px": 66
+      },
+      {
+        "between": [
+          "92:1256",
+          "92:1194"
+        ],
+        "gap_px": 210
+      },
+      {
+        "between": [
+          "92:1194",
+          "92:1202"
+        ],
+        "gap_px": -480
+      },
+      {
+        "between": [
+          "92:1202",
+          "92:1195"
+        ],
+        "gap_px": -345
+      },
+      {
+        "between": [
+          "92:1195",
+          "92:1225"
+        ],
+        "gap_px": 2
+      },
+      {
+        "between": [
+          "92:1225",
+          "92:1198"
+        ],
+        "gap_px": -218
+      },
+      {
+        "between": [
+          "92:1198",
+          "92:1200"
+        ],
+        "gap_px": 273
+      },
+      {
+        "between": [
+          "92:1200",
+          "92:1257"
+        ],
+        "gap_px": -419
+      },
+      {
+        "between": [
+          "92:1257",
+          "92:1331"
+        ],
+        "gap_px": -66
+      },
+      {
+        "between": [
+          "92:1331",
+          "92:1332"
+        ],
+        "gap_px": -305
+      },
+      {
+        "between": [
+          "92:1332",
+          "92:1333"
+        ],
+        "gap_px": -305
+      },
+      {
+        "between": [
+          "92:1333",
+          "92:1260"
+        ],
+        "gap_px": -205
+      },
+      {
+        "between": [
+          "92:1260",
+          "92:1227"
+        ],
+        "gap_px": 392
+      },
+      {
+        "between": [
+          "92:1227",
+          "92:1261"
+        ],
+        "gap_px": 56
+      },
+      {
+        "between": [
+          "92:1261",
+          "92:1262"
+        ],
+        "gap_px": -127
+      },
+      {
+        "between": [
+          "92:1262",
+          "92:1226"
+        ],
+        "gap_px": 95
+      },
+      {
+        "between": [
+          "92:1226",
+          "92:1263"
+        ],
+        "gap_px": -599
+      },
+      {
+        "between": [
+          "92:1263",
+          "92:1199"
+        ],
+        "gap_px": -390
+      },
+      {
+        "between": [
+          "92:1199",
+          "92:1334"
+        ],
+        "gap_px": -263
+      },
+      {
+        "between": [
+          "92:1334",
+          "92:1295"
+        ],
+        "gap_px": 0
+      }
+    ],
+    "background_candidates": [
+      "92:1193",
+      "92:1224",
+      "92:1194",
+      "92:1202",
+      "92:1225",
+      "92:1200",
+      "92:1331",
+      "92:1332",
+      "92:1333",
+      "92:1261",
+      "92:1226",
+      "92:1199"
+    ],
+    "consecutive_patterns": [
+      {
+        "indices": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "ids": [
+          "92:1203",
+          "92:1206",
+          "92:1209",
+          "92:1212",
+          "92:1215",
+          "92:1218"
+        ],
+        "names": [
+          "Group 47",
+          "Group 152",
+          "Group 48",
+          "Group 154",
+          "Group 153",
+          "Group 46"
+        ],
+        "hash": "FRAME:[ELLIPSE,TEXT]"
+      },
+      {
+        "indices": [
+          23,
+          24,
+          25
+        ],
+        "ids": [
+          "92:1331",
+          "92:1332",
+          "92:1333"
+        ],
+        "names": [
+          "image 14",
+          "image 15",
+          "image 16"
+        ],
+        "hash": "RECTANGLE"
+      }
+    ],
+    "heading_candidates": [
+      {
+        "index": 0,
+        "id": "92:1273",
+        "name": "menubar",
+        "height": 62.0
+      },
+      {
+        "index": 2,
+        "id": "92:1203",
+        "name": "Group 47",
+        "height": 24.0
+      },
+      {
+        "index": 3,
+        "id": "92:1206",
+        "name": "Group 152",
+        "height": 24.0
+      },
+      {
+        "index": 4,
+        "id": "92:1209",
+        "name": "Group 48",
+        "height": 24.0
+      },
+      {
+        "index": 5,
+        "id": "92:1212",
+        "name": "Group 154",
+        "height": 24.0
+      },
+      {
+        "index": 6,
+        "id": "92:1215",
+        "name": "Group 153",
+        "height": 24.0
+      },
+      {
+        "index": 7,
+        "id": "92:1218",
+        "name": "Group 46",
+        "height": 27.0
+      },
+      {
+        "index": 8,
+        "id": "92:1221",
+        "name": "Group 230",
+        "height": 0.00020404477254487574
+      },
+      {
+        "index": 14,
+        "id": "92:1253",
+        "name": "Group 146",
+        "height": 66.0
+      },
+      {
+        "index": 18,
+        "id": "92:1195",
+        "name": "Group 149",
+        "height": 66.0
+      },
+      {
+        "index": 22,
+        "id": "92:1257",
+        "name": "Group 150",
+        "height": 66.0
+      }
+    ],
+    "loose_elements": []
+  },
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|\n| 1 | 92:1273 | menubar | FRAME | 8543 | 1285 | F | 1442x62 | N | 2FRA | - | 会社情報 |\n| 2 | 92:1228 | Group 141 | FRAME | 8544 | 1347 | F | 1441x284 | N | 2FRA | - | Certification |\n| 3 | 92:1203 | Group 47 | FRAME | 8833 | 1723 | L | 97x24 | N | 1ELL+1TEX | - | ISO認証 |\n| 4 | 92:1206 | Group 152 | FRAME | 9128 | 1723 | L | 55x24 | N | 1ELL+1TEX | - | 認定 |\n| 5 | 92:1209 | Group 48 | FRAME | 8971 | 1723 | L | 108x24 | N | 1ELL+1TEX | - | 商標登録証 |\n| 6 | 92:1212 | Group 154 | FRAME | 9356 | 1723 | R | 140x24 | N | 1ELL+1TEX | - | 環境・品質方針 |\n| 7 | 92:1215 | Group 153 | FRAME | 9242 | 1723 | C | 55x24 | N | 1ELL+1TEX | - | 特許 |\n| 8 | 92:1218 | Group 46 | FRAME | 8671 | 1723 | L | 121x27 | N | 1ELL+1TEX | - | SDGs認定書 |\n| 9 | 92:1221 | Group 230 | FRAME | 8662 | 1778 | F | 1167x0 | N | 2VEC | - | - |\n| 10 | 92:1238 | Group 148 | FRAME | 8662 | 1891 | C | 996x383 | N | 2REC+2TEX | - | 当社ではサステナビリティ化を目指し、SDGsへの活動に日々取 |\n| 11 | 92:1243 | Group 147 | FRAME | 8544 | 2386 | F | 1440x607 | N | 1FRA+3REC+2TEX+1VEC | - | ISO認証 |\n| 12 | 92:1201 | 文章入れます | TEXT | 8907 | 2949 | C | 571x24 | Y | - | - | 文章入れます |\n| 13 | 92:1193 | Rectangle 95 | RECTANGLE | 8544 | 2993 | F | 1440x607 | Y | - | bg-full | - |\n| 14 | 92:1224 | image 6 | RECTANGLE | 9372 | 3103 | R | 265x361 | Y | - | - | - |\n| 15 | 92:1253 | Group 146 | FRAME | 8662 | 3108 | L | 448x66 | N | 1REC+1TEX | - | 商標登録証 |\n| 16 | 92:1256 | 製造業では類似製品の存在がつきものです。特にステンレスチューブにおいて | TEXT | 8663 | 3240 | L | 586x150 | Y | - | - | 製造業では類似製品の存在がつきものです。特にステンレスチュー |\n| 17 | 92:1194 | Rectangle 96 | RECTANGLE | 8544 | 3600 | F | 1440x607 | Y | - | bg-full | - |\n| 18 | 92:1202 | image 5 | RECTANGLE | 8684 | 3727 | L | 259x353 | Y | - | - | - |\n| 19 | 92:1195 | Group 149 | FRAME | 9336 | 3735 | R | 436x66 | N | 1REC+1TEX | - | 認定 |\n| 20 | 92:1225 | image 7 | RECTANGLE | 8963 | 3803 | L | 271x277 | Y | - | - | - |\n| 21 | 92:1198 | 当社は、社員が仕事と子育てを両立できる企業として、厚生労働大臣よりくる | TEXT | 9336 | 3862 | R | 531x72 | Y | - | - | 当社は、社員が仕事と子育てを両立できる企業として、厚生労働大 |\n| 22 | 92:1200 | Rectangle 97 | RECTANGLE | 8544 | 4207 | F | 1440x533 | Y | - | bg-full | - |\n| 23 | 92:1257 | Group 150 | FRAME | 8661 | 4321 | L | 444x66 | N | 1REC+1TEX | - | 特許 |\n| 24 | 92:1331 | image 14 | RECTANGLE | 9644 | 4321 | R | 220x305 | Y | - | - | - |\n| 25 | 92:1332 | image 15 | RECTANGLE | 9409 | 4321 | R | 220x305 | Y | - | - | - |\n| 26 | 92:1333 | image 16 | RECTANGLE | 9175 | 4321 | C | 220x305 | Y | - | - | - |\n| 27 | 92:1260 | 金属細管の製造方法の特許を取得いたしました。 日本だけではなく、韓国・ | TEXT | 8662 | 4421 | L | 502x72 | Y | - | - | 金属細管の製造方法の特許を取得いたしました。 日本だけではな |\n| 28 | 92:1227 | 手島精管株式会社 環境・品質方針 | TEXT | 8991 | 4885 | C | 547x24 | Y | - | - | 手島精管株式会社 環境・品質方針 |\n| 29 | 92:1261 | Rectangle 800 | RECTANGLE | 8662 | 4965 | F | 1205x166 | Y | - | bg-wide | - |\n| 30 | 92:1262 | 当社は､医療用・工業用機器に用いるステンレスチューブ製品の設計､製造の | TEXT | 8808 | 5004 | C | 913x87 | Y | - | - | 当社は､医療用・工業用機器に用いるステンレスチューブ製品の設 |\n| 31 | 92:1226 | Rectangle 801 | RECTANGLE | 8662 | 5186 | F | 1205x652 | Y | - | bg-wide | - |\n| 32 | 92:1263 | Group 151 | FRAME | 8777 | 5239 | C | 974x546 | N | 9TEX | - | 当社は､以下の品質/環境目標の枠組みでQMS/EMSを推進し |\n| 33 | 92:1199 | 名称未設定のデザイン (9) 1 | RECTANGLE | 8846 | 5395 | C | 836x814 | Y | - | - | - |\n| 34 | 92:1334 | contact | FRAME | 8544 | 5946 | F | 1440x552 | N | 3FRA+1REC+1VEC | - | CONTACT |\n| 35 | 92:1295 | footer | FRAME | 8544 | 6498 | F | 1440x638 | N | 2FRA+3REC+17TEX+4VEC | - | 群馬県館林市下早川田町306-1 |"
+}

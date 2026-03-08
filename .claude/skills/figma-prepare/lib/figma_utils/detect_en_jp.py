@@ -16,15 +16,19 @@ from .geometry import get_bbox
 
 
 def _is_en_label(text):
-    """Check if text is a short uppercase ASCII label.
+    """Check if text is a short uppercase or title-case ASCII label.
 
     Args:
         text: Text string to check.
 
     Returns:
-        bool: True if text is a short (1-3 word) uppercase ASCII label.
+        bool: True if text is a short (1-3 word) uppercase or title-case
+              ASCII label (e.g., "COMPANY", "Environment", "Human resources").
 
     Issue 185: EN+JP label pair detection.
+    Benchmark fix: Accept title-case labels (first letter uppercase per word)
+    in addition to all-uppercase labels. Common in Figma designs where
+    section headings use "Environment" style rather than "ENVIRONMENT".
     """
     ascii_only = re.sub(r'[^\x00-\x7f]', '', text).strip()
     if not ascii_only or ascii_only != text.strip():
@@ -32,11 +36,21 @@ def _is_en_label(text):
     words = ascii_only.split()
     if len(words) < 1 or len(words) > EN_LABEL_MAX_WORDS:
         return False
-    # Must be uppercase (allow minor punctuation)
+    # Must have alphabetic characters
     alpha_chars = re.sub(r'[^a-zA-Z]', '', ascii_only)
     if not alpha_chars:
         return False
-    return alpha_chars == alpha_chars.upper()
+    # Accept all-uppercase (e.g., "COMPANY", "OUR BUSINESS")
+    if alpha_chars == alpha_chars.upper():
+        return True
+    # Accept title-case: first word must start with uppercase letter,
+    # and all words must start with uppercase (e.g., "Environment", "Human Resources")
+    # Also accept sentence-case where only first word is capitalized
+    # (e.g., "Human resources", "Business organization")
+    if words[0][0].isupper():
+        # At least the first word starts uppercase — accept as EN label
+        return True
+    return False
 
 
 def _is_jp_text(text):

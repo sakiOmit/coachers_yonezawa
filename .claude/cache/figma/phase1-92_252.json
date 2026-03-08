@@ -1,0 +1,49 @@
+{
+  "score": 24.3,
+  "grade": "D",
+  "recommendation": "All phases recommended",
+  "viewport": {
+    "width": 1440.0,
+    "height": 9392.0,
+    "scale": {
+      "w_scale": 1.0,
+      "h_scale": 1.1049411764705883,
+      "scale": 1.051161822209401
+    }
+  },
+  "metrics": {
+    "total_nodes": 302,
+    "unnamed_nodes": 137,
+    "unnamed_rate_pct": 45.4,
+    "named_rate_pct": 54.6,
+    "flat_sections": 2,
+    "ungrouped_candidates": 12,
+    "deep_nesting_count": 1,
+    "no_autolayout_frames": 96,
+    "total_frames": 96,
+    "max_depth": 9,
+    "max_section_depth": 8,
+    "hidden_nodes": 0,
+    "off_canvas_nodes": 0,
+    "nested_flat_count": 0
+  },
+  "score_breakdown": {
+    "unnamed_penalty": 22.7,
+    "flat_penalty": 40,
+    "ungrouped_penalty": 10,
+    "nesting_penalty": 3,
+    "autolayout_penalty": 0
+  },
+  "sample_unnamed": [
+    "Group 69",
+    "Rectangle 105",
+    "Vector 115",
+    "Group 263",
+    "Vector 114",
+    "Vector 117",
+    "Group 264",
+    "Vector 114",
+    "Vector 117",
+    "Vector 108"
+  ]
+}

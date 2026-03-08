@@ -1,1 +1,3458 @@
-{"document": {"type": "FRAME", "id": "92:252", "name": "/csr", "absoluteBoundingBox": {"x": 2.0, "y": 1285.0, "width": 1440.0, "height": 9392.0}, "children": [{"type": "TEXT", "id": "92:253", "name": "環境への取り組み", "absoluteBoundingBox": {"x": 160.0, "y": 2450.0, "width": 218.0, "height": 36.0}}, {"type": "TEXT", "id": "92:254", "name": "社会への取り組み", "absoluteBoundingBox": {"x": 160.0, "y": 3782.0, "width": 218.0, "height": 36.0}}, {"type": "TEXT", "id": "92:255", "name": "人材への取り組み", "absoluteBoundingBox": {"x": 160.0, "y": 5024.0, "width": 218.0, "height": 36.0}}, {"type": "TEXT", "id": "92:256", "name": "事業組織への取り組み", "absoluteBoundingBox": {"x": 160.0, "y": 7324.0, "width": 218.0, "height": 36.0}}, {"type": "FRAME", "id": "92:257", "name": "Group 69", "absoluteBoundingBox": {"x": -14.0, "y": 310.0, "width": 1455.0, "height": 1817.0}, "children": [{"type": "RECTANGLE", "id": "92:258", "name": "Rectangle 105", "absoluteBoundingBox": {"x": 0.0, "y": 310.0, "width": 1440.0, "height": 1817.0}}, {"type": "VECTOR", "id": "92:259", "name": "Vector 115", "absoluteBoundingBox": {"x": -14.0, "y": 1195.0, "width": 1318.0, "height": 0.0}}, {"type": "FRAME", "id": "92:260", "name": "Group 263", "absoluteBoundingBox": {"x": 123.0, "y": 741.0, "width": 1318.0, "height": 0.0}, "children": [{"type": "VECTOR", "id": "92:261", "name": "Vector 114", "absoluteBoundingBox": {"x": 123.0, "y": 741.0, "width": 1318.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:262", "name": "Vector 117", "absoluteBoundingBox": {"x": 1116.0, "y": 741.0, "width": 325.0, "height": 0.0}}]}, {"type": "FRAME", "id": "92:263", "name": "Group 264", "absoluteBoundingBox": {"x": 1318.0, "y": 1195.0, "width": 1318.0, "height": 0.0}, "children": [{"type": "VECTOR", "id": "92:264", "name": "Vector 114", "absoluteBoundingBox": {"x": 1318.0, "y": 1195.0, "width": 1318.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:265", "name": "Vector 117", "absoluteBoundingBox": {"x": 325.0, "y": 1195.0, "width": 325.0, "height": 0.0}}]}]}, {"type": "TEXT", "id": "92:266", "name": "Environment", "absoluteBoundingBox": {"x": 157.0, "y": 2388.0, "width": 246.0, "height": 48.0}}, {"type": "TEXT", "id": "92:267", "name": "Social", "absoluteBoundingBox": {"x": 157.0, "y": 3727.0, "width": 119.0, "height": 48.0}}, {"type": "TEXT", "id": "92:268", "name": "Human resources", "absoluteBoundingBox": {"x": 157.0, "y": 4969.0, "width": 346.0, "height": 48.0}}, {"type": "TEXT", "id": "92:269", "name": "Business organization", "absoluteBoundingBox": {"x": 157.0, "y": 7269.0, "width": 433.0, "height": 48.0}}, {"type": "TEXT", "id": "92:270", "name": "VISION", "absoluteBoundingBox": {"x": 614.0, "y": 2091.0, "width": 212.0, "height": 31.0}}, {"type": "TEXT", "id": "92:271", "name": "全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する", "absoluteBoundingBox": {"x": 397.0, "y": 2153.0, "width": 646.0, "height": 78.0}}, {"type": "VECTOR", "id": "92:272", "name": "Vector 108", "absoluteBoundingBox": {"x": 157.0, "y": 2183.0, "width": 194.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:273", "name": "Vector 109", "absoluteBoundingBox": {"x": 1090.0, "y": 2183.0, "width": 194.0, "height": 0.0}}, {"type": "TEXT", "id": "92:274", "name": "気候変動対策", "absoluteBoundingBox": {"x": 195.0, "y": 2531.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:275", "name": "CSR活動", "absoluteBoundingBox": {"x": 195.0, "y": 3863.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:276", "name": "人材育成", "absoluteBoundingBox": {"x": 195.0, "y": 5112.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:277", "name": "事業活動", "absoluteBoundingBox": {"x": 195.0, "y": 7412.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:278", "name": "品質/安全", "absoluteBoundingBox": {"x": 195.0, "y": 7757.0, "width": 167.0, "height": 39.0}}, {"type": "ELLIPSE", "id": "92:279", "name": "Ellipse 68", "absoluteBoundingBox": {"x": 166.0, "y": 7772.0, "width": 10.0, "height": 10.0}}, {"type": "TEXT", "id": "92:280", "name": "水質環境保全", "absoluteBoundingBox": {"x": 195.0, "y": 3076.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:281", "name": "地域活性化", "absoluteBoundingBox": {"x": 193.0, "y": 4508.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:282", "name": "健康経営", "absoluteBoundingBox": {"x": 193.0, "y": 6755.0, "width": 167.0, "height": 39.0}}, {"type": "TEXT", "id": "92:283", "name": "働き方/多様な人材の活躍", "absoluteBoundingBox": {"x": 193.0, "y": 5838.0, "width": 326.0, "height": 39.0}}, {"type": "TEXT", "id": "92:284", "name": "発電結果の共有", "absoluteBoundingBox": {"x": 249.0, "y": 2848.0, "width": 171.0, "height": 29.0}}, {"type": "TEXT", "id": "92:285", "name": "切手回収", "absoluteBoundingBox": {"x": 249.0, "y": 4255.0, "width": 171.0, "height": 29.0}}, {"type": "TEXT", "id": "92:286", "name": "労働環境の改善", "absoluteBoundingBox": {"x": 251.0, "y": 3393.0, "width": 171.0, "height": 29.0}}, {"type": "TEXT", "id": "92:287", "name": "省エネ活動", "absoluteBoundingBox": {"x": 822.0, "y": 2630.0, "width": 108.0, "height": 29.0}}, {"type": "TEXT", "id": "92:288", "name": "プルタブ/ペットボトルキャップ回収", "absoluteBoundingBox": {"x": 822.0, "y": 3962.0, "width": 360.0, "height": 29.0}}, {"type": "TEXT", "id": "92:289", "name": "ISO14001取得", "absoluteBoundingBox": {"x": 822.0, "y": 3169.0, "width": 149.0, "height": 29.0}}, {"type": "FRAME", "id": "92:290", "name": "Group 169", "absoluteBoundingBox": {"x": 193.0, "y": 2628.0, "width": 490.0, "height": 118.0}, "children": [{"type": "TEXT", "id": "92:291", "name": "太陽光パネル設置", "absoluteBoundingBox": {"x": 249.0, "y": 2628.0, "width": 196.0, "height": 29.0}}, {"type": "FRAME", "id": "92:292", "name": "真珠の無料アイコン3 1", "absoluteBoundingBox": {"x": 193.0, "y": 2628.0, "width": 33.0, "height": 32.0}}, {"type": "TEXT", "id": "92:304", "name": "自社社屋に太陽光パネルを設置し...", "absoluteBoundingBox": {"x": 195.0, "y": 2671.0, "width": 488.0, "height": 75.0}}]}, {"type": "FRAME", "id": "92:305", "name": "Group 171", "absoluteBoundingBox": {"x": 195.0, "y": 3960.0, "width": 488.0, "height": 168.0}, "children": [{"type": "TEXT", "id": "92:306", "name": "社内献血活動", "absoluteBoundingBox": {"x": 249.0, "y": 3960.0, "width": 196.0, "height": 29.0}}, {"type": "TEXT", "id": "92:307", "name": "赤十字血液センターにより...", "absoluteBoundingBox": {"x": 195.0, "y": 4003.0, "width": 488.0, "height": 125.0}}]}, {"type": "FRAME", "id": "92:308", "name": "献血アイコン2 1", "absoluteBoundingBox": {"x": 195.0, "y": 3960.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:312", "name": "Group 174", "absoluteBoundingBox": {"x": 190.0, "y": 5209.0, "width": 488.0, "height": 143.0}, "children": [{"type": "TEXT", "id": "92:313", "name": "次世代リーダー育成", "absoluteBoundingBox": {"x": 244.0, "y": 5209.0, "width": 254.0, "height": 29.0}}, {"type": "TEXT", "id": "92:314", "name": "内部コミュニケーションにて...", "absoluteBoundingBox": {"x": 190.0, "y": 5252.0, "width": 488.0, "height": 100.0}}]}, {"type": "FRAME", "id": "92:315", "name": "Group 183", "absoluteBoundingBox": {"x": 190.0, "y": 7509.0, "width": 944.0, "height": 93.0}, "children": [{"type": "TEXT", "id": "92:316", "name": "医療用・工業用機器に用いる...", "absoluteBoundingBox": {"x": 244.0, "y": 7509.0, "width": 873.0, "height": 29.0}}, {"type": "TEXT", "id": "92:317", "name": "自社ステンレスチューブは...", "absoluteBoundingBox": {"x": 190.0, "y": 7552.0, "width": 944.0, "height": 50.0}}]}, {"type": "FRAME", "id": "92:318", "name": "Group 184", "absoluteBoundingBox": {"x": 190.0, "y": 7854.0, "width": 944.0, "height": 93.0}, "children": [{"type": "TEXT", "id": "92:319", "name": "環境・品質方針の策定", "absoluteBoundingBox": {"x": 244.0, "y": 7854.0, "width": 873.0, "height": 29.0}}, {"type": "TEXT", "id": "92:320", "name": "事業を通じて...", "absoluteBoundingBox": {"x": 190.0, "y": 7897.0, "width": 944.0, "height": 50.0}}]}, {"type": "FRAME", "id": "92:321", "name": "Group 170", "absoluteBoundingBox": {"x": 194.0, "y": 3173.0, "width": 475.0, "height": 118.0}, "children": [{"type": "TEXT", "id": "92:322", "name": "洗浄機と水溶性引き抜き油の開発", "absoluteBoundingBox": {"x": 248.0, "y": 3173.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:323", "name": "従来トリクロロエチレンを...", "absoluteBoundingBox": {"x": 194.0, "y": 3216.0, "width": 475.0, "height": 75.0}}]}, {"type": "FRAME", "id": "92:324", "name": "Group 172", "absoluteBoundingBox": {"x": 195.0, "y": 4607.0, "width": 485.0, "height": 119.0}, "children": [{"type": "TEXT", "id": "92:325", "name": "地域の製品調達", "absoluteBoundingBox": {"x": 249.0, "y": 4607.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:326", "name": "コロナウイルス感染対策として...", "absoluteBoundingBox": {"x": 195.0, "y": 4651.0, "width": 485.0, "height": 75.0}}]}, {"type": "FRAME", "id": "92:327", "name": "Group 181", "absoluteBoundingBox": {"x": 195.0, "y": 6854.0, "width": 494.0, "height": 194.0}, "children": [{"type": "TEXT", "id": "92:328", "name": "労働安全衛生", "absoluteBoundingBox": {"x": 249.0, "y": 6854.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:329", "name": "当社で一部使用している...", "absoluteBoundingBox": {"x": 195.0, "y": 6898.0, "width": 494.0, "height": 150.0}}]}, {"type": "FRAME", "id": "92:330", "name": "Group 175", "absoluteBoundingBox": {"x": 195.0, "y": 5937.0, "width": 485.0, "height": 94.0}, "children": [{"type": "TEXT", "id": "92:331", "name": "子育て支援", "absoluteBoundingBox": {"x": 249.0, "y": 5937.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:332", "name": "2018年9月くるみん認定...", "absoluteBoundingBox": {"x": 195.0, "y": 5981.0, "width": 485.0, "height": 50.0}}]}, {"type": "FRAME", "id": "92:333", "name": "Group 178", "absoluteBoundingBox": {"x": 195.0, "y": 6145.0, "width": 485.0, "height": 144.0}, "children": [{"type": "TEXT", "id": "92:334", "name": "ハラスメント対策", "absoluteBoundingBox": {"x": 249.0, "y": 6145.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:335", "name": "社内でハラスメント窓口を設置...", "absoluteBoundingBox": {"x": 195.0, "y": 6189.0, "width": 485.0, "height": 100.0}}]}, {"type": "FRAME", "id": "92:336", "name": "Group 180", "absoluteBoundingBox": {"x": 195.0, "y": 6381.0, "width": 485.0, "height": 219.0}, "children": [{"type": "TEXT", "id": "92:337", "name": "障がい者雇用/教育", "absoluteBoundingBox": {"x": 249.0, "y": 6381.0, "width": 334.0, "height": 29.0}}, {"type": "TEXT", "id": "92:338", "name": "2018年6月より...", "absoluteBoundingBox": {"x": 195.0, "y": 6425.0, "width": 485.0, "height": 175.0}}]}, {"type": "TEXT", "id": "92:339", "name": "月報として全社員に...", "absoluteBoundingBox": {"x": 195.0, "y": 2891.0, "width": 480.0, "height": 50.0}}, {"type": "TEXT", "id": "92:340", "name": "社内で切手を回収し...", "absoluteBoundingBox": {"x": 195.0, "y": 4298.0, "width": 475.0, "height": 50.0}}, {"type": "FRAME", "id": "92:341", "name": "お札を受け取る手のフリーアイコン 1", "absoluteBoundingBox": {"x": 199.0, "y": 4252.0, "width": 36.0, "height": 36.0}}, {"type": "TEXT", "id": "92:346", "name": "作業員の健康被害リスクが...", "absoluteBoundingBox": {"x": 197.0, "y": 3436.0, "width": 468.0, "height": 50.0}}, {"type": "FRAME", "id": "92:347", "name": "ウォーキングアイコン3 1", "absoluteBoundingBox": {"x": 194.0, "y": 3392.0, "width": 32.0, "height": 32.0}}, {"type": "TEXT", "id": "92:351", "name": "社員の残業を最小限に...", "absoluteBoundingBox": {"x": 775.0, "y": 2671.0, "width": 374.0, "height": 50.0}}, {"type": "TEXT", "id": "92:352", "name": "社内に回収箱を設置し...", "absoluteBoundingBox": {"x": 773.0, "y": 4003.0, "width": 465.0, "height": 125.0}}, {"type": "FRAME", "id": "92:353", "name": "Group 177", "absoluteBoundingBox": {"x": 773.0, "y": 5209.0, "width": 465.0, "height": 191.0}, "children": [{"type": "TEXT", "id": "92:354", "name": "e-ラーニング導入", "absoluteBoundingBox": {"x": 822.0, "y": 5209.0, "width": 175.0, "height": 29.0}}, {"type": "TEXT", "id": "92:355", "name": "ベネフィットワンを全従業員に...", "absoluteBoundingBox": {"x": 773.0, "y": 5250.0, "width": 465.0, "height": 150.0}}]}, {"type": "TEXT", "id": "92:356", "name": "作業環境測定結果の管理区分が...", "absoluteBoundingBox": {"x": 773.0, "y": 3212.0, "width": 425.0, "height": 50.0}}, {"type": "FRAME", "id": "92:357", "name": "Group 173", "absoluteBoundingBox": {"x": 773.0, "y": 4607.0, "width": 460.0, "height": 141.0}, "children": [{"type": "TEXT", "id": "92:358", "name": "地域のパートナーシップ", "absoluteBoundingBox": {"x": 822.0, "y": 4607.0, "width": 240.0, "height": 29.0}}, {"type": "TEXT", "id": "92:359", "name": "新・群馬県総合計画...", "absoluteBoundingBox": {"x": 773.0, "y": 4648.0, "width": 460.0, "height": 100.0}}]}, {"type": "FRAME", "id": "92:360", "name": "Group 182", "absoluteBoundingBox": {"x": 773.0, "y": 6854.0, "width": 460.0, "height": 191.0}, "children": [{"type": "TEXT", "id": "92:361", "name": "ストレスチェックの実施", "absoluteBoundingBox": {"x": 822.0, "y": 6854.0, "width": 240.0, "height": 29.0}}, {"type": "TEXT", "id": "92:362", "name": "全社員のメンタル不調の...", "absoluteBoundingBox": {"x": 773.0, "y": 6895.0, "width": 460.0, "height": 150.0}}]}, {"type": "FRAME", "id": "92:363", "name": "Group 176", "absoluteBoundingBox": {"x": 773.0, "y": 5934.0, "width": 460.0, "height": 119.0}, "children": [{"type": "TEXT", "id": "92:364", "name": "育児休暇の取得推進", "absoluteBoundingBox": {"x": 822.0, "y": 5937.0, "width": 196.0, "height": 29.0}}, {"type": "FRAME", "id": "92:365", "name": "哺乳瓶のアイコン2 1", "absoluteBoundingBox": {"x": 773.0, "y": 5934.0, "width": 32.0, "height": 32.0}}, {"type": "TEXT", "id": "92:372", "name": "男女・ジェンダーに関わらず...", "absoluteBoundingBox": {"x": 773.0, "y": 5978.0, "width": 460.0, "height": 75.0}}]}, {"type": "FRAME", "id": "92:373", "name": "Group 179", "absoluteBoundingBox": {"x": 773.0, "y": 6145.0, "width": 460.0, "height": 141.0}, "children": [{"type": "TEXT", "id": "92:374", "name": "福利厚生の充実", "absoluteBoundingBox": {"x": 822.0, "y": 6145.0, "width": 152.0, "height": 29.0}}, {"type": "TEXT", "id": "92:375", "name": "社内全員に働きやすい環境を...", "absoluteBoundingBox": {"x": 773.0, "y": 6186.0, "width": 460.0, "height": 100.0}}]}, {"type": "VECTOR", "id": "92:376", "name": "Vector 48", "absoluteBoundingBox": {"x": 159.0, "y": 2583.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:377", "name": "Vector 114", "absoluteBoundingBox": {"x": 159.0, "y": 3915.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:378", "name": "Vector 122", "absoluteBoundingBox": {"x": 159.0, "y": 5164.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:379", "name": "Vector 134", "absoluteBoundingBox": {"x": 159.0, "y": 7464.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:380", "name": "Vector 136", "absoluteBoundingBox": {"x": 159.0, "y": 7809.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:381", "name": "Vector 110", "absoluteBoundingBox": {"x": 159.0, "y": 3128.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:382", "name": "Vector 115", "absoluteBoundingBox": {"x": 157.0, "y": 4560.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:383", "name": "Vector 131", "absoluteBoundingBox": {"x": 157.0, "y": 6807.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:384", "name": "Vector 123", "absoluteBoundingBox": {"x": 157.0, "y": 5890.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:385", "name": "Vector 129", "absoluteBoundingBox": {"x": 158.0, "y": 6334.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:386", "name": "Vector 49", "absoluteBoundingBox": {"x": 159.0, "y": 2791.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:387", "name": "Vector 116", "absoluteBoundingBox": {"x": 159.0, "y": 4173.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:388", "name": "Vector 124", "absoluteBoundingBox": {"x": 159.0, "y": 5445.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:389", "name": "Vector 135", "absoluteBoundingBox": {"x": 159.0, "y": 7647.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:390", "name": "Vector 137", "absoluteBoundingBox": {"x": 159.0, "y": 7992.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:391", "name": "Vector 111", "absoluteBoundingBox": {"x": 159.0, "y": 3336.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:392", "name": "Vector 117", "absoluteBoundingBox": {"x": 157.0, "y": 4793.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:393", "name": "Vector 132", "absoluteBoundingBox": {"x": 156.0, "y": 7093.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:394", "name": "Vector 125", "absoluteBoundingBox": {"x": 157.0, "y": 6098.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:395", "name": "Vector 130", "absoluteBoundingBox": {"x": 160.0, "y": 6645.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:396", "name": "Vector 50", "absoluteBoundingBox": {"x": 159.0, "y": 2999.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:397", "name": "Vector 118", "absoluteBoundingBox": {"x": 159.0, "y": 4431.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:398", "name": "Vector 126", "absoluteBoundingBox": {"x": 158.0, "y": 5728.0, "width": 1123.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:399", "name": "Vector 112", "absoluteBoundingBox": {"x": 159.0, "y": 3544.0, "width": 1123.0, "height": 0.0}}, {"type": "FRAME", "id": "92:400", "name": "署名アイコン (1) 1", "absoluteBoundingBox": {"x": 192.0, "y": 2848.0, "width": 31.0, "height": 31.0}}, {"type": "TEXT", "id": "92:411", "name": "SDGs研修/啓蒙活動", "absoluteBoundingBox": {"x": 249.0, "y": 5490.0, "width": 238.0, "height": 29.0}}, {"type": "TEXT", "id": "92:412", "name": "イマココラボカードゲーム...", "absoluteBoundingBox": {"x": 195.0, "y": 5533.0, "width": 475.0, "height": 150.0}}, {"type": "VECTOR", "id": "92:413", "name": "Vector 51", "absoluteBoundingBox": {"x": 720.0, "y": 2583.0, "width": 0.0, "height": 416.0}}, {"type": "VECTOR", "id": "92:414", "name": "Vector 120", "absoluteBoundingBox": {"x": 720.0, "y": 3915.0, "width": 0.0, "height": 516.0}}, {"type": "VECTOR", "id": "92:415", "name": "Vector 127", "absoluteBoundingBox": {"x": 720.0, "y": 5164.0, "width": 0.0, "height": 564.0}}, {"type": "VECTOR", "id": "92:416", "name": "Vector 113", "absoluteBoundingBox": {"x": 720.0, "y": 3128.0, "width": 0.0, "height": 422.0}}, {"type": "VECTOR", "id": "92:417", "name": "Vector 121", "absoluteBoundingBox": {"x": 718.0, "y": 4560.0, "width": 0.0, "height": 233.0}}, {"type": "VECTOR", "id": "92:418", "name": "Vector 133", "absoluteBoundingBox": {"x": 718.0, "y": 6807.0, "width": 0.0, "height": 286.0}}, {"type": "VECTOR", "id": "92:419", "name": "Vector 128", "absoluteBoundingBox": {"x": 718.0, "y": 5890.0, "width": 0.0, "height": 755.0}}, {"type": "FRAME", "id": "92:420", "name": "visual", "absoluteBoundingBox": {"x": 0.0, "y": 62.0, "width": 1441.0, "height": 266.0}, "children": [{"type": "FRAME", "id": "92:421", "name": "Mask group", "absoluteBoundingBox": {"x": 0.0, "y": 62.0, "width": 1440.0, "height": 266.0}, "children": [{"type": "RECTANGLE", "id": "92:422", "name": "Rectangle 43", "absoluteBoundingBox": {"x": 0.0, "y": 62.0, "width": 1440.0, "height": 266.0}}, {"type": "RECTANGLE", "id": "92:423", "name": "image 22", "absoluteBoundingBox": {"x": 542.0, "y": -209.0, "width": 1100.0, "height": 826.0}}]}, {"type": "RECTANGLE", "id": "92:424", "name": "Rectangle 771", "absoluteBoundingBox": {"x": 0.0, "y": 62.0, "width": 1441.0, "height": 266.0}}, {"type": "FRAME", "id": "92:425", "name": "Group 99", "absoluteBoundingBox": {"x": 118.0, "y": 112.0, "width": 918.0, "height": 167.0}, "children": [{"type": "TEXT", "id": "92:426", "name": "Social contributions", "absoluteBoundingBox": {"x": 118.0, "y": 112.0, "width": 918.0, "height": 115.0}}, {"type": "VECTOR", "id": "92:427", "name": "Vector 91", "absoluteBoundingBox": {"x": 118.0, "y": 228.0, "width": 190.0, "height": 0.0}}, {"type": "TEXT", "id": "92:428", "name": "手島精管の社会貢献の在り方", "absoluteBoundingBox": {"x": 120.0, "y": 245.0, "width": 289.0, "height": 34.0}}]}]}, {"type": "FRAME", "id": "92:429", "name": "Mask group", "absoluteBoundingBox": {"x": 0.0, "y": 1716.0, "width": 1440.0, "height": 266.0}, "children": [{"type": "RECTANGLE", "id": "92:430", "name": "Rectangle 43", "absoluteBoundingBox": {"x": 0.0, "y": 1716.0, "width": 1440.0, "height": 266.0}}, {"type": "RECTANGLE", "id": "92:431", "name": "pixta_85072735_M 1", "absoluteBoundingBox": {"x": -131.0, "y": 1550.0, "width": 1793.0, "height": 1007.0}}]}, {"type": "RECTANGLE", "id": "92:432", "name": "Rectangle 772", "absoluteBoundingBox": {"x": 0.0, "y": 1716.0, "width": 1441.0, "height": 266.0}}, {"type": "FRAME", "id": "92:433", "name": "Group 100", "absoluteBoundingBox": {"x": 158.0, "y": 1766.0, "width": 918.0, "height": 167.0}, "children": [{"type": "TEXT", "id": "92:434", "name": "Sustainability", "absoluteBoundingBox": {"x": 158.0, "y": 1766.0, "width": 918.0, "height": 115.0}}, {"type": "VECTOR", "id": "92:435", "name": "Vector 91", "absoluteBoundingBox": {"x": 158.0, "y": 1882.0, "width": 190.0, "height": 0.0}}, {"type": "TEXT", "id": "92:436", "name": "サスティナビリティ", "absoluteBoundingBox": {"x": 160.0, "y": 1899.0, "width": 289.0, "height": 34.0}}]}, {"type": "FRAME", "id": "92:437", "name": "csr1", "absoluteBoundingBox": {"x": 122.0, "y": 386.0, "width": 1076.0, "height": 301.0}, "children": [{"type": "FRAME", "id": "92:438", "name": "Group 119", "absoluteBoundingBox": {"x": 122.0, "y": 436.0, "width": 585.0, "height": 204.0}, "children": [{"type": "TEXT", "id": "92:439", "name": "結婚、出産などの...", "absoluteBoundingBox": {"x": 150.0, "y": 531.0, "width": 557.0, "height": 48.0}}, {"type": "TEXT", "id": "92:440", "name": "少子化に向かう...", "absoluteBoundingBox": {"x": 150.0, "y": 593.0, "width": 557.0, "height": 47.0}}, {"type": "FRAME", "id": "92:441", "name": "Group 65", "absoluteBoundingBox": {"x": 122.0, "y": 436.0, "width": 562.0, "height": 65.0}, "children": [{"type": "TEXT", "id": "92:442", "name": "社員の人生の節目においても...", "absoluteBoundingBox": {"x": 122.0, "y": 436.0, "width": 562.0, "height": 65.0}}]}, {"type": "ELLIPSE", "id": "92:443", "name": "Ellipse 30", "absoluteBoundingBox": {"x": 127.0, "y": 542.0, "width": 9.0, "height": 9.0}}, {"type": "ELLIPSE", "id": "92:444", "name": "Ellipse 31", "absoluteBoundingBox": {"x": 127.0, "y": 601.0, "width": 9.0, "height": 9.0}}]}, {"type": "FRAME", "id": "92:445", "name": "Mask group", "absoluteBoundingBox": {"x": 779.0, "y": 386.0, "width": 419.0, "height": 301.0}, "children": [{"type": "RECTANGLE", "id": "92:446", "name": "Rectangle 109", "absoluteBoundingBox": {"x": 779.0, "y": 386.0, "width": 419.0, "height": 301.0}}, {"type": "RECTANGLE", "id": "92:447", "name": "pixta_99601119_M 1", "absoluteBoundingBox": {"x": 552.0, "y": 234.0, "width": 928.0, "height": 619.0}}]}]}, {"type": "FRAME", "id": "92:448", "name": "csr3", "absoluteBoundingBox": {"x": 201.0, "y": 812.0, "width": 1083.0, "height": 301.0}, "children": [{"type": "FRAME", "id": "92:449", "name": "Group 102", "absoluteBoundingBox": {"x": 201.0, "y": 851.0, "width": 582.0, "height": 213.0}, "children": [{"type": "FRAME", "id": "92:450", "name": "Group 115", "absoluteBoundingBox": {"x": 201.0, "y": 851.0, "width": 582.0, "height": 213.0}, "children": [{"type": "TEXT", "id": "92:451", "name": "館林で就職したい...", "absoluteBoundingBox": {"x": 224.0, "y": 947.0, "width": 559.0, "height": 117.0}}, {"type": "FRAME", "id": "92:452", "name": "Group 65", "absoluteBoundingBox": {"x": 201.0, "y": 851.0, "width": 556.0, "height": 65.0}, "children": [{"type": "TEXT", "id": "92:453", "name": "館林市内の中学生及び...", "absoluteBoundingBox": {"x": 201.0, "y": 851.0, "width": 556.0, "height": 65.0}}]}, {"type": "ELLIPSE", "id": "92:454", "name": "Ellipse 30", "absoluteBoundingBox": {"x": 201.0, "y": 955.0, "width": 9.0, "height": 9.0}}]}]}, {"type": "FRAME", "id": "92:455", "name": "Mask group", "absoluteBoundingBox": {"x": 865.0, "y": 812.0, "width": 419.0, "height": 301.0}, "children": [{"type": "RECTANGLE", "id": "92:456", "name": "Rectangle 109", "absoluteBoundingBox": {"x": 865.0, "y": 812.0, "width": 419.0, "height": 301.0}}, {"type": "RECTANGLE", "id": "92:457", "name": "pixta_53646639_M 1", "absoluteBoundingBox": {"x": 823.0, "y": 813.0, "width": 504.0, "height": 300.0}}]}]}, {"type": "FRAME", "id": "92:458", "name": "csr4", "absoluteBoundingBox": {"x": 161.0, "y": 1264.0, "width": 1138.0, "height": 301.0}, "children": [{"type": "FRAME", "id": "92:459", "name": "Group 103", "absoluteBoundingBox": {"x": 161.0, "y": 1264.0, "width": 419.0, "height": 301.0}, "children": [{"type": "RECTANGLE", "id": "92:460", "name": "Rectangle 105", "absoluteBoundingBox": {"x": 4.0, "y": 1205.0, "width": 1440.0, "height": 646.0}}, {"type": "FRAME", "id": "92:461", "name": "Mask group", "absoluteBoundingBox": {"x": 161.0, "y": 1264.0, "width": 419.0, "height": 301.0}, "children": [{"type": "RECTANGLE", "id": "92:462", "name": "Rectangle 109", "absoluteBoundingBox": {"x": 161.0, "y": 1264.0, "width": 419.0, "height": 301.0}}, {"type": "RECTANGLE", "id": "92:463", "name": "pixta_55443012_M 1", "absoluteBoundingBox": {"x": 125.0, "y": 1264.0, "width": 478.0, "height": 318.0}}]}]}, {"type": "FRAME", "id": "92:464", "name": "Group 120", "absoluteBoundingBox": {"x": 652.0, "y": 1305.0, "width": 647.0, "height": 235.0}, "children": [{"type": "TEXT", "id": "92:465", "name": "手島精管では、会社を...", "absoluteBoundingBox": {"x": 682.0, "y": 1371.0, "width": 617.0, "height": 41.0}}, {"type": "TEXT", "id": "92:466", "name": "手島精管では、各自の受講したい...", "absoluteBoundingBox": {"x": 682.0, "y": 1440.0, "width": 602.0, "height": 100.0}}, {"type": "FRAME", "id": "92:467", "name": "Group 65", "absoluteBoundingBox": {"x": 652.0, "y": 1305.0, "width": 614.0, "height": 57.0}, "children": [{"type": "TEXT", "id": "92:468", "name": "社員に対する教育を強化...", "absoluteBoundingBox": {"x": 652.0, "y": 1305.0, "width": 614.0, "height": 57.0}}]}, {"type": "ELLIPSE", "id": "92:469", "name": "Ellipse 38", "absoluteBoundingBox": {"x": 657.0, "y": 1382.0, "width": 9.0, "height": 9.0}}, {"type": "ELLIPSE", "id": "92:470", "name": "Ellipse 39", "absoluteBoundingBox": {"x": 657.0, "y": 1449.0, "width": 9.0, "height": 9.0}}]}]}, {"type": "FRAME", "id": "92:471", "name": "Group 124", "absoluteBoundingBox": {"x": 397.0, "y": 2286.0, "width": 75.0, "height": 25.0}, "children": [{"type": "TEXT", "id": "92:472", "name": "環境", "absoluteBoundingBox": {"x": 422.0, "y": 2286.0, "width": 50.0, "height": 25.0}}, {"type": "ELLIPSE", "id": "92:473", "name": "Ellipse 56", "absoluteBoundingBox": {"x": 397.0, "y": 2293.0, "width": 9.0, "height": 9.0}}]}, {"type": "FRAME", "id": "92:474", "name": "Group 122", "absoluteBoundingBox": {"x": 747.0, "y": 2286.0, "width": 75.0, "height": 29.0}, "children": [{"type": "TEXT", "id": "92:475", "name": "人材", "absoluteBoundingBox": {"x": 772.0, "y": 2286.0, "width": 50.0, "height": 29.0}}, {"type": "ELLIPSE", "id": "92:476", "name": "Ellipse 58", "absoluteBoundingBox": {"x": 747.0, "y": 2293.0, "width": 9.0, "height": 9.0}}]}, {"type": "FRAME", "id": "92:477", "name": "Group 121", "absoluteBoundingBox": {"x": 572.0, "y": 2286.0, "width": 75.0, "height": 25.0}, "children": [{"type": "TEXT", "id": "92:478", "name": "社会", "absoluteBoundingBox": {"x": 597.0, "y": 2286.0, "width": 50.0, "height": 25.0}}, {"type": "ELLIPSE", "id": "92:479", "name": "Ellipse 57", "absoluteBoundingBox": {"x": 572.0, "y": 2293.0, "width": 9.0, "height": 9.0}}]}, {"type": "FRAME", "id": "92:480", "name": "Group 123", "absoluteBoundingBox": {"x": 922.0, "y": 2286.0, "width": 122.0, "height": 25.0}, "children": [{"type": "TEXT", "id": "92:481", "name": "事業組織", "absoluteBoundingBox": {"x": 947.0, "y": 2286.0, "width": 97.0, "height": 25.0}}, {"type": "ELLIPSE", "id": "92:482", "name": "Ellipse 59", "absoluteBoundingBox": {"x": 922.0, "y": 2293.0, "width": 9.0, "height": 9.0}}]}, {"type": "ELLIPSE", "id": "92:483", "name": "Ellipse 60", "absoluteBoundingBox": {"x": 171.0, "y": 2546.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:484", "name": "Ellipse 61", "absoluteBoundingBox": {"x": 171.0, "y": 3092.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:485", "name": "Ellipse 62", "absoluteBoundingBox": {"x": 166.0, "y": 3879.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:486", "name": "Ellipse 64", "absoluteBoundingBox": {"x": 166.0, "y": 5128.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:487", "name": "Ellipse 63", "absoluteBoundingBox": {"x": 166.0, "y": 4524.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:488", "name": "Ellipse 66", "absoluteBoundingBox": {"x": 166.0, "y": 6770.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:489", "name": "Ellipse 65", "absoluteBoundingBox": {"x": 166.0, "y": 5853.0, "width": 10.0, "height": 10.0}}, {"type": "ELLIPSE", "id": "92:490", "name": "Ellipse 67", "absoluteBoundingBox": {"x": 166.0, "y": 7427.0, "width": 10.0, "height": 10.0}}, {"type": "FRAME", "id": "92:491", "name": "menubar", "absoluteBoundingBox": {"x": -1.0, "y": 0.0, "width": 1442.0, "height": 62.0}, "children": [{"type": "FRAME", "id": "92:492", "name": "menubar", "absoluteBoundingBox": {"x": -1.0, "y": 0.0, "width": 1442.0, "height": 62.0}, "children": [{"type": "RECTANGLE", "id": "92:493", "name": "Rectangle 45", "absoluteBoundingBox": {"x": -1.0, "y": 0.0, "width": 1442.0, "height": 62.0}}]}, {"type": "FRAME", "id": "92:494", "name": "menubar", "absoluteBoundingBox": {"x": 28.0, "y": 13.0, "width": 1383.0, "height": 36.0}, "children": [{"type": "FRAME", "id": "92:495", "name": "menu", "absoluteBoundingBox": {"x": 511.0, "y": 21.0, "width": 708.0, "height": 20.0}, "children": [{"type": "TEXT", "id": "92:496", "name": "会社情報", "absoluteBoundingBox": {"x": 511.0, "y": 21.0, "width": 62.0, "height": 20.0}}, {"type": "TEXT", "id": "92:497", "name": "製品 / 技術", "absoluteBoundingBox": {"x": 636.0, "y": 21.0, "width": 80.0, "height": 20.0}}, {"type": "TEXT", "id": "92:498", "name": "ブログ", "absoluteBoundingBox": {"x": 1029.0, "y": 21.0, "width": 46.0, "height": 20.0}}, {"type": "TEXT", "id": "92:499", "name": "ニュース", "absoluteBoundingBox": {"x": 779.0, "y": 21.0, "width": 62.0, "height": 20.0}}, {"type": "TEXT", "id": "92:500", "name": "メディア", "absoluteBoundingBox": {"x": 904.0, "y": 21.0, "width": 62.0, "height": 20.0}}, {"type": "FRAME", "id": "92:501", "name": "Group 97", "absoluteBoundingBox": {"x": 1138.0, "y": 21.0, "width": 81.0, "height": 20.0}, "children": [{"type": "TEXT", "id": "92:502", "name": "採用案内", "absoluteBoundingBox": {"x": 1138.0, "y": 21.0, "width": 62.0, "height": 20.0}}, {"type": "FRAME", "id": "92:503", "name": "新しいウィンドウで開くボタン　1 3", "absoluteBoundingBox": {"x": 1205.0, "y": 24.0, "width": 14.0, "height": 14.0}}]}]}, {"type": "RECTANGLE", "id": "92:508", "name": "image 1", "absoluteBoundingBox": {"x": 28.0, "y": 18.0, "width": 106.0, "height": 27.0}}, {"type": "FRAME", "id": "92:509", "name": "Group 2", "absoluteBoundingBox": {"x": 1287.0, "y": 13.0, "width": 124.0, "height": 36.0}, "children": [{"type": "FRAME", "id": "92:510", "name": "Group 98", "absoluteBoundingBox": {"x": 1287.0, "y": 13.0, "width": 124.0, "height": 36.0}, "children": [{"type": "RECTANGLE", "id": "92:511", "name": "Rectangle 2", "absoluteBoundingBox": {"x": 1287.0, "y": 13.0, "width": 124.0, "height": 36.0}}, {"type": "TEXT", "id": "92:512", "name": "CONTACT", "absoluteBoundingBox": {"x": 1307.0, "y": 20.0, "width": 86.0, "height": 22.0}}]}]}]}]}, {"type": "FRAME", "id": "92:513", "name": "footer", "absoluteBoundingBox": {"x": 0.0, "y": 8754.0, "width": 1440.0, "height": 638.0}, "children": [{"type": "RECTANGLE", "id": "92:514", "name": "Rectangle 769", "absoluteBoundingBox": {"x": 0.0, "y": 8754.0, "width": 1440.0, "height": 312.0}}, {"type": "RECTANGLE", "id": "92:515", "name": "Rectangle 788", "absoluteBoundingBox": {"x": 0.0, "y": 9065.0, "width": 1440.0, "height": 327.0}}, {"type": "VECTOR", "id": "92:516", "name": "Vector 89", "absoluteBoundingBox": {"x": 166.0, "y": 9176.0, "width": 23.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:517", "name": "Vector 86", "absoluteBoundingBox": {"x": 165.0, "y": 8945.0, "width": 1110.0, "height": 0.0}}, {"type": "VECTOR", "id": "92:518", "name": "Vector 87", "absoluteBoundingBox": {"x": 165.0, "y": 9021.0, "width": 1110.0, "height": 0.0}}, {"type": "TEXT", "id": "92:519", "name": "群馬県館林市下早川田町306-1", "absoluteBoundingBox": {"x": 576.0, "y": 8875.0, "width": 279.0, "height": 32.0}}, {"type": "TEXT", "id": "92:520", "name": "手島精管株式会社", "absoluteBoundingBox": {"x": 582.0, "y": 8797.0, "width": 268.0, "height": 32.0}}, {"type": "TEXT", "id": "92:521", "name": "TESHIMASEIKAN Co., Ltd", "absoluteBoundingBox": {"x": 597.0, "y": 8836.0, "width": 238.0, "height": 32.0}}, {"type": "VECTOR", "id": "92:522", "name": "Vector 90", "absoluteBoundingBox": {"x": 463.0, "y": 9176.0, "width": 23.0, "height": 0.0}}, {"type": "RECTANGLE", "id": "92:523", "name": "image 1", "absoluteBoundingBox": {"x": 1083.0, "y": 9254.0, "width": 151.0, "height": 39.0}}, {"type": "TEXT", "id": "92:524", "name": "会社情報", "absoluteBoundingBox": {"x": 166.0, "y": 9135.0, "width": 70.0, "height": 32.0}}, {"type": "TEXT", "id": "92:525", "name": "製品/技術", "absoluteBoundingBox": {"x": 464.0, "y": 9135.0, "width": 79.0, "height": 32.0}}, {"type": "TEXT", "id": "92:526", "name": "ブログ", "absoluteBoundingBox": {"x": 754.0, "y": 9182.0, "width": 52.0, "height": 32.0}}, {"type": "TEXT", "id": "92:527", "name": "お問い合せ", "absoluteBoundingBox": {"x": 754.0, "y": 9232.0, "width": 88.0, "height": 32.0}}, {"type": "TEXT", "id": "92:528", "name": "プライバシーポリシー", "absoluteBoundingBox": {"x": 1082.0, "y": 9298.0, "width": 158.0, "height": 32.0}}, {"type": "TEXT", "id": "92:529", "name": "ニュース", "absoluteBoundingBox": {"x": 754.0, "y": 9135.0, "width": 70.0, "height": 32.0}}, {"type": "TEXT", "id": "92:530", "name": "私たちの強み", "absoluteBoundingBox": {"x": 166.0, "y": 9230.0, "width": 101.0, "height": 32.0}}, {"type": "TEXT", "id": "92:531", "name": "会社案内", "absoluteBoundingBox": {"x": 166.0, "y": 9196.0, "width": 67.0, "height": 32.0}}, {"type": "TEXT", "id": "92:532", "name": "製品情報", "absoluteBoundingBox": {"x": 464.0, "y": 9196.0, "width": 67.0, "height": 32.0}}, {"type": "TEXT", "id": "92:533", "name": "CSR/SDGs", "absoluteBoundingBox": {"x": 166.0, "y": 9264.0, "width": 83.0, "height": 32.0}}, {"type": "TEXT", "id": "92:534", "name": "規格・国際規格", "absoluteBoundingBox": {"x": 464.0, "y": 9230.0, "width": 118.0, "height": 32.0}}, {"type": "TEXT", "id": "92:535", "name": "グローバルサプライチェーン", "absoluteBoundingBox": {"x": 166.0, "y": 9298.0, "width": 220.0, "height": 32.0}}, {"type": "TEXT", "id": "92:536", "name": "工程・技術", "absoluteBoundingBox": {"x": 464.0, "y": 9264.0, "width": 84.0, "height": 32.0}}, {"type": "TEXT", "id": "92:537", "name": "ISO・認証・特許・登録証", "absoluteBoundingBox": {"x": 464.0, "y": 9298.0, "width": 199.0, "height": 32.0}}, {"type": "FRAME", "id": "92:538", "name": "Group 95", "absoluteBoundingBox": {"x": 606.0, "y": 8960.0, "width": 229.0, "height": 44.0}, "children": [{"type": "FRAME", "id": "92:539", "name": "icons8-facebookの新しい 1", "absoluteBoundingBox": {"x": 695.0, "y": 8960.0, "width": 45.0, "height": 44.0}}, {"type": "FRAME", "id": "92:541", "name": "icons8-プレイ動画 1", "absoluteBoundingBox": {"x": 791.0, "y": 8960.0, "width": 44.0, "height": 44.0}}, {"type": "FRAME", "id": "92:543", "name": "icons8-ツイッター 1", "absoluteBoundingBox": {"x": 606.0, "y": 8963.0, "width": 38.0, "height": 38.0}}]}, {"type": "FRAME", "id": "92:545", "name": "Group 220", "absoluteBoundingBox": {"x": 754.0, "y": 8910.0, "width": 193.0, "height": 415.0}, "children": [{"type": "RECTANGLE", "id": "92:546", "name": "Rectangle 869", "absoluteBoundingBox": {"x": 754.0, "y": 9284.0, "width": 193.0, "height": 41.0}}, {"type": "VECTOR", "id": "92:547", "name": "Vector", "absoluteBoundingBox": {"x": 917.0, "y": 8910.0, "width": 8.0, "height": 8.0}}, {"type": "TEXT", "id": "92:548", "name": "English Website", "absoluteBoundingBox": {"x": 772.0, "y": 9295.0, "width": 158.0, "height": 19.0}}]}]}, {"type": "FRAME", "id": "92:549", "name": "contact", "absoluteBoundingBox": {"x": 0.0, "y": 8202.0, "width": 1440.0, "height": 552.0}, "children": [{"type": "FRAME", "id": "92:550", "name": "Group 145", "absoluteBoundingBox": {"x": 0.0, "y": 8202.0, "width": 1440.0, "height": 552.0}, "children": [{"type": "FRAME", "id": "92:551", "name": "Mask group", "absoluteBoundingBox": {"x": 0.0, "y": 8202.0, "width": 1440.0, "height": 552.0}, "children": [{"type": "RECTANGLE", "id": "92:552", "name": "Rectangle 42", "absoluteBoundingBox": {"x": 0.0, "y": 8202.0, "width": 1440.0, "height": 552.0}}, {"type": "RECTANGLE", "id": "92:553", "name": "image 18", "absoluteBoundingBox": {"x": -108.0, "y": 7948.0, "width": 1568.0, "height": 1046.0}}]}]}, {"type": "RECTANGLE", "id": "92:554", "name": "Rectangle 40", "absoluteBoundingBox": {"x": 0.0, "y": 8202.0, "width": 1440.0, "height": 552.0}}, {"type": "FRAME", "id": "92:555", "name": "Group 38", "absoluteBoundingBox": {"x": 618.0, "y": 8278.0, "width": 203.0, "height": 73.0}, "children": [{"type": "TEXT", "id": "92:556", "name": "CONTACT", "absoluteBoundingBox": {"x": 618.0, "y": 8278.0, "width": 203.0, "height": 46.0}}, {"type": "TEXT", "id": "92:557", "name": "お問い合わせ", "absoluteBoundingBox": {"x": 661.0, "y": 8324.0, "width": 123.0, "height": 27.0}}]}, {"type": "VECTOR", "id": "92:558", "name": "Vector 19", "absoluteBoundingBox": {"x": 720.0, "y": 8404.0, "width": 0.0, "height": 260.0}}, {"type": "FRAME", "id": "92:559", "name": "Group 144", "absoluteBoundingBox": {"x": 166.0, "y": 8404.0, "width": 1108.0, "height": 259.0}, "children": [{"type": "RECTANGLE", "id": "92:560", "name": "Rectangle 41", "absoluteBoundingBox": {"x": 166.0, "y": 8404.0, "width": 1108.0, "height": 259.0}}, {"type": "FRAME", "id": "92:561", "name": "Group 53", "absoluteBoundingBox": {"x": 243.0, "y": 8465.0, "width": 395.0, "height": 123.0}, "children": [{"type": "FRAME", "id": "92:562", "name": "Group 83", "absoluteBoundingBox": {"x": 243.0, "y": 8465.0, "width": 395.0, "height": 123.0}, "children": [{"type": "TEXT", "id": "92:563", "name": "WEBからのお問い合わせ", "absoluteBoundingBox": {"x": 329.0, "y": 8465.0, "width": 223.0, "height": 26.0}}, {"type": "FRAME", "id": "92:564", "name": "Group 51", "absoluteBoundingBox": {"x": 243.0, "y": 8514.0, "width": 395.0, "height": 74.0}, "children": [{"type": "FRAME", "id": "92:565", "name": "Group 50", "absoluteBoundingBox": {"x": 243.0, "y": 8514.0, "width": 395.0, "height": 74.0}, "children": [{"type": "FRAME", "id": "92:566", "name": "Group 143", "absoluteBoundingBox": {"x": 243.0, "y": 8514.0, "width": 395.0, "height": 74.0}, "children": [{"type": "RECTANGLE", "id": "92:567", "name": "Rectangle 42", "absoluteBoundingBox": {"x": 243.0, "y": 8514.0, "width": 395.0, "height": 74.0}}, {"type": "FRAME", "id": "92:568", "name": "Group 142", "absoluteBoundingBox": {"x": 290.0, "y": 8532.0, "width": 301.0, "height": 38.0}, "children": [{"type": "TEXT", "id": "92:569", "name": "お問い合わせフォーム", "absoluteBoundingBox": {"x": 328.0, "y": 8532.0, "width": 263.0, "height": 38.0}}, {"type": "VECTOR", "id": "92:570", "name": "Vector", "absoluteBoundingBox": {"x": 290.0, "y": 8541.0, "width": 27.0, "height": 21.0}}]}]}]}]}]}]}, {"type": "FRAME", "id": "92:571", "name": "Group 52", "absoluteBoundingBox": {"x": 842.0, "y": 8445.0, "width": 302.0, "height": 183.0}, "children": [{"type": "TEXT", "id": "92:572", "name": "お電話でのお問い合わせ", "absoluteBoundingBox": {"x": 884.0, "y": 8445.0, "width": 218.0, "height": 26.0}}, {"type": "TEXT", "id": "92:573", "name": "FAXでのお問い合わせ", "absoluteBoundingBox": {"x": 903.0, "y": 8565.0, "width": 176.0, "height": 23.0}}, {"type": "TEXT", "id": "92:574", "name": "（営業時間 8:00-17:00）", "absoluteBoundingBox": {"x": 881.0, "y": 8519.0, "width": 211.0, "height": 23.0}}, {"type": "FRAME", "id": "92:575", "name": "Group 29", "absoluteBoundingBox": {"x": 842.0, "y": 8472.0, "width": 302.0, "height": 50.0}, "children": [{"type": "FRAME", "id": "92:576", "name": "電話の受話器のアイコン素材 1", "absoluteBoundingBox": {"x": 842.0, "y": 8479.0, "width": 34.0, "height": 34.0}}, {"type": "TEXT", "id": "92:579", "name": "0276-73-1173", "absoluteBoundingBox": {"x": 883.0, "y": 8472.0, "width": 261.0, "height": 50.0}}]}, {"type": "FRAME", "id": "92:580", "name": "Group 30", "absoluteBoundingBox": {"x": 879.0, "y": 8590.0, "width": 224.0, "height": 38.0}, "children": [{"type": "FRAME", "id": "92:581", "name": "プリンターの無料アイコン4 1", "absoluteBoundingBox": {"x": 879.0, "y": 8590.0, "width": 34.0, "height": 34.0}}, {"type": "TEXT", "id": "92:587", "name": "0276-74-8069", "absoluteBoundingBox": {"x": 924.0, "y": 8593.0, "width": 179.0, "height": 35.0}}]}]}]}]}, {"type": "FRAME", "id": "92:588", "name": "電球アイコン15 1", "absoluteBoundingBox": {"x": 771.0, "y": 2630.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:594", "name": "水滴アイコン4 1", "absoluteBoundingBox": {"x": 224.0, "y": 3173.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:598", "name": "受験勉強アイコン 1", "absoluteBoundingBox": {"x": 773.0, "y": 3169.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:606", "name": "リサイクルマーク付きのゴミ箱イラスト 1", "absoluteBoundingBox": {"x": 773.0, "y": 3961.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:609", "name": "インフルエンザ対策のマスクの無料アイコン素材 2 1", "absoluteBoundingBox": {"x": 197.0, "y": 4607.0, "width": 30.0, "height": 30.0}}, {"type": "FRAME", "id": "92:617", "name": "握手のフリーアイコン 1", "absoluteBoundingBox": {"x": 773.0, "y": 4604.0, "width": 36.0, "height": 36.0}}, {"type": "FRAME", "id": "92:622", "name": "人物アイコン　チーム 1", "absoluteBoundingBox": {"x": 190.0, "y": 5206.0, "width": 36.0, "height": 36.0}}, {"type": "FRAME", "id": "92:627", "name": "ノートのアイコン素材7 1", "absoluteBoundingBox": {"x": 773.0, "y": 5208.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:630", "name": "新芽のアイコン 1", "absoluteBoundingBox": {"x": 195.0, "y": 5490.0, "width": 31.0, "height": 31.0}}, {"type": "FRAME", "id": "92:633", "name": "ベビー服のフリーアイコン 1", "absoluteBoundingBox": {"x": 195.0, "y": 5936.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:640", "name": "シールドアイコン5 1", "absoluteBoundingBox": {"x": 195.0, "y": 6145.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:644", "name": "ナイフ、お皿、フォークのお食事アイコン2 1", "absoluteBoundingBox": {"x": 773.0, "y": 6145.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:651", "name": "プレゼンテーションアイコン 1", "absoluteBoundingBox": {"x": 195.0, "y": 6380.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:661", "name": "キラキラ 3 1", "absoluteBoundingBox": {"x": 193.0, "y": 6853.0, "width": 31.0, "height": 31.0}}, {"type": "FRAME", "id": "92:666", "name": "ハートの心電図のアイコン素材 1 1", "absoluteBoundingBox": {"x": 773.0, "y": 6853.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:669", "name": "注射器のアイコン素材 (1) 1", "absoluteBoundingBox": {"x": 193.0, "y": 7507.0, "width": 32.0, "height": 32.0}}, {"type": "FRAME", "id": "92:679", "name": "地球アイコン9 1", "absoluteBoundingBox": {"x": 190.0, "y": 7854.0, "width": 32.0, "height": 32.0}}]}}
+{
+  "document": {
+    "type": "FRAME",
+    "id": "92:252",
+    "name": "/csr",
+    "absoluteBoundingBox": {
+      "x": 2.0,
+      "y": 1285.0,
+      "width": 1440.0,
+      "height": 9392.0
+    },
+    "children": [
+      {
+        "type": "TEXT",
+        "id": "92:253",
+        "name": "環境への取り組み",
+        "absoluteBoundingBox": {
+          "x": 160.0,
+          "y": 2450.0,
+          "width": 218.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:254",
+        "name": "社会への取り組み",
+        "absoluteBoundingBox": {
+          "x": 160.0,
+          "y": 3782.0,
+          "width": 218.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:255",
+        "name": "人材への取り組み",
+        "absoluteBoundingBox": {
+          "x": 160.0,
+          "y": 5024.0,
+          "width": 218.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:256",
+        "name": "事業組織への取り組み",
+        "absoluteBoundingBox": {
+          "x": 160.0,
+          "y": 7324.0,
+          "width": 218.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:257",
+        "name": "Group 69",
+        "absoluteBoundingBox": {
+          "x": -14.0,
+          "y": 310.0,
+          "width": 1455.0,
+          "height": 1817.0
+        },
+        "children": [
+          {
+            "type": "RECTANGLE",
+            "id": "92:258",
+            "name": "Rectangle 105",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 310.0,
+              "width": 1440.0,
+              "height": 1817.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:259",
+            "name": "Vector 115",
+            "absoluteBoundingBox": {
+              "x": -14.0,
+              "y": 1195.0,
+              "width": 1318.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:260",
+            "name": "Group 263",
+            "absoluteBoundingBox": {
+              "x": 123.0,
+              "y": 741.0,
+              "width": 1318.0,
+              "height": 0.0
+            },
+            "children": [
+              {
+                "type": "VECTOR",
+                "id": "92:261",
+                "name": "Vector 114",
+                "absoluteBoundingBox": {
+                  "x": 123.0,
+                  "y": 741.0,
+                  "width": 1318.0,
+                  "height": 0.0
+                }
+              },
+              {
+                "type": "VECTOR",
+                "id": "92:262",
+                "name": "Vector 117",
+                "absoluteBoundingBox": {
+                  "x": 1116.0,
+                  "y": 741.0,
+                  "width": 325.0,
+                  "height": 0.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:263",
+            "name": "Group 264",
+            "absoluteBoundingBox": {
+              "x": 1318.0,
+              "y": 1195.0,
+              "width": 1318.0,
+              "height": 0.0
+            },
+            "children": [
+              {
+                "type": "VECTOR",
+                "id": "92:264",
+                "name": "Vector 114",
+                "absoluteBoundingBox": {
+                  "x": 1318.0,
+                  "y": 1195.0,
+                  "width": 1318.0,
+                  "height": 0.0
+                }
+              },
+              {
+                "type": "VECTOR",
+                "id": "92:265",
+                "name": "Vector 117",
+                "absoluteBoundingBox": {
+                  "x": 325.0,
+                  "y": 1195.0,
+                  "width": 325.0,
+                  "height": 0.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "id": "92:266",
+        "name": "Environment",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 2388.0,
+          "width": 246.0,
+          "height": 48.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:267",
+        "name": "Social",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 3727.0,
+          "width": 119.0,
+          "height": 48.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:268",
+        "name": "Human resources",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 4969.0,
+          "width": 346.0,
+          "height": 48.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:269",
+        "name": "Business organization",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 7269.0,
+          "width": 433.0,
+          "height": 48.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:270",
+        "name": "VISION",
+        "absoluteBoundingBox": {
+          "x": 614.0,
+          "y": 2091.0,
+          "width": 212.0,
+          "height": 31.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:271",
+        "name": "全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する",
+        "absoluteBoundingBox": {
+          "x": 397.0,
+          "y": 2153.0,
+          "width": 646.0,
+          "height": 78.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:272",
+        "name": "Vector 108",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 2183.0,
+          "width": 194.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:273",
+        "name": "Vector 109",
+        "absoluteBoundingBox": {
+          "x": 1090.0,
+          "y": 2183.0,
+          "width": 194.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:274",
+        "name": "気候変動対策",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 2531.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:275",
+        "name": "CSR活動",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 3863.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:276",
+        "name": "人材育成",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 5112.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:277",
+        "name": "事業活動",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 7412.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:278",
+        "name": "品質/安全",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 7757.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:279",
+        "name": "Ellipse 68",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 7772.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:280",
+        "name": "水質環境保全",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 3076.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:281",
+        "name": "地域活性化",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 4508.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:282",
+        "name": "健康経営",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 6755.0,
+          "width": 167.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:283",
+        "name": "働き方/多様な人材の活躍",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 5838.0,
+          "width": 326.0,
+          "height": 39.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:284",
+        "name": "発電結果の共有",
+        "absoluteBoundingBox": {
+          "x": 249.0,
+          "y": 2848.0,
+          "width": 171.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:285",
+        "name": "切手回収",
+        "absoluteBoundingBox": {
+          "x": 249.0,
+          "y": 4255.0,
+          "width": 171.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:286",
+        "name": "労働環境の改善",
+        "absoluteBoundingBox": {
+          "x": 251.0,
+          "y": 3393.0,
+          "width": 171.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:287",
+        "name": "省エネ活動",
+        "absoluteBoundingBox": {
+          "x": 822.0,
+          "y": 2630.0,
+          "width": 108.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:288",
+        "name": "プルタブ/ペットボトルキャップ回収",
+        "absoluteBoundingBox": {
+          "x": 822.0,
+          "y": 3962.0,
+          "width": 360.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:289",
+        "name": "ISO14001取得",
+        "absoluteBoundingBox": {
+          "x": 822.0,
+          "y": 3169.0,
+          "width": 149.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:290",
+        "name": "Group 169",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 2628.0,
+          "width": 490.0,
+          "height": 118.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:291",
+            "name": "太陽光パネル設置",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 2628.0,
+              "width": 196.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:292",
+            "name": "真珠の無料アイコン3 1",
+            "absoluteBoundingBox": {
+              "x": 193.0,
+              "y": 2628.0,
+              "width": 33.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:304",
+            "name": "自社社屋に太陽光パネルを設置し...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 2671.0,
+              "width": 488.0,
+              "height": 75.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:305",
+        "name": "Group 171",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 3960.0,
+          "width": 488.0,
+          "height": 168.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:306",
+            "name": "社内献血活動",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 3960.0,
+              "width": 196.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:307",
+            "name": "赤十字血液センターにより...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 4003.0,
+              "width": 488.0,
+              "height": 125.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:308",
+        "name": "献血アイコン2 1",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 3960.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:312",
+        "name": "Group 174",
+        "absoluteBoundingBox": {
+          "x": 190.0,
+          "y": 5209.0,
+          "width": 488.0,
+          "height": 143.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:313",
+            "name": "次世代リーダー育成",
+            "absoluteBoundingBox": {
+              "x": 244.0,
+              "y": 5209.0,
+              "width": 254.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:314",
+            "name": "内部コミュニケーションにて...",
+            "absoluteBoundingBox": {
+              "x": 190.0,
+              "y": 5252.0,
+              "width": 488.0,
+              "height": 100.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:315",
+        "name": "Group 183",
+        "absoluteBoundingBox": {
+          "x": 190.0,
+          "y": 7509.0,
+          "width": 944.0,
+          "height": 93.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:316",
+            "name": "医療用・工業用機器に用いる...",
+            "absoluteBoundingBox": {
+              "x": 244.0,
+              "y": 7509.0,
+              "width": 873.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:317",
+            "name": "自社ステンレスチューブは...",
+            "absoluteBoundingBox": {
+              "x": 190.0,
+              "y": 7552.0,
+              "width": 944.0,
+              "height": 50.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:318",
+        "name": "Group 184",
+        "absoluteBoundingBox": {
+          "x": 190.0,
+          "y": 7854.0,
+          "width": 944.0,
+          "height": 93.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:319",
+            "name": "環境・品質方針の策定",
+            "absoluteBoundingBox": {
+              "x": 244.0,
+              "y": 7854.0,
+              "width": 873.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:320",
+            "name": "事業を通じて...",
+            "absoluteBoundingBox": {
+              "x": 190.0,
+              "y": 7897.0,
+              "width": 944.0,
+              "height": 50.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:321",
+        "name": "Group 170",
+        "absoluteBoundingBox": {
+          "x": 194.0,
+          "y": 3173.0,
+          "width": 475.0,
+          "height": 118.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:322",
+            "name": "洗浄機と水溶性引き抜き油の開発",
+            "absoluteBoundingBox": {
+              "x": 248.0,
+              "y": 3173.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:323",
+            "name": "従来トリクロロエチレンを...",
+            "absoluteBoundingBox": {
+              "x": 194.0,
+              "y": 3216.0,
+              "width": 475.0,
+              "height": 75.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:324",
+        "name": "Group 172",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 4607.0,
+          "width": 485.0,
+          "height": 119.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:325",
+            "name": "地域の製品調達",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 4607.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:326",
+            "name": "コロナウイルス感染対策として...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 4651.0,
+              "width": 485.0,
+              "height": 75.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:327",
+        "name": "Group 181",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 6854.0,
+          "width": 494.0,
+          "height": 194.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:328",
+            "name": "労働安全衛生",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 6854.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:329",
+            "name": "当社で一部使用している...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 6898.0,
+              "width": 494.0,
+              "height": 150.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:330",
+        "name": "Group 175",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 5937.0,
+          "width": 485.0,
+          "height": 94.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:331",
+            "name": "子育て支援",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 5937.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:332",
+            "name": "2018年9月くるみん認定...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 5981.0,
+              "width": 485.0,
+              "height": 50.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:333",
+        "name": "Group 178",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 6145.0,
+          "width": 485.0,
+          "height": 144.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:334",
+            "name": "ハラスメント対策",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 6145.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:335",
+            "name": "社内でハラスメント窓口を設置...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 6189.0,
+              "width": 485.0,
+              "height": 100.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:336",
+        "name": "Group 180",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 6381.0,
+          "width": 485.0,
+          "height": 219.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:337",
+            "name": "障がい者雇用/教育",
+            "absoluteBoundingBox": {
+              "x": 249.0,
+              "y": 6381.0,
+              "width": 334.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:338",
+            "name": "2018年6月より...",
+            "absoluteBoundingBox": {
+              "x": 195.0,
+              "y": 6425.0,
+              "width": 485.0,
+              "height": 175.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "id": "92:339",
+        "name": "月報として全社員に...",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 2891.0,
+          "width": 480.0,
+          "height": 50.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:340",
+        "name": "社内で切手を回収し...",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 4298.0,
+          "width": 475.0,
+          "height": 50.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:341",
+        "name": "お札を受け取る手のフリーアイコン 1",
+        "absoluteBoundingBox": {
+          "x": 199.0,
+          "y": 4252.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:346",
+        "name": "作業員の健康被害リスクが...",
+        "absoluteBoundingBox": {
+          "x": 197.0,
+          "y": 3436.0,
+          "width": 468.0,
+          "height": 50.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:347",
+        "name": "ウォーキングアイコン3 1",
+        "absoluteBoundingBox": {
+          "x": 194.0,
+          "y": 3392.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:351",
+        "name": "社員の残業を最小限に...",
+        "absoluteBoundingBox": {
+          "x": 775.0,
+          "y": 2671.0,
+          "width": 374.0,
+          "height": 50.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:352",
+        "name": "社内に回収箱を設置し...",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 4003.0,
+          "width": 465.0,
+          "height": 125.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:353",
+        "name": "Group 177",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 5209.0,
+          "width": 465.0,
+          "height": 191.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:354",
+            "name": "e-ラーニング導入",
+            "absoluteBoundingBox": {
+              "x": 822.0,
+              "y": 5209.0,
+              "width": 175.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:355",
+            "name": "ベネフィットワンを全従業員に...",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 5250.0,
+              "width": 465.0,
+              "height": 150.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "id": "92:356",
+        "name": "作業環境測定結果の管理区分が...",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 3212.0,
+          "width": 425.0,
+          "height": 50.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:357",
+        "name": "Group 173",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 4607.0,
+          "width": 460.0,
+          "height": 141.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:358",
+            "name": "地域のパートナーシップ",
+            "absoluteBoundingBox": {
+              "x": 822.0,
+              "y": 4607.0,
+              "width": 240.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:359",
+            "name": "新・群馬県総合計画...",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 4648.0,
+              "width": 460.0,
+              "height": 100.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:360",
+        "name": "Group 182",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 6854.0,
+          "width": 460.0,
+          "height": 191.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:361",
+            "name": "ストレスチェックの実施",
+            "absoluteBoundingBox": {
+              "x": 822.0,
+              "y": 6854.0,
+              "width": 240.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:362",
+            "name": "全社員のメンタル不調の...",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 6895.0,
+              "width": 460.0,
+              "height": 150.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:363",
+        "name": "Group 176",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 5934.0,
+          "width": 460.0,
+          "height": 119.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:364",
+            "name": "育児休暇の取得推進",
+            "absoluteBoundingBox": {
+              "x": 822.0,
+              "y": 5937.0,
+              "width": 196.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:365",
+            "name": "哺乳瓶のアイコン2 1",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 5934.0,
+              "width": 32.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:372",
+            "name": "男女・ジェンダーに関わらず...",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 5978.0,
+              "width": 460.0,
+              "height": 75.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:373",
+        "name": "Group 179",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 6145.0,
+          "width": 460.0,
+          "height": 141.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:374",
+            "name": "福利厚生の充実",
+            "absoluteBoundingBox": {
+              "x": 822.0,
+              "y": 6145.0,
+              "width": 152.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:375",
+            "name": "社内全員に働きやすい環境を...",
+            "absoluteBoundingBox": {
+              "x": 773.0,
+              "y": 6186.0,
+              "width": 460.0,
+              "height": 100.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:376",
+        "name": "Vector 48",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 2583.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:377",
+        "name": "Vector 114",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 3915.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:378",
+        "name": "Vector 122",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 5164.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:379",
+        "name": "Vector 134",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 7464.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:380",
+        "name": "Vector 136",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 7809.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:381",
+        "name": "Vector 110",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 3128.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:382",
+        "name": "Vector 115",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 4560.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:383",
+        "name": "Vector 131",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 6807.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:384",
+        "name": "Vector 123",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 5890.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:385",
+        "name": "Vector 129",
+        "absoluteBoundingBox": {
+          "x": 158.0,
+          "y": 6334.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:386",
+        "name": "Vector 49",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 2791.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:387",
+        "name": "Vector 116",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 4173.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:388",
+        "name": "Vector 124",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 5445.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:389",
+        "name": "Vector 135",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 7647.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:390",
+        "name": "Vector 137",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 7992.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:391",
+        "name": "Vector 111",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 3336.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:392",
+        "name": "Vector 117",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 4793.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:393",
+        "name": "Vector 132",
+        "absoluteBoundingBox": {
+          "x": 156.0,
+          "y": 7093.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:394",
+        "name": "Vector 125",
+        "absoluteBoundingBox": {
+          "x": 157.0,
+          "y": 6098.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:395",
+        "name": "Vector 130",
+        "absoluteBoundingBox": {
+          "x": 160.0,
+          "y": 6645.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:396",
+        "name": "Vector 50",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 2999.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:397",
+        "name": "Vector 118",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 4431.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:398",
+        "name": "Vector 126",
+        "absoluteBoundingBox": {
+          "x": 158.0,
+          "y": 5728.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:399",
+        "name": "Vector 112",
+        "absoluteBoundingBox": {
+          "x": 159.0,
+          "y": 3544.0,
+          "width": 1123.0,
+          "height": 0.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:400",
+        "name": "署名アイコン (1) 1",
+        "absoluteBoundingBox": {
+          "x": 192.0,
+          "y": 2848.0,
+          "width": 31.0,
+          "height": 31.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:411",
+        "name": "SDGs研修/啓蒙活動",
+        "absoluteBoundingBox": {
+          "x": 249.0,
+          "y": 5490.0,
+          "width": 238.0,
+          "height": 29.0
+        }
+      },
+      {
+        "type": "TEXT",
+        "id": "92:412",
+        "name": "イマココラボカードゲーム...",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 5533.0,
+          "width": 475.0,
+          "height": 150.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:413",
+        "name": "Vector 51",
+        "absoluteBoundingBox": {
+          "x": 720.0,
+          "y": 2583.0,
+          "width": 0.0,
+          "height": 416.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:414",
+        "name": "Vector 120",
+        "absoluteBoundingBox": {
+          "x": 720.0,
+          "y": 3915.0,
+          "width": 0.0,
+          "height": 516.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:415",
+        "name": "Vector 127",
+        "absoluteBoundingBox": {
+          "x": 720.0,
+          "y": 5164.0,
+          "width": 0.0,
+          "height": 564.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:416",
+        "name": "Vector 113",
+        "absoluteBoundingBox": {
+          "x": 720.0,
+          "y": 3128.0,
+          "width": 0.0,
+          "height": 422.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:417",
+        "name": "Vector 121",
+        "absoluteBoundingBox": {
+          "x": 718.0,
+          "y": 4560.0,
+          "width": 0.0,
+          "height": 233.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:418",
+        "name": "Vector 133",
+        "absoluteBoundingBox": {
+          "x": 718.0,
+          "y": 6807.0,
+          "width": 0.0,
+          "height": 286.0
+        }
+      },
+      {
+        "type": "VECTOR",
+        "id": "92:419",
+        "name": "Vector 128",
+        "absoluteBoundingBox": {
+          "x": 718.0,
+          "y": 5890.0,
+          "width": 0.0,
+          "height": 755.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:420",
+        "name": "visual",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 62.0,
+          "width": 1441.0,
+          "height": 266.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:421",
+            "name": "Mask group",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 62.0,
+              "width": 1440.0,
+              "height": 266.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:422",
+                "name": "Rectangle 43",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 62.0,
+                  "width": 1440.0,
+                  "height": 266.0
+                }
+              },
+              {
+                "type": "RECTANGLE",
+                "id": "92:423",
+                "name": "image 22",
+                "absoluteBoundingBox": {
+                  "x": 542.0,
+                  "y": -209.0,
+                  "width": 1100.0,
+                  "height": 826.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "RECTANGLE",
+            "id": "92:424",
+            "name": "Rectangle 771",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 62.0,
+              "width": 1441.0,
+              "height": 266.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:425",
+            "name": "Group 99",
+            "absoluteBoundingBox": {
+              "x": 118.0,
+              "y": 112.0,
+              "width": 918.0,
+              "height": 167.0
+            },
+            "children": [
+              {
+                "type": "TEXT",
+                "id": "92:426",
+                "name": "Social contributions",
+                "absoluteBoundingBox": {
+                  "x": 118.0,
+                  "y": 112.0,
+                  "width": 918.0,
+                  "height": 115.0
+                }
+              },
+              {
+                "type": "VECTOR",
+                "id": "92:427",
+                "name": "Vector 91",
+                "absoluteBoundingBox": {
+                  "x": 118.0,
+                  "y": 228.0,
+                  "width": 190.0,
+                  "height": 0.0
+                }
+              },
+              {
+                "type": "TEXT",
+                "id": "92:428",
+                "name": "手島精管の社会貢献の在り方",
+                "absoluteBoundingBox": {
+                  "x": 120.0,
+                  "y": 245.0,
+                  "width": 289.0,
+                  "height": 34.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:429",
+        "name": "Mask group",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 1716.0,
+          "width": 1440.0,
+          "height": 266.0
+        },
+        "children": [
+          {
+            "type": "RECTANGLE",
+            "id": "92:430",
+            "name": "Rectangle 43",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 1716.0,
+              "width": 1440.0,
+              "height": 266.0
+            }
+          },
+          {
+            "type": "RECTANGLE",
+            "id": "92:431",
+            "name": "pixta_85072735_M 1",
+            "absoluteBoundingBox": {
+              "x": -131.0,
+              "y": 1550.0,
+              "width": 1793.0,
+              "height": 1007.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "RECTANGLE",
+        "id": "92:432",
+        "name": "Rectangle 772",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 1716.0,
+          "width": 1441.0,
+          "height": 266.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:433",
+        "name": "Group 100",
+        "absoluteBoundingBox": {
+          "x": 158.0,
+          "y": 1766.0,
+          "width": 918.0,
+          "height": 167.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:434",
+            "name": "Sustainability",
+            "absoluteBoundingBox": {
+              "x": 158.0,
+              "y": 1766.0,
+              "width": 918.0,
+              "height": 115.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:435",
+            "name": "Vector 91",
+            "absoluteBoundingBox": {
+              "x": 158.0,
+              "y": 1882.0,
+              "width": 190.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:436",
+            "name": "サスティナビリティ",
+            "absoluteBoundingBox": {
+              "x": 160.0,
+              "y": 1899.0,
+              "width": 289.0,
+              "height": 34.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:437",
+        "name": "csr1",
+        "absoluteBoundingBox": {
+          "x": 122.0,
+          "y": 386.0,
+          "width": 1076.0,
+          "height": 301.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:438",
+            "name": "Group 119",
+            "absoluteBoundingBox": {
+              "x": 122.0,
+              "y": 436.0,
+              "width": 585.0,
+              "height": 204.0
+            },
+            "children": [
+              {
+                "type": "TEXT",
+                "id": "92:439",
+                "name": "結婚、出産などの...",
+                "absoluteBoundingBox": {
+                  "x": 150.0,
+                  "y": 531.0,
+                  "width": 557.0,
+                  "height": 48.0
+                }
+              },
+              {
+                "type": "TEXT",
+                "id": "92:440",
+                "name": "少子化に向かう...",
+                "absoluteBoundingBox": {
+                  "x": 150.0,
+                  "y": 593.0,
+                  "width": 557.0,
+                  "height": 47.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:441",
+                "name": "Group 65",
+                "absoluteBoundingBox": {
+                  "x": 122.0,
+                  "y": 436.0,
+                  "width": 562.0,
+                  "height": 65.0
+                },
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "id": "92:442",
+                    "name": "社員の人生の節目においても...",
+                    "absoluteBoundingBox": {
+                      "x": 122.0,
+                      "y": 436.0,
+                      "width": 562.0,
+                      "height": 65.0
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "ELLIPSE",
+                "id": "92:443",
+                "name": "Ellipse 30",
+                "absoluteBoundingBox": {
+                  "x": 127.0,
+                  "y": 542.0,
+                  "width": 9.0,
+                  "height": 9.0
+                }
+              },
+              {
+                "type": "ELLIPSE",
+                "id": "92:444",
+                "name": "Ellipse 31",
+                "absoluteBoundingBox": {
+                  "x": 127.0,
+                  "y": 601.0,
+                  "width": 9.0,
+                  "height": 9.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:445",
+            "name": "Mask group",
+            "absoluteBoundingBox": {
+              "x": 779.0,
+              "y": 386.0,
+              "width": 419.0,
+              "height": 301.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:446",
+                "name": "Rectangle 109",
+                "absoluteBoundingBox": {
+                  "x": 779.0,
+                  "y": 386.0,
+                  "width": 419.0,
+                  "height": 301.0
+                }
+              },
+              {
+                "type": "RECTANGLE",
+                "id": "92:447",
+                "name": "pixta_99601119_M 1",
+                "absoluteBoundingBox": {
+                  "x": 552.0,
+                  "y": 234.0,
+                  "width": 928.0,
+                  "height": 619.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:448",
+        "name": "csr3",
+        "absoluteBoundingBox": {
+          "x": 201.0,
+          "y": 812.0,
+          "width": 1083.0,
+          "height": 301.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:449",
+            "name": "Group 102",
+            "absoluteBoundingBox": {
+              "x": 201.0,
+              "y": 851.0,
+              "width": 582.0,
+              "height": 213.0
+            },
+            "children": [
+              {
+                "type": "FRAME",
+                "id": "92:450",
+                "name": "Group 115",
+                "absoluteBoundingBox": {
+                  "x": 201.0,
+                  "y": 851.0,
+                  "width": 582.0,
+                  "height": 213.0
+                },
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "id": "92:451",
+                    "name": "館林で就職したい...",
+                    "absoluteBoundingBox": {
+                      "x": 224.0,
+                      "y": 947.0,
+                      "width": 559.0,
+                      "height": 117.0
+                    }
+                  },
+                  {
+                    "type": "FRAME",
+                    "id": "92:452",
+                    "name": "Group 65",
+                    "absoluteBoundingBox": {
+                      "x": 201.0,
+                      "y": 851.0,
+                      "width": 556.0,
+                      "height": 65.0
+                    },
+                    "children": [
+                      {
+                        "type": "TEXT",
+                        "id": "92:453",
+                        "name": "館林市内の中学生及び...",
+                        "absoluteBoundingBox": {
+                          "x": 201.0,
+                          "y": 851.0,
+                          "width": 556.0,
+                          "height": 65.0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ELLIPSE",
+                    "id": "92:454",
+                    "name": "Ellipse 30",
+                    "absoluteBoundingBox": {
+                      "x": 201.0,
+                      "y": 955.0,
+                      "width": 9.0,
+                      "height": 9.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:455",
+            "name": "Mask group",
+            "absoluteBoundingBox": {
+              "x": 865.0,
+              "y": 812.0,
+              "width": 419.0,
+              "height": 301.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:456",
+                "name": "Rectangle 109",
+                "absoluteBoundingBox": {
+                  "x": 865.0,
+                  "y": 812.0,
+                  "width": 419.0,
+                  "height": 301.0
+                }
+              },
+              {
+                "type": "RECTANGLE",
+                "id": "92:457",
+                "name": "pixta_53646639_M 1",
+                "absoluteBoundingBox": {
+                  "x": 823.0,
+                  "y": 813.0,
+                  "width": 504.0,
+                  "height": 300.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:458",
+        "name": "csr4",
+        "absoluteBoundingBox": {
+          "x": 161.0,
+          "y": 1264.0,
+          "width": 1138.0,
+          "height": 301.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:459",
+            "name": "Group 103",
+            "absoluteBoundingBox": {
+              "x": 161.0,
+              "y": 1264.0,
+              "width": 419.0,
+              "height": 301.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:460",
+                "name": "Rectangle 105",
+                "absoluteBoundingBox": {
+                  "x": 4.0,
+                  "y": 1205.0,
+                  "width": 1440.0,
+                  "height": 646.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:461",
+                "name": "Mask group",
+                "absoluteBoundingBox": {
+                  "x": 161.0,
+                  "y": 1264.0,
+                  "width": 419.0,
+                  "height": 301.0
+                },
+                "children": [
+                  {
+                    "type": "RECTANGLE",
+                    "id": "92:462",
+                    "name": "Rectangle 109",
+                    "absoluteBoundingBox": {
+                      "x": 161.0,
+                      "y": 1264.0,
+                      "width": 419.0,
+                      "height": 301.0
+                    }
+                  },
+                  {
+                    "type": "RECTANGLE",
+                    "id": "92:463",
+                    "name": "pixta_55443012_M 1",
+                    "absoluteBoundingBox": {
+                      "x": 125.0,
+                      "y": 1264.0,
+                      "width": 478.0,
+                      "height": 318.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:464",
+            "name": "Group 120",
+            "absoluteBoundingBox": {
+              "x": 652.0,
+              "y": 1305.0,
+              "width": 647.0,
+              "height": 235.0
+            },
+            "children": [
+              {
+                "type": "TEXT",
+                "id": "92:465",
+                "name": "手島精管では、会社を...",
+                "absoluteBoundingBox": {
+                  "x": 682.0,
+                  "y": 1371.0,
+                  "width": 617.0,
+                  "height": 41.0
+                }
+              },
+              {
+                "type": "TEXT",
+                "id": "92:466",
+                "name": "手島精管では、各自の受講したい...",
+                "absoluteBoundingBox": {
+                  "x": 682.0,
+                  "y": 1440.0,
+                  "width": 602.0,
+                  "height": 100.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:467",
+                "name": "Group 65",
+                "absoluteBoundingBox": {
+                  "x": 652.0,
+                  "y": 1305.0,
+                  "width": 614.0,
+                  "height": 57.0
+                },
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "id": "92:468",
+                    "name": "社員に対する教育を強化...",
+                    "absoluteBoundingBox": {
+                      "x": 652.0,
+                      "y": 1305.0,
+                      "width": 614.0,
+                      "height": 57.0
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "ELLIPSE",
+                "id": "92:469",
+                "name": "Ellipse 38",
+                "absoluteBoundingBox": {
+                  "x": 657.0,
+                  "y": 1382.0,
+                  "width": 9.0,
+                  "height": 9.0
+                }
+              },
+              {
+                "type": "ELLIPSE",
+                "id": "92:470",
+                "name": "Ellipse 39",
+                "absoluteBoundingBox": {
+                  "x": 657.0,
+                  "y": 1449.0,
+                  "width": 9.0,
+                  "height": 9.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:471",
+        "name": "Group 124",
+        "absoluteBoundingBox": {
+          "x": 397.0,
+          "y": 2286.0,
+          "width": 75.0,
+          "height": 25.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:472",
+            "name": "環境",
+            "absoluteBoundingBox": {
+              "x": 422.0,
+              "y": 2286.0,
+              "width": 50.0,
+              "height": 25.0
+            }
+          },
+          {
+            "type": "ELLIPSE",
+            "id": "92:473",
+            "name": "Ellipse 56",
+            "absoluteBoundingBox": {
+              "x": 397.0,
+              "y": 2293.0,
+              "width": 9.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:474",
+        "name": "Group 122",
+        "absoluteBoundingBox": {
+          "x": 747.0,
+          "y": 2286.0,
+          "width": 75.0,
+          "height": 29.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:475",
+            "name": "人材",
+            "absoluteBoundingBox": {
+              "x": 772.0,
+              "y": 2286.0,
+              "width": 50.0,
+              "height": 29.0
+            }
+          },
+          {
+            "type": "ELLIPSE",
+            "id": "92:476",
+            "name": "Ellipse 58",
+            "absoluteBoundingBox": {
+              "x": 747.0,
+              "y": 2293.0,
+              "width": 9.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:477",
+        "name": "Group 121",
+        "absoluteBoundingBox": {
+          "x": 572.0,
+          "y": 2286.0,
+          "width": 75.0,
+          "height": 25.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:478",
+            "name": "社会",
+            "absoluteBoundingBox": {
+              "x": 597.0,
+              "y": 2286.0,
+              "width": 50.0,
+              "height": 25.0
+            }
+          },
+          {
+            "type": "ELLIPSE",
+            "id": "92:479",
+            "name": "Ellipse 57",
+            "absoluteBoundingBox": {
+              "x": 572.0,
+              "y": 2293.0,
+              "width": 9.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:480",
+        "name": "Group 123",
+        "absoluteBoundingBox": {
+          "x": 922.0,
+          "y": 2286.0,
+          "width": 122.0,
+          "height": 25.0
+        },
+        "children": [
+          {
+            "type": "TEXT",
+            "id": "92:481",
+            "name": "事業組織",
+            "absoluteBoundingBox": {
+              "x": 947.0,
+              "y": 2286.0,
+              "width": 97.0,
+              "height": 25.0
+            }
+          },
+          {
+            "type": "ELLIPSE",
+            "id": "92:482",
+            "name": "Ellipse 59",
+            "absoluteBoundingBox": {
+              "x": 922.0,
+              "y": 2293.0,
+              "width": 9.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:483",
+        "name": "Ellipse 60",
+        "absoluteBoundingBox": {
+          "x": 171.0,
+          "y": 2546.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:484",
+        "name": "Ellipse 61",
+        "absoluteBoundingBox": {
+          "x": 171.0,
+          "y": 3092.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:485",
+        "name": "Ellipse 62",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 3879.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:486",
+        "name": "Ellipse 64",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 5128.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:487",
+        "name": "Ellipse 63",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 4524.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:488",
+        "name": "Ellipse 66",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 6770.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:489",
+        "name": "Ellipse 65",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 5853.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "ELLIPSE",
+        "id": "92:490",
+        "name": "Ellipse 67",
+        "absoluteBoundingBox": {
+          "x": 166.0,
+          "y": 7427.0,
+          "width": 10.0,
+          "height": 10.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:491",
+        "name": "menubar",
+        "absoluteBoundingBox": {
+          "x": -1.0,
+          "y": 0.0,
+          "width": 1442.0,
+          "height": 62.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:492",
+            "name": "menubar",
+            "absoluteBoundingBox": {
+              "x": -1.0,
+              "y": 0.0,
+              "width": 1442.0,
+              "height": 62.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:493",
+                "name": "Rectangle 45",
+                "absoluteBoundingBox": {
+                  "x": -1.0,
+                  "y": 0.0,
+                  "width": 1442.0,
+                  "height": 62.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:494",
+            "name": "menubar",
+            "absoluteBoundingBox": {
+              "x": 28.0,
+              "y": 13.0,
+              "width": 1383.0,
+              "height": 36.0
+            },
+            "children": [
+              {
+                "type": "FRAME",
+                "id": "92:495",
+                "name": "menu",
+                "absoluteBoundingBox": {
+                  "x": 511.0,
+                  "y": 21.0,
+                  "width": 708.0,
+                  "height": 20.0
+                },
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "id": "92:496",
+                    "name": "会社情報",
+                    "absoluteBoundingBox": {
+                      "x": 511.0,
+                      "y": 21.0,
+                      "width": 62.0,
+                      "height": 20.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:497",
+                    "name": "製品 / 技術",
+                    "absoluteBoundingBox": {
+                      "x": 636.0,
+                      "y": 21.0,
+                      "width": 80.0,
+                      "height": 20.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:498",
+                    "name": "ブログ",
+                    "absoluteBoundingBox": {
+                      "x": 1029.0,
+                      "y": 21.0,
+                      "width": 46.0,
+                      "height": 20.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:499",
+                    "name": "ニュース",
+                    "absoluteBoundingBox": {
+                      "x": 779.0,
+                      "y": 21.0,
+                      "width": 62.0,
+                      "height": 20.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:500",
+                    "name": "メディア",
+                    "absoluteBoundingBox": {
+                      "x": 904.0,
+                      "y": 21.0,
+                      "width": 62.0,
+                      "height": 20.0
+                    }
+                  },
+                  {
+                    "type": "FRAME",
+                    "id": "92:501",
+                    "name": "Group 97",
+                    "absoluteBoundingBox": {
+                      "x": 1138.0,
+                      "y": 21.0,
+                      "width": 81.0,
+                      "height": 20.0
+                    },
+                    "children": [
+                      {
+                        "type": "TEXT",
+                        "id": "92:502",
+                        "name": "採用案内",
+                        "absoluteBoundingBox": {
+                          "x": 1138.0,
+                          "y": 21.0,
+                          "width": 62.0,
+                          "height": 20.0
+                        }
+                      },
+                      {
+                        "type": "FRAME",
+                        "id": "92:503",
+                        "name": "新しいウィンドウで開くボタン　1 3",
+                        "absoluteBoundingBox": {
+                          "x": 1205.0,
+                          "y": 24.0,
+                          "width": 14.0,
+                          "height": 14.0
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "RECTANGLE",
+                "id": "92:508",
+                "name": "image 1",
+                "absoluteBoundingBox": {
+                  "x": 28.0,
+                  "y": 18.0,
+                  "width": 106.0,
+                  "height": 27.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:509",
+                "name": "Group 2",
+                "absoluteBoundingBox": {
+                  "x": 1287.0,
+                  "y": 13.0,
+                  "width": 124.0,
+                  "height": 36.0
+                },
+                "children": [
+                  {
+                    "type": "FRAME",
+                    "id": "92:510",
+                    "name": "Group 98",
+                    "absoluteBoundingBox": {
+                      "x": 1287.0,
+                      "y": 13.0,
+                      "width": 124.0,
+                      "height": 36.0
+                    },
+                    "children": [
+                      {
+                        "type": "RECTANGLE",
+                        "id": "92:511",
+                        "name": "Rectangle 2",
+                        "absoluteBoundingBox": {
+                          "x": 1287.0,
+                          "y": 13.0,
+                          "width": 124.0,
+                          "height": 36.0
+                        }
+                      },
+                      {
+                        "type": "TEXT",
+                        "id": "92:512",
+                        "name": "CONTACT",
+                        "absoluteBoundingBox": {
+                          "x": 1307.0,
+                          "y": 20.0,
+                          "width": 86.0,
+                          "height": 22.0
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:513",
+        "name": "footer",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 8754.0,
+          "width": 1440.0,
+          "height": 638.0
+        },
+        "children": [
+          {
+            "type": "RECTANGLE",
+            "id": "92:514",
+            "name": "Rectangle 769",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 8754.0,
+              "width": 1440.0,
+              "height": 312.0
+            }
+          },
+          {
+            "type": "RECTANGLE",
+            "id": "92:515",
+            "name": "Rectangle 788",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 9065.0,
+              "width": 1440.0,
+              "height": 327.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:516",
+            "name": "Vector 89",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9176.0,
+              "width": 23.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:517",
+            "name": "Vector 86",
+            "absoluteBoundingBox": {
+              "x": 165.0,
+              "y": 8945.0,
+              "width": 1110.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:518",
+            "name": "Vector 87",
+            "absoluteBoundingBox": {
+              "x": 165.0,
+              "y": 9021.0,
+              "width": 1110.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:519",
+            "name": "群馬県館林市下早川田町306-1",
+            "absoluteBoundingBox": {
+              "x": 576.0,
+              "y": 8875.0,
+              "width": 279.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:520",
+            "name": "手島精管株式会社",
+            "absoluteBoundingBox": {
+              "x": 582.0,
+              "y": 8797.0,
+              "width": 268.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:521",
+            "name": "TESHIMASEIKAN Co., Ltd",
+            "absoluteBoundingBox": {
+              "x": 597.0,
+              "y": 8836.0,
+              "width": 238.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:522",
+            "name": "Vector 90",
+            "absoluteBoundingBox": {
+              "x": 463.0,
+              "y": 9176.0,
+              "width": 23.0,
+              "height": 0.0
+            }
+          },
+          {
+            "type": "RECTANGLE",
+            "id": "92:523",
+            "name": "image 1",
+            "absoluteBoundingBox": {
+              "x": 1083.0,
+              "y": 9254.0,
+              "width": 151.0,
+              "height": 39.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:524",
+            "name": "会社情報",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9135.0,
+              "width": 70.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:525",
+            "name": "製品/技術",
+            "absoluteBoundingBox": {
+              "x": 464.0,
+              "y": 9135.0,
+              "width": 79.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:526",
+            "name": "ブログ",
+            "absoluteBoundingBox": {
+              "x": 754.0,
+              "y": 9182.0,
+              "width": 52.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:527",
+            "name": "お問い合せ",
+            "absoluteBoundingBox": {
+              "x": 754.0,
+              "y": 9232.0,
+              "width": 88.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:528",
+            "name": "プライバシーポリシー",
+            "absoluteBoundingBox": {
+              "x": 1082.0,
+              "y": 9298.0,
+              "width": 158.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:529",
+            "name": "ニュース",
+            "absoluteBoundingBox": {
+              "x": 754.0,
+              "y": 9135.0,
+              "width": 70.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:530",
+            "name": "私たちの強み",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9230.0,
+              "width": 101.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:531",
+            "name": "会社案内",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9196.0,
+              "width": 67.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:532",
+            "name": "製品情報",
+            "absoluteBoundingBox": {
+              "x": 464.0,
+              "y": 9196.0,
+              "width": 67.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:533",
+            "name": "CSR/SDGs",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9264.0,
+              "width": 83.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:534",
+            "name": "規格・国際規格",
+            "absoluteBoundingBox": {
+              "x": 464.0,
+              "y": 9230.0,
+              "width": 118.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:535",
+            "name": "グローバルサプライチェーン",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 9298.0,
+              "width": 220.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:536",
+            "name": "工程・技術",
+            "absoluteBoundingBox": {
+              "x": 464.0,
+              "y": 9264.0,
+              "width": 84.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "TEXT",
+            "id": "92:537",
+            "name": "ISO・認証・特許・登録証",
+            "absoluteBoundingBox": {
+              "x": 464.0,
+              "y": 9298.0,
+              "width": 199.0,
+              "height": 32.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:538",
+            "name": "Group 95",
+            "absoluteBoundingBox": {
+              "x": 606.0,
+              "y": 8960.0,
+              "width": 229.0,
+              "height": 44.0
+            },
+            "children": [
+              {
+                "type": "FRAME",
+                "id": "92:539",
+                "name": "icons8-facebookの新しい 1",
+                "absoluteBoundingBox": {
+                  "x": 695.0,
+                  "y": 8960.0,
+                  "width": 45.0,
+                  "height": 44.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:541",
+                "name": "icons8-プレイ動画 1",
+                "absoluteBoundingBox": {
+                  "x": 791.0,
+                  "y": 8960.0,
+                  "width": 44.0,
+                  "height": 44.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:543",
+                "name": "icons8-ツイッター 1",
+                "absoluteBoundingBox": {
+                  "x": 606.0,
+                  "y": 8963.0,
+                  "width": 38.0,
+                  "height": 38.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "FRAME",
+            "id": "92:545",
+            "name": "Group 220",
+            "absoluteBoundingBox": {
+              "x": 754.0,
+              "y": 8910.0,
+              "width": 193.0,
+              "height": 415.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:546",
+                "name": "Rectangle 869",
+                "absoluteBoundingBox": {
+                  "x": 754.0,
+                  "y": 9284.0,
+                  "width": 193.0,
+                  "height": 41.0
+                }
+              },
+              {
+                "type": "VECTOR",
+                "id": "92:547",
+                "name": "Vector",
+                "absoluteBoundingBox": {
+                  "x": 917.0,
+                  "y": 8910.0,
+                  "width": 8.0,
+                  "height": 8.0
+                }
+              },
+              {
+                "type": "TEXT",
+                "id": "92:548",
+                "name": "English Website",
+                "absoluteBoundingBox": {
+                  "x": 772.0,
+                  "y": 9295.0,
+                  "width": 158.0,
+                  "height": 19.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:549",
+        "name": "contact",
+        "absoluteBoundingBox": {
+          "x": 0.0,
+          "y": 8202.0,
+          "width": 1440.0,
+          "height": 552.0
+        },
+        "children": [
+          {
+            "type": "FRAME",
+            "id": "92:550",
+            "name": "Group 145",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 8202.0,
+              "width": 1440.0,
+              "height": 552.0
+            },
+            "children": [
+              {
+                "type": "FRAME",
+                "id": "92:551",
+                "name": "Mask group",
+                "absoluteBoundingBox": {
+                  "x": 0.0,
+                  "y": 8202.0,
+                  "width": 1440.0,
+                  "height": 552.0
+                },
+                "children": [
+                  {
+                    "type": "RECTANGLE",
+                    "id": "92:552",
+                    "name": "Rectangle 42",
+                    "absoluteBoundingBox": {
+                      "x": 0.0,
+                      "y": 8202.0,
+                      "width": 1440.0,
+                      "height": 552.0
+                    }
+                  },
+                  {
+                    "type": "RECTANGLE",
+                    "id": "92:553",
+                    "name": "image 18",
+                    "absoluteBoundingBox": {
+                      "x": -108.0,
+                      "y": 7948.0,
+                      "width": 1568.0,
+                      "height": 1046.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "RECTANGLE",
+            "id": "92:554",
+            "name": "Rectangle 40",
+            "absoluteBoundingBox": {
+              "x": 0.0,
+              "y": 8202.0,
+              "width": 1440.0,
+              "height": 552.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:555",
+            "name": "Group 38",
+            "absoluteBoundingBox": {
+              "x": 618.0,
+              "y": 8278.0,
+              "width": 203.0,
+              "height": 73.0
+            },
+            "children": [
+              {
+                "type": "TEXT",
+                "id": "92:556",
+                "name": "CONTACT",
+                "absoluteBoundingBox": {
+                  "x": 618.0,
+                  "y": 8278.0,
+                  "width": 203.0,
+                  "height": 46.0
+                }
+              },
+              {
+                "type": "TEXT",
+                "id": "92:557",
+                "name": "お問い合わせ",
+                "absoluteBoundingBox": {
+                  "x": 661.0,
+                  "y": 8324.0,
+                  "width": 123.0,
+                  "height": 27.0
+                }
+              }
+            ]
+          },
+          {
+            "type": "VECTOR",
+            "id": "92:558",
+            "name": "Vector 19",
+            "absoluteBoundingBox": {
+              "x": 720.0,
+              "y": 8404.0,
+              "width": 0.0,
+              "height": 260.0
+            }
+          },
+          {
+            "type": "FRAME",
+            "id": "92:559",
+            "name": "Group 144",
+            "absoluteBoundingBox": {
+              "x": 166.0,
+              "y": 8404.0,
+              "width": 1108.0,
+              "height": 259.0
+            },
+            "children": [
+              {
+                "type": "RECTANGLE",
+                "id": "92:560",
+                "name": "Rectangle 41",
+                "absoluteBoundingBox": {
+                  "x": 166.0,
+                  "y": 8404.0,
+                  "width": 1108.0,
+                  "height": 259.0
+                }
+              },
+              {
+                "type": "FRAME",
+                "id": "92:561",
+                "name": "Group 53",
+                "absoluteBoundingBox": {
+                  "x": 243.0,
+                  "y": 8465.0,
+                  "width": 395.0,
+                  "height": 123.0
+                },
+                "children": [
+                  {
+                    "type": "FRAME",
+                    "id": "92:562",
+                    "name": "Group 83",
+                    "absoluteBoundingBox": {
+                      "x": 243.0,
+                      "y": 8465.0,
+                      "width": 395.0,
+                      "height": 123.0
+                    },
+                    "children": [
+                      {
+                        "type": "TEXT",
+                        "id": "92:563",
+                        "name": "WEBからのお問い合わせ",
+                        "absoluteBoundingBox": {
+                          "x": 329.0,
+                          "y": 8465.0,
+                          "width": 223.0,
+                          "height": 26.0
+                        }
+                      },
+                      {
+                        "type": "FRAME",
+                        "id": "92:564",
+                        "name": "Group 51",
+                        "absoluteBoundingBox": {
+                          "x": 243.0,
+                          "y": 8514.0,
+                          "width": 395.0,
+                          "height": 74.0
+                        },
+                        "children": [
+                          {
+                            "type": "FRAME",
+                            "id": "92:565",
+                            "name": "Group 50",
+                            "absoluteBoundingBox": {
+                              "x": 243.0,
+                              "y": 8514.0,
+                              "width": 395.0,
+                              "height": 74.0
+                            },
+                            "children": [
+                              {
+                                "type": "FRAME",
+                                "id": "92:566",
+                                "name": "Group 143",
+                                "absoluteBoundingBox": {
+                                  "x": 243.0,
+                                  "y": 8514.0,
+                                  "width": 395.0,
+                                  "height": 74.0
+                                },
+                                "children": [
+                                  {
+                                    "type": "RECTANGLE",
+                                    "id": "92:567",
+                                    "name": "Rectangle 42",
+                                    "absoluteBoundingBox": {
+                                      "x": 243.0,
+                                      "y": 8514.0,
+                                      "width": 395.0,
+                                      "height": 74.0
+                                    }
+                                  },
+                                  {
+                                    "type": "FRAME",
+                                    "id": "92:568",
+                                    "name": "Group 142",
+                                    "absoluteBoundingBox": {
+                                      "x": 290.0,
+                                      "y": 8532.0,
+                                      "width": 301.0,
+                                      "height": 38.0
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "TEXT",
+                                        "id": "92:569",
+                                        "name": "お問い合わせフォーム",
+                                        "absoluteBoundingBox": {
+                                          "x": 328.0,
+                                          "y": 8532.0,
+                                          "width": 263.0,
+                                          "height": 38.0
+                                        }
+                                      },
+                                      {
+                                        "type": "VECTOR",
+                                        "id": "92:570",
+                                        "name": "Vector",
+                                        "absoluteBoundingBox": {
+                                          "x": 290.0,
+                                          "y": 8541.0,
+                                          "width": 27.0,
+                                          "height": 21.0
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "FRAME",
+                "id": "92:571",
+                "name": "Group 52",
+                "absoluteBoundingBox": {
+                  "x": 842.0,
+                  "y": 8445.0,
+                  "width": 302.0,
+                  "height": 183.0
+                },
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "id": "92:572",
+                    "name": "お電話でのお問い合わせ",
+                    "absoluteBoundingBox": {
+                      "x": 884.0,
+                      "y": 8445.0,
+                      "width": 218.0,
+                      "height": 26.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:573",
+                    "name": "FAXでのお問い合わせ",
+                    "absoluteBoundingBox": {
+                      "x": 903.0,
+                      "y": 8565.0,
+                      "width": 176.0,
+                      "height": 23.0
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "id": "92:574",
+                    "name": "（営業時間 8:00-17:00）",
+                    "absoluteBoundingBox": {
+                      "x": 881.0,
+                      "y": 8519.0,
+                      "width": 211.0,
+                      "height": 23.0
+                    }
+                  },
+                  {
+                    "type": "FRAME",
+                    "id": "92:575",
+                    "name": "Group 29",
+                    "absoluteBoundingBox": {
+                      "x": 842.0,
+                      "y": 8472.0,
+                      "width": 302.0,
+                      "height": 50.0
+                    },
+                    "children": [
+                      {
+                        "type": "FRAME",
+                        "id": "92:576",
+                        "name": "電話の受話器のアイコン素材 1",
+                        "absoluteBoundingBox": {
+                          "x": 842.0,
+                          "y": 8479.0,
+                          "width": 34.0,
+                          "height": 34.0
+                        }
+                      },
+                      {
+                        "type": "TEXT",
+                        "id": "92:579",
+                        "name": "0276-73-1173",
+                        "absoluteBoundingBox": {
+                          "x": 883.0,
+                          "y": 8472.0,
+                          "width": 261.0,
+                          "height": 50.0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "FRAME",
+                    "id": "92:580",
+                    "name": "Group 30",
+                    "absoluteBoundingBox": {
+                      "x": 879.0,
+                      "y": 8590.0,
+                      "width": 224.0,
+                      "height": 38.0
+                    },
+                    "children": [
+                      {
+                        "type": "FRAME",
+                        "id": "92:581",
+                        "name": "プリンターの無料アイコン4 1",
+                        "absoluteBoundingBox": {
+                          "x": 879.0,
+                          "y": 8590.0,
+                          "width": 34.0,
+                          "height": 34.0
+                        }
+                      },
+                      {
+                        "type": "TEXT",
+                        "id": "92:587",
+                        "name": "0276-74-8069",
+                        "absoluteBoundingBox": {
+                          "x": 924.0,
+                          "y": 8593.0,
+                          "width": 179.0,
+                          "height": 35.0
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "FRAME",
+        "id": "92:588",
+        "name": "電球アイコン15 1",
+        "absoluteBoundingBox": {
+          "x": 771.0,
+          "y": 2630.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:594",
+        "name": "水滴アイコン4 1",
+        "absoluteBoundingBox": {
+          "x": 224.0,
+          "y": 3173.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:598",
+        "name": "受験勉強アイコン 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 3169.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:606",
+        "name": "リサイクルマーク付きのゴミ箱イラスト 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 3961.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:609",
+        "name": "インフルエンザ対策のマスクの無料アイコン素材 2 1",
+        "absoluteBoundingBox": {
+          "x": 197.0,
+          "y": 4607.0,
+          "width": 30.0,
+          "height": 30.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:617",
+        "name": "握手のフリーアイコン 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 4604.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:622",
+        "name": "人物アイコン　チーム 1",
+        "absoluteBoundingBox": {
+          "x": 190.0,
+          "y": 5206.0,
+          "width": 36.0,
+          "height": 36.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:627",
+        "name": "ノートのアイコン素材7 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 5208.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:630",
+        "name": "新芽のアイコン 1",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 5490.0,
+          "width": 31.0,
+          "height": 31.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:633",
+        "name": "ベビー服のフリーアイコン 1",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 5936.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:640",
+        "name": "シールドアイコン5 1",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 6145.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:644",
+        "name": "ナイフ、お皿、フォークのお食事アイコン2 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 6145.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:651",
+        "name": "プレゼンテーションアイコン 1",
+        "absoluteBoundingBox": {
+          "x": 195.0,
+          "y": 6380.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:661",
+        "name": "キラキラ 3 1",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 6853.0,
+          "width": 31.0,
+          "height": 31.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:666",
+        "name": "ハートの心電図のアイコン素材 1 1",
+        "absoluteBoundingBox": {
+          "x": 773.0,
+          "y": 6853.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:669",
+        "name": "注射器のアイコン素材 (1) 1",
+        "absoluteBoundingBox": {
+          "x": 193.0,
+          "y": 7507.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      },
+      {
+        "type": "FRAME",
+        "id": "92:679",
+        "name": "地球アイコン9 1",
+        "absoluteBoundingBox": {
+          "x": 190.0,
+          "y": 7854.0,
+          "width": 32.0,
+          "height": 32.0
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,464 @@
+[
+  {
+    "id": "92:257",
+    "type": "FRAME",
+    "current_name": "Group 69",
+    "width": 1455.0,
+    "height": 1817.0,
+    "x": -12.0,
+    "y": 1595.0,
+    "child_count": 4,
+    "child_types": "2FRA+1REC+1VEC",
+    "text_preview": "",
+    "parent_name": "/csr",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "環境への取り組み",
+      "社会への取り組み",
+      "人材への取り組み",
+      "事業組織への取り組み",
+      "[FRAME]",
+      "Environment",
+      "Social",
+      "Human resources",
+      "Business organization",
+      "VISION",
+      "全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する",
+      "[VECTOR]",
+      "[VECTOR]",
+      "気候変動対策",
+      "CSR活動"
+    ],
+    "sibling_types": [
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "FRAME",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "VECTOR",
+      "VECTOR",
+      "TEXT",
+      "TEXT"
+    ],
+    "is_leaf": false,
+    "method_origin": "zone@0.7",
+    "heuristic_name": "group-4",
+    "confidence": 20
+  },
+  {
+    "id": "92:260",
+    "type": "FRAME",
+    "current_name": "Group 263",
+    "width": 1318.0,
+    "height": 0.0,
+    "x": 111.0,
+    "y": 2336.0,
+    "child_count": 2,
+    "child_types": "2VEC",
+    "text_preview": "",
+    "parent_name": "Group 69",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[RECTANGLE]",
+      "[VECTOR]",
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "RECTANGLE",
+      "VECTOR",
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-2",
+    "confidence": 20
+  },
+  {
+    "id": "92:263",
+    "type": "FRAME",
+    "current_name": "Group 264",
+    "width": 1318.0,
+    "height": 0.0,
+    "x": 1306.0,
+    "y": 2790.0,
+    "child_count": 2,
+    "child_types": "2VEC",
+    "text_preview": "",
+    "parent_name": "Group 69",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[RECTANGLE]",
+      "[VECTOR]",
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "RECTANGLE",
+      "VECTOR",
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-3",
+    "confidence": 20
+  },
+  {
+    "id": "92:438",
+    "type": "FRAME",
+    "current_name": "Group 119",
+    "width": 585.0,
+    "height": 204.0,
+    "x": 246.0,
+    "y": 2107.0,
+    "child_count": 5,
+    "child_types": "2ELL+1FRA+2TEX",
+    "text_preview": "結婚、出産などの...",
+    "parent_name": "csr1",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "Mask group"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-0",
+    "confidence": 20
+  },
+  {
+    "id": "92:449",
+    "type": "FRAME",
+    "current_name": "Group 102",
+    "width": 582.0,
+    "height": 213.0,
+    "x": 404.0,
+    "y": 2948.0,
+    "child_count": 1,
+    "child_types": "1FRA",
+    "text_preview": "館林で就職したい...",
+    "parent_name": "csr3",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "Mask group"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-0",
+    "confidence": 20
+  },
+  {
+    "id": "92:459",
+    "type": "FRAME",
+    "current_name": "Group 103",
+    "width": 419.0,
+    "height": 301.0,
+    "x": 324.0,
+    "y": 3813.0,
+    "child_count": 2,
+    "child_types": "1FRA+1REC",
+    "text_preview": "",
+    "parent_name": "csr4",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-0",
+    "confidence": 20
+  },
+  {
+    "id": "92:464",
+    "type": "FRAME",
+    "current_name": "Group 120",
+    "width": 647.0,
+    "height": 235.0,
+    "x": 815.0,
+    "y": 3854.0,
+    "child_count": 5,
+    "child_types": "2ELL+1FRA+2TEX",
+    "text_preview": "手島精管では、会社を...",
+    "parent_name": "csr4",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-1",
+    "confidence": 20
+  },
+  {
+    "id": "92:538",
+    "type": "FRAME",
+    "current_name": "Group 95",
+    "width": 229.0,
+    "height": 44.0,
+    "x": 608.0,
+    "y": 18999.0,
+    "child_count": 3,
+    "child_types": "3FRA",
+    "text_preview": "",
+    "parent_name": "footer",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[RECTANGLE]",
+      "[RECTANGLE]",
+      "[VECTOR]",
+      "[VECTOR]",
+      "[VECTOR]",
+      "群馬県館林市下早川田町306-1",
+      "手島精管株式会社",
+      "TESHIMASEIKAN Co., Ltd",
+      "[VECTOR]",
+      "[RECTANGLE]",
+      "会社情報",
+      "製品/技術",
+      "ブログ",
+      "お問い合せ",
+      "プライバシーポリシー"
+    ],
+    "sibling_types": [
+      "RECTANGLE",
+      "RECTANGLE",
+      "VECTOR",
+      "VECTOR",
+      "VECTOR",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "VECTOR",
+      "RECTANGLE",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT",
+      "TEXT"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-24",
+    "confidence": 40
+  },
+  {
+    "id": "92:550",
+    "type": "FRAME",
+    "current_name": "Group 145",
+    "width": 1440.0,
+    "height": 552.0,
+    "x": 2.0,
+    "y": 17689.0,
+    "child_count": 1,
+    "child_types": "1FRA",
+    "text_preview": "",
+    "parent_name": "contact",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "[RECTANGLE]",
+      "[FRAME]",
+      "[VECTOR]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "RECTANGLE",
+      "FRAME",
+      "VECTOR",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-0",
+    "confidence": 20
+  },
+  {
+    "id": "92:559",
+    "type": "FRAME",
+    "current_name": "Group 144",
+    "width": 1108.0,
+    "height": 259.0,
+    "x": 168.0,
+    "y": 17891.0,
+    "child_count": 3,
+    "child_types": "2FRA+1REC",
+    "text_preview": "WEBからのお問い合わせ",
+    "parent_name": "contact",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]",
+      "[RECTANGLE]",
+      "[FRAME]",
+      "[VECTOR]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME",
+      "RECTANGLE",
+      "FRAME",
+      "VECTOR",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-contact",
+    "confidence": 40
+  },
+  {
+    "id": "92:561",
+    "type": "FRAME",
+    "current_name": "Group 53",
+    "width": 395.0,
+    "height": 123.0,
+    "x": 411.0,
+    "y": 26356.0,
+    "child_count": 1,
+    "child_types": "1FRA",
+    "text_preview": "WEBからのお問い合わせ",
+    "parent_name": "Group 144",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[RECTANGLE]",
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "RECTANGLE",
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-web",
+    "confidence": 40
+  },
+  {
+    "id": "92:564",
+    "type": "FRAME",
+    "current_name": "Group 51",
+    "width": 395.0,
+    "height": 74.0,
+    "x": 897.0,
+    "y": 43335.0,
+    "child_count": 1,
+    "child_types": "1FRA",
+    "text_preview": "お問い合わせフォーム",
+    "parent_name": "Group 83",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "WEBからのお問い合わせ",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "TEXT",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-1",
+    "confidence": 20
+  },
+  {
+    "id": "92:565",
+    "type": "FRAME",
+    "current_name": "Group 50",
+    "width": 395.0,
+    "height": 74.0,
+    "x": 1140.0,
+    "y": 51849.0,
+    "child_count": 1,
+    "child_types": "1FRA",
+    "text_preview": "お問い合わせフォーム",
+    "parent_name": "Group 51",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-0",
+    "confidence": 20
+  },
+  {
+    "id": "92:566",
+    "type": "FRAME",
+    "current_name": "Group 143",
+    "width": 395.0,
+    "height": 74.0,
+    "x": 1383.0,
+    "y": 60363.0,
+    "child_count": 2,
+    "child_types": "1FRA+1REC",
+    "text_preview": "お問い合わせフォーム",
+    "parent_name": "Group 50",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "-",
+    "heuristic_name": "group-contact",
+    "confidence": 40
+  },
+  {
+    "id": "92:571",
+    "type": "FRAME",
+    "current_name": "Group 52",
+    "width": 302.0,
+    "height": 183.0,
+    "x": 1010.0,
+    "y": 26336.0,
+    "child_count": 5,
+    "child_types": "2FRA+3TEX",
+    "text_preview": "お電話でのお問い合わせ",
+    "parent_name": "Group 144",
+    "parent_type": "FRAME",
+    "sibling_names": [
+      "[RECTANGLE]",
+      "[FRAME]",
+      "[FRAME]"
+    ],
+    "sibling_types": [
+      "RECTANGLE",
+      "FRAME",
+      "FRAME"
+    ],
+    "is_leaf": false,
+    "method_origin": "semantic@0.9",
+    "heuristic_name": "group-contact",
+    "confidence": 40
+  }
+]

@@ -1,0 +1,1157 @@
+[
+  {
+    "node_id": "92:252",
+    "node_name": "/csr",
+    "node_type": "FRAME",
+    "child_count": 127,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 4,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "SPACE_BETWEEN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:257",
+    "node_name": "Group 69",
+    "node_type": "FRAME",
+    "child_count": 4,
+    "layout": {
+      "direction": "WRAP",
+      "gap": 16,
+      "padding": {
+        "top": 312,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "high"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:290",
+    "node_name": "Group 169",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 2628,
+        "right": 0,
+        "bottom": 0,
+        "left": 192
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:305",
+    "node_name": "Group 171",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 3960,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:312",
+    "node_name": "Group 174",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 5208,
+        "right": 0,
+        "bottom": 0,
+        "left": 192
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:315",
+    "node_name": "Group 183",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 7508,
+        "right": 0,
+        "bottom": 0,
+        "left": 192
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:318",
+    "node_name": "Group 184",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 7856,
+        "right": 0,
+        "bottom": 0,
+        "left": 192
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:321",
+    "node_name": "Group 170",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 3172,
+        "right": 0,
+        "bottom": 0,
+        "left": 192
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:324",
+    "node_name": "Group 172",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 4608,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:327",
+    "node_name": "Group 181",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 6856,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:330",
+    "node_name": "Group 175",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 5936,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:333",
+    "node_name": "Group 178",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 6144,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:336",
+    "node_name": "Group 180",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 6380,
+        "right": 0,
+        "bottom": 0,
+        "left": 196
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:353",
+    "node_name": "Group 177",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 12,
+      "padding": {
+        "top": 5208,
+        "right": 0,
+        "bottom": 0,
+        "left": 772
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:357",
+    "node_name": "Group 173",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 12,
+      "padding": {
+        "top": 4608,
+        "right": 0,
+        "bottom": 0,
+        "left": 772
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:360",
+    "node_name": "Group 182",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 12,
+      "padding": {
+        "top": 6856,
+        "right": 0,
+        "bottom": 0,
+        "left": 772
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:363",
+    "node_name": "Group 176",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 5936,
+        "right": 0,
+        "bottom": 0,
+        "left": 772
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:373",
+    "node_name": "Group 179",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 6144,
+        "right": 0,
+        "bottom": 0,
+        "left": 772
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:420",
+    "node_name": "visual",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 64,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:421",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:425",
+    "node_name": "Group 99",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 8,
+      "padding": {
+        "top": 112,
+        "right": 0,
+        "bottom": 0,
+        "left": 120
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:429",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 1552,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:433",
+    "node_name": "Group 100",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 8,
+      "padding": {
+        "top": 1768,
+        "right": 0,
+        "bottom": 0,
+        "left": 160
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:437",
+    "node_name": "csr1",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 72,
+      "padding": {
+        "top": 384,
+        "right": 0,
+        "bottom": 0,
+        "left": 120
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:438",
+    "node_name": "Group 119",
+    "node_type": "FRAME",
+    "child_count": 5,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 436,
+        "right": 0,
+        "bottom": 0,
+        "left": 120
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:445",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 232,
+        "right": 0,
+        "bottom": 0,
+        "left": 552
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:448",
+    "node_name": "csr3",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 80,
+      "padding": {
+        "top": 812,
+        "right": 0,
+        "bottom": 0,
+        "left": 200
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:450",
+    "node_name": "Group 115",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 16,
+      "padding": {
+        "top": 852,
+        "right": 0,
+        "bottom": 0,
+        "left": 200
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:455",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 812,
+        "right": 0,
+        "bottom": 0,
+        "left": 824
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:458",
+    "node_name": "csr4",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 72,
+      "padding": {
+        "top": 1264,
+        "right": 0,
+        "bottom": 0,
+        "left": 160
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:459",
+    "node_name": "Group 103",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 1204,
+        "right": 0,
+        "bottom": 0,
+        "left": 4
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:461",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 1264,
+        "right": 0,
+        "bottom": 0,
+        "left": 124
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:464",
+    "node_name": "Group 120",
+    "node_type": "FRAME",
+    "child_count": 5,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 4,
+      "padding": {
+        "top": 1304,
+        "right": 0,
+        "bottom": 0,
+        "left": 652
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:471",
+    "node_name": "Group 124",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 16,
+      "padding": {
+        "top": 2288,
+        "right": 0,
+        "bottom": 0,
+        "left": 396
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:474",
+    "node_name": "Group 122",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 16,
+      "padding": {
+        "top": 2288,
+        "right": 0,
+        "bottom": 0,
+        "left": 748
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:477",
+    "node_name": "Group 121",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 16,
+      "padding": {
+        "top": 2288,
+        "right": 0,
+        "bottom": 0,
+        "left": 572
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:480",
+    "node_name": "Group 123",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 16,
+      "padding": {
+        "top": 2288,
+        "right": 0,
+        "bottom": 0,
+        "left": 920
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:491",
+    "node_name": "menubar",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:494",
+    "node_name": "menubar",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 224,
+      "padding": {
+        "top": 12,
+        "right": 0,
+        "bottom": 0,
+        "left": 28
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:495",
+    "node_name": "menu",
+    "node_type": "FRAME",
+    "child_count": 6,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 64,
+      "padding": {
+        "top": 20,
+        "right": 0,
+        "bottom": 0,
+        "left": 512
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "high"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:501",
+    "node_name": "Group 97",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 4,
+      "padding": {
+        "top": 20,
+        "right": 0,
+        "bottom": 0,
+        "left": 1136
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:510",
+    "node_name": "Group 98",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 12,
+        "right": 0,
+        "bottom": 0,
+        "left": 1288
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:513",
+    "node_name": "footer",
+    "node_type": "FRAME",
+    "child_count": 26,
+    "layout": {
+      "direction": "WRAP",
+      "gap": 228,
+      "padding": {
+        "top": 8752,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:538",
+    "node_name": "Group 95",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 52,
+      "padding": {
+        "top": 8960,
+        "right": 0,
+        "bottom": 0,
+        "left": 608
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "high"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:545",
+    "node_name": "Group 220",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 184,
+      "padding": {
+        "top": 8912,
+        "right": 0,
+        "bottom": 0,
+        "left": 752
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:549",
+    "node_name": "contact",
+    "node_type": "FRAME",
+    "child_count": 5,
+    "layout": {
+      "direction": "WRAP",
+      "gap": 0,
+      "padding": {
+        "top": 8200,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:551",
+    "node_name": "Mask group",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 0,
+      "padding": {
+        "top": 7948,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:555",
+    "node_name": "Group 38",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 8280,
+        "right": 0,
+        "bottom": 0,
+        "left": 616
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:559",
+    "node_name": "Group 144",
+    "node_type": "FRAME",
+    "child_count": 3,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 104,
+      "padding": {
+        "top": 8404,
+        "right": 0,
+        "bottom": 0,
+        "left": 168
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:562",
+    "node_name": "Group 83",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 24,
+      "padding": {
+        "top": 8464,
+        "right": 0,
+        "bottom": 0,
+        "left": 244
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:566",
+    "node_name": "Group 143",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 8512,
+        "right": 0,
+        "bottom": 0,
+        "left": 244
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:568",
+    "node_name": "Group 142",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 12,
+      "padding": {
+        "top": 8532,
+        "right": 0,
+        "bottom": 0,
+        "left": 288
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:571",
+    "node_name": "Group 52",
+    "node_type": "FRAME",
+    "child_count": 5,
+    "layout": {
+      "direction": "VERTICAL",
+      "gap": 0,
+      "padding": {
+        "top": 8444,
+        "right": 0,
+        "bottom": 0,
+        "left": 840
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "low"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:575",
+    "node_name": "Group 29",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 8,
+      "padding": {
+        "top": 8472,
+        "right": 0,
+        "bottom": 0,
+        "left": 840
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "CENTER",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  },
+  {
+    "node_id": "92:580",
+    "node_name": "Group 30",
+    "node_type": "FRAME",
+    "child_count": 2,
+    "layout": {
+      "direction": "HORIZONTAL",
+      "gap": 12,
+      "padding": {
+        "top": 8592,
+        "right": 0,
+        "bottom": 0,
+        "left": 880
+      },
+      "primary_axis_align": "MIN",
+      "counter_axis_align": "MIN",
+      "confidence": "medium"
+    },
+    "source": "inferred",
+    "applicable": true
+  }
+]

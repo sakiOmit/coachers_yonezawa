@@ -13,18 +13,21 @@ from .constants import (
     HEADER_NAV_MIN_TEXTS,
     HEADER_TEXT_MAX_WIDTH,
     HEADER_ZONE_HEIGHT,
+    HEADER_ZONE_MARGIN,
     HERO_ZONE_DISTANCE,
     LARGE_BG_WIDTH_RATIO,
     SECTION_ROOT_WIDTH,
+    ZONE_MIN_MEMBERS,
     ZONE_OVERLAP_ITEM,
     ZONE_OVERLAP_ZONE,
+    scaled_threshold,
 )
 from .geometry import filter_visible_children, get_bbox
 from .grouping_semantic import is_card_like, is_grid_like, is_navigation_like
 from .metadata import get_text_children_content
 
 
-def detect_header_footer_groups(root_children, page_bb):
+def detect_header_footer_groups(root_children, page_bb, viewport_scale=None):
     """Detect header/footer grouping at the page root level (Issue 85).
 
     Identifies flat elements near the top/bottom of the page that should be
@@ -35,15 +38,29 @@ def detect_header_footer_groups(root_children, page_bb):
     4. Only suggests grouping if 2+ elements are found in a zone
 
     Only runs on root-level children (not recursive).
+
+    Args:
+        root_children: List of root-level child nodes.
+        page_bb: Page bounding box dict with x, y, w, h.
+        viewport_scale: Optional dict from compute_viewport_scale() for
+            viewport-relative threshold scaling.  When None, base (1440px)
+            thresholds are used unchanged.
     """
     if len(root_children) < 3:
         return []
 
+    # Scale zone thresholds if viewport differs from 1440px base
+    w_scale = viewport_scale.get('w_scale', 1.0) if viewport_scale else 1.0
+    header_zone_h = scaled_threshold(HEADER_ZONE_HEIGHT, w_scale, min_value=60)
+    footer_zone_h = scaled_threshold(FOOTER_ZONE_HEIGHT, w_scale, min_value=150)
+    footer_margin = scaled_threshold(FOOTER_ZONE_MARGIN, w_scale, min_value=20)
+    header_max_el_h = scaled_threshold(HEADER_MAX_ELEMENT_HEIGHT, w_scale, min_value=80)
+
     result = []
     page_top = page_bb['y']
     page_bottom = page_bb['y'] + page_bb['h']
-    header_zone_max = page_top + HEADER_ZONE_HEIGHT  # Issue 123: use named constant
-    footer_zone_min = page_bottom - FOOTER_ZONE_HEIGHT  # Issue 123: use named constant
+    header_zone_max = page_top + header_zone_h
+    footer_zone_min = page_bottom - footer_zone_h
 
     # Classify elements by zone
     header_candidates = []
@@ -59,14 +76,14 @@ def detect_header_footer_groups(root_children, page_bb):
             continue
 
         # Header zone: element starts within header zone
-        if el_top < header_zone_max and bb['h'] < HEADER_MAX_ELEMENT_HEIGHT:
+        if el_top < header_zone_max and bb['h'] < header_max_el_h:
             header_candidates.append(c)
 
         # Footer zone: element bottom is near or past footer zone
         # Footer zone: element bottom is in footer zone, and element top is
         # at most FOOTER_ZONE_MARGIN above the zone start (catches elements
         # that span slightly above the footer zone boundary)
-        if el_bottom > footer_zone_min and el_top > footer_zone_min - FOOTER_ZONE_MARGIN:
+        if el_bottom > footer_zone_min and el_top > footer_zone_min - footer_margin:
             footer_candidates.append(c)
 
     # Header grouping: need 2+ elements, at least one nav-like TEXT or VECTOR/IMAGE
@@ -101,6 +118,7 @@ def detect_header_footer_groups(root_children, page_bb):
         if has_nav_text or (has_logo and len(header_candidates) >= 2):
             result.append({
                 'method': 'semantic',
+                'score': 0.9,
                 'semantic_type': 'header',
                 'node_ids': [c.get('id', '') for c in header_candidates],
                 'node_names': [c.get('name', '') for c in header_candidates],
@@ -113,6 +131,7 @@ def detect_header_footer_groups(root_children, page_bb):
     if len(footer_candidates) >= 2:
         result.append({
             'method': 'semantic',
+            'score': 0.9,
             'semantic_type': 'footer',
             'node_ids': [c.get('id', '') for c in footer_candidates],
             'node_names': [c.get('name', '') for c in footer_candidates],
@@ -254,15 +273,16 @@ def detect_vertical_zone_groups(root_children, page_bb):
         if not merged:
             zones.append([y_top, y_bot, [node]])
 
-    # Filter: only zones with 2+ elements that aren't already a single frame
+    # Filter: only zones with ZONE_MIN_MEMBERS+ elements (benchmark fix: reduce over-detection)
     result = []
     zone_counters = {}  # Track semantic name counters across zones (Issue 91)
     for z_top, z_bot, nodes in zones:
-        if len(nodes) < 2:
+        if len(nodes) < ZONE_MIN_MEMBERS:
             continue
         semantic_name = infer_zone_semantic_name(nodes, page_bb, zone_counters)
         result.append({
             'method': 'zone',
+            'score': 0.7,
             'semantic_type': 'vertical-zone',
             'node_ids': [n.get('id', '') for n in nodes],
             'node_names': [n.get('name', '') for n in nodes],

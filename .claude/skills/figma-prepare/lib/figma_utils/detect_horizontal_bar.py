@@ -171,6 +171,7 @@ def detect_horizontal_bar(children, parent_bb):
 
         results.append({
             'method': 'semantic',
+            'score': 0.9,
             'semantic_type': 'horizontal-bar',
             'node_ids': [children[i].get('id', '') for i in band_indices],
             'node_names': [children[i].get('name', '') for i in band_indices],

@@ -1,0 +1,4885 @@
+{
+  "sectioning": {
+    "page_name": "/csr",
+    "page_id": "92:252",
+    "page_size": {
+      "width": 1440.0,
+      "height": 9392.0
+    },
+    "top_level_children": [
+      {
+        "id": "92:491",
+        "name": "menubar",
+        "type": "FRAME",
+        "bbox": {
+          "x": 1.0,
+          "y": 1285.0,
+          "w": 1442.0,
+          "h": 62.0
+        },
+        "child_count": 2,
+        "child_types_summary": "FRAME:2",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:420",
+        "name": "visual",
+        "type": "FRAME",
+        "bbox": {
+          "x": 2.0,
+          "y": 1347.0,
+          "w": 1441.0,
+          "h": 266.0
+        },
+        "child_count": 3,
+        "child_types_summary": "FRAME:2, RECTANGLE:1",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:257",
+        "name": "Group 69",
+        "type": "FRAME",
+        "bbox": {
+          "x": -12.0,
+          "y": 1595.0,
+          "w": 1455.0,
+          "h": 1817.0
+        },
+        "child_count": 4,
+        "child_types_summary": "FRAME:2, RECTANGLE:1, VECTOR:1",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:437",
+        "name": "csr1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 124.0,
+          "y": 1671.0,
+          "w": 1076.0,
+          "h": 301.0
+        },
+        "child_count": 2,
+        "child_types_summary": "FRAME:2",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:448",
+        "name": "csr3",
+        "type": "FRAME",
+        "bbox": {
+          "x": 203.0,
+          "y": 2097.0,
+          "w": 1083.0,
+          "h": 301.0
+        },
+        "child_count": 2,
+        "child_types_summary": "FRAME:2",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:458",
+        "name": "csr4",
+        "type": "FRAME",
+        "bbox": {
+          "x": 163.0,
+          "y": 2549.0,
+          "w": 1138.0,
+          "h": 301.0
+        },
+        "child_count": 2,
+        "child_types_summary": "FRAME:2",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:429",
+        "name": "Mask group",
+        "type": "FRAME",
+        "bbox": {
+          "x": 2.0,
+          "y": 3001.0,
+          "w": 1440.0,
+          "h": 266.0
+        },
+        "child_count": 2,
+        "child_types_summary": "RECTANGLE:2",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:432",
+        "name": "Rectangle 772",
+        "type": "RECTANGLE",
+        "bbox": {
+          "x": 2.0,
+          "y": 3001.0,
+          "w": 1441.0,
+          "h": 266.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:433",
+        "name": "Group 100",
+        "type": "FRAME",
+        "bbox": {
+          "x": 160.0,
+          "y": 3051.0,
+          "w": 918.0,
+          "h": 167.0
+        },
+        "child_count": 3,
+        "child_types_summary": "TEXT:2, VECTOR:1",
+        "has_text_children": true,
+        "text_children_preview": [
+          "Sustainability",
+          "サスティナビリティ"
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:270",
+        "name": "VISION",
+        "type": "TEXT",
+        "bbox": {
+          "x": 616.0,
+          "y": 3376.0,
+          "w": 212.0,
+          "h": 31.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:271",
+        "name": "全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する",
+        "type": "TEXT",
+        "bbox": {
+          "x": 399.0,
+          "y": 3438.0,
+          "w": 646.0,
+          "h": 78.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:272",
+        "name": "Vector 108",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 3468.0,
+          "w": 194.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:273",
+        "name": "Vector 109",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 1092.0,
+          "y": 3468.0,
+          "w": 194.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:471",
+        "name": "Group 124",
+        "type": "FRAME",
+        "bbox": {
+          "x": 399.0,
+          "y": 3571.0,
+          "w": 75.0,
+          "h": 25.0
+        },
+        "child_count": 2,
+        "child_types_summary": "ELLIPSE:1, TEXT:1",
+        "has_text_children": true,
+        "text_children_preview": [
+          "環境"
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:474",
+        "name": "Group 122",
+        "type": "FRAME",
+        "bbox": {
+          "x": 749.0,
+          "y": 3571.0,
+          "w": 75.0,
+          "h": 29.0
+        },
+        "child_count": 2,
+        "child_types_summary": "ELLIPSE:1, TEXT:1",
+        "has_text_children": true,
+        "text_children_preview": [
+          "人材"
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:477",
+        "name": "Group 121",
+        "type": "FRAME",
+        "bbox": {
+          "x": 574.0,
+          "y": 3571.0,
+          "w": 75.0,
+          "h": 25.0
+        },
+        "child_count": 2,
+        "child_types_summary": "ELLIPSE:1, TEXT:1",
+        "has_text_children": true,
+        "text_children_preview": [
+          "社会"
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:480",
+        "name": "Group 123",
+        "type": "FRAME",
+        "bbox": {
+          "x": 924.0,
+          "y": 3571.0,
+          "w": 122.0,
+          "h": 25.0
+        },
+        "child_count": 2,
+        "child_types_summary": "ELLIPSE:1, TEXT:1",
+        "has_text_children": true,
+        "text_children_preview": [
+          "事業組織"
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:266",
+        "name": "Environment",
+        "type": "TEXT",
+        "bbox": {
+          "x": 159.0,
+          "y": 3673.0,
+          "w": 246.0,
+          "h": 48.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:253",
+        "name": "環境への取り組み",
+        "type": "TEXT",
+        "bbox": {
+          "x": 162.0,
+          "y": 3735.0,
+          "w": 218.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:274",
+        "name": "気候変動対策",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 3816.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:483",
+        "name": "Ellipse 60",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 173.0,
+          "y": 3831.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:376",
+        "name": "Vector 48",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 3868.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:413",
+        "name": "Vector 51",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 722.0,
+          "y": 3868.0,
+          "w": 0.0,
+          "h": 416.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:290",
+        "name": "Group 169",
+        "type": "FRAME",
+        "bbox": {
+          "x": 195.0,
+          "y": 3913.0,
+          "w": 490.0,
+          "h": 118.0
+        },
+        "child_count": 3,
+        "child_types_summary": "FRAME:1, TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "太陽光パネル設置",
+          "自社社屋に太陽光パネルを設置し..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:287",
+        "name": "省エネ活動",
+        "type": "TEXT",
+        "bbox": {
+          "x": 824.0,
+          "y": 3915.0,
+          "w": 108.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:588",
+        "name": "電球アイコン15 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 773.0,
+          "y": 3915.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:351",
+        "name": "社員の残業を最小限に...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 777.0,
+          "y": 3956.0,
+          "w": 374.0,
+          "h": 50.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:386",
+        "name": "Vector 49",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 4076.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:284",
+        "name": "発電結果の共有",
+        "type": "TEXT",
+        "bbox": {
+          "x": 251.0,
+          "y": 4133.0,
+          "w": 171.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:400",
+        "name": "署名アイコン (1) 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 194.0,
+          "y": 4133.0,
+          "w": 31.0,
+          "h": 31.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:339",
+        "name": "月報として全社員に...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 4176.0,
+          "w": 480.0,
+          "h": 50.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:396",
+        "name": "Vector 50",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 4284.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:280",
+        "name": "水質環境保全",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 4361.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:484",
+        "name": "Ellipse 61",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 173.0,
+          "y": 4377.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:381",
+        "name": "Vector 110",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 4413.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:416",
+        "name": "Vector 113",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 722.0,
+          "y": 4413.0,
+          "w": 0.0,
+          "h": 422.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:289",
+        "name": "ISO14001取得",
+        "type": "TEXT",
+        "bbox": {
+          "x": 824.0,
+          "y": 4454.0,
+          "w": 149.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:598",
+        "name": "受験勉強アイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 4454.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:321",
+        "name": "Group 170",
+        "type": "FRAME",
+        "bbox": {
+          "x": 196.0,
+          "y": 4458.0,
+          "w": 475.0,
+          "h": 118.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "洗浄機と水溶性引き抜き油の開発",
+          "従来トリクロロエチレンを..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:594",
+        "name": "水滴アイコン4 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 226.0,
+          "y": 4458.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:356",
+        "name": "作業環境測定結果の管理区分が...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 775.0,
+          "y": 4497.0,
+          "w": 425.0,
+          "h": 50.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:391",
+        "name": "Vector 111",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 4621.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:347",
+        "name": "ウォーキングアイコン3 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 196.0,
+          "y": 4677.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:286",
+        "name": "労働環境の改善",
+        "type": "TEXT",
+        "bbox": {
+          "x": 253.0,
+          "y": 4678.0,
+          "w": 171.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:346",
+        "name": "作業員の健康被害リスクが...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 199.0,
+          "y": 4721.0,
+          "w": 468.0,
+          "h": 50.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:399",
+        "name": "Vector 112",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 4829.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:267",
+        "name": "Social",
+        "type": "TEXT",
+        "bbox": {
+          "x": 159.0,
+          "y": 5012.0,
+          "w": 119.0,
+          "h": 48.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:254",
+        "name": "社会への取り組み",
+        "type": "TEXT",
+        "bbox": {
+          "x": 162.0,
+          "y": 5067.0,
+          "w": 218.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:275",
+        "name": "CSR活動",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 5148.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:485",
+        "name": "Ellipse 62",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 5164.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:377",
+        "name": "Vector 114",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 5200.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:414",
+        "name": "Vector 120",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 722.0,
+          "y": 5200.0,
+          "w": 0.0,
+          "h": 516.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:305",
+        "name": "Group 171",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 5245.0,
+          "w": 488.0,
+          "h": 168.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "社内献血活動",
+          "赤十字血液センターにより..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:308",
+        "name": "献血アイコン2 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 5245.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:606",
+        "name": "リサイクルマーク付きのゴミ箱イラスト 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 5246.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:288",
+        "name": "プルタブ/ペットボトルキャップ回収",
+        "type": "TEXT",
+        "bbox": {
+          "x": 824.0,
+          "y": 5247.0,
+          "w": 360.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:352",
+        "name": "社内に回収箱を設置し...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 775.0,
+          "y": 5288.0,
+          "w": 465.0,
+          "h": 125.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:387",
+        "name": "Vector 116",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 5458.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:341",
+        "name": "お札を受け取る手のフリーアイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 201.0,
+          "y": 5537.0,
+          "w": 36.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:285",
+        "name": "切手回収",
+        "type": "TEXT",
+        "bbox": {
+          "x": 251.0,
+          "y": 5540.0,
+          "w": 171.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:340",
+        "name": "社内で切手を回収し...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 5583.0,
+          "w": 475.0,
+          "h": 50.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:397",
+        "name": "Vector 118",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 5716.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:281",
+        "name": "地域活性化",
+        "type": "TEXT",
+        "bbox": {
+          "x": 195.0,
+          "y": 5793.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:487",
+        "name": "Ellipse 63",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 5809.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:382",
+        "name": "Vector 115",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 5845.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:417",
+        "name": "Vector 121",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 720.0,
+          "y": 5845.0,
+          "w": 0.0,
+          "h": 233.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:617",
+        "name": "握手のフリーアイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 5889.0,
+          "w": 36.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:324",
+        "name": "Group 172",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 5892.0,
+          "w": 485.0,
+          "h": 119.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "地域の製品調達",
+          "コロナウイルス感染対策として..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:357",
+        "name": "Group 173",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 5892.0,
+          "w": 460.0,
+          "h": 141.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "地域のパートナーシップ",
+          "新・群馬県総合計画..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:609",
+        "name": "インフルエンザ対策のマスクの無料アイコン素材 2 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 199.0,
+          "y": 5892.0,
+          "w": 30.0,
+          "h": 30.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:392",
+        "name": "Vector 117",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 6078.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:268",
+        "name": "Human resources",
+        "type": "TEXT",
+        "bbox": {
+          "x": 159.0,
+          "y": 6254.0,
+          "w": 346.0,
+          "h": 48.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:255",
+        "name": "人材への取り組み",
+        "type": "TEXT",
+        "bbox": {
+          "x": 162.0,
+          "y": 6309.0,
+          "w": 218.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:276",
+        "name": "人材育成",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 6397.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:486",
+        "name": "Ellipse 64",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 6413.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:378",
+        "name": "Vector 122",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 6449.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:415",
+        "name": "Vector 127",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 722.0,
+          "y": 6449.0,
+          "w": 0.0,
+          "h": 564.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:622",
+        "name": "人物アイコン　チーム 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 192.0,
+          "y": 6491.0,
+          "w": 36.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:627",
+        "name": "ノートのアイコン素材7 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 6493.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:312",
+        "name": "Group 174",
+        "type": "FRAME",
+        "bbox": {
+          "x": 192.0,
+          "y": 6494.0,
+          "w": 488.0,
+          "h": 143.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "次世代リーダー育成",
+          "内部コミュニケーションにて..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:353",
+        "name": "Group 177",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 6494.0,
+          "w": 465.0,
+          "h": 191.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "e-ラーニング導入",
+          "ベネフィットワンを全従業員に..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:388",
+        "name": "Vector 124",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 6730.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:411",
+        "name": "SDGs研修/啓蒙活動",
+        "type": "TEXT",
+        "bbox": {
+          "x": 251.0,
+          "y": 6775.0,
+          "w": 238.0,
+          "h": 29.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:630",
+        "name": "新芽のアイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 6775.0,
+          "w": 31.0,
+          "h": 31.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:412",
+        "name": "イマココラボカードゲーム...",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 6818.0,
+          "w": 475.0,
+          "h": 150.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:398",
+        "name": "Vector 126",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 160.0,
+          "y": 7013.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:283",
+        "name": "働き方/多様な人材の活躍",
+        "type": "TEXT",
+        "bbox": {
+          "x": 195.0,
+          "y": 7123.0,
+          "w": 326.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:489",
+        "name": "Ellipse 65",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 7138.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:384",
+        "name": "Vector 123",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 7175.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:419",
+        "name": "Vector 128",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 720.0,
+          "y": 7175.0,
+          "w": 0.0,
+          "h": 755.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:363",
+        "name": "Group 176",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 7219.0,
+          "w": 460.0,
+          "h": 119.0
+        },
+        "child_count": 3,
+        "child_types_summary": "FRAME:1, TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "育児休暇の取得推進",
+          "男女・ジェンダーに関わらず..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:633",
+        "name": "ベビー服のフリーアイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7221.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:330",
+        "name": "Group 175",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7222.0,
+          "w": 485.0,
+          "h": 94.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "子育て支援",
+          "2018年9月くるみん認定..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:394",
+        "name": "Vector 125",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 7383.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:333",
+        "name": "Group 178",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7430.0,
+          "w": 485.0,
+          "h": 144.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "ハラスメント対策",
+          "社内でハラスメント窓口を設置..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:373",
+        "name": "Group 179",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 7430.0,
+          "w": 460.0,
+          "h": 141.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "福利厚生の充実",
+          "社内全員に働きやすい環境を..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:640",
+        "name": "シールドアイコン5 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7430.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:644",
+        "name": "ナイフ、お皿、フォークのお食事アイコン2 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 7430.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:385",
+        "name": "Vector 129",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 160.0,
+          "y": 7619.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:651",
+        "name": "プレゼンテーションアイコン 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7665.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:336",
+        "name": "Group 180",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 7666.0,
+          "w": 485.0,
+          "h": 219.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "障がい者雇用/教育",
+          "2018年6月より..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:395",
+        "name": "Vector 130",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 162.0,
+          "y": 7930.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:282",
+        "name": "健康経営",
+        "type": "TEXT",
+        "bbox": {
+          "x": 195.0,
+          "y": 8040.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:488",
+        "name": "Ellipse 66",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 8055.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:383",
+        "name": "Vector 131",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 159.0,
+          "y": 8092.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:418",
+        "name": "Vector 133",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 720.0,
+          "y": 8092.0,
+          "w": 0.0,
+          "h": 286.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:661",
+        "name": "キラキラ 3 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 195.0,
+          "y": 8138.0,
+          "w": 31.0,
+          "h": 31.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:666",
+        "name": "ハートの心電図のアイコン素材 1 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 8138.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:327",
+        "name": "Group 181",
+        "type": "FRAME",
+        "bbox": {
+          "x": 197.0,
+          "y": 8139.0,
+          "w": 494.0,
+          "h": 194.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "労働安全衛生",
+          "当社で一部使用している..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:360",
+        "name": "Group 182",
+        "type": "FRAME",
+        "bbox": {
+          "x": 775.0,
+          "y": 8139.0,
+          "w": 460.0,
+          "h": 191.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "ストレスチェックの実施",
+          "全社員のメンタル不調の..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:393",
+        "name": "Vector 132",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 158.0,
+          "y": 8378.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:269",
+        "name": "Business organization",
+        "type": "TEXT",
+        "bbox": {
+          "x": 159.0,
+          "y": 8554.0,
+          "w": 433.0,
+          "h": 48.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:256",
+        "name": "事業組織への取り組み",
+        "type": "TEXT",
+        "bbox": {
+          "x": 162.0,
+          "y": 8609.0,
+          "w": 218.0,
+          "h": 36.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:277",
+        "name": "事業活動",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 8697.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:490",
+        "name": "Ellipse 67",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 8712.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:379",
+        "name": "Vector 134",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 8749.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:669",
+        "name": "注射器のアイコン素材 (1) 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 195.0,
+          "y": 8792.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:315",
+        "name": "Group 183",
+        "type": "FRAME",
+        "bbox": {
+          "x": 192.0,
+          "y": 8794.0,
+          "w": 944.0,
+          "h": 93.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "医療用・工業用機器に用いる...",
+          "自社ステンレスチューブは..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:389",
+        "name": "Vector 135",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 8932.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:278",
+        "name": "品質/安全",
+        "type": "TEXT",
+        "bbox": {
+          "x": 197.0,
+          "y": 9042.0,
+          "w": 167.0,
+          "h": 39.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:279",
+        "name": "Ellipse 68",
+        "type": "ELLIPSE",
+        "bbox": {
+          "x": 168.0,
+          "y": 9057.0,
+          "w": 10.0,
+          "h": 10.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:380",
+        "name": "Vector 136",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 9094.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:318",
+        "name": "Group 184",
+        "type": "FRAME",
+        "bbox": {
+          "x": 192.0,
+          "y": 9139.0,
+          "w": 944.0,
+          "h": 93.0
+        },
+        "child_count": 2,
+        "child_types_summary": "TEXT:2",
+        "has_text_children": true,
+        "text_children_preview": [
+          "環境・品質方針の策定",
+          "事業を通じて..."
+        ],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:679",
+        "name": "地球アイコン9 1",
+        "type": "FRAME",
+        "bbox": {
+          "x": 192.0,
+          "y": 9139.0,
+          "w": 32.0,
+          "h": 32.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:390",
+        "name": "Vector 137",
+        "type": "VECTOR",
+        "bbox": {
+          "x": 161.0,
+          "y": 9277.0,
+          "w": 1123.0,
+          "h": 0.0
+        },
+        "child_count": 0,
+        "child_types_summary": "",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": true
+      },
+      {
+        "id": "92:549",
+        "name": "contact",
+        "type": "FRAME",
+        "bbox": {
+          "x": 2.0,
+          "y": 9487.0,
+          "w": 1440.0,
+          "h": 552.0
+        },
+        "child_count": 5,
+        "child_types_summary": "FRAME:3, RECTANGLE:1, VECTOR:1",
+        "has_text_children": false,
+        "text_children_preview": [],
+        "is_unnamed": false
+      },
+      {
+        "id": "92:513",
+        "name": "footer",
+        "type": "FRAME",
+        "bbox": {
+          "x": 2.0,
+          "y": 10039.0,
+          "w": 1440.0,
+          "h": 638.0
+        },
+        "child_count": 26,
+        "child_types_summary": "FRAME:2, RECTANGLE:3, TEXT:17, VECTOR:4",
+        "has_text_children": true,
+        "text_children_preview": [
+          "群馬県館林市下早川田町306-1",
+          "手島精管株式会社",
+          "TESHIMASEIKAN Co., Ltd",
+          "会社情報",
+          "製品/技術"
+        ],
+        "is_unnamed": false
+      }
+    ],
+    "total_children": 127,
+    "heuristic_hints": {
+      "header_candidates": [
+        "92:491",
+        "92:420",
+        "92:257"
+      ],
+      "header_cluster_ids": [],
+      "footer_candidates": [
+        "92:549",
+        "92:513"
+      ],
+      "gap_analysis": [
+        {
+          "between": [
+            "92:491",
+            "92:420"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:420",
+            "92:257"
+          ],
+          "gap_px": -18
+        },
+        {
+          "between": [
+            "92:257",
+            "92:437"
+          ],
+          "gap_px": -1741
+        },
+        {
+          "between": [
+            "92:437",
+            "92:448"
+          ],
+          "gap_px": 125
+        },
+        {
+          "between": [
+            "92:448",
+            "92:458"
+          ],
+          "gap_px": 151
+        },
+        {
+          "between": [
+            "92:458",
+            "92:429"
+          ],
+          "gap_px": 151
+        },
+        {
+          "between": [
+            "92:429",
+            "92:432"
+          ],
+          "gap_px": -266
+        },
+        {
+          "between": [
+            "92:432",
+            "92:433"
+          ],
+          "gap_px": -216
+        },
+        {
+          "between": [
+            "92:433",
+            "92:270"
+          ],
+          "gap_px": 158
+        },
+        {
+          "between": [
+            "92:270",
+            "92:271"
+          ],
+          "gap_px": 31
+        },
+        {
+          "between": [
+            "92:271",
+            "92:272"
+          ],
+          "gap_px": -48
+        },
+        {
+          "between": [
+            "92:272",
+            "92:273"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:273",
+            "92:471"
+          ],
+          "gap_px": 103
+        },
+        {
+          "between": [
+            "92:471",
+            "92:474"
+          ],
+          "gap_px": -25
+        },
+        {
+          "between": [
+            "92:474",
+            "92:477"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:477",
+            "92:480"
+          ],
+          "gap_px": -25
+        },
+        {
+          "between": [
+            "92:480",
+            "92:266"
+          ],
+          "gap_px": 77
+        },
+        {
+          "between": [
+            "92:266",
+            "92:253"
+          ],
+          "gap_px": 14
+        },
+        {
+          "between": [
+            "92:253",
+            "92:274"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:274",
+            "92:483"
+          ],
+          "gap_px": -24
+        },
+        {
+          "between": [
+            "92:483",
+            "92:376"
+          ],
+          "gap_px": 27
+        },
+        {
+          "between": [
+            "92:376",
+            "92:413"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:413",
+            "92:290"
+          ],
+          "gap_px": -371
+        },
+        {
+          "between": [
+            "92:290",
+            "92:287"
+          ],
+          "gap_px": -116
+        },
+        {
+          "between": [
+            "92:287",
+            "92:588"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:588",
+            "92:351"
+          ],
+          "gap_px": 11
+        },
+        {
+          "between": [
+            "92:351",
+            "92:386"
+          ],
+          "gap_px": 70
+        },
+        {
+          "between": [
+            "92:386",
+            "92:284"
+          ],
+          "gap_px": 57
+        },
+        {
+          "between": [
+            "92:284",
+            "92:400"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:400",
+            "92:339"
+          ],
+          "gap_px": 12
+        },
+        {
+          "between": [
+            "92:339",
+            "92:396"
+          ],
+          "gap_px": 58
+        },
+        {
+          "between": [
+            "92:396",
+            "92:280"
+          ],
+          "gap_px": 77
+        },
+        {
+          "between": [
+            "92:280",
+            "92:484"
+          ],
+          "gap_px": -23
+        },
+        {
+          "between": [
+            "92:484",
+            "92:381"
+          ],
+          "gap_px": 26
+        },
+        {
+          "between": [
+            "92:381",
+            "92:416"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:416",
+            "92:289"
+          ],
+          "gap_px": -381
+        },
+        {
+          "between": [
+            "92:289",
+            "92:598"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:598",
+            "92:321"
+          ],
+          "gap_px": -26
+        },
+        {
+          "between": [
+            "92:321",
+            "92:594"
+          ],
+          "gap_px": -118
+        },
+        {
+          "between": [
+            "92:594",
+            "92:356"
+          ],
+          "gap_px": 9
+        },
+        {
+          "between": [
+            "92:356",
+            "92:391"
+          ],
+          "gap_px": 74
+        },
+        {
+          "between": [
+            "92:391",
+            "92:347"
+          ],
+          "gap_px": 56
+        },
+        {
+          "between": [
+            "92:347",
+            "92:286"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:286",
+            "92:346"
+          ],
+          "gap_px": 14
+        },
+        {
+          "between": [
+            "92:346",
+            "92:399"
+          ],
+          "gap_px": 58
+        },
+        {
+          "between": [
+            "92:399",
+            "92:267"
+          ],
+          "gap_px": 183
+        },
+        {
+          "between": [
+            "92:267",
+            "92:254"
+          ],
+          "gap_px": 7
+        },
+        {
+          "between": [
+            "92:254",
+            "92:275"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:275",
+            "92:485"
+          ],
+          "gap_px": -23
+        },
+        {
+          "between": [
+            "92:485",
+            "92:377"
+          ],
+          "gap_px": 26
+        },
+        {
+          "between": [
+            "92:377",
+            "92:414"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:414",
+            "92:305"
+          ],
+          "gap_px": -471
+        },
+        {
+          "between": [
+            "92:305",
+            "92:308"
+          ],
+          "gap_px": -168
+        },
+        {
+          "between": [
+            "92:308",
+            "92:606"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:606",
+            "92:288"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:288",
+            "92:352"
+          ],
+          "gap_px": 12
+        },
+        {
+          "between": [
+            "92:352",
+            "92:387"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:387",
+            "92:341"
+          ],
+          "gap_px": 79
+        },
+        {
+          "between": [
+            "92:341",
+            "92:285"
+          ],
+          "gap_px": -33
+        },
+        {
+          "between": [
+            "92:285",
+            "92:340"
+          ],
+          "gap_px": 14
+        },
+        {
+          "between": [
+            "92:340",
+            "92:397"
+          ],
+          "gap_px": 83
+        },
+        {
+          "between": [
+            "92:397",
+            "92:281"
+          ],
+          "gap_px": 77
+        },
+        {
+          "between": [
+            "92:281",
+            "92:487"
+          ],
+          "gap_px": -23
+        },
+        {
+          "between": [
+            "92:487",
+            "92:382"
+          ],
+          "gap_px": 26
+        },
+        {
+          "between": [
+            "92:382",
+            "92:417"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:417",
+            "92:617"
+          ],
+          "gap_px": -189
+        },
+        {
+          "between": [
+            "92:617",
+            "92:324"
+          ],
+          "gap_px": -33
+        },
+        {
+          "between": [
+            "92:324",
+            "92:357"
+          ],
+          "gap_px": -119
+        },
+        {
+          "between": [
+            "92:357",
+            "92:609"
+          ],
+          "gap_px": -141
+        },
+        {
+          "between": [
+            "92:609",
+            "92:392"
+          ],
+          "gap_px": 156
+        },
+        {
+          "between": [
+            "92:392",
+            "92:268"
+          ],
+          "gap_px": 176
+        },
+        {
+          "between": [
+            "92:268",
+            "92:255"
+          ],
+          "gap_px": 7
+        },
+        {
+          "between": [
+            "92:255",
+            "92:276"
+          ],
+          "gap_px": 52
+        },
+        {
+          "between": [
+            "92:276",
+            "92:486"
+          ],
+          "gap_px": -23
+        },
+        {
+          "between": [
+            "92:486",
+            "92:378"
+          ],
+          "gap_px": 26
+        },
+        {
+          "between": [
+            "92:378",
+            "92:415"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:415",
+            "92:622"
+          ],
+          "gap_px": -522
+        },
+        {
+          "between": [
+            "92:622",
+            "92:627"
+          ],
+          "gap_px": -34
+        },
+        {
+          "between": [
+            "92:627",
+            "92:312"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:312",
+            "92:353"
+          ],
+          "gap_px": -143
+        },
+        {
+          "between": [
+            "92:353",
+            "92:388"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:388",
+            "92:411"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:411",
+            "92:630"
+          ],
+          "gap_px": -29
+        },
+        {
+          "between": [
+            "92:630",
+            "92:412"
+          ],
+          "gap_px": 12
+        },
+        {
+          "between": [
+            "92:412",
+            "92:398"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:398",
+            "92:283"
+          ],
+          "gap_px": 110
+        },
+        {
+          "between": [
+            "92:283",
+            "92:489"
+          ],
+          "gap_px": -24
+        },
+        {
+          "between": [
+            "92:489",
+            "92:384"
+          ],
+          "gap_px": 27
+        },
+        {
+          "between": [
+            "92:384",
+            "92:419"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:419",
+            "92:363"
+          ],
+          "gap_px": -711
+        },
+        {
+          "between": [
+            "92:363",
+            "92:633"
+          ],
+          "gap_px": -117
+        },
+        {
+          "between": [
+            "92:633",
+            "92:330"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:330",
+            "92:394"
+          ],
+          "gap_px": 67
+        },
+        {
+          "between": [
+            "92:394",
+            "92:333"
+          ],
+          "gap_px": 47
+        },
+        {
+          "between": [
+            "92:333",
+            "92:373"
+          ],
+          "gap_px": -144
+        },
+        {
+          "between": [
+            "92:373",
+            "92:640"
+          ],
+          "gap_px": -141
+        },
+        {
+          "between": [
+            "92:640",
+            "92:644"
+          ],
+          "gap_px": -32
+        },
+        {
+          "between": [
+            "92:644",
+            "92:385"
+          ],
+          "gap_px": 157
+        },
+        {
+          "between": [
+            "92:385",
+            "92:651"
+          ],
+          "gap_px": 46
+        },
+        {
+          "between": [
+            "92:651",
+            "92:336"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:336",
+            "92:395"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:395",
+            "92:282"
+          ],
+          "gap_px": 110
+        },
+        {
+          "between": [
+            "92:282",
+            "92:488"
+          ],
+          "gap_px": -24
+        },
+        {
+          "between": [
+            "92:488",
+            "92:383"
+          ],
+          "gap_px": 27
+        },
+        {
+          "between": [
+            "92:383",
+            "92:418"
+          ],
+          "gap_px": 0
+        },
+        {
+          "between": [
+            "92:418",
+            "92:661"
+          ],
+          "gap_px": -240
+        },
+        {
+          "between": [
+            "92:661",
+            "92:666"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:666",
+            "92:327"
+          ],
+          "gap_px": -31
+        },
+        {
+          "between": [
+            "92:327",
+            "92:360"
+          ],
+          "gap_px": -194
+        },
+        {
+          "between": [
+            "92:360",
+            "92:393"
+          ],
+          "gap_px": 48
+        },
+        {
+          "between": [
+            "92:393",
+            "92:269"
+          ],
+          "gap_px": 176
+        },
+        {
+          "between": [
+            "92:269",
+            "92:256"
+          ],
+          "gap_px": 7
+        },
+        {
+          "between": [
+            "92:256",
+            "92:277"
+          ],
+          "gap_px": 52
+        },
+        {
+          "between": [
+            "92:277",
+            "92:490"
+          ],
+          "gap_px": -24
+        },
+        {
+          "between": [
+            "92:490",
+            "92:379"
+          ],
+          "gap_px": 27
+        },
+        {
+          "between": [
+            "92:379",
+            "92:669"
+          ],
+          "gap_px": 43
+        },
+        {
+          "between": [
+            "92:669",
+            "92:315"
+          ],
+          "gap_px": -30
+        },
+        {
+          "between": [
+            "92:315",
+            "92:389"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:389",
+            "92:278"
+          ],
+          "gap_px": 110
+        },
+        {
+          "between": [
+            "92:278",
+            "92:279"
+          ],
+          "gap_px": -24
+        },
+        {
+          "between": [
+            "92:279",
+            "92:380"
+          ],
+          "gap_px": 27
+        },
+        {
+          "between": [
+            "92:380",
+            "92:318"
+          ],
+          "gap_px": 45
+        },
+        {
+          "between": [
+            "92:318",
+            "92:679"
+          ],
+          "gap_px": -93
+        },
+        {
+          "between": [
+            "92:679",
+            "92:390"
+          ],
+          "gap_px": 106
+        },
+        {
+          "between": [
+            "92:390",
+            "92:549"
+          ],
+          "gap_px": 210
+        },
+        {
+          "between": [
+            "92:549",
+            "92:513"
+          ],
+          "gap_px": 0
+        }
+      ],
+      "background_candidates": [
+        "92:432"
+      ],
+      "consecutive_patterns": [
+        {
+          "indices": [
+            3,
+            4,
+            5
+          ],
+          "ids": [
+            "92:437",
+            "92:448",
+            "92:458"
+          ],
+          "names": [
+            "csr1",
+            "csr3",
+            "csr4"
+          ],
+          "hash": "FRAME:[FRAME,FRAME]|GC:7:TEXT"
+        },
+        {
+          "indices": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "ids": [
+            "92:471",
+            "92:474",
+            "92:477",
+            "92:480"
+          ],
+          "names": [
+            "Group 124",
+            "Group 122",
+            "Group 121",
+            "Group 123"
+          ],
+          "hash": "FRAME:[ELLIPSE,TEXT]"
+        },
+        {
+          "indices": [
+            17,
+            18,
+            19
+          ],
+          "ids": [
+            "92:266",
+            "92:253",
+            "92:274"
+          ],
+          "names": [
+            "Environment",
+            "環境への取り組み",
+            "気候変動対策"
+          ],
+          "hash": "TEXT"
+        },
+        {
+          "indices": [
+            46,
+            47,
+            48
+          ],
+          "ids": [
+            "92:267",
+            "92:254",
+            "92:275"
+          ],
+          "names": [
+            "Social",
+            "社会への取り組み",
+            "CSR活動"
+          ],
+          "hash": "TEXT"
+        },
+        {
+          "indices": [
+            71,
+            72,
+            73
+          ],
+          "ids": [
+            "92:268",
+            "92:255",
+            "92:276"
+          ],
+          "names": [
+            "Human resources",
+            "人材への取り組み",
+            "人材育成"
+          ],
+          "hash": "TEXT"
+        },
+        {
+          "indices": [
+            111,
+            112,
+            113
+          ],
+          "ids": [
+            "92:269",
+            "92:256",
+            "92:277"
+          ],
+          "names": [
+            "Business organization",
+            "事業組織への取り組み",
+            "事業活動"
+          ],
+          "hash": "TEXT"
+        }
+      ],
+      "heading_candidates": [
+        {
+          "index": 0,
+          "id": "92:491",
+          "name": "menubar",
+          "height": 62.0
+        },
+        {
+          "index": 8,
+          "id": "92:433",
+          "name": "Group 100",
+          "height": 167.0
+        },
+        {
+          "index": 13,
+          "id": "92:471",
+          "name": "Group 124",
+          "height": 25.0
+        },
+        {
+          "index": 14,
+          "id": "92:474",
+          "name": "Group 122",
+          "height": 29.0
+        },
+        {
+          "index": 15,
+          "id": "92:477",
+          "name": "Group 121",
+          "height": 25.0
+        },
+        {
+          "index": 16,
+          "id": "92:480",
+          "name": "Group 123",
+          "height": 25.0
+        },
+        {
+          "index": 23,
+          "id": "92:290",
+          "name": "Group 169",
+          "height": 118.0
+        },
+        {
+          "index": 38,
+          "id": "92:321",
+          "name": "Group 170",
+          "height": 118.0
+        },
+        {
+          "index": 52,
+          "id": "92:305",
+          "name": "Group 171",
+          "height": 168.0
+        },
+        {
+          "index": 67,
+          "id": "92:324",
+          "name": "Group 172",
+          "height": 119.0
+        },
+        {
+          "index": 68,
+          "id": "92:357",
+          "name": "Group 173",
+          "height": 141.0
+        },
+        {
+          "index": 79,
+          "id": "92:312",
+          "name": "Group 174",
+          "height": 143.0
+        },
+        {
+          "index": 80,
+          "id": "92:353",
+          "name": "Group 177",
+          "height": 191.0
+        },
+        {
+          "index": 90,
+          "id": "92:363",
+          "name": "Group 176",
+          "height": 119.0
+        },
+        {
+          "index": 92,
+          "id": "92:330",
+          "name": "Group 175",
+          "height": 94.0
+        },
+        {
+          "index": 94,
+          "id": "92:333",
+          "name": "Group 178",
+          "height": 144.0
+        },
+        {
+          "index": 95,
+          "id": "92:373",
+          "name": "Group 179",
+          "height": 141.0
+        },
+        {
+          "index": 108,
+          "id": "92:327",
+          "name": "Group 181",
+          "height": 194.0
+        },
+        {
+          "index": 109,
+          "id": "92:360",
+          "name": "Group 182",
+          "height": 191.0
+        },
+        {
+          "index": 117,
+          "id": "92:315",
+          "name": "Group 183",
+          "height": 93.0
+        },
+        {
+          "index": 122,
+          "id": "92:318",
+          "name": "Group 184",
+          "height": 93.0
+        }
+      ],
+      "loose_elements": [
+        {
+          "index": 11,
+          "id": "92:272",
+          "name": "Vector 108",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 12,
+          "id": "92:273",
+          "name": "Vector 109",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 20,
+          "id": "92:483",
+          "name": "Ellipse 60",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 21,
+          "id": "92:376",
+          "name": "Vector 48",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 27,
+          "id": "92:386",
+          "name": "Vector 49",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 31,
+          "id": "92:396",
+          "name": "Vector 50",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 33,
+          "id": "92:484",
+          "name": "Ellipse 61",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 34,
+          "id": "92:381",
+          "name": "Vector 110",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 41,
+          "id": "92:391",
+          "name": "Vector 111",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 45,
+          "id": "92:399",
+          "name": "Vector 112",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 49,
+          "id": "92:485",
+          "name": "Ellipse 62",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 50,
+          "id": "92:377",
+          "name": "Vector 114",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 57,
+          "id": "92:387",
+          "name": "Vector 116",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 61,
+          "id": "92:397",
+          "name": "Vector 118",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 63,
+          "id": "92:487",
+          "name": "Ellipse 63",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 64,
+          "id": "92:382",
+          "name": "Vector 115",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 70,
+          "id": "92:392",
+          "name": "Vector 117",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 74,
+          "id": "92:486",
+          "name": "Ellipse 64",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 75,
+          "id": "92:378",
+          "name": "Vector 122",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 81,
+          "id": "92:388",
+          "name": "Vector 124",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 85,
+          "id": "92:398",
+          "name": "Vector 126",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 87,
+          "id": "92:489",
+          "name": "Ellipse 65",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 88,
+          "id": "92:384",
+          "name": "Vector 123",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 93,
+          "id": "92:394",
+          "name": "Vector 125",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 98,
+          "id": "92:385",
+          "name": "Vector 129",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 101,
+          "id": "92:395",
+          "name": "Vector 130",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 103,
+          "id": "92:488",
+          "name": "Ellipse 66",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 104,
+          "id": "92:383",
+          "name": "Vector 131",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 110,
+          "id": "92:393",
+          "name": "Vector 132",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 114,
+          "id": "92:490",
+          "name": "Ellipse 67",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 115,
+          "id": "92:379",
+          "name": "Vector 134",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 118,
+          "id": "92:389",
+          "name": "Vector 135",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 120,
+          "id": "92:279",
+          "name": "Ellipse 68",
+          "type": "ELLIPSE",
+          "height": 10.0
+        },
+        {
+          "index": 121,
+          "id": "92:380",
+          "name": "Vector 136",
+          "type": "VECTOR",
+          "height": 0.0
+        },
+        {
+          "index": 124,
+          "id": "92:390",
+          "name": "Vector 137",
+          "type": "VECTOR",
+          "height": 0.0
+        }
+      ]
+    },
+    "enriched_children_table": "| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|\n| 1 | 92:491 | menubar | FRAME | 1 | 1285 | F | 1442x62 | N | 2FRA | - | 会社情報 |\n| 2 | 92:420 | visual | FRAME | 2 | 1347 | F | 1441x266 | N | 2FRA+1REC | - | Social contributions |\n| 3 | 92:257 | Group 69 | FRAME | -12 | 1595 | F | 1455x1817 | N | 2FRA+1REC+1VEC | - | - |\n| 4 | 92:437 | csr1 | FRAME | 124 | 1671 | C | 1076x301 | N | 2FRA | - | 結婚、出産などの... |\n| 5 | 92:448 | csr3 | FRAME | 203 | 2097 | C | 1083x301 | N | 2FRA | - | 館林で就職したい... |\n| 6 | 92:458 | csr4 | FRAME | 163 | 2549 | C | 1138x301 | N | 2FRA | - | 手島精管では、会社を... |\n| 7 | 92:429 | Mask group | FRAME | 2 | 3001 | F | 1440x266 | N | 2REC | - | - |\n| 8 | 92:432 | Rectangle 772 | RECTANGLE | 2 | 3001 | F | 1441x266 | Y | - | bg-full | - |\n| 9 | 92:433 | Group 100 | FRAME | 160 | 3051 | C | 918x167 | N | 2TEX+1VEC | - | Sustainability |\n| 10 | 92:270 | VISION | TEXT | 616 | 3376 | C | 212x31 | Y | - | - | VISION |\n| 11 | 92:271 | 全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人 | TEXT | 399 | 3438 | C | 646x78 | Y | - | - | 全社員がSDGsの目標に向かって業務に取り組むことで世界で活 |\n| 12 | 92:272 | Vector 108 | VECTOR | 159 | 3468 | L | 194x0 | Y | - | - | - |\n| 13 | 92:273 | Vector 109 | VECTOR | 1092 | 3468 | R | 194x0 | Y | - | - | - |\n| 14 | 92:471 | Group 124 | FRAME | 399 | 3571 | L | 75x25 | N | 1ELL+1TEX | - | 環境 |\n| 15 | 92:474 | Group 122 | FRAME | 749 | 3571 | R | 75x29 | N | 1ELL+1TEX | - | 人材 |\n| 16 | 92:477 | Group 121 | FRAME | 574 | 3571 | L | 75x25 | N | 1ELL+1TEX | - | 社会 |\n| 17 | 92:480 | Group 123 | FRAME | 924 | 3571 | R | 122x25 | N | 1ELL+1TEX | - | 事業組織 |\n| 18 | 92:266 | Environment | TEXT | 159 | 3673 | L | 246x48 | Y | - | - | Environment |\n| 19 | 92:253 | 環境への取り組み | TEXT | 162 | 3735 | L | 218x36 | Y | - | - | 環境への取り組み |\n| 20 | 92:274 | 気候変動対策 | TEXT | 197 | 3816 | L | 167x39 | Y | - | - | 気候変動対策 |\n| 21 | 92:483 | Ellipse 60 | ELLIPSE | 173 | 3831 | L | 10x10 | Y | - | tiny | - |\n| 22 | 92:376 | Vector 48 | VECTOR | 161 | 3868 | C | 1123x0 | Y | - | - | - |\n| 23 | 92:413 | Vector 51 | VECTOR | 722 | 3868 | R | 0x416 | Y | - | - | - |\n| 24 | 92:290 | Group 169 | FRAME | 195 | 3913 | L | 490x118 | N | 1FRA+2TEX | - | 太陽光パネル設置 |\n| 25 | 92:287 | 省エネ活動 | TEXT | 824 | 3915 | R | 108x29 | Y | - | - | 省エネ活動 |\n| 26 | 92:588 | 電球アイコン15 1 | FRAME | 773 | 3915 | R | 30x30 | Y | - | tiny | - |\n| 27 | 92:351 | 社員の残業を最小限に... | TEXT | 777 | 3956 | R | 374x50 | Y | - | - | 社員の残業を最小限に... |\n| 28 | 92:386 | Vector 49 | VECTOR | 161 | 4076 | C | 1123x0 | Y | - | - | - |\n| 29 | 92:284 | 発電結果の共有 | TEXT | 251 | 4133 | L | 171x29 | Y | - | - | 発電結果の共有 |\n| 30 | 92:400 | 署名アイコン (1) 1 | FRAME | 194 | 4133 | L | 31x31 | Y | - | tiny | - |\n| 31 | 92:339 | 月報として全社員に... | TEXT | 197 | 4176 | L | 480x50 | Y | - | - | 月報として全社員に... |\n| 32 | 92:396 | Vector 50 | VECTOR | 161 | 4284 | C | 1123x0 | Y | - | - | - |\n| 33 | 92:280 | 水質環境保全 | TEXT | 197 | 4361 | L | 167x39 | Y | - | - | 水質環境保全 |\n| 34 | 92:484 | Ellipse 61 | ELLIPSE | 173 | 4377 | L | 10x10 | Y | - | tiny | - |\n| 35 | 92:381 | Vector 110 | VECTOR | 161 | 4413 | C | 1123x0 | Y | - | - | - |\n| 36 | 92:416 | Vector 113 | VECTOR | 722 | 4413 | R | 0x422 | Y | - | - | - |\n| 37 | 92:289 | ISO14001取得 | TEXT | 824 | 4454 | R | 149x29 | Y | - | - | ISO14001取得 |\n| 38 | 92:598 | 受験勉強アイコン 1 | FRAME | 775 | 4454 | R | 30x30 | Y | - | tiny | - |\n| 39 | 92:321 | Group 170 | FRAME | 196 | 4458 | L | 475x118 | N | 2TEX | - | 洗浄機と水溶性引き抜き油の開発 |\n| 40 | 92:594 | 水滴アイコン4 1 | FRAME | 226 | 4458 | L | 30x30 | Y | - | tiny | - |\n| 41 | 92:356 | 作業環境測定結果の管理区分が... | TEXT | 775 | 4497 | R | 425x50 | Y | - | - | 作業環境測定結果の管理区分が... |\n| 42 | 92:391 | Vector 111 | VECTOR | 161 | 4621 | C | 1123x0 | Y | - | - | - |\n| 43 | 92:347 | ウォーキングアイコン3 1 | FRAME | 196 | 4677 | L | 32x32 | Y | - | tiny | - |\n| 44 | 92:286 | 労働環境の改善 | TEXT | 253 | 4678 | L | 171x29 | Y | - | - | 労働環境の改善 |\n| 45 | 92:346 | 作業員の健康被害リスクが... | TEXT | 199 | 4721 | L | 468x50 | Y | - | - | 作業員の健康被害リスクが... |\n| 46 | 92:399 | Vector 112 | VECTOR | 161 | 4829 | C | 1123x0 | Y | - | - | - |\n| 47 | 92:267 | Social | TEXT | 159 | 5012 | L | 119x48 | Y | - | - | Social |\n| 48 | 92:254 | 社会への取り組み | TEXT | 162 | 5067 | L | 218x36 | Y | - | - | 社会への取り組み |\n| 49 | 92:275 | CSR活動 | TEXT | 197 | 5148 | L | 167x39 | Y | - | - | CSR活動 |\n| 50 | 92:485 | Ellipse 62 | ELLIPSE | 168 | 5164 | L | 10x10 | Y | - | tiny | - |\n| 51 | 92:377 | Vector 114 | VECTOR | 161 | 5200 | C | 1123x0 | Y | - | - | - |\n| 52 | 92:414 | Vector 120 | VECTOR | 722 | 5200 | R | 0x516 | Y | - | - | - |\n| 53 | 92:305 | Group 171 | FRAME | 197 | 5245 | L | 488x168 | N | 2TEX | - | 社内献血活動 |\n| 54 | 92:308 | 献血アイコン2 1 | FRAME | 197 | 5245 | L | 30x30 | Y | - | tiny | - |\n| 55 | 92:606 | リサイクルマーク付きのゴミ箱イラスト 1 | FRAME | 775 | 5246 | R | 30x30 | Y | - | tiny | - |\n| 56 | 92:288 | プルタブ/ペットボトルキャップ回収 | TEXT | 824 | 5247 | R | 360x29 | Y | - | - | プルタブ/ペットボトルキャップ回収 |\n| 57 | 92:352 | 社内に回収箱を設置し... | TEXT | 775 | 5288 | R | 465x125 | Y | - | - | 社内に回収箱を設置し... |\n| 58 | 92:387 | Vector 116 | VECTOR | 161 | 5458 | C | 1123x0 | Y | - | - | - |\n| 59 | 92:341 | お札を受け取る手のフリーアイコン 1 | FRAME | 201 | 5537 | L | 36x36 | Y | - | tiny | - |\n| 60 | 92:285 | 切手回収 | TEXT | 251 | 5540 | L | 171x29 | Y | - | - | 切手回収 |\n| 61 | 92:340 | 社内で切手を回収し... | TEXT | 197 | 5583 | L | 475x50 | Y | - | - | 社内で切手を回収し... |\n| 62 | 92:397 | Vector 118 | VECTOR | 161 | 5716 | C | 1123x0 | Y | - | - | - |\n| 63 | 92:281 | 地域活性化 | TEXT | 195 | 5793 | L | 167x39 | Y | - | - | 地域活性化 |\n| 64 | 92:487 | Ellipse 63 | ELLIPSE | 168 | 5809 | L | 10x10 | Y | - | tiny | - |\n| 65 | 92:382 | Vector 115 | VECTOR | 159 | 5845 | C | 1123x0 | Y | - | - | - |\n| 66 | 92:417 | Vector 121 | VECTOR | 720 | 5845 | R | 0x233 | Y | - | - | - |\n| 67 | 92:617 | 握手のフリーアイコン 1 | FRAME | 775 | 5889 | R | 36x36 | Y | - | tiny | - |\n| 68 | 92:324 | Group 172 | FRAME | 197 | 5892 | L | 485x119 | N | 2TEX | - | 地域の製品調達 |\n| 69 | 92:357 | Group 173 | FRAME | 775 | 5892 | R | 460x141 | N | 2TEX | - | 地域のパートナーシップ |\n| 70 | 92:609 | インフルエンザ対策のマスクの無料アイコン素材 2 1 | FRAME | 199 | 5892 | L | 30x30 | Y | - | tiny | - |\n| 71 | 92:392 | Vector 117 | VECTOR | 159 | 6078 | C | 1123x0 | Y | - | - | - |\n| 72 | 92:268 | Human resources | TEXT | 159 | 6254 | L | 346x48 | Y | - | - | Human resources |\n| 73 | 92:255 | 人材への取り組み | TEXT | 162 | 6309 | L | 218x36 | Y | - | - | 人材への取り組み |\n| 74 | 92:276 | 人材育成 | TEXT | 197 | 6397 | L | 167x39 | Y | - | - | 人材育成 |\n| 75 | 92:486 | Ellipse 64 | ELLIPSE | 168 | 6413 | L | 10x10 | Y | - | tiny | - |\n| 76 | 92:378 | Vector 122 | VECTOR | 161 | 6449 | C | 1123x0 | Y | - | - | - |\n| 77 | 92:415 | Vector 127 | VECTOR | 722 | 6449 | R | 0x564 | Y | - | - | - |\n| 78 | 92:622 | 人物アイコン　チーム 1 | FRAME | 192 | 6491 | L | 36x36 | Y | - | tiny | - |\n| 79 | 92:627 | ノートのアイコン素材7 1 | FRAME | 775 | 6493 | R | 32x32 | Y | - | tiny | - |\n| 80 | 92:312 | Group 174 | FRAME | 192 | 6494 | L | 488x143 | N | 2TEX | - | 次世代リーダー育成 |\n| 81 | 92:353 | Group 177 | FRAME | 775 | 6494 | R | 465x191 | N | 2TEX | - | e-ラーニング導入 |\n| 82 | 92:388 | Vector 124 | VECTOR | 161 | 6730 | C | 1123x0 | Y | - | - | - |\n| 83 | 92:411 | SDGs研修/啓蒙活動 | TEXT | 251 | 6775 | L | 238x29 | Y | - | - | SDGs研修/啓蒙活動 |\n| 84 | 92:630 | 新芽のアイコン 1 | FRAME | 197 | 6775 | L | 31x31 | Y | - | tiny | - |\n| 85 | 92:412 | イマココラボカードゲーム... | TEXT | 197 | 6818 | L | 475x150 | Y | - | - | イマココラボカードゲーム... |\n| 86 | 92:398 | Vector 126 | VECTOR | 160 | 7013 | C | 1123x0 | Y | - | - | - |\n| 87 | 92:283 | 働き方/多様な人材の活躍 | TEXT | 195 | 7123 | L | 326x39 | Y | - | - | 働き方/多様な人材の活躍 |\n| 88 | 92:489 | Ellipse 65 | ELLIPSE | 168 | 7138 | L | 10x10 | Y | - | tiny | - |\n| 89 | 92:384 | Vector 123 | VECTOR | 159 | 7175 | C | 1123x0 | Y | - | - | - |\n| 90 | 92:419 | Vector 128 | VECTOR | 720 | 7175 | R | 0x755 | Y | - | - | - |\n| 91 | 92:363 | Group 176 | FRAME | 775 | 7219 | R | 460x119 | N | 1FRA+2TEX | - | 育児休暇の取得推進 |\n| 92 | 92:633 | ベビー服のフリーアイコン 1 | FRAME | 197 | 7221 | L | 32x32 | Y | - | tiny | - |\n| 93 | 92:330 | Group 175 | FRAME | 197 | 7222 | L | 485x94 | N | 2TEX | - | 子育て支援 |\n| 94 | 92:394 | Vector 125 | VECTOR | 159 | 7383 | C | 1123x0 | Y | - | - | - |\n| 95 | 92:333 | Group 178 | FRAME | 197 | 7430 | L | 485x144 | N | 2TEX | - | ハラスメント対策 |\n| 96 | 92:373 | Group 179 | FRAME | 775 | 7430 | R | 460x141 | N | 2TEX | - | 福利厚生の充実 |\n| 97 | 92:640 | シールドアイコン5 1 | FRAME | 197 | 7430 | L | 32x32 | Y | - | tiny | - |\n| 98 | 92:644 | ナイフ、お皿、フォークのお食事アイコン2 1 | FRAME | 775 | 7430 | R | 32x32 | Y | - | tiny | - |\n| 99 | 92:385 | Vector 129 | VECTOR | 160 | 7619 | C | 1123x0 | Y | - | - | - |\n| 100 | 92:651 | プレゼンテーションアイコン 1 | FRAME | 197 | 7665 | L | 32x32 | Y | - | tiny | - |\n| 101 | 92:336 | Group 180 | FRAME | 197 | 7666 | L | 485x219 | N | 2TEX | - | 障がい者雇用/教育 |\n| 102 | 92:395 | Vector 130 | VECTOR | 162 | 7930 | C | 1123x0 | Y | - | - | - |\n| 103 | 92:282 | 健康経営 | TEXT | 195 | 8040 | L | 167x39 | Y | - | - | 健康経営 |\n| 104 | 92:488 | Ellipse 66 | ELLIPSE | 168 | 8055 | L | 10x10 | Y | - | tiny | - |\n| 105 | 92:383 | Vector 131 | VECTOR | 159 | 8092 | C | 1123x0 | Y | - | - | - |\n| 106 | 92:418 | Vector 133 | VECTOR | 720 | 8092 | R | 0x286 | Y | - | - | - |\n| 107 | 92:661 | キラキラ 3 1 | FRAME | 195 | 8138 | L | 31x31 | Y | - | tiny | - |\n| 108 | 92:666 | ハートの心電図のアイコン素材 1 1 | FRAME | 775 | 8138 | R | 32x32 | Y | - | tiny | - |\n| 109 | 92:327 | Group 181 | FRAME | 197 | 8139 | L | 494x194 | N | 2TEX | - | 労働安全衛生 |\n| 110 | 92:360 | Group 182 | FRAME | 775 | 8139 | R | 460x191 | N | 2TEX | - | ストレスチェックの実施 |\n| 111 | 92:393 | Vector 132 | VECTOR | 158 | 8378 | C | 1123x0 | Y | - | - | - |\n| 112 | 92:269 | Business organization | TEXT | 159 | 8554 | L | 433x48 | Y | - | - | Business organization |\n| 113 | 92:256 | 事業組織への取り組み | TEXT | 162 | 8609 | L | 218x36 | Y | - | - | 事業組織への取り組み |\n| 114 | 92:277 | 事業活動 | TEXT | 197 | 8697 | L | 167x39 | Y | - | - | 事業活動 |\n| 115 | 92:490 | Ellipse 67 | ELLIPSE | 168 | 8712 | L | 10x10 | Y | - | tiny | - |\n| 116 | 92:379 | Vector 134 | VECTOR | 161 | 8749 | C | 1123x0 | Y | - | - | - |\n| 117 | 92:669 | 注射器のアイコン素材 (1) 1 | FRAME | 195 | 8792 | L | 32x32 | Y | - | tiny | - |\n| 118 | 92:315 | Group 183 | FRAME | 192 | 8794 | C | 944x93 | N | 2TEX | - | 医療用・工業用機器に用いる... |\n| 119 | 92:389 | Vector 135 | VECTOR | 161 | 8932 | C | 1123x0 | Y | - | - | - |\n| 120 | 92:278 | 品質/安全 | TEXT | 197 | 9042 | L | 167x39 | Y | - | - | 品質/安全 |\n| 121 | 92:279 | Ellipse 68 | ELLIPSE | 168 | 9057 | L | 10x10 | Y | - | tiny | - |\n| 122 | 92:380 | Vector 136 | VECTOR | 161 | 9094 | C | 1123x0 | Y | - | - | - |\n| 123 | 92:318 | Group 184 | FRAME | 192 | 9139 | C | 944x93 | N | 2TEX | - | 環境・品質方針の策定 |\n| 124 | 92:679 | 地球アイコン9 1 | FRAME | 192 | 9139 | L | 32x32 | Y | - | tiny | - |\n| 125 | 92:390 | Vector 137 | VECTOR | 161 | 9277 | C | 1123x0 | Y | - | - | - |\n| 126 | 92:549 | contact | FRAME | 2 | 9487 | F | 1440x552 | N | 3FRA+1REC+1VEC | - | CONTACT |\n| 127 | 92:513 | footer | FRAME | 2 | 10039 | F | 1440x638 | N | 2FRA+3REC+17TEX+4VEC | - | 群馬県館林市下早川田町306-1 |"
+  },
+  "hints": {
+    "header_candidates": [
+      "92:491",
+      "92:420",
+      "92:257"
+    ],
+    "header_cluster_ids": [],
+    "footer_candidates": [
+      "92:549",
+      "92:513"
+    ],
+    "gap_analysis": [
+      {
+        "between": [
+          "92:491",
+          "92:420"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:420",
+          "92:257"
+        ],
+        "gap_px": -18
+      },
+      {
+        "between": [
+          "92:257",
+          "92:437"
+        ],
+        "gap_px": -1741
+      },
+      {
+        "between": [
+          "92:437",
+          "92:448"
+        ],
+        "gap_px": 125
+      },
+      {
+        "between": [
+          "92:448",
+          "92:458"
+        ],
+        "gap_px": 151
+      },
+      {
+        "between": [
+          "92:458",
+          "92:429"
+        ],
+        "gap_px": 151
+      },
+      {
+        "between": [
+          "92:429",
+          "92:432"
+        ],
+        "gap_px": -266
+      },
+      {
+        "between": [
+          "92:432",
+          "92:433"
+        ],
+        "gap_px": -216
+      },
+      {
+        "between": [
+          "92:433",
+          "92:270"
+        ],
+        "gap_px": 158
+      },
+      {
+        "between": [
+          "92:270",
+          "92:271"
+        ],
+        "gap_px": 31
+      },
+      {
+        "between": [
+          "92:271",
+          "92:272"
+        ],
+        "gap_px": -48
+      },
+      {
+        "between": [
+          "92:272",
+          "92:273"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:273",
+          "92:471"
+        ],
+        "gap_px": 103
+      },
+      {
+        "between": [
+          "92:471",
+          "92:474"
+        ],
+        "gap_px": -25
+      },
+      {
+        "between": [
+          "92:474",
+          "92:477"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:477",
+          "92:480"
+        ],
+        "gap_px": -25
+      },
+      {
+        "between": [
+          "92:480",
+          "92:266"
+        ],
+        "gap_px": 77
+      },
+      {
+        "between": [
+          "92:266",
+          "92:253"
+        ],
+        "gap_px": 14
+      },
+      {
+        "between": [
+          "92:253",
+          "92:274"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:274",
+          "92:483"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:483",
+          "92:376"
+        ],
+        "gap_px": 27
+      },
+      {
+        "between": [
+          "92:376",
+          "92:413"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:413",
+          "92:290"
+        ],
+        "gap_px": -371
+      },
+      {
+        "between": [
+          "92:290",
+          "92:287"
+        ],
+        "gap_px": -116
+      },
+      {
+        "between": [
+          "92:287",
+          "92:588"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:588",
+          "92:351"
+        ],
+        "gap_px": 11
+      },
+      {
+        "between": [
+          "92:351",
+          "92:386"
+        ],
+        "gap_px": 70
+      },
+      {
+        "between": [
+          "92:386",
+          "92:284"
+        ],
+        "gap_px": 57
+      },
+      {
+        "between": [
+          "92:284",
+          "92:400"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:400",
+          "92:339"
+        ],
+        "gap_px": 12
+      },
+      {
+        "between": [
+          "92:339",
+          "92:396"
+        ],
+        "gap_px": 58
+      },
+      {
+        "between": [
+          "92:396",
+          "92:280"
+        ],
+        "gap_px": 77
+      },
+      {
+        "between": [
+          "92:280",
+          "92:484"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "92:484",
+          "92:381"
+        ],
+        "gap_px": 26
+      },
+      {
+        "between": [
+          "92:381",
+          "92:416"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:416",
+          "92:289"
+        ],
+        "gap_px": -381
+      },
+      {
+        "between": [
+          "92:289",
+          "92:598"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:598",
+          "92:321"
+        ],
+        "gap_px": -26
+      },
+      {
+        "between": [
+          "92:321",
+          "92:594"
+        ],
+        "gap_px": -118
+      },
+      {
+        "between": [
+          "92:594",
+          "92:356"
+        ],
+        "gap_px": 9
+      },
+      {
+        "between": [
+          "92:356",
+          "92:391"
+        ],
+        "gap_px": 74
+      },
+      {
+        "between": [
+          "92:391",
+          "92:347"
+        ],
+        "gap_px": 56
+      },
+      {
+        "between": [
+          "92:347",
+          "92:286"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:286",
+          "92:346"
+        ],
+        "gap_px": 14
+      },
+      {
+        "between": [
+          "92:346",
+          "92:399"
+        ],
+        "gap_px": 58
+      },
+      {
+        "between": [
+          "92:399",
+          "92:267"
+        ],
+        "gap_px": 183
+      },
+      {
+        "between": [
+          "92:267",
+          "92:254"
+        ],
+        "gap_px": 7
+      },
+      {
+        "between": [
+          "92:254",
+          "92:275"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:275",
+          "92:485"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "92:485",
+          "92:377"
+        ],
+        "gap_px": 26
+      },
+      {
+        "between": [
+          "92:377",
+          "92:414"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:414",
+          "92:305"
+        ],
+        "gap_px": -471
+      },
+      {
+        "between": [
+          "92:305",
+          "92:308"
+        ],
+        "gap_px": -168
+      },
+      {
+        "between": [
+          "92:308",
+          "92:606"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:606",
+          "92:288"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:288",
+          "92:352"
+        ],
+        "gap_px": 12
+      },
+      {
+        "between": [
+          "92:352",
+          "92:387"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:387",
+          "92:341"
+        ],
+        "gap_px": 79
+      },
+      {
+        "between": [
+          "92:341",
+          "92:285"
+        ],
+        "gap_px": -33
+      },
+      {
+        "between": [
+          "92:285",
+          "92:340"
+        ],
+        "gap_px": 14
+      },
+      {
+        "between": [
+          "92:340",
+          "92:397"
+        ],
+        "gap_px": 83
+      },
+      {
+        "between": [
+          "92:397",
+          "92:281"
+        ],
+        "gap_px": 77
+      },
+      {
+        "between": [
+          "92:281",
+          "92:487"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "92:487",
+          "92:382"
+        ],
+        "gap_px": 26
+      },
+      {
+        "between": [
+          "92:382",
+          "92:417"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:417",
+          "92:617"
+        ],
+        "gap_px": -189
+      },
+      {
+        "between": [
+          "92:617",
+          "92:324"
+        ],
+        "gap_px": -33
+      },
+      {
+        "between": [
+          "92:324",
+          "92:357"
+        ],
+        "gap_px": -119
+      },
+      {
+        "between": [
+          "92:357",
+          "92:609"
+        ],
+        "gap_px": -141
+      },
+      {
+        "between": [
+          "92:609",
+          "92:392"
+        ],
+        "gap_px": 156
+      },
+      {
+        "between": [
+          "92:392",
+          "92:268"
+        ],
+        "gap_px": 176
+      },
+      {
+        "between": [
+          "92:268",
+          "92:255"
+        ],
+        "gap_px": 7
+      },
+      {
+        "between": [
+          "92:255",
+          "92:276"
+        ],
+        "gap_px": 52
+      },
+      {
+        "between": [
+          "92:276",
+          "92:486"
+        ],
+        "gap_px": -23
+      },
+      {
+        "between": [
+          "92:486",
+          "92:378"
+        ],
+        "gap_px": 26
+      },
+      {
+        "between": [
+          "92:378",
+          "92:415"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:415",
+          "92:622"
+        ],
+        "gap_px": -522
+      },
+      {
+        "between": [
+          "92:622",
+          "92:627"
+        ],
+        "gap_px": -34
+      },
+      {
+        "between": [
+          "92:627",
+          "92:312"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:312",
+          "92:353"
+        ],
+        "gap_px": -143
+      },
+      {
+        "between": [
+          "92:353",
+          "92:388"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:388",
+          "92:411"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:411",
+          "92:630"
+        ],
+        "gap_px": -29
+      },
+      {
+        "between": [
+          "92:630",
+          "92:412"
+        ],
+        "gap_px": 12
+      },
+      {
+        "between": [
+          "92:412",
+          "92:398"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:398",
+          "92:283"
+        ],
+        "gap_px": 110
+      },
+      {
+        "between": [
+          "92:283",
+          "92:489"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:489",
+          "92:384"
+        ],
+        "gap_px": 27
+      },
+      {
+        "between": [
+          "92:384",
+          "92:419"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:419",
+          "92:363"
+        ],
+        "gap_px": -711
+      },
+      {
+        "between": [
+          "92:363",
+          "92:633"
+        ],
+        "gap_px": -117
+      },
+      {
+        "between": [
+          "92:633",
+          "92:330"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:330",
+          "92:394"
+        ],
+        "gap_px": 67
+      },
+      {
+        "between": [
+          "92:394",
+          "92:333"
+        ],
+        "gap_px": 47
+      },
+      {
+        "between": [
+          "92:333",
+          "92:373"
+        ],
+        "gap_px": -144
+      },
+      {
+        "between": [
+          "92:373",
+          "92:640"
+        ],
+        "gap_px": -141
+      },
+      {
+        "between": [
+          "92:640",
+          "92:644"
+        ],
+        "gap_px": -32
+      },
+      {
+        "between": [
+          "92:644",
+          "92:385"
+        ],
+        "gap_px": 157
+      },
+      {
+        "between": [
+          "92:385",
+          "92:651"
+        ],
+        "gap_px": 46
+      },
+      {
+        "between": [
+          "92:651",
+          "92:336"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:336",
+          "92:395"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:395",
+          "92:282"
+        ],
+        "gap_px": 110
+      },
+      {
+        "between": [
+          "92:282",
+          "92:488"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:488",
+          "92:383"
+        ],
+        "gap_px": 27
+      },
+      {
+        "between": [
+          "92:383",
+          "92:418"
+        ],
+        "gap_px": 0
+      },
+      {
+        "between": [
+          "92:418",
+          "92:661"
+        ],
+        "gap_px": -240
+      },
+      {
+        "between": [
+          "92:661",
+          "92:666"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:666",
+          "92:327"
+        ],
+        "gap_px": -31
+      },
+      {
+        "between": [
+          "92:327",
+          "92:360"
+        ],
+        "gap_px": -194
+      },
+      {
+        "between": [
+          "92:360",
+          "92:393"
+        ],
+        "gap_px": 48
+      },
+      {
+        "between": [
+          "92:393",
+          "92:269"
+        ],
+        "gap_px": 176
+      },
+      {
+        "between": [
+          "92:269",
+          "92:256"
+        ],
+        "gap_px": 7
+      },
+      {
+        "between": [
+          "92:256",
+          "92:277"
+        ],
+        "gap_px": 52
+      },
+      {
+        "between": [
+          "92:277",
+          "92:490"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:490",
+          "92:379"
+        ],
+        "gap_px": 27
+      },
+      {
+        "between": [
+          "92:379",
+          "92:669"
+        ],
+        "gap_px": 43
+      },
+      {
+        "between": [
+          "92:669",
+          "92:315"
+        ],
+        "gap_px": -30
+      },
+      {
+        "between": [
+          "92:315",
+          "92:389"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:389",
+          "92:278"
+        ],
+        "gap_px": 110
+      },
+      {
+        "between": [
+          "92:278",
+          "92:279"
+        ],
+        "gap_px": -24
+      },
+      {
+        "between": [
+          "92:279",
+          "92:380"
+        ],
+        "gap_px": 27
+      },
+      {
+        "between": [
+          "92:380",
+          "92:318"
+        ],
+        "gap_px": 45
+      },
+      {
+        "between": [
+          "92:318",
+          "92:679"
+        ],
+        "gap_px": -93
+      },
+      {
+        "between": [
+          "92:679",
+          "92:390"
+        ],
+        "gap_px": 106
+      },
+      {
+        "between": [
+          "92:390",
+          "92:549"
+        ],
+        "gap_px": 210
+      },
+      {
+        "between": [
+          "92:549",
+          "92:513"
+        ],
+        "gap_px": 0
+      }
+    ],
+    "background_candidates": [
+      "92:432"
+    ],
+    "consecutive_patterns": [
+      {
+        "indices": [
+          3,
+          4,
+          5
+        ],
+        "ids": [
+          "92:437",
+          "92:448",
+          "92:458"
+        ],
+        "names": [
+          "csr1",
+          "csr3",
+          "csr4"
+        ],
+        "hash": "FRAME:[FRAME,FRAME]|GC:7:TEXT"
+      },
+      {
+        "indices": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "ids": [
+          "92:471",
+          "92:474",
+          "92:477",
+          "92:480"
+        ],
+        "names": [
+          "Group 124",
+          "Group 122",
+          "Group 121",
+          "Group 123"
+        ],
+        "hash": "FRAME:[ELLIPSE,TEXT]"
+      },
+      {
+        "indices": [
+          17,
+          18,
+          19
+        ],
+        "ids": [
+          "92:266",
+          "92:253",
+          "92:274"
+        ],
+        "names": [
+          "Environment",
+          "環境への取り組み",
+          "気候変動対策"
+        ],
+        "hash": "TEXT"
+      },
+      {
+        "indices": [
+          46,
+          47,
+          48
+        ],
+        "ids": [
+          "92:267",
+          "92:254",
+          "92:275"
+        ],
+        "names": [
+          "Social",
+          "社会への取り組み",
+          "CSR活動"
+        ],
+        "hash": "TEXT"
+      },
+      {
+        "indices": [
+          71,
+          72,
+          73
+        ],
+        "ids": [
+          "92:268",
+          "92:255",
+          "92:276"
+        ],
+        "names": [
+          "Human resources",
+          "人材への取り組み",
+          "人材育成"
+        ],
+        "hash": "TEXT"
+      },
+      {
+        "indices": [
+          111,
+          112,
+          113
+        ],
+        "ids": [
+          "92:269",
+          "92:256",
+          "92:277"
+        ],
+        "names": [
+          "Business organization",
+          "事業組織への取り組み",
+          "事業活動"
+        ],
+        "hash": "TEXT"
+      }
+    ],
+    "heading_candidates": [
+      {
+        "index": 0,
+        "id": "92:491",
+        "name": "menubar",
+        "height": 62.0
+      },
+      {
+        "index": 8,
+        "id": "92:433",
+        "name": "Group 100",
+        "height": 167.0
+      },
+      {
+        "index": 13,
+        "id": "92:471",
+        "name": "Group 124",
+        "height": 25.0
+      },
+      {
+        "index": 14,
+        "id": "92:474",
+        "name": "Group 122",
+        "height": 29.0
+      },
+      {
+        "index": 15,
+        "id": "92:477",
+        "name": "Group 121",
+        "height": 25.0
+      },
+      {
+        "index": 16,
+        "id": "92:480",
+        "name": "Group 123",
+        "height": 25.0
+      },
+      {
+        "index": 23,
+        "id": "92:290",
+        "name": "Group 169",
+        "height": 118.0
+      },
+      {
+        "index": 38,
+        "id": "92:321",
+        "name": "Group 170",
+        "height": 118.0
+      },
+      {
+        "index": 52,
+        "id": "92:305",
+        "name": "Group 171",
+        "height": 168.0
+      },
+      {
+        "index": 67,
+        "id": "92:324",
+        "name": "Group 172",
+        "height": 119.0
+      },
+      {
+        "index": 68,
+        "id": "92:357",
+        "name": "Group 173",
+        "height": 141.0
+      },
+      {
+        "index": 79,
+        "id": "92:312",
+        "name": "Group 174",
+        "height": 143.0
+      },
+      {
+        "index": 80,
+        "id": "92:353",
+        "name": "Group 177",
+        "height": 191.0
+      },
+      {
+        "index": 90,
+        "id": "92:363",
+        "name": "Group 176",
+        "height": 119.0
+      },
+      {
+        "index": 92,
+        "id": "92:330",
+        "name": "Group 175",
+        "height": 94.0
+      },
+      {
+        "index": 94,
+        "id": "92:333",
+        "name": "Group 178",
+        "height": 144.0
+      },
+      {
+        "index": 95,
+        "id": "92:373",
+        "name": "Group 179",
+        "height": 141.0
+      },
+      {
+        "index": 108,
+        "id": "92:327",
+        "name": "Group 181",
+        "height": 194.0
+      },
+      {
+        "index": 109,
+        "id": "92:360",
+        "name": "Group 182",
+        "height": 191.0
+      },
+      {
+        "index": 117,
+        "id": "92:315",
+        "name": "Group 183",
+        "height": 93.0
+      },
+      {
+        "index": 122,
+        "id": "92:318",
+        "name": "Group 184",
+        "height": 93.0
+      }
+    ],
+    "loose_elements": [
+      {
+        "index": 11,
+        "id": "92:272",
+        "name": "Vector 108",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 12,
+        "id": "92:273",
+        "name": "Vector 109",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 20,
+        "id": "92:483",
+        "name": "Ellipse 60",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 21,
+        "id": "92:376",
+        "name": "Vector 48",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 27,
+        "id": "92:386",
+        "name": "Vector 49",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 31,
+        "id": "92:396",
+        "name": "Vector 50",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 33,
+        "id": "92:484",
+        "name": "Ellipse 61",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 34,
+        "id": "92:381",
+        "name": "Vector 110",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 41,
+        "id": "92:391",
+        "name": "Vector 111",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 45,
+        "id": "92:399",
+        "name": "Vector 112",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 49,
+        "id": "92:485",
+        "name": "Ellipse 62",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 50,
+        "id": "92:377",
+        "name": "Vector 114",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 57,
+        "id": "92:387",
+        "name": "Vector 116",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 61,
+        "id": "92:397",
+        "name": "Vector 118",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 63,
+        "id": "92:487",
+        "name": "Ellipse 63",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 64,
+        "id": "92:382",
+        "name": "Vector 115",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 70,
+        "id": "92:392",
+        "name": "Vector 117",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 74,
+        "id": "92:486",
+        "name": "Ellipse 64",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 75,
+        "id": "92:378",
+        "name": "Vector 122",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 81,
+        "id": "92:388",
+        "name": "Vector 124",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 85,
+        "id": "92:398",
+        "name": "Vector 126",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 87,
+        "id": "92:489",
+        "name": "Ellipse 65",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 88,
+        "id": "92:384",
+        "name": "Vector 123",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 93,
+        "id": "92:394",
+        "name": "Vector 125",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 98,
+        "id": "92:385",
+        "name": "Vector 129",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 101,
+        "id": "92:395",
+        "name": "Vector 130",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 103,
+        "id": "92:488",
+        "name": "Ellipse 66",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 104,
+        "id": "92:383",
+        "name": "Vector 131",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 110,
+        "id": "92:393",
+        "name": "Vector 132",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 114,
+        "id": "92:490",
+        "name": "Ellipse 67",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 115,
+        "id": "92:379",
+        "name": "Vector 134",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 118,
+        "id": "92:389",
+        "name": "Vector 135",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 120,
+        "id": "92:279",
+        "name": "Ellipse 68",
+        "type": "ELLIPSE",
+        "height": 10.0
+      },
+      {
+        "index": 121,
+        "id": "92:380",
+        "name": "Vector 136",
+        "type": "VECTOR",
+        "height": 0.0
+      },
+      {
+        "index": 124,
+        "id": "92:390",
+        "name": "Vector 137",
+        "type": "VECTOR",
+        "height": 0.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,117 @@
+# Figma Prepare Benchmark Report
+# Generated: 2026-03-08T15:27:13.641370+00:00
+
+fixture: csr.xml
+
+tree_structure:
+  page_width: 1440.0
+  page_height: 9392.0
+  root_children: 127
+  max_depth: 9
+  repeated_patterns: 6
+  unique_hashes: 35
+  node_types:
+    TEXT: 115
+    FRAME: 96
+    VECTOR: 47
+    RECTANGLE: 26
+    ELLIPSE: 18
+
+phase1_quality:
+  score: 24.3
+  grade: D
+  recommendation: All phases recommended
+  metrics:
+    deep_nesting_count: 1
+    flat_sections: 2
+    hidden_nodes: 0
+    max_depth: 9
+    max_section_depth: 8
+    named_rate_pct: 54.6
+    nested_flat_count: 0
+    no_autolayout_frames: 96
+    off_canvas_nodes: 0
+    total_frames: 96
+    total_nodes: 302
+    ungrouped_candidates: 12
+    unnamed_nodes: 137
+    unnamed_rate_pct: 45.4
+  score_breakdown:
+    autolayout_penalty: 0
+    flat_penalty: 40
+    nesting_penalty: 3
+    ungrouped_penalty: 10
+    unnamed_penalty: 22.7
+
+phase2_grouping:
+  total_candidates: 34
+  methods:
+    consecutive:
+      count: 8
+      avg_score: 0.85
+      min_score: 0.85
+      max_score: 0.85
+    heading-content:
+      count: 7
+      avg_score: 0.7
+      min_score: 0.7
+      max_score: 0.7
+    highlight:
+      count: 1
+      avg_score: 0.8
+      min_score: 0.8
+      max_score: 0.8
+    pattern:
+      count: 4
+      avg_score: 0.94
+      min_score: 0.76
+      max_score: 1.0
+    semantic:
+      count: 5
+      avg_score: 0.9
+      min_score: 0.9
+      max_score: 0.9
+    zone:
+      count: 9
+      avg_score: 0.7
+      min_score: 0.7
+      max_score: 0.7
+
+phase3_rename:
+  total_renames: 137
+  en_jp_pairs: 10
+  confidence:
+    high (80-100): 87
+    medium (50-79): 35
+    low (20-49): 15
+    very_low (0-19): 0
+  methods:
+    auto: 137
+  top_prefixes:
+    icon-: 47
+    heading-: 26
+    bullet-: 18
+    group-: 15
+    section-: 12
+    bg-: 10
+    btn-: 7
+    card-: 2
+
+phase4_autolayout:
+  total_frames: 55
+  directions:
+    VERTICAL: 26
+    HORIZONTAL: 26
+    WRAP: 3
+  confidence:
+    medium: 37
+    low: 15
+    high: 3
+
+timings:
+  phase1: 0.006s
+  phase2_stage_a: 0.04s
+  phase3: 0.007s
+  phase4: 0.007s
+  total: 0.066s
+  tree_analysis: 0.006s

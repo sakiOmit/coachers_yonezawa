@@ -1,0 +1,961 @@
+{
+  "92:257": {
+    "old_name": "Group 69",
+    "new_name": "group-4",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:258": {
+    "old_name": "Rectangle 105",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:259": {
+    "old_name": "Vector 115",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:260": {
+    "old_name": "Group 263",
+    "new_name": "group-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:261": {
+    "old_name": "Vector 114",
+    "new_name": "icon-0",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:262": {
+    "old_name": "Vector 117",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:263": {
+    "old_name": "Group 264",
+    "new_name": "group-3",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:264": {
+    "old_name": "Vector 114",
+    "new_name": "icon-0",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:265": {
+    "old_name": "Vector 117",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:272": {
+    "old_name": "Vector 108",
+    "new_name": "icon-11",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:273": {
+    "old_name": "Vector 109",
+    "new_name": "icon-12",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:279": {
+    "old_name": "Ellipse 68",
+    "new_name": "bullet-18",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:290": {
+    "old_name": "Group 169",
+    "new_name": "heading-29",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:305": {
+    "old_name": "Group 171",
+    "new_name": "heading-30",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:312": {
+    "old_name": "Group 174",
+    "new_name": "heading-32",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:315": {
+    "old_name": "Group 183",
+    "new_name": "heading-33",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:318": {
+    "old_name": "Group 184",
+    "new_name": "heading-business",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:321": {
+    "old_name": "Group 170",
+    "new_name": "heading-35",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:324": {
+    "old_name": "Group 172",
+    "new_name": "heading-36",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:327": {
+    "old_name": "Group 181",
+    "new_name": "heading-37",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:330": {
+    "old_name": "Group 175",
+    "new_name": "heading-20189",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:333": {
+    "old_name": "Group 178",
+    "new_name": "heading-39",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:336": {
+    "old_name": "Group 180",
+    "new_name": "heading-20186",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:353": {
+    "old_name": "Group 177",
+    "new_name": "heading-e",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:357": {
+    "old_name": "Group 173",
+    "new_name": "heading-50",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:360": {
+    "old_name": "Group 182",
+    "new_name": "heading-51",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:363": {
+    "old_name": "Group 176",
+    "new_name": "heading-52",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:373": {
+    "old_name": "Group 179",
+    "new_name": "heading-53",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:376": {
+    "old_name": "Vector 48",
+    "new_name": "icon-54",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:377": {
+    "old_name": "Vector 114",
+    "new_name": "icon-55",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:378": {
+    "old_name": "Vector 122",
+    "new_name": "icon-56",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:379": {
+    "old_name": "Vector 134",
+    "new_name": "icon-57",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:380": {
+    "old_name": "Vector 136",
+    "new_name": "icon-58",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:381": {
+    "old_name": "Vector 110",
+    "new_name": "icon-59",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:382": {
+    "old_name": "Vector 115",
+    "new_name": "icon-60",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:383": {
+    "old_name": "Vector 131",
+    "new_name": "icon-61",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:384": {
+    "old_name": "Vector 123",
+    "new_name": "icon-62",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:385": {
+    "old_name": "Vector 129",
+    "new_name": "icon-63",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:386": {
+    "old_name": "Vector 49",
+    "new_name": "icon-64",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:387": {
+    "old_name": "Vector 116",
+    "new_name": "icon-65",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:388": {
+    "old_name": "Vector 124",
+    "new_name": "icon-66",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:389": {
+    "old_name": "Vector 135",
+    "new_name": "icon-67",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:390": {
+    "old_name": "Vector 137",
+    "new_name": "icon-68",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:391": {
+    "old_name": "Vector 111",
+    "new_name": "icon-69",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:392": {
+    "old_name": "Vector 117",
+    "new_name": "icon-70",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:393": {
+    "old_name": "Vector 132",
+    "new_name": "icon-71",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:394": {
+    "old_name": "Vector 125",
+    "new_name": "icon-72",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:395": {
+    "old_name": "Vector 130",
+    "new_name": "icon-73",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:396": {
+    "old_name": "Vector 50",
+    "new_name": "icon-74",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:397": {
+    "old_name": "Vector 118",
+    "new_name": "icon-75",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:398": {
+    "old_name": "Vector 126",
+    "new_name": "icon-76",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:399": {
+    "old_name": "Vector 112",
+    "new_name": "icon-77",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:413": {
+    "old_name": "Vector 51",
+    "new_name": "icon-81",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:414": {
+    "old_name": "Vector 120",
+    "new_name": "icon-82",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:415": {
+    "old_name": "Vector 127",
+    "new_name": "icon-83",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:416": {
+    "old_name": "Vector 113",
+    "new_name": "icon-84",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:417": {
+    "old_name": "Vector 121",
+    "new_name": "icon-85",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:418": {
+    "old_name": "Vector 133",
+    "new_name": "icon-86",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:419": {
+    "old_name": "Vector 128",
+    "new_name": "icon-87",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:422": {
+    "old_name": "Rectangle 43",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:423": {
+    "old_name": "image 22",
+    "new_name": "bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:424": {
+    "old_name": "Rectangle 771",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:425": {
+    "old_name": "Group 99",
+    "new_name": "heading-social-contributions",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:427": {
+    "old_name": "Vector 91",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:430": {
+    "old_name": "Rectangle 43",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:432": {
+    "old_name": "Rectangle 772",
+    "new_name": "section-bg-90",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:433": {
+    "old_name": "Group 100",
+    "new_name": "heading-sustainability",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:435": {
+    "old_name": "Vector 91",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:438": {
+    "old_name": "Group 119",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:441": {
+    "old_name": "Group 65",
+    "new_name": "heading-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 50
+  },
+  "92:443": {
+    "old_name": "Ellipse 30",
+    "new_name": "bullet-3",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:444": {
+    "old_name": "Ellipse 31",
+    "new_name": "bullet-4",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:446": {
+    "old_name": "Rectangle 109",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:449": {
+    "old_name": "Group 102",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:450": {
+    "old_name": "Group 115",
+    "new_name": "heading-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 50
+  },
+  "92:452": {
+    "old_name": "Group 65",
+    "new_name": "heading-1",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 50
+  },
+  "92:454": {
+    "old_name": "Ellipse 30",
+    "new_name": "bullet-2",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:456": {
+    "old_name": "Rectangle 109",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:459": {
+    "old_name": "Group 103",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:460": {
+    "old_name": "Rectangle 105",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:462": {
+    "old_name": "Rectangle 109",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:464": {
+    "old_name": "Group 120",
+    "new_name": "group-1",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:467": {
+    "old_name": "Group 65",
+    "new_name": "heading-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 50
+  },
+  "92:469": {
+    "old_name": "Ellipse 38",
+    "new_name": "bullet-3",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:470": {
+    "old_name": "Ellipse 39",
+    "new_name": "bullet-4",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:471": {
+    "old_name": "Group 124",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:473": {
+    "old_name": "Ellipse 56",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:474": {
+    "old_name": "Group 122",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:476": {
+    "old_name": "Ellipse 58",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:477": {
+    "old_name": "Group 121",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:479": {
+    "old_name": "Ellipse 57",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:480": {
+    "old_name": "Group 123",
+    "new_name": "btn-business",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:482": {
+    "old_name": "Ellipse 59",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:483": {
+    "old_name": "Ellipse 60",
+    "new_name": "bullet-99",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:484": {
+    "old_name": "Ellipse 61",
+    "new_name": "bullet-100",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:485": {
+    "old_name": "Ellipse 62",
+    "new_name": "bullet-101",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:486": {
+    "old_name": "Ellipse 64",
+    "new_name": "bullet-102",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:487": {
+    "old_name": "Ellipse 63",
+    "new_name": "bullet-103",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:488": {
+    "old_name": "Ellipse 66",
+    "new_name": "bullet-104",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:489": {
+    "old_name": "Ellipse 65",
+    "new_name": "bullet-105",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:490": {
+    "old_name": "Ellipse 67",
+    "new_name": "bullet-106",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:493": {
+    "old_name": "Rectangle 45",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:501": {
+    "old_name": "Group 97",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:508": {
+    "old_name": "image 1",
+    "new_name": "bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:509": {
+    "old_name": "Group 2",
+    "new_name": "btn-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 60
+  },
+  "92:510": {
+    "old_name": "Group 98",
+    "new_name": "card-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:511": {
+    "old_name": "Rectangle 2",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:514": {
+    "old_name": "Rectangle 769",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:515": {
+    "old_name": "Rectangle 788",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:516": {
+    "old_name": "Vector 89",
+    "new_name": "icon-2",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:517": {
+    "old_name": "Vector 86",
+    "new_name": "icon-3",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:518": {
+    "old_name": "Vector 87",
+    "new_name": "icon-4",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:522": {
+    "old_name": "Vector 90",
+    "new_name": "icon-8",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:523": {
+    "old_name": "image 1",
+    "new_name": "bg-9",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:538": {
+    "old_name": "Group 95",
+    "new_name": "group-24",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:545": {
+    "old_name": "Group 220",
+    "new_name": "card-english-website",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:546": {
+    "old_name": "Rectangle 869",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:547": {
+    "old_name": "Vector",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:550": {
+    "old_name": "Group 145",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:552": {
+    "old_name": "Rectangle 42",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:553": {
+    "old_name": "image 18",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:554": {
+    "old_name": "Rectangle 40",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:555": {
+    "old_name": "Group 38",
+    "new_name": "heading-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:558": {
+    "old_name": "Vector 19",
+    "new_name": "icon-3",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:559": {
+    "old_name": "Group 144",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:560": {
+    "old_name": "Rectangle 41",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:561": {
+    "old_name": "Group 53",
+    "new_name": "group-web",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:562": {
+    "old_name": "Group 83",
+    "new_name": "heading-web",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:564": {
+    "old_name": "Group 51",
+    "new_name": "group-1",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:565": {
+    "old_name": "Group 50",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:566": {
+    "old_name": "Group 143",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:567": {
+    "old_name": "Rectangle 42",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:568": {
+    "old_name": "Group 142",
+    "new_name": "heading-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:570": {
+    "old_name": "Vector",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:571": {
+    "old_name": "Group 52",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:575": {
+    "old_name": "Group 29",
+    "new_name": "heading-0276-73-1173",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:580": {
+    "old_name": "Group 30",
+    "new_name": "btn-0276-74-8069",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  }
+}

@@ -85,6 +85,7 @@ score = max(0, score)
 | footer_zone_height | 300px | フッター検出ゾーン（ページ下端からの距離） |
 | zone_overlap_item | 0.5 (50%) | 垂直ゾーンマージ：アイテム側の最小重なり率 |
 | zone_overlap_zone | 0.3 (30%) | 垂直ゾーンマージ：ゾーン側の最小重なり率 |
+| zone_min_members | 3 | 垂直ゾーングループの最小ノード数（ベンチマーク改善：1-2ノードゾーンの過剰検出防止） |
 | jaccard_threshold | 0.7 | パターン検出のファジーマッチ閾値 |
 | header_max_element_height | 200px | ヘッダーグループ内要素の最大高さ（Issue 125） |
 | footer_zone_margin | 50px | フッターゾーン下方マージン（ページ外要素包含用、Issue 129） |
@@ -96,6 +97,8 @@ score = max(0, score)
 | wide_element_ratio | 0.7 | 「幅広」判定の親幅比率（Phase 3 リネーム、Issue 124） |
 | wide_element_min_width | 500px | 「幅広」判定の最小絶対幅（Phase 3 リネーム、Issue 124） |
 | icon_max_size | 48px | アイコン検出の最大幅/高さ（Phase 3 リネーム、Issue 124） |
+| bullet_max_size | 12px | 弾丸ポイントELLIPSE検出の最大幅/高さ（ベンチマーク改善2） |
+| section_bg_width_ratio | 0.9 (90%) | セクション背景RECTANGLE検出の幅比率（>= 1296px、ベンチマーク改善3） |
 | button_max_height | 70px | ボタン検出の最大高さ（Phase 3 リネーム、Issue 124） |
 | button_max_width | 300px | ボタン検出の最大幅（Phase 3 リネーム、Issue 124） |
 | button_text_max_len | 15 chars | ボタンテキストの最大文字数（Phase 3 リネーム、Issue 124） |
@@ -171,7 +174,16 @@ score = max(0, score)
 | grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
 | max_stage_c_depth | 10 levels | Stage C 再帰安全上限（収束ベース、実際は3-4で終了。Issue 224, 257） |
 | compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
-| stage_c_coverage_threshold | 0.8 (80%) | Stage C採用閾値：カバレッジ >= 80% → Stage C使用、未満 → Stage Aフォールバック（Issue 214） |
+| stage_c_coverage_threshold | 0.8 (80%) | Stage C採用閾値（レガシー、段階統合に置換済み） |
+| stage_merge_tier1 | 0.8 (80%) | 段階統合Tier 1：カバレッジ >= 80% → Stage C完全採用 |
+| stage_merge_tier2 | 0.6 (60%) | 段階統合Tier 2：カバレッジ >= 60% → Stage C + 未マッチStage Aマージ |
+| stage_merge_tier3 | 0.4 (40%) | 段階統合Tier 3：カバレッジ >= 40% → Stage A + 高信頼Stage Cマージ |
+| base_viewport_width | 1440px | ビューポートスケーリング基準幅 |
+| base_viewport_height | 8500px | ビューポートスケーリング基準高さ |
+| llm_fallback_confidence_threshold | 50 | LLMフォールバック発動の信頼度閾値 |
+| llm_confidence_high | 92 | LLM回答「高」の信頼度スコア |
+| llm_confidence_medium | 78 | LLM回答「中」の信頼度スコア |
+| llm_confidence_low | 62 | LLM回答「低」の信頼度スコア |
 
 ## リネームロジック（優先順）
 
@@ -344,6 +356,7 @@ score = max(0, score)
 | Horizontal-Bar | 狭Y帯域(<100px)に4+要素、RECTANGLE背景あり、水平分布(X分散>Y分散×3) | horizontal-bar / news-bar（Issue 184） |
 | Two-Column | テキスト群が片側+画像がもう片側、X座標で左右分離 | two-column（Issue #223、Stage C Claude推論） |
 | Decoration | ドットグリッド等の装飾FRAME、コンテンツと分離 | decoration（Issue #223、Stage C Claude推論） |
+| Variant | 同一componentIdのINSTANCE 2+個 | variant（Proposal 5、componentIdベース） |
 
 ## Auto Layout推論ロジック
 
@@ -355,10 +368,13 @@ score = max(0, score)
   dy = |center_y1 - center_y2|
   dx > dy → HORIZONTAL, それ以外 → VERTICAL
 
-3要素以上:
-  x_variance = 子要素のX座標の分散
-  y_variance = 子要素のY座標の分散
-  x_variance > y_variance * 1.5 → HORIZONTAL, それ以外 → VERTICAL
+3要素以上（3段階フォールバック）:
+  Stage 1: x_variance > y_variance * 1.5 → HORIZONTAL
+  Stage 1: y_variance > x_variance * 1.5 → VERTICAL
+  Stage 2: 曖昧な場合 → 行数 vs 列数で判定
+    行数 < 列数 → HORIZONTAL
+    列数 < 行数 → VERTICAL
+    同数 → HORIZONTAL（デフォルト）
 ```
 
 ### WRAP検出
@@ -490,7 +506,25 @@ if not is_root and _is_protected_node(node):
 
 ### 6. テスト必須（必須）
 
-新規関数・バグ修正には必ずテストを追加せよ。
+新規関数・バグ修正には必ずユニットテスト + ベンチマーク回帰テストを実施せよ。
+
+### 7. ベンチマーク回帰テスト（必須）
+
+ロジック変更後は実務デザインベンチマークで精度が劣化していないことを確認せよ。
+
+```bash
+python3 tests/figma-prepare/benchmark/run_benchmark.py --all
+```
+
+| データ | ファイル | ノード数 | 検証ポイント |
+|--------|---------|---------|------------|
+| /iso | `tests/figma-prepare/benchmark/data/iso.xml` | 167 | EN+JP 4ペア, bullet 6, section-bg 12 |
+| /csr | `tests/figma-prepare/benchmark/data/csr.xml` | 302 | EN+JP 10ペア, bullet 18, section-bg 12, zone 9 |
+
+ベースライン結果は `tests/figma-prepare/benchmark/results/` にある。
+変更後の結果をベースラインと比較し、指標悪化がないことを確認してからコミットせよ。
+
+### ユニットテスト
 
 | 変更種別 | 最低テスト数 |
 |---------|------------|
@@ -545,5 +579,6 @@ if not is_root and _is_protected_node(node):
 - [ ] 除算の前にゼロガードを入れた
 - [ ] 座標関数の呼び出しで root_x/root_y を渡した
 - [ ] 新しい閾値は figma_utils.py + figma-prepare.md の両方に定義した
-- [ ] テストを追加した（正常系 + エッジケース）
+- [ ] ユニットテストを追加した（正常系 + エッジケース）
+- [ ] ベンチマーク回帰テストを実行した（`run_benchmark.py --all`）
 - [ ] 再帰スキップにはコメントで理由を明示した

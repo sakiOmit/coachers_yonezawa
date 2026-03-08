@@ -1,0 +1,438 @@
+{
+  "fixture": "csr.xml",
+  "timestamp": "2026-03-08T15:27:13.641370+00:00",
+  "phases": {
+    "phase1": {
+      "score": 24.3,
+      "grade": "D",
+      "recommendation": "All phases recommended",
+      "viewport": {
+        "width": 1440.0,
+        "height": 9392.0,
+        "scale": {
+          "w_scale": 1.0,
+          "h_scale": 1.1049411764705883,
+          "scale": 1.051161822209401
+        }
+      },
+      "metrics": {
+        "total_nodes": 302,
+        "unnamed_nodes": 137,
+        "unnamed_rate_pct": 45.4,
+        "named_rate_pct": 54.6,
+        "flat_sections": 2,
+        "ungrouped_candidates": 12,
+        "deep_nesting_count": 1,
+        "no_autolayout_frames": 96,
+        "total_frames": 96,
+        "max_depth": 9,
+        "max_section_depth": 8,
+        "hidden_nodes": 0,
+        "off_canvas_nodes": 0,
+        "nested_flat_count": 0
+      },
+      "score_breakdown": {
+        "unnamed_penalty": 22.7,
+        "flat_penalty": 40,
+        "ungrouped_penalty": 10,
+        "nesting_penalty": 3,
+        "autolayout_penalty": 0
+      },
+      "sample_unnamed": [
+        "Group 69",
+        "Rectangle 105",
+        "Vector 115",
+        "Group 263",
+        "Vector 114",
+        "Vector 117",
+        "Group 264",
+        "Vector 114",
+        "Vector 117",
+        "Vector 108"
+      ]
+    },
+    "phase2_stage_a": {
+      "total_candidates": 34,
+      "method_breakdown": {
+        "consecutive": {
+          "count": 8,
+          "avg_score": 0.85,
+          "min_score": 0.85,
+          "max_score": 0.85
+        },
+        "heading-content": {
+          "count": 7,
+          "avg_score": 0.7,
+          "min_score": 0.7,
+          "max_score": 0.7
+        },
+        "highlight": {
+          "count": 1,
+          "avg_score": 0.8,
+          "min_score": 0.8,
+          "max_score": 0.8
+        },
+        "pattern": {
+          "count": 4,
+          "avg_score": 0.94,
+          "min_score": 0.76,
+          "max_score": 1.0
+        },
+        "semantic": {
+          "count": 5,
+          "avg_score": 0.9,
+          "min_score": 0.9,
+          "max_score": 0.9
+        },
+        "zone": {
+          "count": 9,
+          "avg_score": 0.7,
+          "min_score": 0.7,
+          "max_score": 0.7
+        }
+      },
+      "parent_distribution": {
+        "/csr": 25,
+        "footer": 3,
+        "Group 69": 1,
+        "visual": 1,
+        "menu": 1,
+        "Group 98": 1,
+        "contact": 1,
+        "Group 144": 1
+      }
+    },
+    "phase3": {
+      "total_renames": 137,
+      "confidence_distribution": {
+        "high (80-100)": 87,
+        "medium (50-79)": 35,
+        "low (20-49)": 15,
+        "very_low (0-19)": 0
+      },
+      "method_distribution": {
+        "auto": 137
+      },
+      "prefix_distribution": {
+        "icon-": 47,
+        "heading-": 26,
+        "bullet-": 18,
+        "group-": 15,
+        "section-": 12,
+        "bg-": 10,
+        "btn-": 7,
+        "card-": 2
+      },
+      "en_jp_pairs_detected": 10
+    },
+    "phase4": {
+      "total_frames": 55,
+      "direction_distribution": {
+        "VERTICAL": 26,
+        "HORIZONTAL": 26,
+        "WRAP": 3
+      },
+      "confidence_distribution": {
+        "medium": 37,
+        "low": 15,
+        "high": 3
+      },
+      "source_distribution": {
+        "inferred": 55
+      }
+    }
+  },
+  "timings": {
+    "tree_analysis": 0.006,
+    "phase1": 0.006,
+    "phase2_stage_a": 0.04,
+    "phase3": 0.007,
+    "phase4": 0.007,
+    "total": 0.066
+  },
+  "tree_structure": {
+    "page_dimensions": {
+      "width": 1440.0,
+      "height": 9392.0
+    },
+    "root_children_count": 127,
+    "node_type_distribution": {
+      "TEXT": 115,
+      "FRAME": 96,
+      "VECTOR": 47,
+      "RECTANGLE": 26,
+      "ELLIPSE": 18
+    },
+    "depth_histogram": {
+      "0": 1,
+      "1": 127,
+      "2": 93,
+      "3": 42,
+      "4": 22,
+      "5": 11,
+      "6": 1,
+      "7": 1,
+      "8": 2,
+      "9": 2
+    },
+    "max_depth": 9,
+    "repeated_structure_hashes": 6,
+    "total_unique_hashes": 35,
+    "flat_sections_detail": [
+      {
+        "name": "/csr",
+        "id": "92:252",
+        "child_count": 127,
+        "excess": 112
+      },
+      {
+        "name": "footer",
+        "id": "92:513",
+        "child_count": 26,
+        "excess": 11
+      }
+    ],
+    "root_children_summary": [
+      {
+        "index": 0,
+        "name": "環境への取り組み",
+        "type": "TEXT",
+        "y": 3735.0,
+        "height": 36.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 1,
+        "name": "社会への取り組み",
+        "type": "TEXT",
+        "y": 5067.0,
+        "height": 36.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 2,
+        "name": "人材への取り組み",
+        "type": "TEXT",
+        "y": 6309.0,
+        "height": 36.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 3,
+        "name": "事業組織への取り組み",
+        "type": "TEXT",
+        "y": 8609.0,
+        "height": 36.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 4,
+        "name": "Group 69",
+        "type": "FRAME",
+        "y": 1595.0,
+        "height": 1817.0,
+        "descendant_count": 9
+      },
+      {
+        "index": 5,
+        "name": "Environment",
+        "type": "TEXT",
+        "y": 3673.0,
+        "height": 48.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 6,
+        "name": "Social",
+        "type": "TEXT",
+        "y": 5012.0,
+        "height": 48.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 7,
+        "name": "Human resources",
+        "type": "TEXT",
+        "y": 6254.0,
+        "height": 48.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 8,
+        "name": "Business organization",
+        "type": "TEXT",
+        "y": 8554.0,
+        "height": 48.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 9,
+        "name": "VISION",
+        "type": "TEXT",
+        "y": 3376.0,
+        "height": 31.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 10,
+        "name": "全社員がSDGsの目標に向かって業務に取り組むことで世界で活躍できる人材・企業に成長する",
+        "type": "TEXT",
+        "y": 3438.0,
+        "height": 78.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 11,
+        "name": "Vector 108",
+        "type": "VECTOR",
+        "y": 3468.0,
+        "height": 0.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 12,
+        "name": "Vector 109",
+        "type": "VECTOR",
+        "y": 3468.0,
+        "height": 0.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 13,
+        "name": "気候変動対策",
+        "type": "TEXT",
+        "y": 3816.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 14,
+        "name": "CSR活動",
+        "type": "TEXT",
+        "y": 5148.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 15,
+        "name": "人材育成",
+        "type": "TEXT",
+        "y": 6397.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 16,
+        "name": "事業活動",
+        "type": "TEXT",
+        "y": 8697.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 17,
+        "name": "品質/安全",
+        "type": "TEXT",
+        "y": 9042.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 18,
+        "name": "Ellipse 68",
+        "type": "ELLIPSE",
+        "y": 9057.0,
+        "height": 10.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 19,
+        "name": "水質環境保全",
+        "type": "TEXT",
+        "y": 4361.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 20,
+        "name": "地域活性化",
+        "type": "TEXT",
+        "y": 5793.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 21,
+        "name": "健康経営",
+        "type": "TEXT",
+        "y": 8040.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 22,
+        "name": "働き方/多様な人材の活躍",
+        "type": "TEXT",
+        "y": 7123.0,
+        "height": 39.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 23,
+        "name": "発電結果の共有",
+        "type": "TEXT",
+        "y": 4133.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 24,
+        "name": "切手回収",
+        "type": "TEXT",
+        "y": 5540.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 25,
+        "name": "労働環境の改善",
+        "type": "TEXT",
+        "y": 4678.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 26,
+        "name": "省エネ活動",
+        "type": "TEXT",
+        "y": 3915.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 27,
+        "name": "プルタブ/ペットボトルキャップ回収",
+        "type": "TEXT",
+        "y": 5247.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 28,
+        "name": "ISO14001取得",
+        "type": "TEXT",
+        "y": 4454.0,
+        "height": 29.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 29,
+        "name": "Group 169",
+        "type": "FRAME",
+        "y": 3913.0,
+        "height": 118.0,
+        "descendant_count": 4
+      }
+    ]
+  }
+}

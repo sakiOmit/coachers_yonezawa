@@ -1,0 +1,49 @@
+# Figma Prepare Benchmark Report — After Apply
+# Design: ISO (LP-PC)
+# Apply date: 2026-03-09
+# Clone artboard: /iso [prepared] (114:4704)
+
+fixture: iso.xml
+
+before:
+  phase1_quality:
+    score: 35.8
+    grade: D
+  tree_structure:
+    root_children: 35
+    max_depth: 9
+    total_nodes: 167
+    unnamed_rate_pct: 51.5
+
+apply_results:
+  grouping:
+    total_candidates: 34
+    applied: 34
+    skipped: 0
+  rename:
+    total_renames: 88
+    verification_match: 100%
+  structure:
+    before_flat_children: 35
+    after_top_level: 3
+    top_level_sections:
+      - header
+      - main-content
+      - footer
+    subsections: 9
+  visual_breakage: false
+
+after:
+  phase1_quality:
+    score: ~80
+    grade: A
+    recommendation: Proceed to /figma-analyze
+  tree_structure:
+    root_children: 3
+    subsections: 9
+    unnamed_rate_pct: ~0
+  improvements:
+    flat_children_reduction: "35 -> 3 (91.4%)"
+    unnamed_nodes_reduction: "88 renames applied (100% verified)"
+    grouping_wrappers: "34 wrappers applied"
+    structure: "Flat -> header/main-content(9 subsections)/footer"

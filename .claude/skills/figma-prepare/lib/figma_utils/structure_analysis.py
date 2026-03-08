@@ -10,6 +10,7 @@ from .constants import (
     FLAT_THRESHOLD,
     DEEP_NESTING_THRESHOLD,
     OFF_CANVAS_MARGIN,
+    compute_viewport_scale,
 )
 from .geometry import get_bbox, resolve_absolute_coords
 from .metadata import (
@@ -204,10 +205,17 @@ def run_structure_analysis(metadata_path):
         grade = 'F'
         recommendation = 'All phases recommended + manual review'
 
+    page_height = root_bb.get('h', 0) if root_bb else 0
+
     result = {
         'score': score,
         'grade': grade,
         'recommendation': recommendation,
+        'viewport': {
+            'width': page_width,
+            'height': page_height,
+            'scale': compute_viewport_scale(page_width, page_height),
+        },
         'metrics': {
             'total_nodes': stats['total'],
             'unnamed_nodes': stats['unnamed'],

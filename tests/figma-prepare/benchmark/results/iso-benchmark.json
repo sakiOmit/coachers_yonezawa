@@ -1,0 +1,436 @@
+{
+  "fixture": "iso.xml",
+  "timestamp": "2026-03-08T14:29:42.203547+00:00",
+  "phases": {
+    "phase1": {
+      "score": 35.8,
+      "grade": "D",
+      "recommendation": "All phases recommended",
+      "viewport": {
+        "width": 1440.0,
+        "height": 5851.0,
+        "scale": {
+          "w_scale": 1.0,
+          "h_scale": 0.6883529411764706,
+          "scale": 0.8296703810408508
+        }
+      },
+      "metrics": {
+        "total_nodes": 167,
+        "unnamed_nodes": 86,
+        "unnamed_rate_pct": 51.5,
+        "named_rate_pct": 48.5,
+        "flat_sections": 2,
+        "ungrouped_candidates": 11,
+        "deep_nesting_count": 1,
+        "no_autolayout_frames": 49,
+        "total_frames": 49,
+        "max_depth": 9,
+        "max_section_depth": 8,
+        "hidden_nodes": 0,
+        "off_canvas_nodes": 0,
+        "nested_flat_count": 0
+      },
+      "score_breakdown": {
+        "unnamed_penalty": 25.7,
+        "flat_penalty": 25.5,
+        "ungrouped_penalty": 10,
+        "nesting_penalty": 3,
+        "autolayout_penalty": 0
+      },
+      "sample_unnamed": [
+        "Rectangle 95",
+        "Rectangle 96",
+        "Group 149",
+        "Rectangle 799",
+        "Rectangle 97",
+        "image 5",
+        "Group 47",
+        "Ellipse 26",
+        "Group 152",
+        "Ellipse 26"
+      ]
+    },
+    "phase2_stage_a": {
+      "total_candidates": 18,
+      "method_breakdown": {
+        "heading-content": {
+          "count": 1,
+          "avg_score": 0.7,
+          "min_score": 0.7,
+          "max_score": 0.7
+        },
+        "highlight": {
+          "count": 6,
+          "avg_score": 0.8,
+          "min_score": 0.8,
+          "max_score": 0.8
+        },
+        "pattern": {
+          "count": 4,
+          "avg_score": 1.0,
+          "min_score": 1.0,
+          "max_score": 1.0
+        },
+        "semantic": {
+          "count": 6,
+          "avg_score": 0.9,
+          "min_score": 0.9,
+          "max_score": 0.9
+        },
+        "zone": {
+          "count": 1,
+          "avg_score": 0.7,
+          "min_score": 0.7,
+          "max_score": 0.7
+        }
+      },
+      "parent_distribution": {
+        "/iso": 5,
+        "footer": 3,
+        "Group 146": 2,
+        "Group 149": 1,
+        "Group 148": 1,
+        "Group 147": 1,
+        "Group 150": 1,
+        "menu": 1,
+        "Group 98": 1,
+        "contact": 1,
+        "Group 144": 1
+      }
+    },
+    "phase3": {
+      "total_renames": 86,
+      "confidence_distribution": {
+        "high (80-100)": 52,
+        "medium (50-79)": 21,
+        "low (20-49)": 13,
+        "very_low (0-19)": 0
+      },
+      "method_distribution": {
+        "auto": 86
+      },
+      "prefix_distribution": {
+        "bg-": 23,
+        "section-": 12,
+        "group-": 11,
+        "icon-": 11,
+        "btn-": 9,
+        "card-": 7,
+        "bullet-": 6,
+        "heading-": 5,
+        "container-": 2
+      },
+      "en_jp_pairs_detected": 4
+    },
+    "phase4": {
+      "total_frames": 35,
+      "direction_distribution": {
+        "HORIZONTAL": 24,
+        "VERTICAL": 7,
+        "WRAP": 4
+      },
+      "confidence_distribution": {
+        "medium": 23,
+        "low": 9,
+        "high": 3
+      },
+      "source_distribution": {
+        "inferred": 35
+      }
+    }
+  },
+  "timings": {
+    "tree_analysis": 0.003,
+    "phase1": 0.003,
+    "phase2_stage_a": 0.009,
+    "phase3": 0.004,
+    "phase4": 0.004,
+    "total": 0.023
+  },
+  "tree_structure": {
+    "page_dimensions": {
+      "width": 1440.0,
+      "height": 5851.0
+    },
+    "root_children_count": 35,
+    "node_type_distribution": {
+      "TEXT": 65,
+      "FRAME": 49,
+      "RECTANGLE": 36,
+      "VECTOR": 11,
+      "ELLIPSE": 6
+    },
+    "depth_histogram": {
+      "0": 1,
+      "1": 35,
+      "2": 75,
+      "3": 23,
+      "4": 17,
+      "5": 10,
+      "6": 1,
+      "7": 1,
+      "8": 2,
+      "9": 2
+    },
+    "max_depth": 9,
+    "repeated_structure_hashes": 4,
+    "total_unique_hashes": 29,
+    "flat_sections_detail": [
+      {
+        "name": "/iso",
+        "id": "92:1192",
+        "child_count": 35,
+        "excess": 20
+      },
+      {
+        "name": "footer",
+        "id": "92:1295",
+        "child_count": 26,
+        "excess": 11
+      }
+    ],
+    "root_children_summary": [
+      {
+        "index": 0,
+        "name": "Rectangle 95",
+        "type": "RECTANGLE",
+        "y": 2993.0,
+        "height": 607.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 1,
+        "name": "Rectangle 96",
+        "type": "RECTANGLE",
+        "y": 3600.0,
+        "height": 607.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 2,
+        "name": "Group 149",
+        "type": "FRAME",
+        "y": 3735.0,
+        "height": 66.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 3,
+        "name": "当社は、社員が仕事と子育てを両立できる企業として、厚生労働大臣よりくるみんの認定を取得いたしました。また、群馬県の発行する「群馬県いきいきGカンパニー認証書」も取得しております。",
+        "type": "TEXT",
+        "y": 3862.0,
+        "height": 72.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 4,
+        "name": "名称未設定のデザイン (9) 1",
+        "type": "RECTANGLE",
+        "y": 5395.0,
+        "height": 814.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 5,
+        "name": "Rectangle 97",
+        "type": "RECTANGLE",
+        "y": 4207.0,
+        "height": 533.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 6,
+        "name": "文章入れます",
+        "type": "TEXT",
+        "y": 2949.0,
+        "height": 24.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 7,
+        "name": "image 5",
+        "type": "RECTANGLE",
+        "y": 3727.0,
+        "height": 353.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 8,
+        "name": "Group 47",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 24.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 9,
+        "name": "Group 152",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 24.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 10,
+        "name": "Group 48",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 24.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 11,
+        "name": "Group 154",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 24.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 12,
+        "name": "Group 153",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 24.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 13,
+        "name": "Group 46",
+        "type": "FRAME",
+        "y": 1723.0,
+        "height": 27.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 14,
+        "name": "Group 230",
+        "type": "FRAME",
+        "y": 1778.999755859375,
+        "height": 0.00020404477254487574,
+        "descendant_count": 3
+      },
+      {
+        "index": 15,
+        "name": "image 6",
+        "type": "RECTANGLE",
+        "y": 3103.0,
+        "height": 361.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 16,
+        "name": "image 7",
+        "type": "RECTANGLE",
+        "y": 3803.0,
+        "height": 277.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 17,
+        "name": "Rectangle 801",
+        "type": "RECTANGLE",
+        "y": 5186.0,
+        "height": 652.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 18,
+        "name": "手島精管株式会社 環境・品質方針",
+        "type": "TEXT",
+        "y": 4885.0,
+        "height": 24.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 19,
+        "name": "Group 141",
+        "type": "FRAME",
+        "y": 1347.0,
+        "height": 284.0,
+        "descendant_count": 10
+      },
+      {
+        "index": 20,
+        "name": "Group 148",
+        "type": "FRAME",
+        "y": 1891.0,
+        "height": 383.0,
+        "descendant_count": 5
+      },
+      {
+        "index": 21,
+        "name": "Group 147",
+        "type": "FRAME",
+        "y": 2386.0,
+        "height": 607.0,
+        "descendant_count": 10
+      },
+      {
+        "index": 22,
+        "name": "Group 146",
+        "type": "FRAME",
+        "y": 3108.0,
+        "height": 66.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 23,
+        "name": "製造業では類似製品の存在がつきものです。特にステンレスチューブにおいては、医療や自動車など人々の命に関わるもののため、手島品質をお約束するための商標を登録しております。 なお、ロゴのTesimaに関しては、創業当初の想いを大切にする意味も含め、創業時より利用している\"h\"のないロゴを利用しております。",
+        "type": "TEXT",
+        "y": 3240.0,
+        "height": 150.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 24,
+        "name": "Group 150",
+        "type": "FRAME",
+        "y": 4321.0,
+        "height": 66.0,
+        "descendant_count": 3
+      },
+      {
+        "index": 25,
+        "name": "金属細管の製造方法の特許を取得いたしました。 日本だけではなく、韓国・中国においても特許を取得しております。",
+        "type": "TEXT",
+        "y": 4421.0,
+        "height": 72.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 26,
+        "name": "Rectangle 800",
+        "type": "RECTANGLE",
+        "y": 4965.0,
+        "height": 166.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 27,
+        "name": "当社は､医療用・工業用機器に用いるステンレスチューブ製品の設計､製造の事業活動を行う企業です。当社は、事業を通じて、「品質向上」により顧客満足度を高め、「環境負荷の低減」活動により、地域、地球環境に配慮し、継続的に改善活動を実施する事が当社のミッションです。",
+        "type": "TEXT",
+        "y": 5004.0,
+        "height": 87.0,
+        "descendant_count": 1
+      },
+      {
+        "index": 28,
+        "name": "Group 151",
+        "type": "FRAME",
+        "y": 5239.0,
+        "height": 546.0,
+        "descendant_count": 10
+      },
+      {
+        "index": 29,
+        "name": "menubar",
+        "type": "FRAME",
+        "y": 1285.0,
+        "height": 62.0,
+        "descendant_count": 18
+      }
+    ]
+  }
+}

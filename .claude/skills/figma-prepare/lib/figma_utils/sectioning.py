@@ -6,6 +6,7 @@ optionally an enriched children table.
 """
 
 import json
+import statistics
 from collections import Counter
 
 from .constants import (
@@ -22,6 +23,7 @@ from .constants import (
     JACCARD_THRESHOLD,
     CONSECUTIVE_PATTERN_MIN,
     LOOSE_ELEMENT_MAX_HEIGHT,
+    scaled_threshold,
 )
 from .geometry import filter_visible_children, get_bbox, resolve_absolute_coords, sort_by_y
 from .metadata import get_root_node, load_metadata, get_text_children_content
@@ -56,11 +58,21 @@ def get_text_children_preview(node, max_items=5):
     return get_text_children_content(node.get('children', []), max_items=max_items)
 
 
-def _detect_header_footer_bg(sorted_children, page_y, page_h, page_w):
+def _detect_header_footer_bg(sorted_children, page_y, page_h, page_w, viewport_scale=None):
     """Detect header, footer, and background RECTANGLE candidates by position.
+
+    Args:
+        sorted_children: Children sorted by Y.
+        page_y: Page top Y coordinate.
+        page_h: Page height.
+        page_w: Page width.
+        viewport_scale: Optional dict from compute_viewport_scale().
 
     Returns (header_candidates, footer_candidates, background_candidates) lists of node IDs.
     """
+    w_scale = viewport_scale.get('w_scale', 1.0) if viewport_scale else 1.0
+    bg_min_h = scaled_threshold(HINT_BG_MIN_HEIGHT, w_scale, min_value=50)
+
     header_candidates = []
     footer_candidates = []
     background_candidates = []
@@ -82,7 +94,7 @@ def _detect_header_footer_bg(sorted_children, page_y, page_h, page_w):
                 footer_candidates.append(node_id)
 
         # Background candidates: RECTANGLE with significant height
-        if node_type == 'RECTANGLE' and bb['h'] >= HINT_BG_MIN_HEIGHT:
+        if node_type == 'RECTANGLE' and bb['h'] >= bg_min_h:
             background_candidates.append(node_id)
 
     return header_candidates, footer_candidates, background_candidates
@@ -145,16 +157,23 @@ def _detect_consecutive_patterns(sorted_children):
     return consecutive_patterns
 
 
-def _detect_heading_and_loose(sorted_children):
+def _detect_heading_and_loose(sorted_children, viewport_scale=None):
     """Detect heading candidates and loose elements (dividers, small leaf nodes).
+
+    Args:
+        sorted_children: Children sorted by Y.
+        viewport_scale: Optional dict from compute_viewport_scale().
 
     Returns (heading_candidates, loose_elements) tuple.
     """
+    w_scale = viewport_scale.get('w_scale', 1.0) if viewport_scale else 1.0
+    heading_max_h = scaled_threshold(HINT_HEADING_MAX_HEIGHT, w_scale, min_value=80)
+
     heading_candidates = []
     for idx, child in enumerate(sorted_children):
         bb = get_bbox(child)
         child_h = bb.get('h', 999)
-        if child_h > HINT_HEADING_MAX_HEIGHT:
+        if child_h > heading_max_h:
             continue
         if is_heading_like(child):
             heading_candidates.append({
@@ -180,11 +199,17 @@ def _detect_heading_and_loose(sorted_children):
     return heading_candidates, loose_elements
 
 
-def detect_heuristic_hints(children, page_bbox):
+def detect_heuristic_hints(children, page_bbox, viewport_scale=None):
     """Detect header/footer candidates, gap analysis, and background candidates.
 
     Semantic understanding (page-kv, section boundaries) is delegated to Stage B Claude reasoning.
     This function provides mechanical hints to support Claude's decision-making.
+
+    Args:
+        children: List of child nodes.
+        page_bbox: Page bounding box dict with x, y, w, h.
+        viewport_scale: Optional dict from compute_viewport_scale() for
+            viewport-relative threshold scaling.
     """
     page_h = page_bbox['h']
     page_y = page_bbox['y']
@@ -204,7 +229,7 @@ def detect_heuristic_hints(children, page_bbox):
         key=lambda c: get_bbox(c).get('y', 0)
     )
 
-    header_cands, footer_cands, bg_cands = _detect_header_footer_bg(sorted_children, page_y, page_h, page_w)
+    header_cands, footer_cands, bg_cands = _detect_header_footer_bg(sorted_children, page_y, page_h, page_w, viewport_scale=viewport_scale)
 
     # Gap analysis: Y-direction gaps between consecutive children
     gap_analysis = []
@@ -221,7 +246,7 @@ def detect_heuristic_hints(children, page_bbox):
 
     header_cluster_ids = _detect_header_cluster(sorted_children, page_y)
     consecutive_patterns = _detect_consecutive_patterns(sorted_children)
-    heading_candidates, loose_elements = _detect_heading_and_loose(sorted_children)
+    heading_candidates, loose_elements = _detect_heading_and_loose(sorted_children, viewport_scale=viewport_scale)
 
     return {
         'header_candidates': header_cands,
@@ -232,6 +257,80 @@ def detect_heuristic_hints(children, page_bbox):
         'consecutive_patterns': consecutive_patterns,
         'heading_candidates': heading_candidates,
         'loose_elements': loose_elements,
+    }
+
+
+def classify_section_type(hints, section_name=''):
+    """Classify a section based on its heuristic hints and name.
+
+    Args:
+        hints: Dict of heuristic hints (from detect_heuristic_hints or subset).
+        section_name: Optional section name string for keyword matching.
+
+    Returns one of: 'header', 'footer', 'hero', 'content', 'unknown'.
+    """
+    if not hints:
+        hints = {}
+    name_lower = section_name.lower() if section_name else ''
+
+    if hints.get('is_header') or hints.get('header_candidates') or 'header' in name_lower:
+        return 'header'
+    if hints.get('is_footer') or hints.get('footer_candidates') or 'footer' in name_lower:
+        return 'footer'
+    if hints.get('has_hero_bg') or 'hero' in name_lower:
+        return 'hero'
+    if hints.get('has_bg_candidate') or hints.get('background_candidates') or hints.get('has_heading') or hints.get('heading_candidates'):
+        return 'content'
+    return 'unknown'
+
+
+def _compute_gap_analysis(children):
+    """Compute gap statistics for a group of sibling nodes.
+
+    Analyses vertical gaps between consecutive children (sorted by Y).
+
+    Args:
+        children: List of Figma node dicts.
+
+    Returns:
+        Dict with 'median', 'mean', 'consistency' keys, or None if
+        insufficient data (fewer than 3 children or fewer than 2 positive gaps).
+    """
+    if len(children) < 3:
+        return None
+
+    visible = [c for c in children if c.get('visible') != False]
+    if len(visible) < 3:
+        return None
+
+    bboxes = [get_bbox(c) for c in visible]
+    sorted_bbs = sorted(bboxes, key=lambda b: b['y'])
+
+    gaps = []
+    for i in range(len(sorted_bbs) - 1):
+        gap = sorted_bbs[i + 1]['y'] - (sorted_bbs[i]['y'] + sorted_bbs[i]['h'])
+        if gap > 0:
+            gaps.append(gap)
+
+    if len(gaps) < 2:
+        return None
+
+    median_gap = int(statistics.median(gaps))
+    mean_gap = int(statistics.mean(gaps))
+    # Zero-division guard (Issue 238 pattern)
+    cv = statistics.stdev(gaps) / mean_gap if mean_gap > 0 else 1.0
+
+    if cv < 0.15:
+        consistency = 'high'
+    elif cv < 0.35:
+        consistency = 'medium'
+    else:
+        consistency = 'low'
+
+    return {
+        'median': median_gap,
+        'mean': mean_gap,
+        'consistency': consistency,
     }
 
 

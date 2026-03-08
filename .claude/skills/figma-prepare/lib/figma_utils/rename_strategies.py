@@ -5,6 +5,7 @@ Each function handles a priority group from the infer_name() dispatch table.
 """
 
 from .constants import (
+    BULLET_MAX_SIZE,
     BUTTON_MAX_HEIGHT,
     BUTTON_MAX_WIDTH,
     BUTTON_TEXT_MAX_LEN,
@@ -24,6 +25,7 @@ from .constants import (
     NAV_MAX_TEXT_LEN,
     NAV_MIN_TEXT_COUNT,
     OVERFLOW_BG_MIN_WIDTH,
+    SECTION_BG_WIDTH_RATIO,
     SECTION_ROOT_WIDTH,
     SECTION_ROOT_WIDTH_RATIO,
     SIDE_PANEL_HEIGHT_RATIO,
@@ -151,16 +153,29 @@ def _infer_from_shape(node, node_type, children, w, h, sibling_index):
     if node_type not in _SHAPE_PREFIXES or children:
         return None
 
-    prefix = _SHAPE_PREFIXES[node_type]
     # Issue 17: fills-based IMAGE detection (enriched metadata)
     fills = node.get('fills', [])
     if fills and isinstance(fills, list):
         if any(f.get('type') == 'IMAGE' for f in fills if isinstance(f, dict)):
             return f'img-{sibling_index}'
+
+    # Explicit IMAGE node → always img- prefix (benchmark improvement 1)
+    if node_type == 'IMAGE':
+        return f'img-{sibling_index}'
+
+    # Small ELLIPSE → bullet point marker (benchmark improvement 2)
+    if node_type == 'ELLIPSE' and w <= BULLET_MAX_SIZE and h <= BULLET_MAX_SIZE:
+        return f'bullet-{sibling_index}'
+
     # Thin wide rectangle -> divider
     if node_type == 'RECTANGLE' and w > 0 and h > 0:
         if w / max(h, 1) > 10 and h < DIVIDER_MAX_HEIGHT:
             return f'divider-{sibling_index}'
+        # Full-width RECTANGLE → section background (benchmark improvement 3)
+        if w >= SECTION_ROOT_WIDTH * SECTION_BG_WIDTH_RATIO:
+            return f'section-bg-{sibling_index}'
+
+    prefix = _SHAPE_PREFIXES[node_type]
     return f'{prefix}-{sibling_index}'
 
 

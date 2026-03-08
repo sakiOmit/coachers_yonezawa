@@ -252,6 +252,7 @@ class TestDeduplicateCandidates:
         # Semantic keeps all nodes
         assert set(result[0]['node_ids']) == {'10', '11', '12'}
         # Pattern is trimmed: node 12 removed, nodes 13+14 preserved
+        # (pattern method not eligible for absorption)
         assert set(result[1]['node_ids']) == {'13', '14'}
         assert result[1]['count'] == 2
 
@@ -314,17 +315,22 @@ class TestDeduplicateCandidates:
         assert len(result) == 1
 
     def test_triple_overlap_cascade(self):
-        """Three candidates with cascading overlaps: highest priority wins overlap nodes."""
+        """Three candidates with cascading overlaps — merge-aware absorption.
+
+        consecutive loses '3' to semantic → ['4','5'] stays (consecutive not eligible).
+        proximity loses '5' to consecutive → ['6','7'] absorbed into consecutive
+        (proximity is eligible for absorption, remaining < 3).
+        Result: semantic + consecutive (with absorbed proximity nodes).
+        """
         c1 = self._make_candidate('semantic', ['1', '2', '3'])       # priority 4
         c2 = self._make_candidate('consecutive', ['3', '4', '5'])    # priority 2.5
         c3 = self._make_candidate('proximity', ['5', '6', '7'])      # priority 0
         result = deduplicate_candidates([c1, c2, c3])
-        assert len(result) == 3
+        assert len(result) == 2
         assert set(result[0]['node_ids']) == {'1', '2', '3'}
-        # consecutive: node 3 trimmed by semantic
-        assert set(result[1]['node_ids']) == {'4', '5'}
-        # proximity: node 5 trimmed by consecutive (which has higher priority)
-        assert set(result[2]['node_ids']) == {'6', '7'}
+        # consecutive keeps its trimmed nodes + absorbs proximity's remainder
+        assert set(result[1]['node_ids']) == {'4', '5', '6', '7'}
+        assert result[1]['method'] == 'consecutive'
 
     def test_does_not_mutate_original(self):
         """Trimming should not mutate the original candidate dicts."""

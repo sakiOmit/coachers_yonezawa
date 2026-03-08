@@ -89,6 +89,7 @@ def detect_semantic_groups(children):
     if len(cards) >= 3:
         result.append({
             'method': 'semantic',
+            'score': 0.9,
             'semantic_type': 'card-list',
             'node_ids': [c.get('id', '') for c in cards],
             'node_names': [c.get('name', '') for c in cards],
@@ -101,6 +102,7 @@ def detect_semantic_groups(children):
     if is_navigation_like(children):
         result.append({
             'method': 'semantic',
+            'score': 0.9,
             'semantic_type': 'navigation',
             'node_ids': [c.get('id', '') for c in children],
             'node_names': [c.get('name', '') for c in children],
@@ -113,6 +115,7 @@ def detect_semantic_groups(children):
     if is_grid_like(children):
         result.append({
             'method': 'semantic',
+            'score': 0.9,
             'semantic_type': 'grid',
             'node_ids': [c.get('id', '') for c in children],
             'node_names': [c.get('name', '') for c in children],
@@ -122,3 +125,51 @@ def detect_semantic_groups(children):
         })
 
     return result
+
+
+def detect_variant_groups(children):
+    """Detect groups of INSTANCE nodes sharing the same componentId.
+
+    Figma component variants (e.g., Button/Primary, Button/Secondary) share
+    the same componentId but may have different internal structure. Standard
+    structure_hash matching fails for these because internal nodes differ.
+
+    This detector groups INSTANCEs by componentId, bypassing structure comparison.
+
+    Args:
+        children: List of visible sibling nodes.
+
+    Returns:
+        List of candidate dicts: [{'method': 'variant', 'node_ids': [...],
+                                    'semantic_type': 'variant', 'score': 0.95,
+                                    'suggested_name': 'variant-group-N'}]
+    """
+    component_groups = defaultdict(list)
+    for child in children:
+        if child.get('type') == 'INSTANCE':
+            comp_id = child.get('componentId')
+            if comp_id:
+                component_groups[comp_id].append(child)
+
+    candidates = []
+    idx = 0
+    for comp_id, nodes in component_groups.items():
+        if len(nodes) >= 2:  # At least 2 instances of same component
+            node_ids = [n.get('id', '') for n in nodes if n.get('id')]
+            if len(node_ids) >= 2:
+                # Try to infer name from component name
+                comp_name = nodes[0].get('name', '')
+                # Component instances often have names like "Button/Primary"
+                slug = comp_name.split('/')[0].strip().lower().replace(' ', '-') if '/' in comp_name else ''
+                suggested = f'variant-{slug}-list' if slug else f'variant-group-{idx}'
+
+                candidates.append({
+                    'method': 'variant',
+                    'node_ids': node_ids,
+                    'semantic_type': 'variant',
+                    'score': 0.95,  # High confidence: same componentId
+                    'suggested_name': suggested,
+                })
+                idx += 1
+
+    return candidates

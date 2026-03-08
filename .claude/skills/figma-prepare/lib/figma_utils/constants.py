@@ -59,6 +59,7 @@ HEADER_ZONE_HEIGHT = 120  # px — header detection zone from page top (figma-pr
 FOOTER_ZONE_HEIGHT = 300  # px — footer detection zone from page bottom (figma-prepare.md: footer_zone_height)
 ZONE_OVERLAP_ITEM = 0.5  # 50% — vertical zone merge: item overlap ratio (figma-prepare.md: zone_overlap_item)
 ZONE_OVERLAP_ZONE = 0.3  # 30% — vertical zone merge: zone overlap ratio (figma-prepare.md: zone_overlap_zone)
+ZONE_MIN_MEMBERS = 3  # Minimum nodes per vertical zone group (benchmark fix: filter out tiny 1-2 node zones)
 HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for header zone elements (figma-prepare.md: header_max_element_height)
 FOOTER_ZONE_MARGIN = 50  # px — extra margin for footer zone bottom (figma-prepare.md: footer_zone_margin)
 HEADER_ZONE_MARGIN = 50  # px — extra margin for header zone bottom (Issue #266)
@@ -84,6 +85,8 @@ FOOTER_MAX_HEIGHT = 200  # px — max height for footer detection (figma-prepare
 WIDE_ELEMENT_RATIO = 0.7  # fraction of parent width to be 'wide' (figma-prepare.md: wide_element_ratio)
 WIDE_ELEMENT_MIN_WIDTH = 500  # px — minimum absolute width for 'wide' (figma-prepare.md: wide_element_min_width)
 ICON_MAX_SIZE = 48  # px — max width/height for icon detection (figma-prepare.md: icon_max_size)
+BULLET_MAX_SIZE = 12  # px — max width/height for bullet point ELLIPSE detection (benchmark improvement 2)
+SECTION_BG_WIDTH_RATIO = 0.9  # Section-level background RECTANGLE width ratio (>= 1296px, benchmark improvement 3)
 BUTTON_MAX_HEIGHT = 70  # px — max height for button detection (figma-prepare.md: button_max_height)
 BUTTON_MAX_WIDTH = 300  # px — max width for button detection (figma-prepare.md: button_max_width)
 BUTTON_TEXT_MAX_LEN = 15  # chars — max text length for button role (figma-prepare.md: button_text_max_len)
@@ -100,7 +103,13 @@ GRANDCHILD_THRESHOLD = 5  # Stage C: max node_ids to switch to grandchildren mod
 
 # --- Issue 214: compare_grouping_results constants ---
 COMPARE_MATCH_THRESHOLD = 0.5  # Jaccard threshold for Stage A/C group matching
-STAGE_C_COVERAGE_THRESHOLD = 0.8  # Stage C adoption: coverage >= 80% → use Stage C, else Stage A fallback
+STAGE_C_COVERAGE_THRESHOLD = 0.8  # Stage C adoption: coverage >= 80% → use Stage C, else Stage A fallback (legacy, see tiers below)
+
+# --- Graduated Stage integration thresholds (Proposal 2) ---
+STAGE_MERGE_TIER1 = 0.8   # coverage >= 80% → Stage C fully adopted
+STAGE_MERGE_TIER2 = 0.6   # coverage >= 60% → Stage C + unmatched Stage A merged
+STAGE_MERGE_TIER3 = 0.4   # coverage >= 40% → Stage A + high-confidence Stage C
+# coverage < 40% → Stage A only
 
 # --- Issue 224: Stage C recursive nesting ---
 MAX_STAGE_C_DEPTH = 10  # Safety upper bound for Stage C recursion (converges naturally at 3-4)
@@ -138,6 +147,7 @@ STAGE_A_ONLY_DETECTORS = {
 # Issue 165/166: consecutive (2.5) between pattern and zone; heading-content (3.5) between zone and semantic
 # Issue 186: tuple (2.8) between consecutive and zone — type-sequence based, higher than structure_hash pattern
 METHOD_PRIORITY = {
+    'variant': 4.5,  # Higher than semantic — componentId is definitive
     'semantic': 4,
     'highlight': 3.8,
     'heading-content': 3.5,
@@ -315,6 +325,55 @@ TABLE_ROW_WIDTH_RATIO = 0.9  # Row bg RECTANGLE must cover >=90% of parent width
 TABLE_DIVIDER_MAX_HEIGHT = 2  # px — divider VECTORs are <=2px height
 
 # ---------------------------------------------------------------------------
+# Viewport-relative threshold scaling (Proposal 6)
+# ---------------------------------------------------------------------------
+
+# Base viewport dimensions (design reference)
+BASE_VIEWPORT_WIDTH = 1440
+BASE_VIEWPORT_HEIGHT = 8500  # Typical tall landing page
+
+
+def compute_viewport_scale(page_width, page_height=0):
+    """Compute scale factors relative to base viewport.
+
+    Args:
+        page_width: Actual page/artboard width in px.
+        page_height: Actual page/artboard height in px (0 = use width ratio).
+
+    Returns:
+        dict with 'w_scale', 'h_scale', 'scale' (geometric mean).
+    """
+    w_scale = page_width / BASE_VIEWPORT_WIDTH if BASE_VIEWPORT_WIDTH > 0 else 1.0
+    h_scale = page_height / BASE_VIEWPORT_HEIGHT if page_height > 0 and BASE_VIEWPORT_HEIGHT > 0 else w_scale
+    scale = (w_scale * h_scale) ** 0.5  # geometric mean
+    return {
+        'w_scale': w_scale,
+        'h_scale': h_scale,
+        'scale': scale,
+    }
+
+
+def scaled_threshold(base_value, scale_factor, min_value=None, max_value=None):
+    """Scale a threshold value by a factor, with optional bounds.
+
+    Args:
+        base_value: Original threshold value.
+        scale_factor: Multiplier (e.g., 0.5 for half-width viewport).
+        min_value: Floor value (don't go below this).
+        max_value: Ceiling value (don't go above this).
+
+    Returns:
+        Scaled integer value.
+    """
+    result = int(base_value * scale_factor)
+    if min_value is not None:
+        result = max(result, min_value)
+    if max_value is not None:
+        result = min(result, max_value)
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Stage A → Stage C pattern mapping (Issue 229)
 # ---------------------------------------------------------------------------
 
@@ -336,4 +395,5 @@ _STAGE_A_TO_C_PATTERN_MAP = {
     'bg-content': ['bg-content'],
     'table': ['table'],
     'horizontal-bar': ['list', 'single'],
+    'variant': ['card', 'list'],  # Variants are typically card or list patterns
 }

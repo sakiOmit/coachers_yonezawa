@@ -164,6 +164,7 @@ def detect_bg_content_layers(children, parent_bb):
 
     return [{
         'method': 'semantic',
+        'score': 0.9,
         'semantic_type': 'bg-content',
         'node_ids': content_ids,
         'node_names': content_names,

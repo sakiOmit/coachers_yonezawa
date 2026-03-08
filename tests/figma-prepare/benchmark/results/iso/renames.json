@@ -1,0 +1,604 @@
+{
+  "92:1193": {
+    "old_name": "Rectangle 95",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1194": {
+    "old_name": "Rectangle 96",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1195": {
+    "old_name": "Group 149",
+    "new_name": "card-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 55
+  },
+  "92:1196": {
+    "old_name": "Rectangle 799",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1200": {
+    "old_name": "Rectangle 97",
+    "new_name": "section-bg-5",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1202": {
+    "old_name": "image 5",
+    "new_name": "bg-7",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1203": {
+    "old_name": "Group 47",
+    "new_name": "btn-iso",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1205": {
+    "old_name": "Ellipse 26",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1206": {
+    "old_name": "Group 152",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1208": {
+    "old_name": "Ellipse 26",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1209": {
+    "old_name": "Group 48",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1211": {
+    "old_name": "Ellipse 26",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1212": {
+    "old_name": "Group 154",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1214": {
+    "old_name": "Ellipse 26",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1215": {
+    "old_name": "Group 153",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1217": {
+    "old_name": "Ellipse 26",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1218": {
+    "old_name": "Group 46",
+    "new_name": "btn-sd-gs",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1220": {
+    "old_name": "Ellipse 28",
+    "new_name": "bullet-1",
+    "type": "ELLIPSE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1221": {
+    "old_name": "Group 230",
+    "new_name": "group-14",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:1222": {
+    "old_name": "Vector 47",
+    "new_name": "icon-0",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1223": {
+    "old_name": "Vector 48",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1224": {
+    "old_name": "image 6",
+    "new_name": "bg-15",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1225": {
+    "old_name": "image 7",
+    "new_name": "bg-16",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1226": {
+    "old_name": "Rectangle 801",
+    "new_name": "bg-17",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1228": {
+    "old_name": "Group 141",
+    "new_name": "group-certification",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1229": {
+    "old_name": "Group 134",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:1231": {
+    "old_name": "Rectangle 43",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1232": {
+    "old_name": "image 11",
+    "new_name": "bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1233": {
+    "old_name": "Rectangle 771",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1234": {
+    "old_name": "Group 99",
+    "new_name": "heading-certification",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1236": {
+    "old_name": "Vector 91",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1238": {
+    "old_name": "Group 148",
+    "new_name": "card-sd-gs",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1240": {
+    "old_name": "Rectangle 799",
+    "new_name": "bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1242": {
+    "old_name": "image 11",
+    "new_name": "bg-3",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1243": {
+    "old_name": "Group 147",
+    "new_name": "container-iso",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1244": {
+    "old_name": "Rectangle 94",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1245": {
+    "old_name": "Group 146",
+    "new_name": "card-iso",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1246": {
+    "old_name": "Rectangle 799",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1250": {
+    "old_name": "image 12",
+    "new_name": "bg-4",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1251": {
+    "old_name": "image 13",
+    "new_name": "bg-5",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1252": {
+    "old_name": "Vector 46",
+    "new_name": "icon-6",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1253": {
+    "old_name": "Group 146",
+    "new_name": "card-22",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1254": {
+    "old_name": "Rectangle 799",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1257": {
+    "old_name": "Group 150",
+    "new_name": "card-24",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1258": {
+    "old_name": "Rectangle 799",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1261": {
+    "old_name": "Rectangle 800",
+    "new_name": "bg-26",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1263": {
+    "old_name": "Group 151",
+    "new_name": "container-qmsems",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1275": {
+    "old_name": "Rectangle 45",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1283": {
+    "old_name": "Group 97",
+    "new_name": "btn-content",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  },
+  "92:1290": {
+    "old_name": "image 1",
+    "new_name": "bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1291": {
+    "old_name": "Group 2",
+    "new_name": "btn-2",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 60
+  },
+  "92:1292": {
+    "old_name": "Group 98",
+    "new_name": "card-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1293": {
+    "old_name": "Rectangle 2",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1296": {
+    "old_name": "Rectangle 769",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1297": {
+    "old_name": "Rectangle 788",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1298": {
+    "old_name": "Vector 89",
+    "new_name": "icon-2",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1299": {
+    "old_name": "Vector 86",
+    "new_name": "icon-3",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1300": {
+    "old_name": "Vector 87",
+    "new_name": "icon-4",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1304": {
+    "old_name": "Vector 90",
+    "new_name": "icon-8",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1305": {
+    "old_name": "image 1",
+    "new_name": "bg-9",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1320": {
+    "old_name": "Group 95",
+    "new_name": "group-24",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1327": {
+    "old_name": "Group 220",
+    "new_name": "card-english-website",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1328": {
+    "old_name": "Rectangle 869",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1329": {
+    "old_name": "Vector",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1331": {
+    "old_name": "image 14",
+    "new_name": "bg-31",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1332": {
+    "old_name": "image 15",
+    "new_name": "bg-32",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1333": {
+    "old_name": "image 16",
+    "new_name": "bg-33",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1335": {
+    "old_name": "Group 145",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:1337": {
+    "old_name": "Rectangle 42",
+    "new_name": "section-bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1338": {
+    "old_name": "image 18",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1339": {
+    "old_name": "Rectangle 40",
+    "new_name": "section-bg-1",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1340": {
+    "old_name": "Group 38",
+    "new_name": "heading-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1343": {
+    "old_name": "Vector 19",
+    "new_name": "icon-3",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1344": {
+    "old_name": "Group 144",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1345": {
+    "old_name": "Rectangle 41",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1346": {
+    "old_name": "Group 53",
+    "new_name": "group-web",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1347": {
+    "old_name": "Group 83",
+    "new_name": "heading-web",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1349": {
+    "old_name": "Group 51",
+    "new_name": "group-1",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:1350": {
+    "old_name": "Group 50",
+    "new_name": "group-0",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 20
+  },
+  "92:1351": {
+    "old_name": "Group 143",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1352": {
+    "old_name": "Rectangle 42",
+    "new_name": "bg-0",
+    "type": "RECTANGLE",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1353": {
+    "old_name": "Group 142",
+    "new_name": "heading-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1355": {
+    "old_name": "Vector",
+    "new_name": "icon-1",
+    "type": "VECTOR",
+    "inference_method": "auto",
+    "confidence": 85
+  },
+  "92:1356": {
+    "old_name": "Group 52",
+    "new_name": "group-contact",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 40
+  },
+  "92:1360": {
+    "old_name": "Group 29",
+    "new_name": "heading-0276-73-1173",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 70
+  },
+  "92:1365": {
+    "old_name": "Group 30",
+    "new_name": "btn-0276-74-8069",
+    "type": "FRAME",
+    "inference_method": "auto",
+    "confidence": 75
+  }
+}

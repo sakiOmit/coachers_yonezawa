@@ -30,10 +30,12 @@ from .scoring import structure_hash, structure_similarity
 from .grouping_proximity import (  # noqa: F401
     UnionFind,
     _split_by_spatial_gap,
+    compute_adaptive_gap,
     detect_proximity_groups,
 )
 from .grouping_semantic import (  # noqa: F401
     detect_semantic_groups,
+    detect_variant_groups,
     is_card_like,
     is_grid_like,
     is_navigation_like,
@@ -58,20 +60,25 @@ def detect_pattern_groups(children):
     hashes = [(structure_hash(c), c) for c in children]
 
     # Greedy clustering by Jaccard similarity
-    clusters = []  # list of (representative_hash, [nodes])
+    clusters = []  # list of (representative_hash, [nodes], [similarities])
     for h, child in hashes:
         matched = False
         for cluster in clusters:
-            if structure_similarity(cluster[0], h) >= JACCARD_THRESHOLD:
+            sim = structure_similarity(cluster[0], h)
+            if sim >= JACCARD_THRESHOLD:
                 cluster[1].append(child)
+                cluster[2].append(sim)
                 matched = True
                 break
         if not matched:
-            clusters.append((h, [child]))
+            clusters.append((h, [child], []))
 
     result = []
-    for rep_hash, nodes in clusters:
+    for rep_hash, nodes, similarities in clusters:
         if len(nodes) >= REPEATED_PATTERN_MIN:
+            # Compute pattern score as min Jaccard similarity within cluster
+            # First node has implicit similarity 1.0 with itself
+            min_jaccard = min(similarities) if similarities else 1.0
             # Issue 87: For leaf nodes (no children), split by spatial proximity
             # to avoid grouping distant TEXT elements (e.g. nav labels + content text)
             sub_groups = _split_by_spatial_gap(nodes)
@@ -82,6 +89,7 @@ def detect_pattern_groups(children):
                 is_fuzzy = len(node_hashes) > 1
                 result.append({
                     'method': 'pattern',
+                    'score': round(min_jaccard, 4),
                     'structure_hash': rep_hash,
                     'node_ids': [n.get('id', '') for n in sg],
                     'node_names': [n.get('name', '') for n in sg],
@@ -95,6 +103,8 @@ def detect_pattern_groups(children):
 
 def detect_spacing_groups(children):
     """Detect groups of regularly-spaced elements."""
+    import statistics as _stats
+
     from .scoring import detect_regular_spacing
 
     if len(children) < 3:
@@ -105,8 +115,35 @@ def detect_spacing_groups(children):
     if not detect_regular_spacing(bboxes):
         return []
 
+    # Compute spacing score as max(0, 1.0 - cv)
+    # Replicate axis detection from detect_regular_spacing
+    xs = [b['x'] for b in bboxes]
+    ys = [b['y'] for b in bboxes]
+    x_range = max(xs) - min(xs) if xs else 0
+    y_range = max(ys) - min(ys) if ys else 0
+    axis = 'x' if x_range > y_range else 'y'
+    if axis == 'x':
+        sorted_bb = sorted(bboxes, key=lambda b: b['x'])
+        gaps = [sorted_bb[i+1]['x'] - (sorted_bb[i]['x'] + sorted_bb[i]['w'])
+                for i in range(len(sorted_bb) - 1)]
+    else:
+        sorted_bb = sorted(bboxes, key=lambda b: b['y'])
+        gaps = [sorted_bb[i+1]['y'] - (sorted_bb[i]['y'] + sorted_bb[i]['h'])
+                for i in range(len(sorted_bb) - 1)]
+    gaps = [g for g in gaps if g >= 0]
+    if len(gaps) >= 2:
+        mean_gap = _stats.mean(gaps)
+        if mean_gap > 0:
+            cv = _stats.stdev(gaps) / mean_gap
+            spacing_score = max(0.0, 1.0 - cv)
+        else:
+            spacing_score = 1.0  # Perfect edge-to-edge
+    else:
+        spacing_score = 1.0  # Single gap or no gaps = perfectly regular
+
     return [{
         'method': 'spacing',
+        'score': round(spacing_score, 4),
         'node_ids': [c.get('id', '') for c in children],
         'node_names': [c.get('name', '') for c in children],
         'count': len(children),
@@ -132,6 +169,8 @@ def _write_yaml_output(candidates, output_file, root_skipped=0, disabled=None):
         for i, c in enumerate(candidates):
             f.write(f'  - index: {i}\n')
             f.write(f'    method: {yaml_str(c["method"])}\n')
+            if 'score' in c:
+                f.write(f'    score: {c["score"]}\n')
             f.write(f'    parent: {yaml_str(c.get("parent_name", ""))}\n')
             if 'node_ids' in c:
                 f.write(f'    node_ids: {json.dumps(c["node_ids"])}\n')

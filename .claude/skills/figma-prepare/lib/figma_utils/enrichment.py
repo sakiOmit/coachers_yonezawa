@@ -122,13 +122,37 @@ def _compute_flags(node, page_width, page_height, root_x=0, root_y=0):
     return flags
 
 
-def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, root_y=0):
+def _compute_method_tag(node_id, stage_a_candidates):
+    """Return method tag for a node if it's in any Stage A candidate.
+
+    Format: "method@score" (e.g., "proximity@0.7") or "-" if not in any candidate.
+
+    Args:
+        node_id: Figma node ID string.
+        stage_a_candidates: List of candidate dicts with 'method', 'score', 'node_ids'.
+
+    Returns:
+        str: Method tag like "proximity@0.7" or "-".
+    """
+    if not stage_a_candidates:
+        return '-'
+    for cand in stage_a_candidates:
+        if node_id in cand.get('node_ids', []):
+            method = cand.get('method', '?')
+            score = cand.get('score', 0)
+            return f"{method}@{score:.1f}"
+    return '-'
+
+
+def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, root_y=0,
+                            stage_a_candidates=None):
     """Generate enriched Markdown table for Phase B Claude reasoning.
 
     Produces the enriched format:
-    | # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |
+    | # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Method | Text |
 
     Col column (Issue 256): L=left, R=right, F=full-width, C=center, -=no columns detected.
+    Method column: Stage A detection method and score (e.g., "proximity@0.7") or "-".
 
     This format provides Claude with enough structural information to detect
     patterns like cards, tables, background layers, etc. without needing
@@ -142,12 +166,17 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
         page_height: Page height for overflow detection (default: 0 = skip).
         root_x: Artboard X offset for root-relative coordinate calculation (default: 0).
         root_y: Artboard Y offset for root-relative coordinate calculation (default: 0).
+        stage_a_candidates: Optional list of Stage A candidate dicts for Method column.
 
     Returns:
         str: Markdown table string.
     """
-    header = '| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |'
-    separator = '|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|'
+    if stage_a_candidates:
+        header = '| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Method | Text |'
+        separator = '|---|-----|------|------|---|---|-----|-------|-------|------------|-------|--------|------|'
+    else:
+        header = '| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |'
+        separator = '|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|'
     rows = [header, separator]
 
     # Pre-compute column classification (Issue 256)
@@ -213,7 +242,11 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, 
         if not text:
             text = '-'
 
-        row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {col} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {text} |'
+        if stage_a_candidates:
+            method_tag = _compute_method_tag(node_id, stage_a_candidates)
+            row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {col} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {method_tag} | {text} |'
+        else:
+            row = f'| {i+1} | {node_id} | {name} | {node_type} | {x} | {y} | {col} | {w}x{h} | {leaf_str} | {child_types} | {flags_str} | {text} |'
         rows.append(row)
 
     return '\n'.join(rows)

@@ -82,29 +82,69 @@ def compute_grouping_score(a_bb, b_bb, gap=24):
     return max(0.0, 1.0 - effective / (gap * 2))
 
 
-def structure_hash(node):
+def structure_hash(node, depth=2):
     """Calculate structure hash from child types and count.
 
     Issue 128: Moved from detect-grouping-candidates.sh to share with
     structure_similarity (which parses the hash format produced here).
 
-    Format: "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]" (sorted child types).
+    Args:
+        node: Figma node dict.
+        depth: Hash depth. 1=children only (legacy), 2=children+grandchildren (default).
+
+    Format (depth=1): "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]"
+    Format (depth=2): "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]|GC:N:DOMINANT" where N=total
+        grandchild count and DOMINANT=most frequent grandchild type.
+
+    The grandchild count adds discrimination without making the hash too complex.
+    Two FRAMEs with [TEXT, RECTANGLE] but different internal complexity will now differ.
     Leaf nodes return just "TYPE".
     """
     children = filter_visible_children(node)
     if not children:
         return node.get('type', 'UNKNOWN')
     child_types = sorted(c.get('type', '') for c in children)
-    return f"{node.get('type', 'UNKNOWN')}:[{','.join(child_types)}]"
+    base_hash = f"{node.get('type', 'UNKNOWN')}:[{','.join(child_types)}]"
+
+    if depth >= 2:
+        # Count total grandchildren across all children
+        gc_count = 0
+        gc_type_counts = {}
+        for child in children:
+            grandchildren = filter_visible_children(child)
+            gc_count += len(grandchildren)
+            for gc in grandchildren:
+                gc_type = gc.get('type', '')
+                gc_type_counts[gc_type] = gc_type_counts.get(gc_type, 0) + 1
+
+        if gc_count > 0:
+            # Add grandchild summary: total count + dominant type
+            dominant = max(gc_type_counts, key=gc_type_counts.get) if gc_type_counts else ''
+            base_hash += f"|GC:{gc_count}:{dominant}"
+
+    return base_hash
 
 
 def structure_similarity(hash_a, hash_b):
     """Compute Jaccard similarity between two structure hashes.
 
     Structure hash format: "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]"
+    or with L2: "TYPE:[CHILD_TYPE1,...]|GC:N:DOMINANT"
+
+    For 2-level hashes (with |GC:... suffix), computes weighted similarity:
+    - Level 1 (child types): 70% weight
+    - Level 2 (grandchild count + dominant type): 30% weight
+
     Treats child type lists as multisets for comparison.
     Returns 0.0-1.0.
     """
+    # Split into L1 (child types) and L2 (grandchild) parts
+    a_parts = hash_a.split('|')
+    b_parts = hash_b.split('|')
+    a_l1 = a_parts[0]
+    b_l1 = b_parts[0]
+
+    # Level 1: Jaccard on child types
     def _parse_children(h):
         bracket = h.find('[')
         if bracket < 0:
@@ -112,19 +152,48 @@ def structure_similarity(hash_a, hash_b):
         inner = h[bracket + 1:h.rfind(']')]
         return inner.split(',') if inner else []
 
-    a_children = _parse_children(hash_a)
-    b_children = _parse_children(hash_b)
+    a_children = _parse_children(a_l1)
+    b_children = _parse_children(b_l1)
 
     if not a_children and not b_children:
-        return 1.0 if hash_a == hash_b else 0.0
+        l1_sim = 1.0 if a_l1 == b_l1 else 0.0
+    else:
+        # Multiset Jaccard
+        ca = Counter(a_children)
+        cb = Counter(b_children)
+        all_keys = set(ca) | set(cb)
+        intersection = sum(min(ca[k], cb[k]) for k in all_keys)
+        union = sum(max(ca[k], cb[k]) for k in all_keys)
+        l1_sim = intersection / union if union > 0 else 0.0
 
-    # Multiset Jaccard
-    ca = Counter(a_children)
-    cb = Counter(b_children)
-    all_keys = set(ca) | set(cb)
-    intersection = sum(min(ca[k], cb[k]) for k in all_keys)
-    union = sum(max(ca[k], cb[k]) for k in all_keys)
-    return intersection / union if union > 0 else 0.0
+    # Level 2: grandchild count similarity (if both hashes have L2)
+    if len(a_parts) >= 2 and len(b_parts) >= 2:
+        # Parse GC:count:type
+        a_gc = a_parts[1]  # "GC:5:TEXT"
+        b_gc = b_parts[1]
+
+        a_gc_parts = a_gc.split(':')
+        b_gc_parts = b_gc.split(':')
+        a_gc_count = int(a_gc_parts[1]) if len(a_gc_parts) >= 2 else 0
+        b_gc_count = int(b_gc_parts[1]) if len(b_gc_parts) >= 2 else 0
+
+        # GC count similarity: 1.0 if same, decreasing with difference
+        max_gc = max(a_gc_count, b_gc_count)
+        if max_gc == 0:
+            l2_sim = 1.0
+        else:
+            l2_sim = 1.0 - abs(a_gc_count - b_gc_count) / max_gc
+
+        # Dominant type bonus
+        a_dom = a_gc_parts[2] if len(a_gc_parts) >= 3 else ''
+        b_dom = b_gc_parts[2] if len(b_gc_parts) >= 3 else ''
+        if a_dom and b_dom and a_dom == b_dom:
+            l2_sim = min(1.0, l2_sim + 0.2)  # bonus for same dominant type
+
+        return l1_sim * 0.7 + l2_sim * 0.3
+
+    # If only one hash has L2, or neither, use L1 only (backward compat)
+    return l1_sim
 
 
 def detect_regular_spacing(children_bboxes, axis='auto'):
