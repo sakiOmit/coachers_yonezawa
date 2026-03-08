@@ -195,9 +195,11 @@ if use_groups_mode:
         group_name = group.get('name', 'unknown')
         group_node_ids = group.get('node_ids', [])
 
-        # Skip groups with pattern 'single'
-        if group_pattern == 'single':
-            skipped_groups.append({'name': group_name, 'reason': 'pattern=single'})
+        # Skip groups with pattern 'single' AND fewer than 3 node_ids (Issue 255)
+        # Groups with 3+ children may contain content-blocks (icon+title+description)
+        # that benefit from depth-1 sub-grouping even with pattern='single'
+        if group_pattern == 'single' and len(group_node_ids) < 3:
+            skipped_groups.append({'name': group_name, 'reason': 'pattern=single, children<3'})
             continue
 
         if not group_node_ids:

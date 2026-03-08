@@ -6435,7 +6435,7 @@ class TestSkippedGroupsReporting:
                 meta_tmp, "--groups", groups_tmp, "--depth", "0")
             assert result.get('skipped_count', 0) >= 1
             skipped = result.get('skipped_groups', [])
-            single_skipped = [s for s in skipped if s.get('reason') == 'pattern=single']
+            single_skipped = [s for s in skipped if 'pattern=single' in s.get('reason', '')]
             assert len(single_skipped) >= 1
             assert single_skipped[0]['name'] == 'leaf-item'
         finally:
