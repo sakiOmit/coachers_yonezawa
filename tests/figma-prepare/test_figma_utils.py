@@ -96,7 +96,9 @@ from figma_utils import (
     STAGE_A_ONLY_DETECTORS,
     STAGE_C_COVERAGE_THRESHOLD,
     deduplicate_candidates,
+    absorb_stage_c_dividers,
     METHOD_PRIORITY,
+    DIVIDER_MAX_HEIGHT,
 )
 
 SCRIPTS_DIR = os.path.join(SKILLS_DIR, "scripts")
@@ -7305,3 +7307,107 @@ class TestCountFlatDescendants:
         # section_child is a section root → skipped (not counted itself)
         # but inner_flat (20 children > 15) is found via recursion → 1
         assert _count_flat_descendants(node) == 1
+
+
+class TestAbsorbStageCDividers:
+    """Issue #253: Absorb single-element divider groups into adjacent list-item groups."""
+
+    def _make_node(self, nid, ntype, y, h=50, w=100):
+        return {
+            'id': nid,
+            'type': ntype,
+            'absoluteBoundingBox': {'x': 0, 'y': y, 'width': w, 'height': h},
+        }
+
+    def test_dividers_absorbed_into_preceding_list_items(self):
+        """Dividers between list items should be absorbed into the preceding item."""
+        node_lookup = {
+            'item1-a': self._make_node('item1-a', 'FRAME', 0),
+            'item1-b': self._make_node('item1-b', 'TEXT', 0),
+            'div1': self._make_node('div1', 'VECTOR', 60, h=0),
+            'item2-a': self._make_node('item2-a', 'FRAME', 80),
+            'item2-b': self._make_node('item2-b', 'TEXT', 80),
+            'div2': self._make_node('div2', 'VECTOR', 140, h=0),
+            'item3-a': self._make_node('item3-a', 'FRAME', 160),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item1-a', 'item1-b']},
+            {'name': 'divider-1', 'pattern': 'single', 'node_ids': ['div1']},
+            {'name': 'list-item-2', 'pattern': 'list', 'node_ids': ['item2-a', 'item2-b']},
+            {'name': 'divider-2', 'pattern': 'single', 'node_ids': ['div2']},
+            {'name': 'list-item-3', 'pattern': 'list', 'node_ids': ['item3-a']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 3
+        names = [g['name'] for g in result]
+        assert 'divider-1' not in names
+        assert 'divider-2' not in names
+        assert 'div1' in result[0]['node_ids']
+        assert 'div2' in result[1]['node_ids']
+
+    def test_no_dividers_unchanged(self):
+        """Groups without dividers should pass through unchanged."""
+        node_lookup = {
+            'a': self._make_node('a', 'FRAME', 0),
+            'b': self._make_node('b', 'FRAME', 100),
+        }
+        groups = [
+            {'name': 'group-1', 'pattern': 'list', 'node_ids': ['a']},
+            {'name': 'group-2', 'pattern': 'list', 'node_ids': ['b']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 2
+
+    def test_rectangle_divider_absorbed(self):
+        """Thin RECTANGLE (height <= DIVIDER_MAX_HEIGHT) should also be absorbed."""
+        node_lookup = {
+            'item': self._make_node('item', 'FRAME', 0),
+            'rect_div': self._make_node('rect_div', 'RECTANGLE', 55, h=2),
+            'item2': self._make_node('item2', 'FRAME', 100),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item']},
+            {'name': 'divider', 'pattern': 'single', 'node_ids': ['rect_div']},
+            {'name': 'list-item-2', 'pattern': 'list', 'node_ids': ['item2']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 2
+        # rect_div (y=55) is closer to item (y=0, center=25) than item2 (y=100, center=125)
+        assert 'rect_div' in result[0]['node_ids']
+
+    def test_tall_rectangle_not_absorbed(self):
+        """Tall RECTANGLE (height > LOOSE_ELEMENT_MAX_HEIGHT) should NOT be absorbed."""
+        node_lookup = {
+            'item': self._make_node('item', 'FRAME', 0),
+            'big_rect': self._make_node('big_rect', 'RECTANGLE', 55, h=100),
+            'item2': self._make_node('item2', 'FRAME', 200),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item']},
+            {'name': 'bg-rect', 'pattern': 'single', 'node_ids': ['big_rect']},
+            {'name': 'list-item-2', 'pattern': 'list', 'node_ids': ['item2']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 3
+
+    def test_empty_groups(self):
+        """Empty or single group should return unchanged."""
+        assert absorb_stage_c_dividers([], {}) == []
+        single = [{'name': 'g', 'pattern': 'list', 'node_ids': ['a']}]
+        assert absorb_stage_c_dividers(single, {}) == single
+
+    def test_line_type_absorbed(self):
+        """LINE type divider should be absorbed."""
+        node_lookup = {
+            'item': self._make_node('item', 'FRAME', 0),
+            'line': self._make_node('line', 'LINE', 55, h=1),
+            'item2': self._make_node('item2', 'FRAME', 80),
+        }
+        groups = [
+            {'name': 'list-item-1', 'pattern': 'list', 'node_ids': ['item']},
+            {'name': 'divider', 'pattern': 'single', 'node_ids': ['line']},
+            {'name': 'list-item-2', 'pattern': 'list', 'node_ids': ['item2']},
+        ]
+        result = absorb_stage_c_dividers(groups, node_lookup)
+        assert len(result) == 2
+        assert 'line' in result[0]['node_ids']

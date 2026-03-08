@@ -208,6 +208,100 @@ def deduplicate_candidates(candidates, root_id=''):
     return result
 
 
+def absorb_stage_c_dividers(groups, node_lookup=None):
+    """Post-process Stage C groups: absorb single-element divider groups into
+    the nearest sibling group (Issue 253).
+
+    When Claude generates Stage C nested grouping, thin divider lines
+    (VECTOR/LINE/RECTANGLE with height <= DIVIDER_MAX_HEIGHT) are often
+    placed in their own single-element groups. For coding purposes, these
+    should be absorbed into adjacent list-item groups so that figma-implement
+    can render them as border-bottom or similar CSS.
+
+    Algorithm (order-based — no coordinate data required):
+    1. Identify divider groups by name pattern ('divider') or node type+size
+    2. Absorb into the nearest preceding non-divider group (border-bottom)
+    3. If no preceding group, absorb into the nearest following group
+    4. Mark divider group for removal
+
+    Groups in Stage C YAML are already sorted by Y-coordinate, so group order
+    reliably indicates spatial adjacency.
+
+    Args:
+        groups: list of group dicts with 'node_ids', 'pattern', 'name'
+        node_lookup: optional dict mapping node_id -> node dict (with type, bbox).
+                     Used for type-based detection when name doesn't contain 'divider'.
+                     If None, detection falls back to name-only.
+
+    Returns:
+        list of groups with dividers absorbed (divider groups removed)
+    """
+    if not groups or len(groups) < 2:
+        return groups
+
+    if node_lookup is None:
+        node_lookup = {}
+
+    # Identify divider groups
+    divider_indices = []
+    for i, g in enumerate(groups):
+        nids = g.get('node_ids', [])
+        name = g.get('name', '').lower()
+
+        # Name-based detection: group named 'divider*' with single element
+        if len(nids) == 1 and 'divider' in name:
+            divider_indices.append(i)
+            continue
+
+        # Type-based detection: single LINE/VECTOR or thin RECTANGLE
+        if len(nids) != 1:
+            continue
+        node = node_lookup.get(nids[0])
+        if not node:
+            continue
+        bb = get_bbox(node)
+        node_type = node.get('type', '')
+        is_divider = (
+            node_type in ('LINE', 'VECTOR')
+            or (node_type == 'RECTANGLE' and bb['h'] <= DIVIDER_MAX_HEIGHT)
+        ) and bb['h'] <= LOOSE_ELEMENT_MAX_HEIGHT
+        if is_divider:
+            divider_indices.append(i)
+
+    if not divider_indices:
+        return groups
+
+    # Absorb each divider into nearest preceding non-divider group
+    # (border-bottom semantics). Fallback to following if no preceding.
+    absorbed = set()
+    merge_map = {}  # divider_index -> target_index
+    non_divider_indices = [i for i in range(len(groups)) if i not in divider_indices]
+
+    for di in divider_indices:
+        if not non_divider_indices:
+            break
+        # Find nearest preceding non-divider group
+        preceding = [ni for ni in non_divider_indices if ni < di]
+        following = [ni for ni in non_divider_indices if ni > di]
+        if preceding:
+            merge_map[di] = preceding[-1]  # closest preceding
+        elif following:
+            merge_map[di] = following[0]   # closest following
+        absorbed.add(di)
+
+    # Apply merges
+    result_groups = list(groups)  # shallow copy
+    for di, ti in merge_map.items():
+        target = result_groups[ti]
+        divider_nids = result_groups[di].get('node_ids', [])
+        merged = dict(target)
+        merged['node_ids'] = list(target.get('node_ids', [])) + divider_nids
+        result_groups[ti] = merged
+
+    # Remove absorbed divider groups
+    return [g for i, g in enumerate(result_groups) if i not in absorbed]
+
+
 def yaml_str(value):
     """Safely encode a string for YAML double-quoted output.
 

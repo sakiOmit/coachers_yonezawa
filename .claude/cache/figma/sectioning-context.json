@@ -1,0 +1,135 @@
+{
+  "page_name": "products",
+  "page_id": "92:203",
+  "page_size": {
+    "width": 1020.0,
+    "height": 785.0
+  },
+  "top_level_children": [
+    {
+      "id": "92:204",
+      "name": "Group 16",
+      "type": "FRAME",
+      "bbox": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 238.0,
+        "h": 70.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "Products",
+        "製品情報"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:238",
+      "name": "Group 96",
+      "type": "FRAME",
+      "bbox": {
+        "x": 607.0,
+        "y": 99.0,
+        "w": 413.0,
+        "h": 609.0
+      },
+      "child_count": 5,
+      "child_types_summary": "FRAME:2, RECTANGLE:1, TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "耳鼻科用ノズル　　 その他医療用部品",
+        "各種注射針　 脳外科用コネクター　"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:207",
+      "name": "Group 17",
+      "type": "FRAME",
+      "bbox": {
+        "x": 2.0,
+        "y": 100.0,
+        "w": 529.0,
+        "h": 608.0
+      },
+      "child_count": 18,
+      "child_types_summary": "FRAME:6, RECTANGLE:2, TEXT:6, VECTOR:4",
+      "has_text_children": true,
+      "text_children_preview": [
+        "O1",
+        "医療用",
+        "工業用",
+        "その他",
+        "加工法いろいろ"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "92:247",
+      "name": "Group 4",
+      "type": "FRAME",
+      "bbox": {
+        "x": 0.0,
+        "y": 737.0,
+        "w": 215.0,
+        "h": 48.0
+      },
+      "child_count": 3,
+      "child_types_summary": "RECTANGLE:1, TEXT:1, VECTOR:1",
+      "has_text_children": true,
+      "text_children_preview": [
+        "製品案内"
+      ],
+      "is_unnamed": true
+    }
+  ],
+  "total_children": 4,
+  "heuristic_hints": {
+    "header_candidates": [],
+    "header_cluster_ids": [],
+    "footer_candidates": [],
+    "gap_analysis": [
+      {
+        "between": [
+          "92:204",
+          "92:238"
+        ],
+        "gap_px": 29
+      },
+      {
+        "between": [
+          "92:238",
+          "92:207"
+        ],
+        "gap_px": -608
+      },
+      {
+        "between": [
+          "92:207",
+          "92:247"
+        ],
+        "gap_px": 29
+      }
+    ],
+    "background_candidates": [],
+    "consecutive_patterns": [],
+    "heading_candidates": [
+      {
+        "index": 0,
+        "id": "92:204",
+        "name": "Group 16",
+        "height": 70.0
+      },
+      {
+        "index": 3,
+        "id": "92:247",
+        "name": "Group 4",
+        "height": 48.0
+      }
+    ],
+    "loose_elements": []
+  },
+  "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |\n|---|-----|------|------|---|---|-------|-------|------------|-------|------|\n| 1 | 92:204 | Group 16 | FRAME | 0 | 0 | 238x70 | N | 2TEX | - | Products |\n| 2 | 92:238 | Group 96 | FRAME | 607 | 99 | 413x609 | N | 2FRA+1REC+2TEX | - | 耳鼻科用ノズル　　 その他医療用部品 |\n| 3 | 92:207 | Group 17 | FRAME | 2 | 100 | 529x608 | N | 6FRA+2REC+6TEX+4VEC | - | O1 |\n| 4 | 92:247 | Group 4 | FRAME | 0 | 737 | 215x48 | N | 1REC+1TEX+1VEC | - | 製品案内 |"
+}
