@@ -60,6 +60,7 @@ ZONE_OVERLAP_ITEM = 0.5  # 50% — vertical zone merge: item overlap ratio (figm
 ZONE_OVERLAP_ZONE = 0.3  # 30% — vertical zone merge: zone overlap ratio (figma-prepare.md: zone_overlap_zone)
 HEADER_MAX_ELEMENT_HEIGHT = 200  # px — max height for header zone elements (figma-prepare.md: header_max_element_height)
 FOOTER_ZONE_MARGIN = 50  # px — extra margin for footer zone bottom (figma-prepare.md: footer_zone_margin)
+HEADER_ZONE_MARGIN = 50  # px — extra margin for header zone bottom (Issue #266)
 HEADER_TEXT_MAX_WIDTH = 200  # px — max width for nav-like text in header (figma-prepare.md: header_text_max_width)
 HEADER_LOGO_MAX_WIDTH = 300  # px — max width for logo in header (figma-prepare.md: header_logo_max_width)
 HEADER_LOGO_MAX_HEIGHT = 100  # px — max height for logo in header (figma-prepare.md: header_logo_max_height)
@@ -770,7 +771,7 @@ def _count_flat_descendants(node, threshold=FLAT_THRESHOLD):
     return count
 
 
-def is_off_canvas(node, page_width, root_x=0):
+def is_off_canvas(node, page_width, root_x=0, root_y=0):
     """Check if a node is positioned completely outside the viewport.
 
     An element is considered off-canvas if:
@@ -789,6 +790,7 @@ def is_off_canvas(node, page_width, root_x=0):
         node: Figma node dict.
         page_width: Width of the page/artboard (typically 1440px).
         root_x: X coordinate of the root artboard (for offset correction).
+        root_y: Y coordinate of the root artboard (for offset correction, Issue 265).
 
     Returns:
         bool: True if the node is completely off-canvas.

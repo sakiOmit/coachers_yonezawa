@@ -88,6 +88,7 @@ score = max(0, score)
 | jaccard_threshold | 0.7 | パターン検出のファジーマッチ閾値 |
 | header_max_element_height | 200px | ヘッダーグループ内要素の最大高さ（Issue 125） |
 | footer_zone_margin | 50px | フッターゾーン下方マージン（ページ外要素包含用、Issue 129） |
+| header_zone_margin | 50px | ヘッダーゾーン下方マージン（Issue 266） |
 | divider_max_height | 5px | 水平区切り線の最大高さ（Phase 3 リネーム、Issue 124） |
 | header_y_threshold | 100px | ヘッダー検出Y位置閾値（Phase 3 リネーム、Issue 124） |
 | footer_proximity | 100px | フッター検出の親下端からの距離（Phase 3 リネーム、Issue 124） |

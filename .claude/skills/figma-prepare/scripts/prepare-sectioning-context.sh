@@ -48,7 +48,7 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_
     generate_enriched_table,
     HINT_HEADER_Y_RATIO, HINT_FOOTER_Y_RATIO, HINT_WIDE_ELEMENT_RATIO,
     HINT_BG_MIN_HEIGHT, HINT_HEADING_MAX_HEIGHT,
-    HEADER_ZONE_HEIGHT, FOOTER_ZONE_MARGIN, NAV_MAX_TEXT_LEN, HEADER_NAV_MIN_TEXTS,
+    HEADER_ZONE_HEIGHT, HEADER_ZONE_MARGIN, NAV_MAX_TEXT_LEN, HEADER_NAV_MIN_TEXTS,
     JACCARD_THRESHOLD, CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT)
 
 def count_children(node):
@@ -148,7 +148,7 @@ def detect_heuristic_hints(children, page_bbox):
     for child in sorted_children:
         bb_c = get_bbox(child)
         # Element must start within header zone and bottom within zone + 50px margin
-        if bb_c['y'] >= header_zone_top and bb_c['y'] + bb_c['h'] <= header_zone_bottom + FOOTER_ZONE_MARGIN:
+        if bb_c['y'] >= header_zone_top and bb_c['y'] + bb_c['h'] <= header_zone_bottom + HEADER_ZONE_MARGIN:
             header_zone_elements.append(child.get('id', ''))
             if child.get('type') == 'TEXT':
                 text_content = child.get('characters', child.get('name', ''))

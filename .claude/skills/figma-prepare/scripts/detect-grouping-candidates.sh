@@ -634,9 +634,10 @@ def walk_and_detect(node, all_candidates=None, is_root=True, disabled=None):
         page_bb_pre = get_bbox(node)
         page_width = page_bb_pre['w'] if page_bb_pre else 0
         root_x = page_bb_pre['x'] if page_bb_pre else 0
+        root_y = page_bb_pre['y'] if page_bb_pre else 0
         children = [c for c in children
                      if c.get('visible') != False
-                     and not (page_width > 0 and is_off_canvas(c, page_width, root_x=root_x))]
+                     and not (page_width > 0 and is_off_canvas(c, page_width, root_x=root_x, root_y=root_y))]
     else:
         children = [c for c in children if c.get('visible') != False]
 

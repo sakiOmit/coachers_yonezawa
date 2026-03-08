@@ -70,7 +70,8 @@ for line in lines:
         elif stripped.startswith('node_ids:'):
             try:
                 current_group['node_ids'] = json.loads(stripped.split(':', 1)[1].strip())
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f\"Warning: Failed to parse node_ids in group '{current_group.get('name', '?')}', defaulting to empty: {e}\", file=sys.stderr)
                 current_group['node_ids'] = []
         elif stripped.startswith('reason:'):
             current_group['reason'] = stripped.split(':', 1)[1].strip().strip('\"')

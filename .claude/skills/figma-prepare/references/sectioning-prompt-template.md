@@ -193,14 +193,15 @@ sections:
 `--enriched-table` フラグ使用時は、`generate_enriched_table()` (Issue 194) で生成されるリッチ形式を使用:
 
 ```
-| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |
-|---|-----|------|------|---|---|-------|-------|------------|-------|------|
-| 1 | 1:106 | Group 46165 | FRAME | 0 | 10 | 1420x60 | N | 2TEX+1VEC | - | メニュー |
-| 2 | 1:101 | Rectangle 4 | RECTANGLE | 0 | 0 | 1440x400 | Y | - | bg-full | - |
+| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |
+|---|-----|------|------|---|---|-----|-------|-------|------------|-------|------|
+| 1 | 1:106 | Group 46165 | FRAME | 0 | 10 | - | 1420x60 | N | 2TEX+1VEC | - | メニュー |
+| 2 | 1:101 | Rectangle 4 | RECTANGLE | 0 | 0 | - | 1440x400 | Y | - | bg-full | - |
 ```
 
 追加カラムの意味:
 - **X**: X座標（横並び・グリッド検出に有用）
+- **Col**: 2カラムレイアウト検出時の列位置（L=左, R=右, F=全幅, C=中央, -=非2カラム）
 - **Leaf?**: Y=リーフ（子なし）、N=コンテナ（背景RECTとコンテナFRAMEの区別）
 - **ChildTypes**: `2REC+1TEX` 形式の子要素構成（構造パターン検出用）
 - **Flags**: `bg-full`, `overflow`, `tiny`, `decoration` 等の機械的フラグ

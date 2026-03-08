@@ -85,7 +85,8 @@ def parse_plan_yaml(plan_file):
             elif stripped.startswith('node_ids:'):
                 try:
                     current_group['node_ids'] = json.loads(stripped.split(':', 1)[1].strip())
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
+                    print(f"Warning: Failed to parse node_ids in group '{current_group.get('name', '?')}', defaulting to empty: {e}", file=sys.stderr)
                     current_group['node_ids'] = []
             elif stripped.startswith('reason:'):
                 current_group['reason'] = stripped.split(':', 1)[1].strip().strip('"')
@@ -618,10 +619,9 @@ def _collect_from_groups(groups, section_name, targets):
         node_ids = g.get('node_ids', [])
         pattern = g.get('pattern', 'single')
 
-        # Recursion criteria: pattern != single OR node_ids >= 3
-        if pattern != 'single' or len(node_ids) >= 3:
-            if len(node_ids) >= 3:  # Need at least 3 to meaningfully split
-                targets.append((g, section_name))
+        # Recursion criteria: need at least 3 node_ids to meaningfully split
+        if len(node_ids) >= 3:
+            targets.append((g, section_name))
 
 
 def main():

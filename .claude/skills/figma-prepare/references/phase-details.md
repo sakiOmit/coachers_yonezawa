@@ -69,7 +69,7 @@ Stage A ヒューリスティック（12+検出器）と対称的に動作し、
       "section_width": 1440,
       "section_height": 800,
       "total_children": 11,
-      "enriched_children_table": "| # | ID | Name | Type | X | Y | W x H | Leaf? | ChildTypes | Flags | Text |"
+      "enriched_children_table": "| # | ID | Name | Type | X | Y | Col | W x H | Leaf? | ChildTypes | Flags | Text |"
     }
   ]
 }
