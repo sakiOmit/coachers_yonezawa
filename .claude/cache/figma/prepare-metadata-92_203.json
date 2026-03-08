@@ -1,0 +1,58 @@
+<frame id="92:203" name="products" x="0" y="0" width="1020" height="785">
+  <frame id="92:204" name="Group 16" x="0" y="0" width="238" height="70">
+    <text id="92:205" name="Products" x="0" y="0" width="238.00000002068094" height="33.000000000000036" />
+    <text id="92:206" name="製品情報" x="1" y="54" width="98.00000001002712" height="16.000000000000014" />
+  </frame>
+  <frame id="92:207" name="Group 17" x="2" y="100" width="529" height="608">
+    <text id="92:208" name="O1" x="124" y="160" width="24" height="63" />
+    <rounded-rectangle id="92:209" name="Rectangle 25" x="2" y="101" width="529" height="607" />
+    <rounded-rectangle id="92:210" name="Rectangle 26" x="2" y="100" width="529" height="125" />
+    <vector id="92:211" name="Vector 10" x="50" y="214" width="481" height="1.1368683772161603e-13" />
+    <vector id="92:212" name="Vector 11" x="2" y="345" width="529" height="1.1368683772161603e-13" />
+    <vector id="92:213" name="Vector 12" x="2" y="467" width="529" height="0" />
+    <vector id="92:214" name="Vector 13" x="2" y="588" width="529" height="0" />
+    <frame id="92:215" name="Group 81" x="47" y="129" width="56" height="63">
+      <ellipse id="92:216" name="Ellipse 1" x="47" y="133" width="56" height="56" />
+      <text id="92:217" name="01" x="66" y="129" width="18" height="63" />
+    </frame>
+    <frame id="92:218" name="Group 82" x="47" y="252" width="56" height="63">
+      <ellipse id="92:219" name="Ellipse 2" x="47" y="256" width="56" height="56" />
+      <text id="92:220" name="02" x="66" y="252" width="19" height="63" />
+    </frame>
+    <frame id="92:221" name="Group 79" x="47" y="496" width="56" height="63">
+      <ellipse id="92:222" name="Ellipse 4" x="47" y="500" width="56" height="56" />
+      <text id="92:223" name="04" x="66" y="496" width="19" height="63" />
+    </frame>
+    <frame id="92:224" name="Group 80" x="47" y="617" width="56" height="63">
+      <ellipse id="92:225" name="Ellipse 5" x="47" y="621" width="56" height="56" />
+      <text id="92:226" name="05" x="66" y="617" width="19" height="63" />
+    </frame>
+    <frame id="92:227" name="Group 78" x="47" y="373" width="56" height="63">
+      <ellipse id="92:228" name="Ellipse 3" x="47" y="377" width="56" height="56" />
+      <text id="92:229" name="03" x="66" y="373" width="19" height="63" />
+    </frame>
+    <text id="92:230" name="医療用" x="125" y="129" width="82" height="63" />
+    <text id="92:231" name="工業用" x="125" y="252" width="82" height="63" />
+    <text id="92:232" name="その他" x="125" y="496" width="82" height="63" />
+    <text id="92:233" name="加工法いろいろ" x="125" y="617" width="194" height="63" />
+    <text id="92:234" name="自動車用" x="125" y="372" width="110" height="63" />
+    <frame id="92:235" name="Group 23" x="457" y="156" width="40" height="13" />
+  </frame>
+  <frame id="92:238" name="Group 96" x="607" y="99" width="413" height="609">
+    <frame id="92:239" name="Group 18" x="607" y="99" width="412" height="609">
+      <rounded-rectangle id="92:240" name="Rectangle 24" x="607" y="99" width="412" height="609" />
+    </frame>
+    <frame id="92:241" name="Group 19" x="607" y="100" width="413" height="608">
+      <rounded-rectangle id="92:242" name="Rectangle 24" x="607" y="100" width="413" height="608" />
+      <rounded-rectangle id="92:243" name="pixta_84983958_M 1" x="528" y="66" width="701" height="701" />
+    </frame>
+    <rounded-rectangle id="92:244" name="Rectangle 784" x="653" y="579" width="366" height="92" />
+    <text id="92:245" name="耳鼻科用ノズル　　 その他医療用部品" x="851" y="592" width="164" height="60" />
+    <text id="92:246" name="各種注射針　 脳外科用コネクター　" x="682" y="593" width="182" height="60" />
+  </frame>
+  <frame id="92:247" name="Group 4" x="0" y="737" width="215" height="48">
+    <rounded-rectangle id="92:248" name="Rectangle 11" x="0" y="737" width="215" height="48" />
+    <vector id="92:249" name="Vector 8" x="177" y="761" width="23" height="0" />
+    <text id="92:250" name="製品案内" x="22" y="750" width="92" height="21" />
+  </frame>
+</frame>

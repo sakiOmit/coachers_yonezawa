@@ -67,7 +67,7 @@ def enrich_node(node, enrichment_map, stats):
             stats['enriched_nodes'] += 1
             stats['merged_keys'] += len(merged_keys)
 
-    for child in node.get('children', []):
+    for child in [c for c in node.get('children', []) if c.get('visible') != False]:
         enrich_node(child, enrichment_map, stats)
 
 try:

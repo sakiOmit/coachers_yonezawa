@@ -168,13 +168,21 @@ if use_groups_mode:
     with open(GROUPS_FILE, 'r') as f:
         groups_text = f.read()
 
-    if yaml_available:
-        try:
-            groups_data = yaml.safe_load(groups_text)
-        except Exception:
+    try:
+        if yaml_available:
+            try:
+                groups_data = yaml.safe_load(groups_text)
+            except Exception:
+                groups_data = json.loads(groups_text)
+        else:
             groups_data = json.loads(groups_text)
-    else:
-        groups_data = json.loads(groups_text)
+    except (json.JSONDecodeError, ValueError) as e:
+        print(json.dumps({'error': f'Cannot parse groups file: {e}'}), file=sys.stderr)
+        sys.exit(1)
+
+    if not isinstance(groups_data, dict):
+        print(json.dumps({'error': f'groups file must contain a JSON object, got {type(groups_data).__name__}'}), file=sys.stderr)
+        sys.exit(1)
 
     groups_list = groups_data.get('groups', [])
 
@@ -198,12 +206,15 @@ if use_groups_mode:
 
         # For each node_id in the group, find the node and get its children
         for nid in group_node_ids:
+            if not isinstance(nid, str):
+                skipped_groups.append({'name': group_name, 'reason': f'node_id {repr(nid)} is not a string'})
+                continue
             node = find_node_by_id(root, nid)
             if not node:
                 skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'node not found'})
                 continue
 
-            children = node.get('children', [])
+            children = [c for c in node.get('children', []) if c.get('visible') != False]
             if not children:
                 skipped_groups.append({'name': group_name, 'node_id': nid, 'reason': 'no children'})
                 continue
@@ -219,10 +230,13 @@ if use_groups_mode:
             section_id = nid
 
             # Generate enriched table
+            # Issue #2: Pass root_x so off-canvas detection works for negative-X artboards
             enriched_table = generate_enriched_table(
                 children_sorted,
                 page_width=section_width if section_width > 0 else page_width,
                 page_height=section_height if section_height > 0 else page_height,
+                root_x=nb['x'],
+                root_y=nb['y'],
             )
 
             total_children = len(children_sorted)
@@ -347,7 +361,7 @@ else:
                 # Use grandchildren (children of each node)
                 grandchildren = []
                 for n in nodes:
-                    grandchildren.extend(n.get('children', []))
+                    grandchildren.extend([c for c in n.get('children', []) if c.get('visible') != False])
                 if grandchildren:
                     return grandchildren, None
 
@@ -379,9 +393,13 @@ else:
                 sb = get_bbox(wrapper)
                 section_width = sb['w']
                 section_height = sb['h']
+                section_root_x = sb['x']
+                section_root_y = sb['y']
             else:
                 section_width = page_width
                 section_height = 0
+                section_root_x = page_bbox['x']
+                section_root_y = page_bbox.get('y', 0)
         else:
             # Multiple nodes: compute bounding box
             min_x = min(get_bbox(c)['x'] for c in children_sorted)
@@ -390,15 +408,20 @@ else:
             max_y = max(get_bbox(c)['y'] + get_bbox(c)['h'] for c in children_sorted)
             section_width = max_x - min_x
             section_height = max_y - min_y
+            section_root_x = min_x
+            section_root_y = min_y
 
         # Determine section_id: first node_id or single wrapper
         section_id = node_ids[0] if len(node_ids) == 1 else node_ids[0]
 
         # Generate enriched table
+        # Issue #2: Pass root_x so off-canvas detection works for negative-X artboards
         enriched_table = generate_enriched_table(
             children_sorted,
             page_width=section_width if section_width > 0 else page_width,
             page_height=section_height if section_height > 0 else page_height,
+            root_x=section_root_x,
+            root_y=section_root_y,
         )
 
         total_children = len(children_sorted)

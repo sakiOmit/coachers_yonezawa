@@ -78,7 +78,7 @@ def has_image_wrapper(children):
         c_type = c.get('type', '')
         if c_type not in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
             continue
-        sub_children = c.get('children', [])
+        sub_children = [sc for sc in c.get('children', []) if sc.get('visible') != False]
         if not sub_children:
             continue
         rect_count = sum(1 for sc in sub_children if sc.get('type', '') in ('RECTANGLE', 'IMAGE', 'ELLIPSE'))
@@ -89,7 +89,7 @@ def has_image_wrapper(children):
 def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
     \"\"\"Infer semantic name for an unnamed node.\"\"\"
     node_type = node.get('type', '')
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     name = node.get('name', '')
     abs_bbox = node.get('absoluteBoundingBox', {})
     w = abs_bbox.get('width', 0)
@@ -153,7 +153,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
                     # Issue 77: Include INSTANCE/COMPONENT for nav detection
                     if c.get('type') in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                         text_gchildren = [gc for gc in c.get('children', [])
-                                          if gc.get('type') == 'TEXT']
+                                          if gc.get('visible') != False and gc.get('type') == 'TEXT']
                         if len(text_gchildren) >= NAV_GRANDCHILD_MIN:
                             has_nav = True
                             break
@@ -326,7 +326,7 @@ def infer_name(node, parent=None, sibling_index=0, total_siblings=1):
         if not all_texts:
             # Recurse one level deeper to find text in grandchildren
             for c in children[:10]:
-                for gc in c.get('children', []):
+                for gc in [g for g in c.get('children', []) if g.get('visible') != False]:
                     if gc.get('type') == 'TEXT':
                         content = gc.get('characters', '') or gc.get('name', '')
                         if content and not UNNAMED_RE.match(content):
@@ -377,7 +377,7 @@ def collect_renames(node, parent=None, sibling_index=0, total_siblings=1, rename
                 'inference_method': 'auto',
             }
 
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
 
     # Issue 185: Detect EN+JP label pairs among children
     child_overrides = {}

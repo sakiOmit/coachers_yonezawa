@@ -72,6 +72,7 @@ score = max(0, score)
 | パラメータ | 値 | 用途 |
 |-----------|-----|------|
 | proximity_gap | 24px | 近接要素のグルーピング判定距離 |
+| section_root_width | 1440px | Figmaページレベルフレーム幅（セクションルート検出の基準値） |
 | flat_threshold | 15 children | フラット構造の検出閾値 |
 | repeated_pattern_min | 3 occurrences | リピートパターンの最小検出回数 |
 | grid_snap | 4px | Gap/Paddingのスナップ単位 |
@@ -169,6 +170,7 @@ score = max(0, score)
 | grandchild_threshold | 5 nodes | Stage C：グランドチャイルド展開の最大node_ids数（Issue 212） |
 | max_stage_c_depth | 2 levels | Stage C 再帰的ネスト処理の最大深度（Issue 224） |
 | compare_match_threshold | 0.5 | Stage A/C グループマッチングのJaccard閾値（Issue 214） |
+| stage_c_coverage_threshold | 0.8 (80%) | Stage C採用閾値：カバレッジ >= 80% → Stage C使用、未満 → Stage Aフォールバック（Issue 214） |
 
 ## リネームロジック（優先順）
 
@@ -392,6 +394,116 @@ padding_right = (parent.x + parent.width) - max(child.x + child.width)
 # 各値を4px刻みにスナップ
 ```
 
+## 開発ルール（コーディング規約）
+
+figma-prepare のスクリプト・ユーティリティを新規作成・修正する際に必ず守るルール。
+過去のバグパターンから抽出した予防策。
+
+### 1. Hidden Children フィルタ（必須）
+
+`children` を処理する全関数の冒頭で `visible: false` をフィルタせよ。
+フィルタなしで children を走査すると、非表示要素の座標が検出・推論を狂わせる。
+
+```python
+# ✅ 正しい — 冒頭でフィルタ
+children = [c for c in node.get('children', []) if c.get('visible') != False]
+
+# ❌ 禁止 — フィルタなしで直接走査
+children = node.get('children', [])
+```
+
+**適用対象**: `walk_and_detect`, `infer_layout`, `walk_and_infer`, `count_nodes`, 新規関数すべて
+
+### 2. ゼロ除算ガード（必須）
+
+割り算の前に分母が 0 でないことを確認せよ。
+統計関数（`mean`, `stdev`）の結果も分母に使う場合は同様。
+
+```python
+# ✅ 正しい
+mean_val = statistics.mean(values)
+if mean_val <= 0:
+    return default_value
+cv = statistics.stdev(values) / mean_val
+
+# ❌ 禁止
+cv = statistics.stdev(values) / statistics.mean(values)
+```
+
+**特に注意**: gap計算、比率計算、面積計算、bbox の w/h
+
+### 3. 座標パラメータ伝播（必須）
+
+`root_x` / `root_y` を受け取る関数を呼ぶ際は、必ずアートボードの原点座標を渡せ。
+デフォルト値 `0` に頼ると、マイナス座標アートボードで誤判定が発生する。
+
+```python
+# ✅ 正しい — 呼び出し元で root_x/root_y を渡す
+generate_enriched_table(children, page_width=w, page_height=h, root_x=root_bb['x'], root_y=root_bb['y'])
+
+# ❌ 禁止 — root_x/root_y を省略（デフォルト 0 に落ちる）
+generate_enriched_table(children, page_width=w, page_height=h)
+```
+
+**対象関数**: `is_off_canvas`, `_compute_flags`, `generate_enriched_table`
+
+### 4. 定数の一元管理（必須）
+
+新しい閾値・マジックナンバーは以下の2箇所に**同時に**定義せよ:
+
+| 場所 | 役割 |
+|------|------|
+| `figma_utils.py` 冒頭の定数セクション | 実装で参照する Python 定数 |
+| `.claude/rules/figma-prepare.md` の閾値パラメータ表 | ドキュメント・レビュー用 |
+
+```python
+# ✅ 正しい — figma_utils.py に名前付き定数
+NEW_THRESHOLD = 42  # 新しい閾値の説明（Issue NNN）
+
+# ❌ 禁止 — スクリプト内にマジックナンバー
+if some_value > 42:  # なぜ 42？
+```
+
+**ルール**:
+- 定数名は `UPPER_SNAKE_CASE`
+- コメントに用途と Issue 番号を記載
+- `figma-prepare.md` の閾値パラメータ表にも行を追加
+
+### 5. 再帰スキップ対象の明示（推奨）
+
+特定条件のノードで再帰をスキップする場合、スキップ理由をコメントで明示せよ。
+スキップ漏れ（無駄な再帰）とスキップ過剰（検出漏れ）の両方を防ぐ。
+
+```python
+# ✅ 正しい — スキップ理由を明示
+# Skip: decoration patterns have no meaningful sub-structure (Issue 240)
+if not is_root and is_decoration_pattern(child):
+    continue
+
+# Skip: protected nodes preserve designer intent (Issue 221)
+if not is_root and _is_protected_node(node):
+    for child in children:
+        walk_and_detect(child, ...)  # recurse but don't detect at this level
+    return
+```
+
+### 6. テスト必須（必須）
+
+新規関数・バグ修正には必ずテストを追加せよ。
+
+| 変更種別 | 最低テスト数 |
+|---------|------------|
+| 新規関数 | 正常系 2 + エッジケース 1 |
+| バグ修正 | 再現テスト 1 + 回帰テスト 1 |
+| 定数変更 | 境界値テスト 1 |
+
+**エッジケースの必須チェック項目**:
+- 空配列 / None
+- 要素数 0, 1, 2（最小ケース）
+- ゼロサイズ要素（w=0, h=0）
+- マイナス座標
+- `visible: false` の要素が混在
+
 ## 禁止事項
 
 | 禁止項目 | 理由 |
@@ -401,6 +513,10 @@ padding_right = (parent.x + parent.width) - max(child.x + child.width)
 | コンポーネントインスタンスのdetach | コンポーネント関係の破壊 |
 | 元アートボードの直接変更 | 復元不能のリスク（Adjacent Artboard 方式を使用） |
 | 非表示レイヤーの操作 | 意図的に非表示の可能性 |
+| children 直接走査（hidden フィルタなし） | 非表示要素による検出・推論の歪み |
+| ガードなし除算 | ZeroDivisionError |
+| スクリプト内マジックナンバー | 保守性低下・二重管理 |
+| root_x/root_y 省略での座標関数呼び出し | マイナス座標アートボードで誤判定 |
 
 ## 安全策
 
@@ -414,6 +530,7 @@ padding_right = (parent.x + parent.width) - max(child.x + child.width)
 
 ## チェックリスト
 
+### 実行時
 - [ ] Phase 1 の品質スコアを確認した
 - [ ] グレードに応じた推奨フェーズを実行した
 - [ ] Phase 2以降は clone した隣接アートボード上で実行した
@@ -421,3 +538,11 @@ padding_right = (parent.x + parent.width) - max(child.x + child.width)
 - [ ] リネーム結果が命名規約に沿っている
 - [ ] グルーピングでレイアウトが崩れていない
 - [ ] Auto Layout適用後の表示を確認した
+
+### 開発時（コード変更時）
+- [ ] children 走査前に `visible != False` フィルタを入れた
+- [ ] 除算の前にゼロガードを入れた
+- [ ] 座標関数の呼び出しで root_x/root_y を渡した
+- [ ] 新しい閾値は figma_utils.py + figma-prepare.md の両方に定義した
+- [ ] テストを追加した（正常系 + エッジケース）
+- [ ] 再帰スキップにはコメントで理由を明示した

@@ -52,18 +52,18 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_
     JACCARD_THRESHOLD, CONSECUTIVE_PATTERN_MIN, LOOSE_ELEMENT_MAX_HEIGHT)
 
 def count_children(node):
-    return len(node.get('children', []))
+    return len([c for c in node.get('children', []) if c.get('visible') != False])
 
 def get_child_types_summary(node):
     \"\"\"Get summary of child types like 'RECTANGLE:2, FRAME:2'.\"\"\"
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     if not children:
         return ''
     types = Counter(c.get('type', 'UNKNOWN') for c in children)
     return ', '.join(f'{t}:{n}' for t, n in sorted(types.items()))
 
 def has_text_children(node):
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     return any(c.get('type') == 'TEXT' for c in children)
 
 def get_text_children_preview(node, max_items=5):
@@ -97,7 +97,10 @@ def detect_heuristic_hints(children, page_bbox):
     background_candidates = []
 
     # Sort by Y for analysis
-    sorted_children = sorted(children, key=lambda c: get_bbox(c).get('y', 0))
+    sorted_children = sorted(
+        [c for c in children if c.get('visible') != False],
+        key=lambda c: get_bbox(c).get('y', 0)
+    )
 
     for child in sorted_children:
         bb = get_bbox(child)
@@ -274,6 +277,7 @@ try:
             page_width=page_bbox['w'],
             page_height=page_bbox['h'],
             root_x=page_bbox.get('x', 0),
+            root_y=page_bbox.get('y', 0),
         )
         result['enriched_children_table'] = enriched
 

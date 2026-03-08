@@ -56,7 +56,8 @@ def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
 
     name = node.get('name', '')
     node_type = node.get('type', '')
-    children = node.get('children', [])
+    all_children = node.get('children', [])
+    children = [c for c in all_children if c.get('visible') != False]
 
     # Reset section_depth at section root boundaries
     if is_section_root(node):
@@ -94,9 +95,9 @@ def count_nodes(node, depth=0, section_depth=None, page_width=0, root_x=0):
     elif node_type == 'FRAME':
         stats['frames'] += 1
 
-    # Recurse children
+    # Recurse all children (including hidden) to count hidden_nodes correctly
     child_section_depth = (section_depth + 1) if section_depth is not None else None
-    for child in children:
+    for child in all_children:
         child_stats = count_nodes(child, depth + 1, child_section_depth, page_width, root_x)
         stats['total'] += child_stats['total']
         stats['unnamed'] += child_stats['unnamed']

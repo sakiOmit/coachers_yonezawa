@@ -31,7 +31,8 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_
 
 def infer_layout(frame):
     \"\"\"Infer Auto Layout settings for a frame.\"\"\"
-    children = frame.get('children', [])
+    # Filter out hidden children (visible: false) to avoid skewing calculations
+    children = [c for c in frame.get('children', []) if c.get('visible') != False]
     if len(children) < 2:
         return None
 
@@ -205,7 +206,8 @@ def walk_and_infer(node, results=None):
         results = []
 
     node_type = node.get('type', '')
-    children = node.get('children', [])
+    # Filter out hidden children (visible: false) before processing
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
 
     # Issue 69: Include INSTANCE/COMPONENT nodes for Auto Layout inference
     if node_type in ('FRAME', 'INSTANCE', 'COMPONENT', 'SECTION') and len(children) >= 2:

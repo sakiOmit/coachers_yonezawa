@@ -64,7 +64,8 @@ from figma_utils import (resolve_absolute_coords, get_bbox, get_root_node, load_
     HEADER_MAX_ELEMENT_HEIGHT, FOOTER_ZONE_MARGIN,
     HEADER_TEXT_MAX_WIDTH, HEADER_LOGO_MAX_WIDTH, HEADER_LOGO_MAX_HEIGHT, HEADER_NAV_MIN_TEXTS,
     HERO_ZONE_DISTANCE, LARGE_BG_WIDTH_RATIO,
-    GRID_SIZE_SIMILARITY, FLAT_THRESHOLD, STAGE_A_ONLY_DETECTORS)
+    GRID_SIZE_SIMILARITY, FLAT_THRESHOLD, STAGE_A_ONLY_DETECTORS,
+    is_decoration_pattern, deduplicate_candidates, METHOD_PRIORITY)
 
 class UnionFind:
     def __init__(self, n):
@@ -239,7 +240,7 @@ def is_card_like(node):
     \"\"\"Detect card-like structure: FRAME/COMPONENT/INSTANCE with 2-6 children including IMAGE+TEXT.\"\"\"
     if node.get('type') not in ('FRAME', 'COMPONENT', 'INSTANCE'):
         return False
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     if not (2 <= len(children) <= 6):
         return False
     types = [c.get('type', '') for c in children]
@@ -249,7 +250,7 @@ def is_card_like(node):
     if not has_text:
         for c in children:
             if c.get('type') in ('FRAME', 'GROUP'):
-                sub_types = [sc.get('type', '') for sc in c.get('children', [])]
+                sub_types = [sc.get('type', '') for sc in c.get('children', []) if sc.get('visible') != False]
                 if 'TEXT' in sub_types:
                     has_text = True
                     break
@@ -403,7 +404,7 @@ def detect_header_footer_groups(root_children, page_bb):
                     has_logo = True
             elif t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
                 # Check if it contains nav-like elements
-                sub_children = c.get('children', [])
+                sub_children = [sc for sc in c.get('children', []) if sc.get('visible') != False]
                 sub_texts = [sc for sc in sub_children if sc.get('type') == 'TEXT']
                 if len(sub_texts) >= HEADER_NAV_MIN_TEXTS:  # Issue 134
                     has_nav_text = True
@@ -478,11 +479,11 @@ def infer_zone_semantic_name(zone_nodes, page_bb, zone_counters):
             has_text = True
         # Check children of FRAME/GROUP for text
         if t in ('FRAME', 'GROUP', 'INSTANCE', 'COMPONENT'):
-            child_texts = get_text_children_content(n.get('children', []), max_items=3)
+            child_texts = get_text_children_content([c for c in n.get('children', []) if c.get('visible') != False], max_items=3)
             if child_texts:
                 has_text = True
             # Nested large background
-            for child in n.get('children', []):
+            for child in [c for c in n.get('children', []) if c.get('visible') != False]:
                 ct = child.get('type', '')
                 cbb = get_bbox(child)
                 if ct in ('RECTANGLE', 'IMAGE') and (cbb['w'] > page_bb['w'] * LARGE_BG_WIDTH_RATIO or cbb['w'] > SECTION_ROOT_WIDTH):  # Issue 183
@@ -804,56 +805,15 @@ def walk_and_detect(node, all_candidates=None, is_root=True, disabled=None):
                 'count': 2,
             })
 
-    # Recurse
+    # Recurse (skip decoration patterns — Issue #3)
     for child in children:
+        if not is_root and is_decoration_pattern(child):
+            continue  # No value in grouping elements inside a decoration frame
         walk_and_detect(child, all_candidates, is_root=False, disabled=disabled)
 
     return all_candidates
 
-# Method priority for deduplication: higher = better quality
-# Issue 165/166: consecutive (2.5) between pattern and zone; heading-content (3.5) between zone and semantic
-# Issue 186: tuple (2.8) between consecutive and zone — type-sequence based, higher than structure_hash pattern
-METHOD_PRIORITY = {'semantic': 4, 'highlight': 3.8, 'heading-content': 3.5, 'zone': 3, 'tuple': 2.8, 'consecutive': 2.5, 'pattern': 2, 'spacing': 1, 'proximity': 0}
-
-def deduplicate_candidates(candidates, root_id=''):
-    \"\"\"Remove duplicate/overlapping grouping candidates (Issue 7+9+22).
-
-    Rules:
-    - If same node_ids appear in both lower and higher-quality method, keep higher-quality
-    - If a parent node already has a semantic (non-auto-generated) name, skip proximity
-      (exception: root-level parents are exempt)
-    - Merge candidates that share >50% of their node_ids
-    \"\"\"
-    # Index: node_id -> list of candidate indices
-    node_to_candidates = defaultdict(list)
-    for i, c in enumerate(candidates):
-        for nid in c.get('node_ids', []):
-            node_to_candidates[nid].append(i)
-
-    # Mark candidates for removal
-    remove = set()
-
-    # Rule 1: higher-quality methods > lower-quality when same nodes overlap
-    for nid, indices in node_to_candidates.items():
-        if len(indices) < 2:
-            continue
-        methods = {i: candidates[i].get('method', '') for i in indices}
-        max_priority = max(METHOD_PRIORITY.get(m, 0) for m in methods.values())
-        for i, m in methods.items():
-            if METHOD_PRIORITY.get(m, 0) < max_priority:
-                remove.add(i)
-
-    # Rule 2: skip proximity/spacing candidates where parent already has semantic name
-    # Exception: root-level (artboard) parents are exempt
-    for i, c in enumerate(candidates):
-        if c.get('parent_id') == root_id:
-            continue  # exempt root-level candidates
-        parent_name = c.get('parent_name', '')
-        if parent_name and not UNNAMED_RE.match(parent_name):
-            if c.get('method') in ('proximity', 'spacing'):
-                remove.add(i)
-
-    return [c for i, c in enumerate(candidates) if i not in remove]
+# deduplicate_candidates and METHOD_PRIORITY imported from figma_utils (Issue 236)
 
 try:
     # Issue 229: Parse --disable-detectors flag

@@ -12,7 +12,7 @@ Issue 53: is_section_root() extracted from analyze-structure.sh.
 import json
 import re
 import statistics
-from collections import Counter
+from collections import Counter, defaultdict
 from html import unescape
 
 # --- Constants ---
@@ -124,6 +124,88 @@ STAGE_A_ONLY_DETECTORS = {
     'spacing',         # Fine-grained, always useful
     'pattern',         # General pattern matching
 }
+
+# --- Issue 236: deduplicate_candidates constants ---
+# Method priority for deduplication: higher = better quality
+# Issue 165/166: consecutive (2.5) between pattern and zone; heading-content (3.5) between zone and semantic
+# Issue 186: tuple (2.8) between consecutive and zone — type-sequence based, higher than structure_hash pattern
+METHOD_PRIORITY = {
+    'semantic': 4,
+    'highlight': 3.8,
+    'heading-content': 3.5,
+    'zone': 3,
+    'tuple': 2.8,
+    'consecutive': 2.5,
+    'pattern': 2,
+    'spacing': 1,
+    'proximity': 0,
+}
+
+
+def deduplicate_candidates(candidates, root_id=''):
+    """Remove duplicate/overlapping grouping candidates (Issue 7+9+22+236).
+
+    Rules:
+    - Rule 1: If same node appears in both lower and higher-priority method,
+      trim the overlapping node from the lower-priority candidate.
+      Only remove the candidate entirely if all its nodes are claimed (Issue 236).
+    - Rule 2: If a parent node already has a semantic (non-auto-generated) name,
+      skip proximity/spacing (exception: root-level parents are exempt)
+    """
+    # Index: node_id -> list of candidate indices
+    node_to_candidates = defaultdict(list)
+    for i, c in enumerate(candidates):
+        for nid in c.get('node_ids', []):
+            node_to_candidates[nid].append(i)
+
+    # Rule 1: trim overlapping nodes from lower-priority candidates (Issue 236)
+    nodes_to_trim = defaultdict(set)  # candidate_index -> set of node_ids to trim
+    for nid, indices in node_to_candidates.items():
+        if len(indices) < 2:
+            continue
+        methods = {i: candidates[i].get('method', '') for i in indices}
+        max_priority = max(METHOD_PRIORITY.get(m, 0) for m in methods.values())
+        for i, m in methods.items():
+            if METHOD_PRIORITY.get(m, 0) < max_priority:
+                nodes_to_trim[i].add(nid)
+
+    # Rule 2: skip proximity/spacing candidates where parent already has semantic name
+    # Exception: root-level (artboard) parents are exempt
+    remove_by_rule2 = set()
+    for i, c in enumerate(candidates):
+        if c.get('parent_id') == root_id:
+            continue  # exempt root-level candidates
+        parent_name = c.get('parent_name', '')
+        if parent_name and not UNNAMED_RE.match(parent_name):
+            if c.get('method') in ('proximity', 'spacing'):
+                remove_by_rule2.add(i)
+
+    # Build result: apply trims and removals
+    result = []
+    for i, c in enumerate(candidates):
+        if i in remove_by_rule2:
+            continue
+        if i in nodes_to_trim:
+            trim_set = nodes_to_trim[i]
+            original_ids = c.get('node_ids', [])
+            original_names = c.get('node_names', [])
+            remaining_ids = []
+            remaining_names = []
+            for j, nid in enumerate(original_ids):
+                if nid not in trim_set:
+                    remaining_ids.append(nid)
+                    if j < len(original_names):
+                        remaining_names.append(original_names[j])
+            if not remaining_ids:
+                continue  # fully subsumed by higher-priority — remove
+            c = dict(c)  # shallow copy to avoid mutating original
+            c['node_ids'] = remaining_ids
+            if original_names:
+                c['node_names'] = remaining_names
+            c['count'] = len(remaining_ids)
+        result.append(c)
+
+    return result
 
 
 def yaml_str(value):
@@ -632,7 +714,7 @@ def structure_hash(node):
     Format: "TYPE:[CHILD_TYPE1,CHILD_TYPE2,...]" (sorted child types).
     Leaf nodes return just "TYPE".
     """
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     if not children:
         return node.get('type', 'UNKNOWN')
     child_types = sorted(c.get('type', '') for c in children)
@@ -698,11 +780,13 @@ def detect_regular_spacing(children_bboxes, axis='auto'):
                 for i in range(len(sorted_bb) - 1)]
 
     # Filter out negative gaps (overlapping elements)
-    gaps = [g for g in gaps if g > 0]
+    gaps = [g for g in gaps if g >= 0]
     if len(gaps) < 2:
         return False
 
     mean_gap = statistics.mean(gaps)
+    if mean_gap <= 0:
+        return True  # Zero gap = perfectly regular (edge-to-edge placement)
     std_gap = statistics.stdev(gaps)
     cv = std_gap / mean_gap
     return cv < CV_THRESHOLD
@@ -736,13 +820,19 @@ def detect_wrap(children_bboxes, direction, row_tolerance=None):
     Returns:
         bool: True if HORIZONTAL with 4+ elements wrapping to 2+ rows.
     """
-    if row_tolerance is None:
+    if row_tolerance is None or row_tolerance <= 0:
         row_tolerance = ROW_TOLERANCE
     if direction != 'HORIZONTAL' or len(children_bboxes) < 4:
         return False
 
-    ys = sorted(set(round(b['y'] / row_tolerance) for b in children_bboxes))
-    return len(ys) >= 2
+    # Issue 251: Use distance-based grouping instead of rounding to avoid
+    # false row splits when Y values straddle a rounding boundary
+    sorted_ys = sorted(set(b['y'] for b in children_bboxes))
+    row_count = 1
+    for i in range(1, len(sorted_ys)):
+        if sorted_ys[i] - sorted_ys[i - 1] > row_tolerance:
+            row_count += 1
+    return row_count >= 2
 
 
 def detect_space_between(children_bboxes, direction, frame_bb, tolerance=4):
@@ -1057,7 +1147,7 @@ def is_heading_like(node):
     Returns:
         bool: True if node appears to be a heading frame.
     """
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     if not children:
         return False
     if len(children) > HEADING_MAX_CHILDREN:
@@ -1065,7 +1155,7 @@ def is_heading_like(node):
 
     # Count leaf descendants by type
     def count_leaves(n):
-        ch = n.get('children', [])
+        ch = [c for c in n.get('children', []) if c.get('visible') != False]
         if not ch:
             return {n.get('type', 'UNKNOWN'): 1}
         counts = {}
@@ -1351,7 +1441,7 @@ def is_decoration_pattern(node):
     if node_type not in ('FRAME', 'GROUP'):
         return False
 
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     if not children:
         return False
 
@@ -1366,7 +1456,7 @@ def is_decoration_pattern(node):
     shape_types = {'ELLIPSE', 'RECTANGLE', 'VECTOR'}
 
     def count_leaves(n):
-        ch = n.get('children', [])
+        ch = [c for c in n.get('children', []) if c.get('visible') != False]
         if not ch:
             return (1 if n.get('type', '') in shape_types else 0, 1)
         shape_total = 0
@@ -1405,7 +1495,7 @@ def decoration_dominant_shape(node):
     counts = {'ELLIPSE': 0, 'RECTANGLE': 0, 'VECTOR': 0}
 
     def count_shapes(n):
-        ch = n.get('children', [])
+        ch = [c for c in n.get('children', []) if c.get('visible') != False]
         if not ch:
             t = n.get('type', '')
             if t in shape_types:
@@ -1448,6 +1538,7 @@ def detect_highlight_text(children):
 
     Issue 190: Text highlighting pattern detection.
     """
+    children = [c for c in children if c.get('visible') != False]
     if not children:
         return []
 
@@ -1554,6 +1645,7 @@ def detect_horizontal_bar(children, parent_bb):
 
     Issue 184: Horizontal bar (news ticker) grouping.
     """
+    children = [c for c in children if c.get('visible') != False]
     if len(children) < HORIZONTAL_BAR_MIN_ELEMENTS:
         return []
 
@@ -1781,6 +1873,7 @@ def detect_en_jp_label_pairs(children):
     Issue 185: EN+JP label pairs get generic names. Detect them for
     semantic renaming (en-label-* / heading-*).
     """
+    children = [c for c in children if c.get('visible') != False]
     if len(children) < 2:
         return []
 
@@ -1911,6 +2004,7 @@ def detect_table_rows(children, parent_bb):
 
     Issue 181: Flat sibling elements forming table rows are not grouped.
     """
+    children = [c for c in children if c.get('visible') != False]
     if not children or parent_bb.get('w', 0) <= 0:
         return []
 
@@ -2034,7 +2128,7 @@ def _collect_text_preview(node, max_depth=3, max_len=30):
             return text[:max_len]
     if max_depth <= 0:
         return ''
-    for c in node.get('children', []):
+    for c in [ch for ch in node.get('children', []) if ch.get('visible') != False]:
         result = _collect_text_preview(c, max_depth - 1, max_len)
         if result:
             return result
@@ -2046,6 +2140,7 @@ def _compute_child_types(children):
 
     Uses 3-letter abbreviations sorted alphabetically.
     """
+    children = [c for c in children if c.get('visible') != False]
     TYPE_ABBR = {
         'BOOLEAN_OPERATION': 'BOO',
         'COMPONENT': 'CMP',
@@ -2072,7 +2167,7 @@ def _compute_child_types(children):
     return '+'.join(f'{v}{k}' for k, v in sorted(counts.items()))
 
 
-def _compute_flags(node, page_width, page_height, root_x=0):
+def _compute_flags(node, page_width, page_height, root_x=0, root_y=0):
     """Compute machine-readable flags for a node.
 
     Flags:
@@ -2087,7 +2182,7 @@ def _compute_flags(node, page_width, page_height, root_x=0):
     flags = []
     bb = get_bbox(node)
     node_type = node.get('type', '')
-    children = node.get('children', [])
+    children = [c for c in node.get('children', []) if c.get('visible') != False]
     is_leaf = len(children) == 0
 
     # Visibility
@@ -2105,7 +2200,8 @@ def _compute_flags(node, page_width, page_height, root_x=0):
         right_edge = rel_x + bb['w']
         if right_edge > page_width * FLAG_OVERFLOW_X_RATIO:
             flags.append('overflow')
-        if page_height > 0 and bb['y'] + bb['h'] > page_height * FLAG_OVERFLOW_Y_RATIO:
+        rel_y = bb['y'] - root_y
+        if page_height > 0 and rel_y + bb['h'] > page_height * FLAG_OVERFLOW_Y_RATIO:
             flags.append('overflow-y')
 
     # Background candidates
@@ -2128,7 +2224,7 @@ def _compute_flags(node, page_width, page_height, root_x=0):
     return flags
 
 
-def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0):
+def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0, root_y=0):
     """Generate enriched Markdown table for Phase B Claude reasoning.
 
     Produces the enriched format:
@@ -2144,6 +2240,8 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0):
         children: List of Figma child nodes (with absoluteBoundingBox).
         page_width: Page width for flag computation (default: 1440).
         page_height: Page height for overflow detection (default: 0 = skip).
+        root_x: Artboard X offset for root-relative coordinate calculation (default: 0).
+        root_y: Artboard Y offset for root-relative coordinate calculation (default: 0).
 
     Returns:
         str: Markdown table string.
@@ -2161,7 +2259,7 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0):
         node_type = child.get('type', '')
         name = (child.get('name', '') or '')[:35]
         node_id = child.get('id', '')
-        child_nodes = child.get('children', [])
+        child_nodes = [c for c in child.get('children', []) if c.get('visible') != False]
         is_leaf = len(child_nodes) == 0
         leaf_str = 'Y' if is_leaf else 'N'
 
@@ -2169,7 +2267,7 @@ def generate_enriched_table(children, page_width=1440, page_height=0, root_x=0):
         child_types = _compute_child_types(child_nodes)
 
         # Flags
-        flags = _compute_flags(child, page_width, page_height, root_x=root_x)
+        flags = _compute_flags(child, page_width, page_height, root_x=root_x, root_y=root_y)
         flags_str = ','.join(flags) if flags else '-'
 
         # Text preview
