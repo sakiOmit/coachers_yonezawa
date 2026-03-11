@@ -1,3 +1,7 @@
+---
+globs: ["*.php", "themes/**"]
+---
+
 # WordPress Rules
 
 ## Overview
@@ -253,6 +257,166 @@ PHP/CSS/JS: 644 (rw-r--r--)
 ディレクトリ: 755 (rwxr-xr-x)
 ```
 
+## ACFオプションページ（PRO不要）
+
+ACF PROの `acf_add_options_page()` は有料プラン限定。
+無料版ACFでも以下の方法でオプションページを実現できる。
+
+### 仕組み
+
+1. `add_menu_page()` で管理画面にページ追加
+2. ACF無料版の内部関数でフィールドを描画・保存
+3. `get_field('key', 'options')` で値を取得
+
+### 実装ファイル構成
+
+```
+inc/
+├── options-page.php              # オプションページ本体（共通テンプレート）
+├── helpers/acf-helpers.php       # get_acf_or_default() ラッパー
+└── advanced-custom-fields/
+    └── groups/options/           # オプションページ用フィールドグループ
+```
+
+### オプションページ本体（共通テンプレート）
+
+```php
+// inc/options-page.php
+
+function {{PREFIX}}_add_options_page() {
+    add_menu_page(
+        'サイト設定',
+        'サイト設定',
+        'manage_options',
+        'site-settings',
+        '{{PREFIX}}_render_settings_page',
+        'dashicons-admin-settings',
+        60
+    );
+}
+add_action( 'admin_menu', '{{PREFIX}}_add_options_page' );
+
+function {{PREFIX}}_render_settings_page() {
+    {{PREFIX}}_render_options_page_template( 'group_site_settings' );
+}
+
+/**
+ * 共通レンダリングテンプレート
+ * フィールドグループキーを渡すだけで別ページにも使い回せる
+ */
+function {{PREFIX}}_render_options_page_template( $field_group_key ) {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // 保存処理
+    if ( isset( $_POST['acf'], $_POST['_acfnonce'] ) ) {
+        if ( wp_verify_nonce( $_POST['_acfnonce'], 'acf_form' ) ) {
+            if ( function_exists( 'acf_save_post' ) ) {
+                acf_save_post( 'options' );
+                echo '<div class="notice notice-success is-dismissible"><p>設定を保存しました。</p></div>';
+            }
+        }
+    }
+
+    if ( ! function_exists( 'acf_get_fields' ) ) {
+        echo '<div class="wrap"><div class="notice notice-error"><p>ACFプラグインが有効化されていません。</p></div></div>';
+        return;
+    }
+
+    $field_group = acf_get_local_field_group( $field_group_key );
+    if ( ! $field_group ) {
+        echo '<div class="wrap"><div class="notice notice-error"><p>フィールドグループが見つかりません。</p></div></div>';
+        return;
+    }
+
+    $fields = acf_get_fields( $field_group_key );
+    if ( ! $fields ) {
+        echo '<div class="wrap"><div class="notice notice-error"><p>フィールドが見つかりません。</p></div></div>';
+        return;
+    }
+    ?>
+    <div class="wrap">
+        <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+        <form method="post" action="">
+            <?php
+            wp_nonce_field( 'acf_form', '_acfnonce' );
+            echo '<div class="acf-fields acf-form-fields -top">';
+            foreach ( $fields as $field ) {
+                $field['value'] = acf_get_value( 'options', $field );
+                acf_render_field_wrap( $field );
+            }
+            echo '</div>';
+            ?>
+            <div class="acf-form-submit">
+                <input type="submit" class="acf-button button button-primary button-large" value="設定を保存">
+            </div>
+        </form>
+    </div>
+    <?php
+}
+```
+
+### ACFスクリプト読み込み（必須）
+
+```php
+// acf_form_head + acf_enqueue_scripts を該当ページでのみ読み込む
+function {{PREFIX}}_acf_form_head_on_load() {
+    if ( function_exists( 'acf_form_head' ) ) {
+        acf_form_head();
+    }
+    do_action( 'add_meta_boxes', 'acf_options_page', null );
+}
+add_action( 'load-toplevel_page_site-settings', '{{PREFIX}}_acf_form_head_on_load' );
+
+function {{PREFIX}}_acf_enqueue_scripts() {
+    $screen = get_current_screen();
+    if ( $screen && $screen->id === 'toplevel_page_site-settings' ) {
+        wp_enqueue_media();
+        acf_enqueue_scripts();
+    }
+}
+add_action( 'admin_enqueue_scripts', '{{PREFIX}}_acf_enqueue_scripts' );
+```
+
+### ACFヘルパー
+
+```php
+// inc/helpers/acf-helpers.php
+
+/**
+ * ACFフィールド取得（ACF無効時はデフォルト値を返す）
+ */
+function get_acf_or_default( $field_name, $default = '', $post_id = null ) {
+    if ( ! function_exists( 'get_field' ) ) {
+        return $default;
+    }
+    $value = get_field( $field_name, $post_id );
+    return ( $value !== null && $value !== '' && $value !== false ) ? $value : $default;
+}
+```
+
+### ページ追加の拡張
+
+新しいオプションページを追加する場合:
+
+1. `add_menu_page()` / `add_submenu_page()` でページ追加
+2. コールバックで `{{PREFIX}}_render_options_page_template('group_xxx')` を呼ぶ
+3. 対応するACFフィールドグループをPHPで登録
+4. `load-*` フックに `acf_form_head` を追加
+
+### 使用する ACF 内部関数
+
+| 関数 | 用途 |
+|------|------|
+| `acf_get_local_field_group()` | PHPコード登録済みフィールドグループ取得 |
+| `acf_get_fields()` | フィールド一覧取得 |
+| `acf_get_value()` | 保存値取得 |
+| `acf_render_field()` | フィールドHTML描画 |
+| `acf_save_post()` | `'options'` を渡してオプション保存 |
+| `acf_form_head()` | フォーム処理の初期化 |
+| `acf_enqueue_scripts()` | ACF用CSS/JS読み込み |
+
 ## チェックリスト
 
 - [ ] Template Nameコメント記述
@@ -262,3 +426,4 @@ PHP/CSS/JS: 644 (rw-r--r--)
 - [ ] 出力はエスケープ済み
 - [ ] テンプレートパーツで再利用
 - [ ] パーミッション644/755
+- [ ] オプションページはACF PRO不要の自前実装を使用

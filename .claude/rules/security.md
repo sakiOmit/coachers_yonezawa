@@ -1,3 +1,7 @@
+---
+globs: ["*.php", "*.js", "*.ts"]
+---
+
 # Security Rules
 
 ## Overview

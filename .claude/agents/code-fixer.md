@@ -30,13 +30,6 @@ allowed_tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__replace_symbol_body
-  - mcp__serena__insert_after_symbol
-  - mcp__serena__insert_before_symbol
-  - mcp__serena__find_symbol
-  - mcp__serena__search_for_pattern
-  - mcp__serena__edit_memory
-  - mcp__serena__read_memory
 ---
 
 # Code Fixer (Unified)

@@ -55,12 +55,11 @@ temp/
 # Claude Code (project-specific)
 .claude/reviews/
 .claude/checkpoints/
+.init-done
 
-# Figma cache (generated, do not commit)
+# Figma cache (shared across team)
 .claude/cache/*
 !.claude/cache/figma/
-.claude/cache/figma/*
-!.claude/cache/figma/analysis-report.yaml
 
 # Serena temporary files (keep memories)
 .serena/project.yml
@@ -77,7 +76,13 @@ wordpress_data/
 # Playwright MCP screenshots
 .playwright-mcp/
 
-themes/*/assets
+themes/*/assets/*
+!themes/*/assets/images/
+themes/*/assets/images/*
+!themes/*/assets/images/favicon.ico
+!themes/*/assets/images/apple-touch-icon.png
+!themes/*/assets/images/android-chrome-192x192.png
+!themes/*/assets/images/site.webmanifest
 themes/twenty*
 themes/test-theme
 

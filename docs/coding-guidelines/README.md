@@ -25,12 +25,11 @@
 
 ### 🔌 WordPress実装時
 
-- **[03-wordpress-integration.md](./03-wordpress-integration.md)**
-  - ページテンプレート基本構造
-  - template-parts使用方法
-  - PageHeaderコンポーネント
-  - **画像出力規約（render_responsive_image）**
-  - template-parts切り分けルール
+- **[03-wordpress-integration.md](./03-wordpress-integration.md)**（インデックス）
+  - [03-html-structure.md](./03-html-structure.md) - HTML構造・セマンティック規約
+  - [03-template-parts.md](./03-template-parts.md) - テンプレートパーツ設計規約
+  - [03-image-handling.md](./03-image-handling.md) - 画像出力規約
+  - [03-sanitization.md](./03-sanitization.md) - サニタイズ規約
 
 ### ⚙️ ビルド設定時
 
@@ -80,8 +79,8 @@
 | **プロジェクト初見** | `01-project-structure.md` | 最初に読む |
 | **新規ページ作成** | `05-checklist.md` → 必要に応じて `02`, `03`, `04` | チェックリストから開始 |
 | **SCSSコンポーネント作成** | `02-scss-design.md` | SCSS規約のみ |
-| **WordPressテンプレート作成** | `03-wordpress-integration.md` | WordPress規約のみ |
-| **画像出力実装** | `03-wordpress-integration.md` の 2.4節 | 画像出力規約 |
+| **WordPressテンプレート作成** | `03-html-structure.md` + `03-template-parts.md` | WordPress規約 |
+| **画像出力実装** | `03-image-handling.md` | 画像出力規約 |
 | **ビルドエラー対応** | `04-build-configuration.md` | ビルド設定のみ |
 | **コードレビュー** | `06-faq.md` → 該当する規約ファイル | アンチパターン確認 |
 | **既存コード修正** | `06-faq.md` で参考実装確認 → 該当規約 | 模範例から学ぶ |
@@ -118,7 +117,7 @@
 
 - プロジェクト構造変更 → `01-project-structure.md`
 - SCSS規約変更 → `02-scss-design.md`
-- WordPress規約変更 → `03-wordpress-integration.md`
+- WordPress規約変更 → `03-*.md`（該当する分割ファイル）
 - ビルド設定変更 → `04-build-configuration.md`
 - チェックリスト追加 → `05-checklist.md`
 - FAQ追加 → `06-faq.md`

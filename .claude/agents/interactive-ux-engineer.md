@@ -51,12 +51,6 @@ allowed_tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__replace_symbol_body
-  - mcp__serena__insert_after_symbol
-  - mcp__serena__find_symbol
-  - mcp__serena__get_symbols_overview
-  - mcp__serena__search_for_pattern
-  - mcp__serena__read_memory
   - mcp__playwright__browser_navigate
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_take_screenshot
@@ -112,49 +106,8 @@ Load only animation-related portions of guidelines:
 REFERENCE: docs/coding-guidelines/02-scss-design.md
 → Section on BEM naming for animation classes
 
-OPTIONAL: docs/coding-guidelines/03-wordpress-integration.md
+OPTIONAL: docs/coding-guidelines/03-html-structure.md
 → Only if integrating animations with WordPress components
-```
-
-### Serena MCP Integration for Animations
-
-Use Serena to find animation implementation opportunities:
-
-**Find Existing Animation Patterns:**
-```
-search_for_pattern("gsap\\.", relative_path="src/js/")
-→ Locate existing GSAP usage
-
-search_for_pattern("lottie\\.", relative_path="src/js/")
-→ Locate existing Lottie usage
-
-find_symbol("animate", substring_matching=true)
-→ Find animation-related functions
-```
-
-**Find Animation Assets:**
-```
-find_file("*.json", relative_path="public/animations/")
-→ Locate Lottie JSON files
-
-search_for_pattern("loadAnimation", relative_path="src/js/")
-→ Find Lottie initialization code
-```
-
-**Ensure Class Name Compliance:**
-```
-# Before creating animation classes, verify BEM kebab-case
-search_for_pattern("class=\"[^\"]*[A-Z]", relative_path="themes/{{THEME_NAME}}/")
-→ Detect camelCase violations in templates
-```
-
-**Document Animation Patterns:**
-```
-write_memory("animation-patterns.md", pattern_documentation)
-→ Save reusable animation patterns for future use
-
-write_memory("lottie-assets.md", lottie_inventory)
-→ Track available Lottie animations and their usage
 ```
 
 ## Your Workflow

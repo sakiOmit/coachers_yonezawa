@@ -8,7 +8,7 @@
  *   - SP分岐あり: <picture> + <source>(1x,2x,3x) + <img>(1x,2x)
  *   - SP分岐なし: <img>(1x,2x)
  *
- * @package Theme_Template
+ * @package {{PACKAGE_NAME}}
  */
 
 if ( ! defined('ABSPATH') ) {

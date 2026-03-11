@@ -10,9 +10,6 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__read_memory
-  - mcp__serena__search_for_pattern
-  - mcp__serena__find_symbol
 model: opus
 context: fork
 agent: general-purpose

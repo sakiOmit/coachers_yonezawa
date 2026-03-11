@@ -8,7 +8,7 @@
 /**
  * テーマの基本セットアップ
  */
-function theme_setup() {
+function {{THEME_PREFIX}}_setup() {
   // タイトルタグのサポート
   add_theme_support('title-tag');
 
@@ -28,11 +28,11 @@ function theme_setup() {
 
   // ナビゲーションメニューの登録
   register_nav_menus(array(
-    'primary' => __('Primary Menu', 'your-theme'),
-    'footer'  => __('Footer Menu', 'your-theme'),
+    'primary' => __('Primary Menu', '{{TEXT_DOMAIN}}'),
+    'footer'  => __('Footer Menu', '{{TEXT_DOMAIN}}'),
   ));
 }
-add_action('after_setup_theme', 'theme_setup');
+add_action('after_setup_theme', '{{THEME_PREFIX}}_setup');
 
 /**
  * SVGファイルのアップロードを許可

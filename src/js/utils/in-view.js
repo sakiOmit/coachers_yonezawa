@@ -105,12 +105,10 @@ export function inView(target, options = {}) {
   } else if (target instanceof NodeList || Array.isArray(target)) {
     elements = Array.from(target);
   } else {
-    console.warn("[inView] Invalid target:", target);
     return { observer: null, elements: [], destroy: () => {} };
   }
 
   if (elements.length === 0) {
-    console.warn("[inView] No elements found for target:", target);
     return { observer: null, elements: [], destroy: () => {} };
   }
 

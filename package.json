@@ -1,5 +1,5 @@
 {
-  "name": "main-theme",
+  "name": "{{PROJECT_NAME}}",
   "version": "1.0.0",
   "description": "WordPressテーマ",
   "private": true,
@@ -29,6 +29,11 @@
     "check:templates": "tsx scripts/check/templates-quality.ts",
     "check:alt": "tsx scripts/check/alt-attribute.ts",
     "check:unused-functions": "node scripts/check-unused-functions.js",
+    "detect:unused": "node scripts/detect-unused-code.js",
+    "detect:comments": "node scripts/detect-redundant-comments.js",
+    "detect:all": "node scripts/detect-unused-code.js && node scripts/detect-redundant-comments.js",
+    "detect:all:json": "node scripts/detect-unused-code.js --json && node scripts/detect-redundant-comments.js --json",
+    "check:astro": "tsx scripts/check/astro-html-check.ts",
     "check:all": "tsx scripts/check/run-all.ts",
     "qa:check": "tsx scripts/qa/check.ts",
     "qa:fix": "npm run lint:fix",

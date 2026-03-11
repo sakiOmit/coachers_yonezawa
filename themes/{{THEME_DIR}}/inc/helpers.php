@@ -5,7 +5,7 @@
  * ACFヘルパー関数（フォールバック付き）
  * サイト共通情報取得関数
  *
- * @package Theme_Template
+ * @package {{PACKAGE_NAME}}
  */
 
 if ( ! defined('ABSPATH') ) {

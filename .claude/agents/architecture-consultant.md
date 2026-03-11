@@ -43,12 +43,6 @@ allowed_tools:
   - Read
   - Glob
   - Grep
-  - mcp__serena__find_symbol
-  - mcp__serena__get_symbols_overview
-  - mcp__serena__search_for_pattern
-  - mcp__serena__list_dir
-  - mcp__serena__find_referencing_symbols
-  - mcp__serena__read_memory
 color: purple
 ---
 
@@ -235,14 +229,6 @@ Checklist:
 ```
 
 ## Tools to Use
-
-### Serena MCP
-- `list_dir`: Directory structure review
-- `find_file`: File search
-- `search_for_pattern`: Pattern search
-- `get_symbols_overview`: Symbol overview
-- `find_symbol`: Symbol details
-- `read_memory`: Project knowledge reference
 
 ### Static Analysis
 - `npm run lint`: ESLint + Stylelint

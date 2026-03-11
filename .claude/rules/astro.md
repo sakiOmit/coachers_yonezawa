@@ -1,3 +1,7 @@
+---
+globs: ["*.astro", "astro/**"]
+---
+
 # Astro Workflow Rules
 
 ## Overview

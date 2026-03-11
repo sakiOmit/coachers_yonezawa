@@ -46,7 +46,7 @@ fi
 
 ```bash
 # ホスト → コンテナ
-docker compose cp ./local-file.php wordpress:/var/www/html/wp-content/themes/theme-name/
+docker compose cp ./local-file.php wordpress:/var/www/html/wp-content/themes/{{THEME_DIR}}/
 
 # コンテナ → ホスト
 docker compose cp wordpress:/var/www/html/wp-content/uploads ./backups/
@@ -56,7 +56,7 @@ docker compose cp wordpress:/var/www/html/wp-content/uploads ./backups/
 
 ```bash
 # コンテナ内でchmod/chown
-docker compose exec -T wordpress sh -c 'chmod 644 /var/www/html/wp-content/themes/theme-name/**/*.php'
+docker compose exec -T wordpress sh -c 'chmod 644 /var/www/html/wp-content/themes/{{THEME_DIR}}/**/*.php'
 docker compose exec -T wordpress sh -c 'chown www-data:www-data /var/www/html/wp-content/uploads -R'
 ```
 
@@ -80,13 +80,13 @@ import { writeFileSync } from 'fs';
 
 // ✅ 正しい（パーミッション指定）
 writeFileSync(
-  'themes/theme-name/page-example.php',
+  'themes/{{THEME_DIR}}/page-example.php',
   content,
   { encoding: 'utf8', mode: 0o644 }
 );
 
 // ❌ 間違い（デフォルトパーミッションになる可能性）
-writeFileSync('themes/theme-name/page-example.php', content);
+writeFileSync('themes/{{THEME_DIR}}/page-example.php', content);
 ```
 
 ### 推奨パーミッション
@@ -103,7 +103,7 @@ writeFileSync('themes/theme-name/page-example.php', content);
 import { mkdirSync } from 'fs';
 
 // ディレクトリは 755 パーミッション
-mkdirSync('themes/theme-name/template-parts/new-section', {
+mkdirSync('themes/{{THEME_DIR}}/template-parts/new-section', {
   recursive: true,
   mode: 0o755
 });
@@ -115,20 +115,20 @@ mkdirSync('themes/theme-name/template-parts/new-section', {
 
 ```bash
 # テーマディレクトリのPHPファイルで644でないものを検索
-find themes/theme-name -type f -name "*.php" ! -perm 644 -ls
+find themes/{{THEME_DIR}}-type f -name "*.php" ! -perm 644 -ls
 
 # ディレクトリで755でないものを検索
-find themes/theme-name -type d ! -perm 755 -ls
+find themes/{{THEME_DIR}}-type d ! -perm 755 -ls
 ```
 
 ### 一括修正（緊急時のみ）
 
 ```bash
 # ファイル: 644に変更
-find themes/theme-name -type f -exec chmod 644 {} \;
+find themes/{{THEME_DIR}}-type f -exec chmod 644 {} \;
 
 # ディレクトリ: 755に変更
-find themes/theme-name -type d -exec chmod 755 {} \;
+find themes/{{THEME_DIR}}-type d -exec chmod 755 {} \;
 ```
 
 **注意**: 一括修正は最終手段。スクリプト側で正しくパーミッションを設定するのが望ましい。

@@ -286,7 +286,7 @@ WordPress管理画面 → プラグイン → Contact Form 7
 - **CF7フォームコード**: `docs/contact-form-7-code.md`
 - **既存フォームテンプレート**: `themes/{{THEME_NAME}}/template-parts/contact/form.php`
 - **コーディングガイドライン**: `docs/coding-guidelines/02-scss-design.md`
-- **WordPress統合**: `docs/coding-guidelines/03-wordpress-integration.md`
+- **WordPress統合**: `docs/coding-guidelines/03-wordpress-integration.md`（インデックス）
 
 ## まとめ
 

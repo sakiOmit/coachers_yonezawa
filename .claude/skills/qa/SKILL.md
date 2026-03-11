@@ -79,6 +79,8 @@ QA scripts available:
 - HTML構造・セマンティック
 - リンクチェック
 - 画像チェック
+- 未使用コード検出（SCSS/PHP/JS/テンプレートパーツ）
+- 冗長コメント検出（コメントアウトコード/WHATコメント/装飾セパレータ）
 
 結果は `reports/qa-spec.json` と `reports/qa-report.md` に保存。
 

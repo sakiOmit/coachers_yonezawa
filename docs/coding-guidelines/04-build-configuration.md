@@ -64,7 +64,7 @@ ls themes/{{THEME_NAME}}/assets/css/style-[page-slug].css
 // themes/{{THEME_NAME}}/inc/enqueue.php
 
 // 開発環境
-function main_themeenqueue_page_assets_dev($vite_dev_server) {
+function {{THEME_PREFIX}}_enqueue_page_assets_dev($vite_dev_server) {
   $page_slug = '';
 
   if (is_front_page()) {
@@ -85,7 +85,7 @@ function main_themeenqueue_page_assets_dev($vite_dev_server) {
 }
 
 // 本番環境
-function main_themeenqueue_page_assets() {
+function {{THEME_PREFIX}}_enqueue_page_assets() {
   $page_slug = '';
 
   if (is_front_page()) {
@@ -192,7 +192,7 @@ npm run build
 **解決策:**
 ```php
 // デバッグ用コードを一時的に追加
-function main_themeenqueue_page_assets_dev($vite_dev_server) {
+function {{THEME_PREFIX}}_enqueue_page_assets_dev($vite_dev_server) {
   $page_slug = '';
 
   // ... (条件分岐)

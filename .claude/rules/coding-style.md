@@ -1,3 +1,7 @@
+---
+globs: ["*.php", "*.js", "*.ts", "*.scss", "*.astro"]
+---
+
 # Coding Style Rules
 
 ## Overview

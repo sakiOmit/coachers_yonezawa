@@ -14,19 +14,10 @@ MCPを過度に有効化すると、200kのコンテキストウィンドウが7
 
 ## このプロジェクトで使用するMCP
 
-### 必須（常時有効）
-
-| MCP | 用途 | ツール数 |
-|-----|------|---------|
-| serena | コード解析・編集・メモリ | 約20 |
-| playwright | ビジュアル検証 | 約15 |
-
-### 条件付き（タスクに応じて有効化）
-
-| MCP | 用途 | 有効化タイミング |
-|-----|------|-----------------|
-| figma | デザイン解析 | Figma実装時のみ |
-| chrome-devtools | パフォーマンス | 最適化作業時のみ |
+| MCP | 用途 | 有効化 |
+|-----|------|--------|
+| figma-dev-mode-mcp-server | デザイン解析 | Figma実装時 |
+| playwright | ビジュアル検証 | 検証時 |
 
 ## 設定方法
 
@@ -37,20 +28,7 @@ MCPを過度に有効化すると、200kのコンテキストウィンドウが7
 ```json
 {
   "disabledMcpServers": [
-    "unused-mcp-1",
-    "unused-mcp-2"
-  ]
-}
-```
-
-### グローバルで無効化
-
-`~/.claude/settings.json`:
-
-```json
-{
-  "disabledMcpServers": [
-    "rarely-used-mcp"
+    "unused-mcp-1"
   ]
 }
 ```
@@ -62,20 +40,3 @@ MCPを過度に有効化すると、200kのコンテキストウィンドウが7
 1. `/clear` で会話をリセット
 2. 不要なMCPを `disabledMcpServers` に追加
 3. 会話を再開
-
-## このプロジェクトの現在設定
-
-`settings.local.json`:
-
-```json
-{
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "serena",
-    "figma-dev-mode-mcp-server",
-    "playwright"
-  ]
-}
-```
-
-必要に応じて `disabledMcpServers` を追加してください。

@@ -24,7 +24,7 @@ RESULTS=()
 
 # 1. SCSS Lint
 echo ""
-echo "📋 [1/4] SCSS Lint..."
+echo "📋 [1/6] SCSS Lint..."
 if SCSS_OUTPUT=$(cd "$PROJECT_ROOT" && npx stylelint "src/**/*.scss" 2>&1); then
   echo "  ✅ SCSS Lint: PASS"
   RESULTS+=('{"check": "scss-lint", "status": "pass", "issues": 0}')
@@ -37,7 +37,7 @@ fi
 
 # 2. JS Lint
 echo ""
-echo "📋 [2/4] JS Lint..."
+echo "📋 [2/6] JS Lint..."
 if JS_OUTPUT=$(cd "$PROJECT_ROOT" && npx eslint "src/**/*.js" 2>&1); then
   echo "  ✅ JS Lint: PASS"
   RESULTS+=('{"check": "js-lint", "status": "pass", "issues": 0}')
@@ -50,7 +50,7 @@ fi
 
 # 3. PHP Syntax Check
 echo ""
-echo "📋 [3/4] PHP Syntax..."
+echo "📋 [3/6] PHP Syntax..."
 PHP_ERRORS=0
 while IFS= read -r -d '' phpfile; do
   if ! php -l "$phpfile" > /dev/null 2>&1; then
@@ -67,9 +67,35 @@ else
   ERRORS=$((ERRORS + PHP_ERRORS))
 fi
 
-# 4. Build Check
+# 4. Unused Code Detection
 echo ""
-echo "📋 [4/4] Build..."
+echo "📋 [4/6] Unused Code Detection..."
+if UNUSED_OUTPUT=$(cd "$PROJECT_ROOT" && node scripts/detect-unused-code.js 2>&1); then
+  echo "  ✅ Unused Code: PASS"
+  RESULTS+=('{"check": "unused-code", "status": "pass", "issues": 0}')
+else
+  UNUSED_ISSUES=$(echo "$UNUSED_OUTPUT" | grep -c "\[WARNING\]" || true)
+  echo "  ⚠️  Unused Code: ${UNUSED_ISSUES} warnings"
+  RESULTS+=("{\"check\": \"unused-code\", \"status\": \"warn\", \"issues\": ${UNUSED_ISSUES}}")
+  WARNINGS=$((WARNINGS + UNUSED_ISSUES))
+fi
+
+# 5. Redundant Comments Detection
+echo ""
+echo "📋 [5/6] Redundant Comments Detection..."
+if COMMENTS_OUTPUT=$(cd "$PROJECT_ROOT" && node scripts/detect-redundant-comments.js 2>&1); then
+  echo "  ✅ Redundant Comments: PASS"
+  RESULTS+=('{"check": "redundant-comments", "status": "pass", "issues": 0}')
+else
+  COMMENTS_ISSUES=$(echo "$COMMENTS_OUTPUT" | grep -c "\[WARNING\]" || true)
+  echo "  ⚠️  Redundant Comments: ${COMMENTS_ISSUES} warnings"
+  RESULTS+=("{\"check\": \"redundant-comments\", \"status\": \"warn\", \"issues\": ${COMMENTS_ISSUES}}")
+  WARNINGS=$((WARNINGS + COMMENTS_ISSUES))
+fi
+
+# 6. Build Check
+echo ""
+echo "📋 [6/6] Build..."
 if (cd "$PROJECT_ROOT" && npm run build > /dev/null 2>&1); then
   echo "  ✅ Build: PASS"
   RESULTS+=('{"check": "build", "status": "pass", "issues": 0}')

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from "vite";
 import liveReload from "vite-plugin-live-reload";
 import path from "path";
 import { fileURLToPath } from "url";
+import { globSync } from "glob";
 import autoprefixer from "autoprefixer";
 import cssnano from "cssnano";
 import purgecss from "@fullhuman/postcss-purgecss";
@@ -9,6 +10,32 @@ import { THEME_NAME } from "./config/theme.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Auto-discover page entries from src/css/pages/ and src/js/pages/
+function discoverPageEntries() {
+  const entries = {};
+
+  // ページ別CSS: style.scss / archive.scss / single.scss を検出
+  // style.scss   → "style-{pageName}"
+  // archive.scss → "style-{pageName}-archive"
+  // single.scss  → "style-{pageName}-single"
+  const cssFiles = globSync("src/css/pages/*/{style,archive,single}.scss", { cwd: __dirname });
+  for (const file of cssFiles) {
+    const pageName = file.split("/")[3]; // src/css/pages/{pageName}/...
+    const baseName = path.basename(file, ".scss"); // style, archive, or single
+    const entryKey = baseName === "style" ? `style-${pageName}` : `style-${pageName}-${baseName}`;
+    entries[entryKey] = path.resolve(__dirname, file);
+  }
+
+  // ページ別JS: src/js/pages/{pageName}/index.js → "page-{pageName}"
+  const jsFiles = globSync("src/js/pages/*/index.js", { cwd: __dirname });
+  for (const file of jsFiles) {
+    const pageName = file.split("/")[3]; // src/js/pages/{pageName}/index.js
+    entries[`page-${pageName}`] = path.resolve(__dirname, file);
+  }
+
+  return entries;
+}
 
 // カスタムログプラグイン（リロード回数をカウント + debounce）
 const logReloadPlugin = () => {
@@ -131,27 +158,16 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 4096, // 4KB以下は base64 inline化
       rollupOptions: {
         input: {
-          // ============================================
           // 共通アセット（必須）
-          // ============================================
           main: path.resolve(__dirname, "src/js/main.js"),
           style: path.resolve(__dirname, "src/css/common.scss"),
 
-          // ============================================
-          // ページ別アセット（プロジェクトに応じて追加）
-          // ============================================
-          // 命名規則:
-          //   CSS: "style-{page}" → css/{page}/style.css
-          //   JS:  "page-{page}"  → js/{page}/index.js
-          // ============================================
-
-          // 404ページ
-          "style-404": path.resolve(__dirname, "src/css/pages/404/style.scss"),
-
-          // 追加ページの例（必要に応じてコメント解除・追加）
-          // "style-about": path.resolve(__dirname, "src/css/pages/about/style.scss"),
-          // "style-contact": path.resolve(__dirname, "src/css/pages/contact/style.scss"),
-          // "page-contact": path.resolve(__dirname, "src/js/pages/contact/index.js"),
+          // ページ別アセット（自動検出）
+          // CSS: src/css/pages/{page}/style.scss   → css/{page}/style.css
+          //      src/css/pages/{cpt}/archive.scss  → css/{cpt}/archive.css
+          //      src/css/pages/{cpt}/single.scss   → css/{cpt}/single.css
+          // JS:  src/js/pages/{page}/index.js      → js/{page}/index.js
+          ...discoverPageEntries(),
         },
         output: {
           entryFileNames: (chunkInfo) => {
@@ -171,7 +187,12 @@ export default defineConfig(({ mode }) => {
             const fileName = assetInfo.names?.[0] || "";
             if (fileName.endsWith(".css")) {
               const name = fileName.replace(/^style-/, "").replace(/\.css$/, "");
-              // ページ別CSSは階層構造で出力
+              // archive/single 対応: style-{page}-{type} → css/{page}/{type}.css
+              const archiveMatch = name.match(/^(.+)-(archive|single)$/);
+              if (archiveMatch) {
+                return `css/${archiveMatch[1]}/${archiveMatch[2]}.css`;
+              }
+              // 通常ページ: style-{page} → css/{page}/style.css
               return `css/${name}/style.css`;
             }
             return "[name][extname]";

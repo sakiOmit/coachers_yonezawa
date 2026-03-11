@@ -10,9 +10,6 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__read_memory
-  - mcp__serena__search_for_pattern
-  - mcp__serena__find_symbol
 model: opus
 context: fork
 agent: general-purpose
@@ -133,7 +130,7 @@ PHP テンプレートパターン、SCSS 構造、Split ルール（200行以�
 | File | Purpose |
 |------|---------|
 | `docs/coding-guidelines/05-checklist.md` | New page checklist |
-| `docs/coding-guidelines/03-wordpress-integration.md` | WordPress conventions |
+| `docs/coding-guidelines/03-wordpress-integration.md` | WordPress conventions (index) |
 | `docs/coding-guidelines/04-build-configuration.md` | Build settings |
 
 ---

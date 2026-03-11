@@ -1,3 +1,7 @@
+---
+globs: [".claude/skills/**"]
+---
+
 # Skill Rules
 
 ## Overview

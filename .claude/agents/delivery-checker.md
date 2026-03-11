@@ -22,9 +22,6 @@ allowed_tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__search_for_pattern
-  - mcp__serena__list_dir
-  - mcp__serena__read_memory
   - mcp__playwright__browser_navigate
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_take_screenshot
@@ -114,17 +111,12 @@ npm run build              # Verify build succeeds
 npm run lint               # ESLint + Stylelint
 ```
 
-#### 4. Code Quality (Serena MCP)
+#### 4. Code Quality
 
 **SCSS Naming Check:**
-```
-search_for_pattern(
-  pattern="\\.[a-z]+-[a-z]+__[a-zA-Z]*[A-Z][a-zA-Z]*",
-  relative_path="src/scss/",
-  context_lines_before=1,
-  context_lines_after=1
-)
-→ Detect camelCase violations
+```bash
+# Detect camelCase violations in SCSS
+grep -rn '\.[a-z]\+-[a-z]\+__[a-zA-Z]*[A-Z]' src/scss/
 ```
 
 **Base Style Duplication:**

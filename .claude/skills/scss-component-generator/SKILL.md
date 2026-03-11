@@ -9,9 +9,6 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__read_memory
-  - mcp__serena__search_for_pattern
-  - mcp__serena__find_symbol
 model: opus
 context: fork
 agent: general-purpose
@@ -89,7 +86,7 @@ Automatically adds `@use` to:
    └─ Responsive requirement
 
 2. Base Style Check
-   └─ Use Serena MCP read_memory("base-styles-reference.md")
+   └─ Read docs/coding-guidelines/02-scss-design.md
       to check for styles to avoid duplicating
 
 3. Template-Based Code Generation

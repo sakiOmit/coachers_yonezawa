@@ -48,14 +48,6 @@ allowed_tools:
   - Grep
   - Bash
   - Write
-  - mcp__serena__find_symbol
-  - mcp__serena__get_symbols_overview
-  - mcp__serena__search_for_pattern
-  - mcp__serena__list_dir
-  - mcp__serena__find_file
-  - mcp__serena__find_referencing_symbols
-  - mcp__serena__read_memory
-  - mcp__serena__edit_memory
 ---
 
 # Production Reviewer (Unified)
@@ -90,25 +82,8 @@ This agent handles **all review types**. Determine scope from user input:
 
 **Load based on review type:**
 - **SCSS**: `docs/coding-guidelines/02-scss-design.md`, `docs/coding-guidelines/scss/naming.md`
-- **PHP/WordPress**: `docs/coding-guidelines/03-wordpress-integration.md`
+- **PHP/WordPress**: `docs/coding-guidelines/03-html-structure.md`, `docs/coding-guidelines/03-template-parts.md`, `docs/coding-guidelines/03-image-handling.md`, `docs/coding-guidelines/03-sanitization.md`
 - **Build/JS**: `docs/coding-guidelines/04-build-configuration.md`
-
-## Serena MCP Integration
-
-**Before Review:**
-```
-read_memory("base-styles-reference.md")
-read_memory("common-issues-patterns.md")
-```
-
-**During Review:**
-```
-get_symbols_overview(relative_path="themes/{{THEME_NAME}}/pages/page-*.php")
-find_symbol("p-*", relative_path="src/scss/")
-search_for_pattern(pattern="...", relative_path="...")
-```
-
----
 
 ## SCSS Review Checklist
 
@@ -330,7 +305,7 @@ When same pattern detected again, increment count.
 
 ## Key Principles
 
-1. **Investigate first, judge second** - Use Serena tools thoroughly
+1. **Investigate first, judge second** - Use Grep/Glob tools thoroughly
 2. **Be specific** - Always reference file:line
 3. **Classify accurately** - Safe vs Risky determines fix workflow
 4. **Security first** - Security issues are always Critical priority

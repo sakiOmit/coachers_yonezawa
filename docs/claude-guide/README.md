@@ -21,4 +21,4 @@
 ### 関連ドキュメント
 
 - **コーディング規約**: `../coding-guidelines/`
-- **エージェント連携フロー**: `../../.claude/prompts/agent-collaboration-flows.md`
+- **エージェント定義**: `../../.claude/agents/README.md`

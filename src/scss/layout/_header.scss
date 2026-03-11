@@ -1,6 +1,7 @@
 @use "../foundation/function" as *;
 @use "../foundation/mixins/responsive" as *;
 @use "../foundation/mixins/block" as *;
+@use "../foundation/mixins/hover" as *;
 
 .l-header {
   position: fixed;
@@ -110,7 +111,7 @@
     letter-spacing: 0.04em;
     white-space: nowrap;
 
-    &:hover {
+    @include hover {
       opacity: 0.7;
     }
   }
@@ -137,7 +138,7 @@
     background-color: var(--color-text);
     border-radius: rv(50);
 
-    &:hover {
+    @include hover {
       opacity: 0.8;
     }
   }

@@ -14,7 +14,6 @@ export function splitTextToChars(element, options = {}) {
   const { preserveSpaces = true } = options;
 
   if (!element) {
-    console.warn("[TextAnimation] Element not found");
     return [];
   }
 

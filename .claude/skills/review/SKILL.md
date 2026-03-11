@@ -268,7 +268,7 @@ bash .claude/skills/review/scripts/automated-review.sh js
 
      以下の手順で進めてください:
      1. docs/coding-guidelines/ から関連ガイドラインを読み込む
-     2. Serena MCP を使用してコードを調査
+     2. Grep/Glob ツールを使用してコードを調査
      3. 問題を分類（Safe/Risky, Critical/High/Medium/Low）
      4. .claude/reviews/ にレポートを保存
      5. ユーザーに結果サマリーと次のステップを提示

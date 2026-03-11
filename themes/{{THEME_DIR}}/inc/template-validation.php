@@ -5,7 +5,7 @@
  * 開発環境でtemplate-partsの必須引数をチェックし、
  * 不足時に警告を表示します。
  *
- * @package Theme_Template
+ * @package {{PACKAGE_NAME}}
  */
 
 if ( ! defined('ABSPATH') ) {

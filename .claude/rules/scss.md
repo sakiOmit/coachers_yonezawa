@@ -1,3 +1,7 @@
+---
+globs: ["*.scss", "*.css", "src/scss/**", "src/css/**"]
+---
+
 # SCSS/CSS Rules
 
 ## Overview
@@ -20,6 +24,48 @@ src/scss/
     ├── component/        # c- prefix（再利用可能）
     ├── project/          # p- prefix（ページ固有）
     └── utility/          # u- prefix（単機能）
+```
+
+## ページCSSエントリーポイント
+
+### ディレクトリ構造
+
+```
+src/css/pages/
+├── top/style.scss              # 通常の固定ページ
+├── company/style.scss
+├── cases/                      # アーカイブ + 詳細があるCPT
+│   ├── archive.scss            # 一覧ページ（archive-{cpt}.php）
+│   └── single.scss             # 詳細ページ（single-{cpt}.php）
+└── column/
+    ├── archive.scss
+    └── single.scss
+```
+
+### 命名規則
+
+| ページ種別 | ファイル名 | WordPress対応 |
+|-----------|-----------|---------------|
+| 固定ページ | `{slug}/style.scss` | `page-{slug}.php` |
+| CPT一覧 | `{cpt}/archive.scss` | `archive-{cpt}.php` |
+| CPT詳細 | `{cpt}/single.scss` | `single-{cpt}.php` |
+
+### 禁止
+
+```
+❌ cases-list/style.scss     # CPTは {cpt}/ にまとめる
+❌ cases-detail/style.scss   # -list/-detail の分離禁止
+❌ column-detail/style.scss
+```
+
+### ビルド出力
+
+Vite が `{style,archive,single}.scss` を自動検出し、以下に出力:
+
+```
+css/{page}/style.css       ← style.scss
+css/{cpt}/archive.css      ← archive.scss
+css/{cpt}/single.css       ← single.scss
 ```
 
 ## SCSSファイル命名規則

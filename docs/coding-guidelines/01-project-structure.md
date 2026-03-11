@@ -106,7 +106,11 @@
 │       ├── README.md
 │       ├── 01-project-structure.md
 │       ├── 02-scss-design.md
-│       ├── 03-wordpress-integration.md
+│       ├── 03-wordpress-integration.md  # インデックス
+│       ├── 03-html-structure.md
+│       ├── 03-template-parts.md
+│       ├── 03-image-handling.md
+│       ├── 03-sanitization.md
 │       ├── 04-build-configuration.md
 │       ├── 05-checklist.md
 │       └── 06-faq.md

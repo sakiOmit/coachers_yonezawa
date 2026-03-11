@@ -34,9 +34,6 @@ allowed_tools:
   - Glob
   - Grep
   - Bash
-  - mcp__serena__search_for_pattern
-  - mcp__serena__find_file
-  - mcp__serena__list_dir
 ---
 
 # QA Agent (Unified)

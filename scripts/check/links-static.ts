@@ -12,12 +12,15 @@
 import fs from 'fs';
 import path from 'path';
 import { glob } from 'glob';
+import { detectThemeName } from '../lib/detect-theme.js';
+
+const THEME_NAME = detectThemeName();
 
 // チェック対象のディレクトリ
 const TARGET_DIRS = [
-  'themes/lpc-group-wp/pages',
-  'themes/lpc-group-wp/template-parts',
-  'themes/lpc-group-wp',
+  `themes/${THEME_NAME}/pages`,
+  `themes/${THEME_NAME}/template-parts`,
+  `themes/${THEME_NAME}`,
 ];
 
 // ダミーリンクのパターン
