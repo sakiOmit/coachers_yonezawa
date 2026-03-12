@@ -1,0 +1,8 @@
+// 募集詳細（Job Detail）ページ固有スタイル
+@use "../../../scss/foundation/function" as *;
+@use "../../../scss/foundation/mixins/responsive" as *;
+@use "../../../scss/foundation/mixins/block" as *;
+
+// Project styles
+@use "../../../scss/object/projects/job-detail/p-job-detail";
+@use "../../../scss/object/projects/job-detail/p-job-detail-section";

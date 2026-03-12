@@ -1,0 +1,316 @@
+@use "../../../foundation/function" as *;
+@use "../../../foundation/mixins/responsive" as *;
+@use "../../../foundation/mixins/block" as *;
+@use "../../../foundation/mixins/hover" as *;
+
+// p-job-description-main: 募集一覧メインコンテンツ
+// Figma nodes: 30:46, 30:47, 30:56, 30:138
+//
+// Layout:
+//   artboard: 1440px
+//   container: 1240px (padding: 100px each side)
+//   lead text: x=100, y=468 (above tabs section)
+
+.p-job-description-main {
+  // Lead text section
+  &__lead {
+    padding: rv(100) rv(100) rv(86);
+
+    @include sp {
+      padding: svw(60) svw(20) svw(40);
+    }
+  }
+
+  &__lead-text {
+    font-family: var(--font-serif);
+    font-size: rv(24);
+    font-weight: 700;
+    line-height: 2;
+    color: var(--color-slate-600);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      font-size: svw(18);
+      line-height: 2;
+    }
+  }
+
+  // Tab navigation section
+  &__tabs-section {
+    background-color: var(--color-white);
+    padding-top: rv(40);
+    padding-right: rv(100);
+    padding-left: rv(100);
+
+    @include sp {
+      padding-top: svw(24);
+      padding-right: svw(20);
+      padding-left: svw(20);
+    }
+  }
+
+  &__tabs {
+    display: flex;
+  }
+
+  &__tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: rv(60);
+    cursor: pointer;
+    font-family: var(--font-serif);
+    font-size: rv(18);
+    font-weight: 400;
+    line-height: 2;
+    letter-spacing: 0.18em;
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-500);
+    border: 1px solid var(--color-slate-200);
+
+    @include hover {
+      opacity: 0.8;
+    }
+
+    @include sp {
+      height: svw(48);
+      font-size: svw(14);
+    }
+
+    // Active tab
+    &--active {
+      background-color: var(--color-text);
+      color: var(--color-white);
+      border-color: var(--color-text);
+    }
+  }
+
+  // Job cards listing section
+  &__listing {
+    background-color: var(--color-white);
+    padding: rv(60) rv(100) rv(100);
+
+    @include sp {
+      padding: svw(40) svw(20) svw(60);
+    }
+  }
+
+  &__count {
+    font-family: var(--font-serif);
+    font-size: rv(16);
+    font-weight: 400;
+    line-height: 2;
+    color: var(--color-slate-500);
+    letter-spacing: 0.18em;
+    margin-bottom: rv(32);
+
+    @include sp {
+      font-size: svw(14);
+      margin-bottom: svw(24);
+    }
+  }
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+    gap: rv(24);
+
+    @include sp {
+      gap: svw(16);
+    }
+  }
+
+  // Job card
+  &__card {
+    display: flex;
+    background-color: var(--color-white);
+    border-radius: rv(12);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+
+    @include sp {
+      border-radius: svw(8);
+    }
+  }
+
+  &__card-accent {
+    flex-shrink: 0;
+    width: rv(8);
+    background-color: var(--color-gray-lightest);
+
+    @include sp {
+      width: svw(6);
+    }
+  }
+
+  &__card-content {
+    display: flex;
+    flex-direction: column;
+    gap: rv(24);
+    padding: rv(32);
+    flex: 1;
+
+    @include sp {
+      gap: svw(16);
+      padding: svw(20);
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    gap: rv(20);
+    align-items: center;
+
+    @include sp {
+      flex-direction: column;
+      gap: svw(8);
+      align-items: flex-start;
+    }
+  }
+
+  // Label - default: 新卒 (bg:#fafafa, border:#111, text:#111)
+  &__card-label {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: rv(8) rv(16);
+    font-family: var(--font-serif);
+    font-size: rv(14);
+    font-weight: 400;
+    line-height: 2;
+    letter-spacing: 0.18em;
+    color: var(--color-text);
+    background-color: var(--color-gray);
+    border: 1px solid var(--color-text);
+    border-radius: rv(6);
+
+    @include sp {
+      padding: svw(4) svw(12);
+      font-size: svw(12);
+      border-radius: svw(4);
+    }
+
+    // Career variant: 中途 (bg:#111, text:#fff)
+    &--career {
+      background-color: var(--color-text);
+      color: var(--color-white);
+      border-color: transparent;
+    }
+  }
+
+  &__card-title {
+    font-family: var(--font-serif);
+    font-size: rv(24);
+    font-weight: 700;
+    line-height: 2;
+    color: var(--color-text);
+    letter-spacing: 0.12em;
+
+    @include sp {
+      font-size: svw(18);
+      line-height: 1.8;
+    }
+  }
+
+  &__card-description {
+    font-family: var(--font-serif);
+    font-size: rv(14);
+    font-weight: 500;
+    line-height: 2;
+    color: var(--color-slate-600);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      font-size: svw(13);
+      line-height: 1.8;
+    }
+  }
+
+  // CTA button
+  &__card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: rv(8);
+    padding: rv(14) rv(28);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-black);
+    border-radius: rv(8);
+    text-decoration: none;
+
+    @include hover {
+      opacity: 0.7;
+    }
+
+    @include sp {
+      gap: svw(8);
+      padding: svw(12) svw(20);
+      border-radius: svw(6);
+    }
+  }
+
+  &__card-cta-text {
+    font-family: var(--font-serif);
+    font-size: rv(14);
+    font-weight: 400;
+    line-height: 2;
+    color: var(--color-text);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      font-size: svw(13);
+    }
+  }
+
+  &__card-cta-arrow {
+    flex-shrink: 0;
+    width: rv(20);
+    height: rv(20);
+
+    @include sp {
+      width: svw(16);
+      height: svw(16);
+    }
+  }
+
+  // Empty state section
+  &__empty {
+    background-color: var(--color-white);
+    border-top: 1px solid var(--color-black);
+    padding: rv(60) rv(100) rv(100);
+
+    @include sp {
+      padding: svw(40) svw(20) svw(60);
+    }
+  }
+
+  &__empty-count {
+    font-family: var(--font-serif);
+    font-size: rv(16);
+    font-weight: 400;
+    line-height: 2;
+    color: var(--color-slate-500);
+    letter-spacing: 0.18em;
+    margin-bottom: rv(40);
+
+    @include sp {
+      font-size: svw(14);
+      margin-bottom: svw(24);
+    }
+  }
+
+  &__empty-message {
+    font-family: var(--font-serif);
+    font-size: rv(24);
+    font-weight: 700;
+    line-height: 2;
+    color: var(--color-slate-600);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      font-size: svw(18);
+      line-height: 2;
+    }
+  }
+}

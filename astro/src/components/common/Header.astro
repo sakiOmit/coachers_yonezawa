@@ -1,0 +1,67 @@
+---
+/**
+ * Header
+ * 全ページ共通ヘッダー（固定ナビゲーション）
+ *
+ * WordPress変換先: template-parts/common/header.php
+ *
+ * Figma node: 30:147 (Group 46165)
+ * - Logo: 30:154 (image 1254) 137x39
+ * - Nav: 30:155 (Frame 93) horizontal, gap=15
+ * - Hamburger: 30:149 (Frame 1009) 40x40, #111 bg, rounded
+ */
+import ResponsiveImage from './ResponsiveImage.astro';
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { label: '米沢工機について', href: '/about' },
+  { label: '事業紹介', href: '/business' },
+  { label: '仕事内容', href: '/work' },
+  { label: '働く環境', href: '/environment' },
+  { label: '社員インタビュー', href: '/interview' },
+  { label: 'プロジェクトストーリー', href: '/project-story' },
+  { label: 'Q&A', href: '/faq' },
+  { label: 'お知らせ', href: '/news' },
+  { label: '新卒採用情報', href: '/new-graduate' },
+  { label: '中途採用情報', href: '/career' },
+];
+---
+
+<header class="l-header">
+  <div class="l-header__container">
+    <div class="l-header__inner">
+      <a href="/" class="l-header__logo-link">
+        <ResponsiveImage
+          src="/assets/images/common/logo.webp"
+          alt="YONEZAWA 米沢工機"
+          class="l-header__logo-image"
+          sp={false}
+        />
+      </a>
+
+      <nav class="l-header__nav">
+        <ul class="l-header__menu">
+          {navItems.map((item) => (
+            <li class="l-header__menu-item">
+              <a href={item.href} class="l-header__menu-link">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <button class="l-header__hamburger" type="button" aria-label="メニューを開く">
+        <span class="l-header__hamburger-lines">
+          <span class="l-header__hamburger-line"></span>
+          <span class="l-header__hamburger-line"></span>
+          <span class="l-header__hamburger-line"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from "vite";
 import liveReload from "vite-plugin-live-reload";
 import path from "path";
 import { fileURLToPath } from "url";
+import chokidar from "chokidar";
 import { globSync } from "glob";
 import autoprefixer from "autoprefixer";
 import cssnano from "cssnano";
@@ -84,6 +85,34 @@ export default defineConfig(({ mode }) => {
       ),
       // デバッグ用のログプラグイン
       !isProduction && logReloadPlugin(),
+      // WSL2でsrc/scss/パーシャル変更時にCSSを再コンパイルさせる
+      {
+        name: "watch-scss",
+        configureServer(server) {
+          const scssDir = path.resolve(__dirname, "src/scss");
+
+          const watcher = chokidar.watch(scssDir, {
+            usePolling: true,
+            interval: 300,
+            ignoreInitial: true,
+          });
+
+          let debounceTimer = null;
+          watcher.on("change", (filePath) => {
+            if (debounceTimer) return;
+            debounceTimer = setTimeout(() => {
+              debounceTimer = null;
+              console.log(`[watch-scss] Change: ${path.relative(__dirname, filePath)}`);
+              for (const [, mod] of server.moduleGraph.idToModuleMap) {
+                if (mod.file?.endsWith(".scss")) {
+                  server.moduleGraph.invalidateModule(mod);
+                }
+              }
+              server.ws.send({ type: "full-reload" });
+            }, 100);
+          });
+        },
+      },
     ].filter(Boolean),
 
     css: {

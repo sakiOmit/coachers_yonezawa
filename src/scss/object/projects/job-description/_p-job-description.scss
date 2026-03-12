@@ -1,0 +1,9 @@
+@use "../../../foundation/function" as *;
+@use "../../../foundation/mixins/responsive" as *;
+@use "../../../foundation/mixins/block" as *;
+
+// p-job-description: 募集一覧ページ固有スタイル
+// ページ全体の背景色
+.p-job-description {
+  background-color: var(--color-gray);
+}

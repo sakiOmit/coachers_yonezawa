@@ -14,6 +14,7 @@
 @use "../scss/layout/_footer";
 
 // Components（共通コンポーネント）
+@use "../scss/object/components/page-header/c-page-header";
 
 // Utility
 @use "../scss/object/utility/u-text";

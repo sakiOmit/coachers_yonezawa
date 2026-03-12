@@ -19,9 +19,15 @@
   --color-background-disabled: #f2f2f2; // 無効状態の背景
   --color-beige: #f6f4ef; // ベージュ背景
   --color-red-pure: #f00; // 純赤
+  --color-slate-500: #64748b; // スレートグレー（サブテキスト）
+  --color-slate-600: #475569; // スレート濃（説明文）
+  --color-slate-50: #f8fafc; // スレート極薄（タブ背景）
+  --color-slate-200: #e2e8f0; // スレート薄（タブボーダー）
+  --color-slate-800: #1e293b; // スレート濃（テーブルテキスト・ボタン背景）
 
   // フォントファミリー
   --font-primary: "Noto Sans JP", sans-serif; // 本文・ゴシック
-  --font-english: "Poppins", sans-serif; // 英字タイトル（セリフ）※プロジェクトに応じて変更
+  --font-serif: "Noto Serif JP", serif; // 和文セリフ
+  --font-english: "Cormorant Garamond", serif; // 英字タイトル（セリフ）
   --font-poppins: "Poppins", sans-serif; // 英字サンセリフ
 }

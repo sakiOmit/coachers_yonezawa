@@ -1,0 +1,45 @@
+---
+/**
+ * 募集詳細ページ (Job Detail)
+ *
+ * WordPress変換先: pages/page-job-detail.php
+ * Template Name: 募集詳細
+ *
+ * Figma: node-id=30:166 (募集詳細)
+ *
+ * セクション構成:
+ * - Header: 共通ヘッダー（l-header）
+ * - KV: ページヘッダー（c-page-header）
+ * - Job Detail: 募集要項テーブル + エントリーボタン（p-job-detail-section）
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/common/Header.astro';
+import PageHeader from '../components/common/PageHeader.astro';
+import JobDetailSection from '../components/sections/job-detail/JobDetailSection.astro';
+import jobDetailData from '../data/pages/job-detail.json';
+
+const breadcrumbs = [
+  { label: 'TOP', href: '/' },
+  { label: 'Job Description', href: '/job-description/' },
+  { label: 'Job Detail' },
+];
+---
+
+<BaseLayout title="募集詳細 | 米沢工機" bodyClass="p-job-detail">
+  <link rel="stylesheet" href="/assets/css/pages/job-detail/style.css" slot="addCSS" />
+
+  <Header />
+
+  <main>
+    <PageHeader
+      enTitle="Job Description"
+      jaTitle="募集要項"
+      breadcrumbs={breadcrumbs}
+    />
+
+    <JobDetailSection
+      rows={jobDetailData.rows}
+      entryButton={jobDetailData.entry_button}
+    />
+  </main>
+</BaseLayout>

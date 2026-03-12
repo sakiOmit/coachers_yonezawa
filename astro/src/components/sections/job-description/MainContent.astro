@@ -1,0 +1,110 @@
+---
+/**
+ * MainContent - 募集一覧メインコンテンツ
+ *
+ * WordPress変換先: template-parts/sections/job-description/main-content.php
+ *
+ * Figma nodes:
+ * - Lead text: 30:46 (Noto Serif JP 24px w700, #475569, ls=4.32px)
+ * - Tab section: 30:47 (1440x100, bg:#fff, pt:40, px:100)
+ *   - Tab All (active): 30:50 (bg:#222, text:#fff)
+ *   - Tab Graduate: 30:52 (bg:#f8fafc, stroke:#e2e8f0, text:#64748b)
+ *   - Tab Career: 30:54 (same as Graduate)
+ * - Card list: 30:56 (bg:#fff, pt:60, px:100, pb:100, gap:40)
+ *   - Count: 30:58 (Noto Serif JP 16px w400, #64748b)
+ *   - Cards: 30:59 (gap:24)
+ *     - Card: 30:60 (bg:#fff, border-radius:12)
+ *       - Accent bar: 30:61 (8px wide, #ddd)
+ *       - Content: 30:62 (p:32, gap:24)
+ *       - Label 新卒: bg:#fafafa, stroke:#111, border-radius:6
+ *       - Label 中途: bg:#111, text:#fff, border-radius:6
+ *       - Title: 24px w700, #222
+ *       - Desc: 14px w500, #475569
+ *       - CTA: border:1px #000, border-radius:8, gap:8, py:14 px:28
+ * - Empty state: 30:138 (bg:#fff, border-top:1px #000, pt:60, px:100, pb:100)
+ *
+ * Container: 1240px (1440 - 100*2)
+ */
+
+interface JobCard {
+  id: number;
+  category: string;
+  category_label: string;
+  title: string;
+  description: string;
+  detail_url: string;
+}
+
+interface Tab {
+  id: string;
+  label: string;
+  is_active: boolean;
+}
+
+interface Props {
+  leadText: string;
+  tabs: Tab[];
+  jobCards: JobCard[];
+  emptyState: {
+    count_text: string;
+    message: string;
+  };
+}
+
+const { leadText, tabs, jobCards, emptyState } = Astro.props;
+---
+
+<!-- Lead text -->
+<div class="p-job-description-main__lead">
+  <p class="p-job-description-main__lead-text" set:html={leadText.replace(/\n/g, '<br />')} />
+</div>
+
+<!-- Tab navigation -->
+<div class="p-job-description-main__tabs-section">
+  <div class="p-job-description-main__tabs" role="tablist">
+    {tabs.map((tab) => (
+      <button
+        class={`p-job-description-main__tab${tab.is_active ? ' p-job-description-main__tab--active' : ''}`}
+        role="tab"
+        aria-selected={tab.is_active ? 'true' : 'false'}
+        data-tab={tab.id}
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<!-- Job cards listing -->
+<div class="p-job-description-main__listing">
+  <p class="p-job-description-main__count">{jobCards.length}件の募集</p>
+  <div class="p-job-description-main__cards">
+    {jobCards.map((card) => (
+      <article class="p-job-description-main__card" data-category={card.category}>
+        <div class="p-job-description-main__card-accent"></div>
+        <div class="p-job-description-main__card-content">
+          <div class="p-job-description-main__card-header">
+            <span class={`p-job-description-main__card-label${card.category === 'career' ? ' p-job-description-main__card-label--career' : ''}`}>
+              {card.category_label}
+            </span>
+            <h3 class="p-job-description-main__card-title">{card.title}</h3>
+          </div>
+          <p class="p-job-description-main__card-description">{card.description}</p>
+          <a href={card.detail_url} class="p-job-description-main__card-cta">
+            <span class="p-job-description-main__card-cta-text">募集詳細を見る</span>
+            <svg class="p-job-description-main__card-cta-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 10H16" stroke="#222222" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 4L16 10L10 16" stroke="#222222" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>
+
+<!-- Empty state (中途採用 0件) -->
+<div class="p-job-description-main__empty">
+  <p class="p-job-description-main__empty-count">{emptyState.count_text}</p>
+  <p class="p-job-description-main__empty-message" set:html={emptyState.message.replace(/\n/g, '<br />')} />
+</div>

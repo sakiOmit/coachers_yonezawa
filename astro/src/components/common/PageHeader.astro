@@ -1,0 +1,76 @@
+---
+/**
+ * PageHeader (KV - Key Visual)
+ * 下層ページ共通のページヘッダー
+ *
+ * WordPress変換先: template-parts/common/page-header.php
+ *
+ * Figma nodes:
+ * - KV image: 30:142 (image 1347) 428x240, rotated -90deg
+ * - Title frame: 30:143 (Frame 46405) vertical layout
+ *   - EN title: 30:144 Cormorant Garamond 150px Medium Italic, #111
+ *   - JA title: 30:145 Noto Serif JP 20px SemiBold, ls=2.4px, #111
+ * - Breadcrumb: 30:146 Cormorant Garamond 20px Medium, #111, right-aligned
+ *
+ * Layout (from absoluteBoundingBox):
+ * - KV image: x=41, y=71, w=428, h=240
+ * - Title frame: x=90, y=162, w=808, h=186
+ * - Breadcrumb: x=1170, y=303
+ * - Page artboard: 1440px wide
+ * - Content area padding: ~80px left (x=90 - artboard x=0)
+ */
+import ResponsiveImage from './ResponsiveImage.astro';
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  /** 英語見出し（大きいイタリック文字） */
+  enTitle: string;
+  /** 日本語見出し */
+  jaTitle: string;
+  /** パンくずリスト */
+  breadcrumbs: BreadcrumbItem[];
+}
+
+const { enTitle, jaTitle, breadcrumbs } = Astro.props;
+---
+
+<section class="c-page-header">
+  <div class="c-page-header__kv-image-wrapper">
+    <ResponsiveImage
+      src="/assets/images/common/kv-accent.webp"
+      alt=""
+      class="c-page-header__kv-image"
+      sp={false}
+    />
+  </div>
+
+  <div class="c-page-header__container">
+    <div class="c-page-header__inner">
+      <div class="c-page-header__title-block">
+        <h1 class="c-page-header__en-title">{enTitle}</h1>
+        <p class="c-page-header__ja-title">{jaTitle}</p>
+      </div>
+
+      <nav class="c-page-header__breadcrumb" aria-label="パンくずリスト">
+        <ol class="c-page-header__breadcrumb-list">
+          {breadcrumbs.map((item, index) => (
+            <li class="c-page-header__breadcrumb-item">
+              {item.href && index < breadcrumbs.length - 1 ? (
+                <>
+                  <a href={item.href} class="c-page-header__breadcrumb-link">{item.label}</a>
+                  <span class="c-page-header__breadcrumb-separator">&gt;</span>
+                </>
+              ) : (
+                <span class="c-page-header__breadcrumb-current">{item.label}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </div>
+  </div>
+</section>

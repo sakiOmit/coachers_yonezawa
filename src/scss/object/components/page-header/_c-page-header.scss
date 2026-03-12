@@ -1,0 +1,142 @@
+@use "../../../foundation/function" as *;
+@use "../../../foundation/mixins/responsive" as *;
+@use "../../../foundation/mixins/block" as *;
+@use "../../../foundation/mixins/hover" as *;
+
+// c-page-header: 下層ページ共通KVヘッダー
+// Figma: 30:142, 30:143, 30:146
+//
+// Layout:
+//   artboard: 1440px
+//   KV image: x=41, y=71, w=428, h=240 (rotated)
+//   Title frame: x=90, y=162
+//   Breadcrumb: x=1170, y=303 (right-aligned)
+//   Section height: ~310px (from y=71 to y=348)
+
+.c-page-header {
+  position: relative;
+  padding-top: rv(71);
+  padding-bottom: rv(40);
+  overflow: hidden;
+
+  @include sp {
+    padding-top: svw(80);
+    padding-bottom: svw(30);
+  }
+
+  // 左上の赤いアクセント画像（回転あり）
+  &__kv-image-wrapper {
+    position: absolute;
+    top: rv(71);
+    left: rv(41);
+
+    @include sp {
+      top: svw(70);
+      left: svw(20);
+    }
+  }
+
+  &__kv-image {
+    width: rv(240);
+    height: rv(428);
+    object-fit: cover;
+
+    @include sp {
+      width: svw(140);
+      height: svw(250);
+    }
+  }
+
+  &__container {
+    @include container(1240px);
+  }
+
+  &__inner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  // Title block: EN + JA vertical stack
+  &__title-block {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__en-title {
+    font-family: var(--font-english);
+    font-size: rv(150);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-text);
+    text-transform: capitalize;
+
+    @include sp {
+      font-size: svw(60);
+    }
+  }
+
+  &__ja-title {
+    font-family: var(--font-serif);
+    font-size: rv(20);
+    font-weight: 600;
+    line-height: 1.8;
+    color: var(--color-text);
+    letter-spacing: 0.12em;
+
+    @include sp {
+      font-size: svw(16);
+    }
+  }
+
+  // Breadcrumb: right-aligned
+  &__breadcrumb {
+    flex-shrink: 0;
+    padding-bottom: rv(4);
+
+    @include sp {
+      display: none;
+    }
+  }
+
+  &__breadcrumb-list {
+    display: flex;
+    gap: rv(6);
+    align-items: center;
+  }
+
+  &__breadcrumb-item {
+    display: flex;
+    gap: rv(6);
+    align-items: center;
+  }
+
+  &__breadcrumb-link {
+    font-family: var(--font-english);
+    font-size: rv(20);
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: capitalize;
+
+    @include hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__breadcrumb-separator {
+    font-family: var(--font-english);
+    font-size: rv(20);
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  &__breadcrumb-current {
+    font-family: var(--font-english);
+    font-size: rv(20);
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: capitalize;
+  }
+}

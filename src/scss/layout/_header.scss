@@ -5,56 +5,18 @@
 
 .l-header {
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+  top: rv(10);
+  right: rv(10);
+  left: rv(10);
   z-index: 1000;
-  width: 100%;
-  padding-block: rv(26);
+  background-color: var(--color-white);
+  border-radius: 0;
+  box-shadow: 0 rv(2) rv(4) rgb(0 0 0 / 25%);
 
-  &:not(&--home) {
-    background-color: var(--color-white);
-  }
-
-  &--home {
-    background-color: transparent;
-
-    .l-header__menu-link {
-      color: var(--color-white);
-    }
-
-    .l-header__cta-button {
-      color: var(--color-text);
-      background-color: var(--color-white);
-    }
-  }
-
-  // bodyにbg-blackがある場合は背景色を透明に、文字色とボタンを調整
-  .bg-black & {
-    background-color: transparent;
-
-    .l-header__menu-link {
-      color: var(--color-white);
-    }
-
-    .l-header__cta-button {
-      color: var(--color-text);
-      background-color: var(--color-white);
-    }
-  }
-
-  // c-page-headerを越えた時（スクロール時）のスタイル
-  &.is-scrolled {
-    background-color: var(--color-white);
-
-    .l-header__menu-link {
-      color: var(--color-text);
-    }
-
-    .l-header__cta-button {
-      color: var(--color-white);
-      background-color: var(--color-text);
-    }
+  @include sp {
+    top: svw(10);
+    right: svw(10);
+    left: svw(10);
   }
 
   &__container {
@@ -64,22 +26,24 @@
   &__inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    height: rv(60);
+
+    @include sp {
+      height: svw(50);
+    }
   }
 
   // Logo
   &__logo-link {
-    position: relative;
-    z-index: 1100;
     flex-shrink: 0;
   }
 
   &__logo-image {
-    width: rv(120);
+    width: rv(137);
+    height: auto;
 
     @include sp {
-      width: svw(120);
-      height: auto;
+      width: svw(100);
     }
   }
 
@@ -95,20 +59,17 @@
 
   &__menu {
     display: flex;
-    gap: rv(40);
+    gap: rv(15);
     align-items: center;
   }
 
-  &__menu-item {
-    // Inherit from body
-  }
-
   &__menu-link {
-    font-family: var(--font-english);
+    font-family: var(--font-primary);
+    font-size: rv(12);
     font-weight: 500;
+    line-height: 1.448;
     color: var(--color-text);
-    text-transform: capitalize;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     white-space: nowrap;
 
     @include hover {
@@ -116,62 +77,52 @@
     }
   }
 
-  // CTA Buttons (PC only)
-  &__cta {
-    position: relative;
-    z-index: 1100;
+  // Hamburger Menu
+  &__hamburger {
     display: flex;
-    gap: rv(16);
-
-    @include sp {
-      display: none;
-    }
-  }
-
-  &__cta-button {
-    display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    padding-block: rv(6);
-    padding-inline: rv(40);
-    color: var(--color-white);
+    width: rv(40);
+    height: rv(40);
+    margin-left: rv(20);
+    cursor: pointer;
     background-color: var(--color-text);
-    border-radius: rv(50);
+    border-radius: 50%;
+
+    @include sp {
+      width: svw(36);
+      height: svw(36);
+      margin-left: auto;
+    }
 
     @include hover {
       opacity: 0.8;
     }
   }
 
-  &__cta-text {
-    font-family: var(--font-english);
-    font-weight: 600;
-    text-transform: capitalize;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-
-  // Hamburger Menu
-  &__hamburger {
-    position: relative;
-    z-index: 1100;
-    margin-left: rv(40);
+  &__hamburger-lines {
+    display: flex;
+    flex-direction: column;
+    gap: rv(4);
+    align-items: center;
+    width: rv(16);
 
     @include sp {
-      margin-left: auto;
+      gap: svw(4);
+      width: svw(14);
     }
   }
 
-  // Menu Open State（header に付与）
-  &.is-menu-open {
-    .l-header__cta-button {
-      color: var(--color-text);
-      background-color: var(--color-white);
-    }
+  &__hamburger-line {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-gray-lightest);
   }
 }
 
-// body scroll lock（JS の disableScroll() で body に付与）
+// body scroll lock
 body.is-scroll-locked {
   position: fixed;
   width: 100%;

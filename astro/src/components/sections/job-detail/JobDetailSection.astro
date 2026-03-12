@@ -1,0 +1,61 @@
+---
+/**
+ * JobDetailSection - 募集詳細テーブル + エントリーボタン
+ *
+ * WordPress変換先: template-parts/sections/job-detail/job-detail-section.php
+ *
+ * Figma nodes:
+ * - Section: 30:167 (job-detail-section) 1440x3108
+ *   - layout: VERTICAL, gap:60, pt:100, pb:100
+ * - Table: 30:168 (job-detail-table) 1000x2768
+ *   - layout: VERTICAL, gap:30
+ *   - 15 rows, each HORIZONTAL, gap:10
+ *     - Label: 200px wide (Noto Serif JP 16px w500, #1e293b, ls:2.88px)
+ *     - Value: 790px wide (Noto Serif JP 16px w500, #1e293b, ls:2.88px, lh:32px)
+ *     - Bottom divider: stroke:#1e293b 1px
+ * - Entry button: 30:274 (390x80, bg:#1e293b, text:#fff)
+ *   - Noto Serif JP 16px w500, ls:2.88px
+ *   - Padding: pt:28, pr:151, pb:28, pl:151 (→ padding-based, no fixed width)
+ *
+ * Container: 1000px table centered in 1440px artboard
+ *   (1440 - 1000) / 2 = 220px margin each side
+ */
+
+interface TableRow {
+  label: string;
+  value: string;
+}
+
+interface EntryButton {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  rows: TableRow[];
+  entryButton: EntryButton;
+}
+
+const { rows, entryButton } = Astro.props;
+---
+
+<section class="p-job-detail-section">
+  <div class="p-job-detail-section__container">
+    <div class="p-job-detail-section__inner">
+      <dl class="p-job-detail-section__table">
+        {rows.map((row) => (
+          <div class="p-job-detail-section__row">
+            <dt class="p-job-detail-section__label">{row.label}</dt>
+            <dd class="p-job-detail-section__value" set:html={row.value.replace(/\n/g, '<br />')} />
+          </div>
+        ))}
+      </dl>
+
+      <div class="p-job-detail-section__button-wrap">
+        <a href={entryButton.href} class="p-job-detail-section__entry-button">
+          {entryButton.label}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,62 @@
+{
+  "lead_text": "あなたに合ったポジションから、\n米沢工機でのキャリアを見つけてください。",
+  "tabs": [
+    { "id": "all", "label": "すべて", "is_active": true },
+    { "id": "graduate", "label": "新卒採用", "is_active": false },
+    { "id": "career", "label": "中途採用", "is_active": false }
+  ],
+  "job_cards": [
+    {
+      "id": 1,
+      "category": "graduate",
+      "category_label": "新卒",
+      "title": "法人営業職（製造業向けソリューション提案）",
+      "description": "製造業のお客様を訪問し、工作機械や生産設備の提案を行います。未経験からスタートでき、研修・OJTで業界知識を習得。お客様の課題を一緒に解決する仕事です。",
+      "detail_url": "/job-detail/"
+    },
+    {
+      "id": 2,
+      "category": "career",
+      "category_label": "中途",
+      "title": "サービスエンジニア（工作機械・設備保守）",
+      "description": "お客様先に導入した工作機械・生産設備の設置、調整、メンテナンスを担当。機械や電気の知識を活かし、現場を技術面から支える仕事です。経験者優遇。",
+      "detail_url": "/job-detail/"
+    },
+    {
+      "id": 3,
+      "category": "graduate",
+      "category_label": "新卒",
+      "title": "業務職（営業サポート・受発注管理）",
+      "description": "営業担当をサポートし、受発注・見積作成・納期調整などを担当。お客様とメーカーの間に立ち、スムーズな取引を実現する役割です。正確な仕事が得意な方に向いています。",
+      "detail_url": "/job-detail/"
+    },
+    {
+      "id": 4,
+      "category": "career",
+      "category_label": "中途",
+      "title": "海外営業（アジア圏・製造業向け）",
+      "description": "海外拠点（タイ、ベトナム、中国など）にて、現地日系企業への営業活動を担当。語学力を活かし、グローバルなものづくりを支援。海外勤務希望者歓迎。",
+      "detail_url": "/job-detail/"
+    },
+    {
+      "id": 5,
+      "category": "graduate",
+      "category_label": "新卒",
+      "title": "総合職（配属先は適性により決定）",
+      "description": "営業、業務、サービスエンジニアなど、適性・希望に応じて配属を決定。入社後の研修を経て、あなたに合ったポジションで活躍いただきます。幅広い可能性を持つ総合職採用です。",
+      "detail_url": "/job-detail/"
+    },
+    {
+      "id": 6,
+      "category": "career",
+      "category_label": "中途",
+      "title": "バックオフィス（総務・人事）",
+      "description": "総務・人事業務全般を担当。社員が安心して働ける環境づくりや、採用活動のサポートなど、会社を内側から支える役割です。バックオフィス経験者を募集しています。",
+      "detail_url": "/job-detail/"
+    }
+  ],
+  "empty_state": {
+    "count_text": "0件の募集",
+    "message": "現在、新規の募集はしておりません。\n社員募集のタイミングは都度ご案内致します。"
+  }
+}

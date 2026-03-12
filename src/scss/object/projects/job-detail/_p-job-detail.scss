@@ -1,0 +1,9 @@
+@use "../../../foundation/function" as *;
+@use "../../../foundation/mixins/responsive" as *;
+@use "../../../foundation/mixins/block" as *;
+
+// p-job-detail: 募集詳細ページ固有スタイル
+// Figma: 30:166 (bg: #fafafa)
+.p-job-detail {
+  background-color: var(--color-gray);
+}

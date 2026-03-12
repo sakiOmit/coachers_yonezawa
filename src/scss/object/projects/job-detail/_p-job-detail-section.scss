@@ -1,0 +1,127 @@
+@use "../../../foundation/function" as *;
+@use "../../../foundation/mixins/responsive" as *;
+@use "../../../foundation/mixins/block" as *;
+@use "../../../foundation/mixins/hover" as *;
+
+// p-job-detail-section: 募集詳細テーブル + エントリーボタン
+// Figma nodes: 30:167 (section), 30:168 (table), 30:274 (button)
+//
+// Layout:
+//   artboard: 1440px
+//   table width: 1000px (centered)
+//   section padding: 100px top/bottom
+//   table row gap: 30px
+//   button gap from table: 60px
+
+.p-job-detail-section {
+  padding: rv(100) 0;
+
+  @include sp {
+    padding: svw(60) 0;
+  }
+
+  &__container {
+    @include container(rv(1000));
+
+    @include sp {
+      @include container();
+    }
+  }
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rv(60);
+
+    @include sp {
+      gap: svw(40);
+    }
+  }
+
+  // Table (dl)
+  &__table {
+    width: 100%;
+  }
+
+  // Each row
+  &__row {
+    display: flex;
+    gap: rv(10);
+    border-bottom: 1px solid var(--color-slate-800);
+
+    @include sp {
+      flex-direction: column;
+      gap: svw(8);
+    }
+  }
+
+  // Label (dt)
+  &__label {
+    flex-shrink: 0;
+    width: rv(200);
+    padding: rv(10) 0;
+    font-family: var(--font-serif);
+    font-size: rv(16);
+    font-weight: 500;
+    line-height: 2;
+    color: var(--color-slate-800);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      width: 100%;
+      padding: svw(16) 0 0;
+      font-size: svw(14);
+      font-weight: 600;
+    }
+  }
+
+  // Value (dd)
+  &__value {
+    flex: 1;
+    padding: rv(10) 0;
+    font-family: var(--font-serif);
+    font-size: rv(16);
+    font-weight: 500;
+    line-height: 2;
+    color: var(--color-slate-800);
+    letter-spacing: 0.18em;
+
+    @include sp {
+      padding: 0 0 svw(16);
+      font-size: svw(14);
+    }
+  }
+
+  // Button wrapper
+  &__button-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  // Entry button
+  &__entry-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: rv(24) rv(151);
+    background-color: var(--color-slate-800);
+    color: var(--color-white);
+    font-family: var(--font-serif);
+    font-size: rv(16);
+    font-weight: 500;
+    line-height: 2;
+    letter-spacing: 0.18em;
+    text-decoration: none;
+
+    @include hover {
+      opacity: 0.8;
+    }
+
+    @include sp {
+      width: 100%;
+      padding: svw(18) svw(40);
+      font-size: svw(14);
+    }
+  }
+}
