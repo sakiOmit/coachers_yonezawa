@@ -54,6 +54,7 @@ export default function jsBundler({ rootDir }) {
         minify: !isDev,
         sourcemap: isDev ? "inline" : false,
         logLevel: "warning",
+        nodePaths: [path.join(rootDir, "node_modules")],
       });
       console.log(`[js-bundler] Bundled: ${path.relative(rootDir, outFile)}`);
     } catch (error) {
