@@ -1,0 +1,150 @@
+{
+  "page_name": "募集詳細",
+  "page_id": "30:166",
+  "page_size": {
+    "width": 1440.0,
+    "height": 4791.0
+  },
+  "top_level_children": [
+    {
+      "id": "30:281",
+      "name": "Group 46165",
+      "type": "FRAME",
+      "bbox": {
+        "x": 1490.0,
+        "y": 10.0,
+        "w": 1420.0,
+        "h": 60.0
+      },
+      "child_count": 4,
+      "child_types_summary": "FRAME:2, RECTANGLE:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "30:277",
+      "name": "Frame 46405",
+      "type": "FRAME",
+      "bbox": {
+        "x": 1570.0,
+        "y": 162.0,
+        "w": 808.0,
+        "h": 186.0
+      },
+      "child_count": 2,
+      "child_types_summary": "TEXT:2",
+      "has_text_children": true,
+      "text_children_preview": [
+        "job description",
+        "募集要項"
+      ],
+      "is_unnamed": true
+    },
+    {
+      "id": "30:280",
+      "name": "TOP > job description",
+      "type": "TEXT",
+      "bbox": {
+        "x": 2650.0,
+        "y": 303.0,
+        "w": 180.0,
+        "h": 24.0
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": false
+    },
+    {
+      "id": "30:276",
+      "name": "image 1347",
+      "type": "RECTANGLE",
+      "bbox": {
+        "x": 1949.0,
+        "y": 311.0,
+        "w": 428.0000104907326,
+        "h": 240.00000344968512
+      },
+      "child_count": 0,
+      "child_types_summary": "",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    },
+    {
+      "id": "30:167",
+      "name": "Frame 45586",
+      "type": "FRAME",
+      "bbox": {
+        "x": 1480.0,
+        "y": 368.0,
+        "w": 1440.0,
+        "h": 3108.0
+      },
+      "child_count": 2,
+      "child_types_summary": "FRAME:2",
+      "has_text_children": false,
+      "text_children_preview": [],
+      "is_unnamed": true
+    }
+  ],
+  "total_children": 5,
+  "heuristic_hints": {
+    "header_candidates": [
+      "30:281"
+    ],
+    "header_cluster_ids": [],
+    "footer_candidates": [],
+    "gap_analysis": [
+      {
+        "between": [
+          "30:281",
+          "30:277"
+        ],
+        "gap_px": 92
+      },
+      {
+        "between": [
+          "30:277",
+          "30:280"
+        ],
+        "gap_px": -45
+      },
+      {
+        "between": [
+          "30:280",
+          "30:276"
+        ],
+        "gap_px": -16
+      },
+      {
+        "between": [
+          "30:276",
+          "30:167"
+        ],
+        "gap_px": -183
+      }
+    ],
+    "background_candidates": [
+      "30:276"
+    ],
+    "consecutive_patterns": [],
+    "heading_candidates": [
+      {
+        "index": 0,
+        "id": "30:281",
+        "name": "Group 46165",
+        "height": 60.0
+      },
+      {
+        "index": 1,
+        "id": "30:277",
+        "name": "Frame 46405",
+        "height": 186.0
+      }
+    ],
+    "loose_elements": []
+  }
+}

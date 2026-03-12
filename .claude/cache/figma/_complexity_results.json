@@ -1,0 +1,557 @@
+{
+  "募集一覧": {
+    "nodeId": "30:45",
+    "sections": [
+      {
+        "name": "あなたに合ったポジションから、 米沢工機でのキャリアを見つけてください。",
+        "nodeId": "30:46",
+        "type": "TEXT",
+        "height": 96.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.1,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "2. 募集区分タブ",
+        "nodeId": "30:47",
+        "type": "FRAME",
+        "height": 100.0,
+        "nodes": 9,
+        "depth": 4,
+        "texts": 3,
+        "score": 41.1,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "3. 募集カード一覧",
+        "nodeId": "30:56",
+        "type": "FRAME",
+        "height": 1920.0,
+        "nodes": 82,
+        "depth": 7,
+        "texts": 25,
+        "score": 225.9,
+        "strategy": "SPLIT_REQUIRED"
+      },
+      {
+        "name": "3. 募集カード一覧",
+        "nodeId": "30:138",
+        "type": "FRAME",
+        "height": 328.0,
+        "nodes": 4,
+        "depth": 2,
+        "texts": 2,
+        "score": 20.3,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:142",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:143",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > job description",
+        "nodeId": "30:146",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:147",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 371.9,
+    "avg_score": 46.5,
+    "section_count": 8,
+    "strategies": {
+      "NORMAL": 7,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 1
+    }
+  },
+  "募集詳細": {
+    "nodeId": "30:166",
+    "sections": [
+      {
+        "name": "Frame 45586",
+        "nodeId": "30:167",
+        "type": "FRAME",
+        "height": 3108.0,
+        "nodes": 109,
+        "depth": 4,
+        "texts": 31,
+        "score": 272.1,
+        "strategy": "SPLIT_REQUIRED"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:276",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:277",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > job description",
+        "nodeId": "30:280",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:281",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 353.6,
+    "avg_score": 70.7,
+    "section_count": 5,
+    "strategies": {
+      "NORMAL": 4,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 1
+    }
+  },
+  "エントリー": {
+    "nodeId": "30:300",
+    "sections": [
+      {
+        "name": "Main Content",
+        "nodeId": "30:301",
+        "type": "FRAME",
+        "height": 1419.0,
+        "nodes": 30,
+        "depth": 5,
+        "texts": 10,
+        "score": 96.4,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:331",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:332",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > entry",
+        "nodeId": "30:335",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:336",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 177.9,
+    "avg_score": 35.6,
+    "section_count": 5,
+    "strategies": {
+      "NORMAL": 5,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 0
+    }
+  },
+  "エントリー完了": {
+    "nodeId": "30:355",
+    "sections": [
+      {
+        "name": "Frame 145",
+        "nodeId": "30:356",
+        "type": "FRAME",
+        "height": 644.0,
+        "nodes": 4,
+        "depth": 1,
+        "texts": 3,
+        "score": 16.6,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:360",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:361",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > entry",
+        "nodeId": "30:364",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:365",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 98.1,
+    "avg_score": 19.6,
+    "section_count": 5,
+    "strategies": {
+      "NORMAL": 5,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 0
+    }
+  },
+  "よくある質問": {
+    "nodeId": "30:384",
+    "sections": [
+      {
+        "name": "Frame 46041",
+        "nodeId": "30:385",
+        "type": "FRAME",
+        "height": 2484.0,
+        "nodes": 118,
+        "depth": 6,
+        "texts": 36,
+        "score": 304.5,
+        "strategy": "SPLIT_REQUIRED"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:503",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:504",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > Q&A",
+        "nodeId": "30:507",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:508",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 386.0,
+    "avg_score": 77.2,
+    "section_count": 5,
+    "strategies": {
+      "NORMAL": 4,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 1
+    }
+  },
+  "プライバシーポリシー": {
+    "nodeId": "30:527",
+    "sections": [
+      {
+        "name": "Frame 46044",
+        "nodeId": "30:528",
+        "type": "FRAME",
+        "height": 2783.0,
+        "nodes": 31,
+        "depth": 4,
+        "texts": 19,
+        "score": 103.8,
+        "strategy": "SPLIT"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:559",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:560",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > privacy policy",
+        "nodeId": "30:563",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:564",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 185.3,
+    "avg_score": 37.1,
+    "section_count": 5,
+    "strategies": {
+      "NORMAL": 4,
+      "SPLIT": 1,
+      "SPLIT_REQUIRED": 0
+    }
+  },
+  "お知らせ一覧": {
+    "nodeId": "30:583",
+    "sections": [
+      {
+        "name": "Frame 45675",
+        "nodeId": "30:584",
+        "type": "FRAME",
+        "height": 1284.0,
+        "nodes": 145,
+        "depth": 8,
+        "texts": 32,
+        "score": 363.3,
+        "strategy": "SPLIT_REQUIRED"
+      },
+      {
+        "name": "Pagination",
+        "nodeId": "30:729",
+        "type": "FRAME",
+        "height": 44.0,
+        "nodes": 11,
+        "depth": 4,
+        "texts": 3,
+        "score": 45.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "image 1347",
+        "nodeId": "30:740",
+        "type": "RECTANGLE",
+        "height": 240.00000344968512,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 0,
+        "score": 2.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Frame 46405",
+        "nodeId": "30:741",
+        "type": "FRAME",
+        "height": 186.0,
+        "nodes": 3,
+        "depth": 1,
+        "texts": 2,
+        "score": 13.2,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "TOP > news",
+        "nodeId": "30:744",
+        "type": "TEXT",
+        "height": 24.0,
+        "nodes": 1,
+        "depth": 0,
+        "texts": 1,
+        "score": 3.0,
+        "strategy": "NORMAL"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:745",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 489.8,
+    "avg_score": 81.6,
+    "section_count": 6,
+    "strategies": {
+      "NORMAL": 5,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 1
+    }
+  },
+  "お知らせ記事": {
+    "nodeId": "30:764",
+    "sections": [
+      {
+        "name": "Frame 46489",
+        "nodeId": "30:765",
+        "type": "FRAME",
+        "height": 4192.0,
+        "nodes": 129,
+        "depth": 13,
+        "texts": 42,
+        "score": 369.2,
+        "strategy": "SPLIT_REQUIRED"
+      },
+      {
+        "name": "Group 46165",
+        "nodeId": "30:894",
+        "type": "GROUP",
+        "height": 60.0,
+        "nodes": 19,
+        "depth": 3,
+        "texts": 10,
+        "score": 63.1,
+        "strategy": "NORMAL"
+      }
+    ],
+    "total_score": 432.3,
+    "avg_score": 216.2,
+    "section_count": 2,
+    "strategies": {
+      "NORMAL": 1,
+      "SPLIT": 0,
+      "SPLIT_REQUIRED": 1
+    }
+  }
+}

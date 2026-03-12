@@ -1,0 +1,89 @@
+# figma-prepare Report
+# Page: 募集詳細 (30:166)
+# Generated: 2026-03-12
+# Phases executed: 1, 2, 3 (dry-run)
+
+meta:
+  generated_at: "2026-03-12T14:30:00Z"
+  figma_url: "https://www.figma.com/design/YlUnBdy3BJx2HW0FHSqUDr/?node-id=30-166"
+  fileKey: "YlUnBdy3BJx2HW0FHSqUDr"
+  nodeId: "30:166"
+  page_name: "募集詳細"
+
+quality:
+  score: 68
+  grade: "B"
+  recommendation: "Phase 2+3 recommended (grouping + rename)"
+
+metrics:
+  total_nodes: 131
+  unnamed_nodes: 86
+  unnamed_rate_pct: 65.6
+  flat_sections: 0
+  ungrouped_candidates: 2
+  deep_nesting_count: 0
+  max_depth: 5
+  max_section_depth: 4
+  hidden_nodes: 0
+  off_canvas_nodes: 0
+
+score_breakdown:
+  unnamed_penalty: 30
+  flat_penalty: 0.0
+  ungrouped_penalty: 2
+  nesting_penalty: 0
+
+# Phase 2 Results
+phase_2:
+  stage_a:
+    candidates: 4
+    methods: ["proximity", "pattern", "semantic:bg-content", "semantic:navigation"]
+    file: "grouping-plan.yaml"
+  stage_b:
+    sections: 3
+    names: ["header", "kv", "job-detail"]
+    confidence: "high"
+    file: "sectioning-plan.yaml"
+  stage_c:
+    groups: 8
+    patterns: ["bg-content", "two-column", "heading-pair", "single", "decoration", "table"]
+    depth_recursion: true
+    sub_groups_added: 3
+    file: "nested-grouping-plan.yaml"
+  comparison:
+    coverage_pct: 18
+    decision: "Stage A fallback (coverage < 80%)"
+    note: "Stage A captures inner-level patterns (table rows, nav items). Stage C captures section-level structure. Both are complementary."
+
+# Phase 3 Results
+phase_3:
+  total_renames: 86
+  mode: "dry-run"
+  avg_confidence: 87.5
+  file: "rename-map.yaml"
+  sample_renames:
+    - { old: "Group 46165", new: "header" }
+    - { old: "Frame 46405", new: "kv-heading" }
+    - { old: "Frame 45586", new: "job-detail-section" }
+    - { old: "Frame 46417", new: "job-detail-table" }
+    - { old: "Frame 45560", new: "row-target" }
+    - { old: "Frame 45584", new: "row-target-label" }
+    - { old: "Frame 45585", new: "row-target-value" }
+    - { old: "Frame 45603", new: "entry-button" }
+    - { old: "image 1347", new: "kv-image" }
+    - { old: "image 1254", new: "header-logo" }
+
+phases_executed: [1, 2, 3]
+phases_mode: "dry-run"
+
+# Page Structure Summary
+structure:
+  - section: "header"
+    nodes: ["30:281"]
+    description: "Navigation bar: logo + nav links + hamburger menu"
+  - section: "kv"
+    nodes: ["30:277", "30:280", "30:276"]
+    description: "Page hero: 'Job Description' heading + breadcrumb + decorative image"
+  - section: "job-detail"
+    nodes: ["30:167"]
+    description: "Main content: 15-row definition table (対象/職種/勤務予定地/勤務時間/初任給/賞与/昇給/待遇・福利厚生/休日・休暇/社員出身校/待遇・福利厚生/エントリー方法/採用担当/住所/連絡先) + entry CTA button"

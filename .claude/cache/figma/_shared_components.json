@@ -1,0 +1,273 @@
+{
+  "shared_by_name": [
+    {
+      "name": "Group 46165",
+      "pages": [
+        "募集一覧",
+        "募集詳細",
+        "エントリー",
+        "エントリー完了",
+        "よくある質問",
+        "プライバシーポリシー",
+        "お知らせ一覧",
+        "お知らせ記事"
+      ],
+      "count": 8,
+      "types": [
+        "GROUP"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "募集一覧",
+          "nodeId": "30:147",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "募集詳細",
+          "nodeId": "30:281",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー",
+          "nodeId": "30:336",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー完了",
+          "nodeId": "30:365",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "よくある質問",
+          "nodeId": "30:508",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "プライバシーポリシー",
+          "nodeId": "30:564",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "お知らせ一覧",
+          "nodeId": "30:745",
+          "type": "GROUP",
+          "componentId": ""
+        },
+        {
+          "page": "お知らせ記事",
+          "nodeId": "30:894",
+          "type": "GROUP",
+          "componentId": ""
+        }
+      ]
+    },
+    {
+      "name": "image 1347",
+      "pages": [
+        "募集一覧",
+        "募集詳細",
+        "エントリー",
+        "エントリー完了",
+        "よくある質問",
+        "プライバシーポリシー",
+        "お知らせ一覧"
+      ],
+      "count": 7,
+      "types": [
+        "RECTANGLE"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "募集一覧",
+          "nodeId": "30:142",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "募集詳細",
+          "nodeId": "30:276",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー",
+          "nodeId": "30:331",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー完了",
+          "nodeId": "30:360",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "よくある質問",
+          "nodeId": "30:503",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "プライバシーポリシー",
+          "nodeId": "30:559",
+          "type": "RECTANGLE",
+          "componentId": ""
+        },
+        {
+          "page": "お知らせ一覧",
+          "nodeId": "30:740",
+          "type": "RECTANGLE",
+          "componentId": ""
+        }
+      ]
+    },
+    {
+      "name": "Frame 46405",
+      "pages": [
+        "募集一覧",
+        "募集詳細",
+        "エントリー",
+        "エントリー完了",
+        "よくある質問",
+        "プライバシーポリシー",
+        "お知らせ一覧"
+      ],
+      "count": 7,
+      "types": [
+        "FRAME"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "募集一覧",
+          "nodeId": "30:143",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "募集詳細",
+          "nodeId": "30:277",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー",
+          "nodeId": "30:332",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー完了",
+          "nodeId": "30:361",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "よくある質問",
+          "nodeId": "30:504",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "プライバシーポリシー",
+          "nodeId": "30:560",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "お知らせ一覧",
+          "nodeId": "30:741",
+          "type": "FRAME",
+          "componentId": ""
+        }
+      ]
+    },
+    {
+      "name": "3. 募集カード一覧",
+      "pages": [
+        "募集一覧",
+        "募集一覧"
+      ],
+      "count": 2,
+      "types": [
+        "FRAME"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "募集一覧",
+          "nodeId": "30:56",
+          "type": "FRAME",
+          "componentId": ""
+        },
+        {
+          "page": "募集一覧",
+          "nodeId": "30:138",
+          "type": "FRAME",
+          "componentId": ""
+        }
+      ]
+    },
+    {
+      "name": "TOP > job description",
+      "pages": [
+        "募集一覧",
+        "募集詳細"
+      ],
+      "count": 2,
+      "types": [
+        "TEXT"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "募集一覧",
+          "nodeId": "30:146",
+          "type": "TEXT",
+          "componentId": ""
+        },
+        {
+          "page": "募集詳細",
+          "nodeId": "30:280",
+          "type": "TEXT",
+          "componentId": ""
+        }
+      ]
+    },
+    {
+      "name": "TOP > entry",
+      "pages": [
+        "エントリー",
+        "エントリー完了"
+      ],
+      "count": 2,
+      "types": [
+        "TEXT"
+      ],
+      "is_instance": false,
+      "details": [
+        {
+          "page": "エントリー",
+          "nodeId": "30:335",
+          "type": "TEXT",
+          "componentId": ""
+        },
+        {
+          "page": "エントリー完了",
+          "nodeId": "30:364",
+          "type": "TEXT",
+          "componentId": ""
+        }
+      ]
+    }
+  ],
+  "shared_instances": []
+}
