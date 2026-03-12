@@ -43,6 +43,12 @@ def match_any(text, patterns):
 # --- Figma ---
 if has_figma_url(prompt):
     figma_url_count = len(re.findall(FIGMA_URL_RE, prompt))
+    prepare_words = [
+        r"整理", r"prepare", r"cleanup", r"clean\s?up",
+        r"リネーム", r"rename", r"構造", r"structure",
+        r"グループ化", r"group", r"auto.?layout",
+        r"レイヤー", r"layer", r"前処理", r"前裁き",
+    ]
     analyze_words = [
         r"分析", r"analyze", r"比較", r"compare", r"横断",
         r"共通", r"common", r"戦略", r"strategy", r"計画", r"plan",
@@ -56,7 +62,9 @@ if has_figma_url(prompt):
         r"check", r"inspect", r"investigate",
     ]
 
-    if figma_url_count >= 2 or match_any(prompt, analyze_words):
+    if match_any(prompt, prepare_words):
+        suggestions.append(("/figma-prepare", "Figma structure preparation"))
+    elif figma_url_count >= 2 or match_any(prompt, analyze_words):
         # Multiple URLs or analyze keywords → figma-analyze
         suggestions.append(("/figma-analyze", "Multi-page Figma analysis"))
     elif match_any(prompt, investigate_words):

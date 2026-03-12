@@ -1,7 +1,26 @@
+// ホバー状態のmixin（タッチデバイス対応）
 @mixin hover {
-  @media (hover: hover) {
+  @media (any-hover: hover) {
     &:hover {
       @content;
+
+      transition: all 0.3s;
+    }
+  }
+}
+
+// ホバー時のカラー変更
+@mixin u-hover-color($color) {
+  @include hover {
+    color: $color;
+  }
+}
+
+// ホバー時の背景色変更
+@mixin u-hover-background-color($background-color) {
+  @include hover {
+    &::after {
+      background-color: $background-color;
     }
   }
 }

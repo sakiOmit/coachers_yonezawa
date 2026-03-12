@@ -1,212 +1,153 @@
 ---
 /**
  * ResponsiveImage
- * WordPress render_responsive_image() に相当するコンポーネント
+ * WebP専用・Retina対応・レスポンシブ画像コンポーネント
  *
- * 変換先: render_responsive_image([...])
+ * WordPress変換先: render_responsive_image() (inc/image-helpers.php)
  *
- * WebP専用。Retina(@2x) / SP画像(_sp + @2x/@3x) に対応。
- * - SP分岐あり: <picture> + <source>(1x,2x,3x) + <img>(1x,2x)
- * - SP分岐なし: <img>(1x,2x)
- * - SVG: <img> のみ
+ * 出力パターン:
+ *   - SVG: <img> のみ (width/height自動付与)
+ *   - SP分岐あり: <picture> + <source>(1x,2x,3x) + <img>(1x,2x)
+ *   - SP分岐なし: <img srcset="1x, 2x"> のみ
  *
- * width/height は image-size パッケージで画像ファイルから自動取得。
- * Retina(2x)画像の場合: 実寸法 ÷ 2 = 表示寸法。
- * 手動で width/height を指定した場合はそちらを優先。
+ * CSS: 画像要素は base スタイル (max-width: 100%; height: auto;) を継承
  */
-import sizeOf from "image-size";
-import xml2js from "xml2js";
-import { readFileSync, existsSync } from "fs";
-import path from "path";
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve, extname } from 'node:path';
 
 interface Props {
+  /** 画像パス（例: "/assets/images/hero.webp"） */
   src: string;
+  /** alt属性 */
   alt?: string;
-  sp?: boolean;
-  width?: number;
-  height?: number;
-  loading?: "lazy" | "eager";
-  breakpoint?: number;
+  /** CSSクラス（img要素に適用） */
   class?: string;
+  /** picture要素のクラス */
   wrapperClass?: string;
-  [key: string]: unknown;
+  /** SP画像を使用するか（デフォルト: true） */
+  sp?: boolean;
+  /** loading属性（デフォルト: "lazy"） */
+  loading?: 'lazy' | 'eager';
+  /** width属性（指定で上書き） */
+  width?: number;
+  /** height属性（指定で上書き） */
+  height?: number;
+  /** SP/PC切り替えブレークポイント（デフォルト: 767） */
+  breakpoint?: number;
 }
 
 const {
   src,
-  alt = "",
-  sp = true,
-  width: manualWidth,
-  height: manualHeight,
-  loading = "lazy",
-  breakpoint = 767,
+  alt = '',
   class: className,
   wrapperClass,
-  ...rest
+  sp = true,
+  loading = 'lazy',
+  width: propWidth,
+  height: propHeight,
+  breakpoint = 767,
 } = Astro.props;
 
-// パスと拡張子を分離
-const lastDot = src.lastIndexOf(".");
-const basePath = src.substring(0, lastDot);
-const ext = src.substring(lastDot + 1).toLowerCase();
-const isSvg = ext === "svg";
+// --- パス解析 ---
+const ext = extname(src).toLowerCase();
+const isSvg = ext === '.svg';
+const basePath = src.replace(/\.[^.]+$/, '');
 
-// PC画像パス（WebPのみ）
-const pcSrc = isSvg ? src : `${basePath}.webp`;
-const pcSrc2x = isSvg ? undefined : `${basePath}@2x.webp`;
+// PC WebP パス
+const pcWebp = isSvg ? null : `${basePath}.webp`;
+const pcWebp2x = isSvg ? null : `${basePath}@2x.webp`;
 
-// SP画像パス（WebPのみ、3x含む）
-const spSrc = sp && !isSvg ? `${basePath}_sp.webp` : undefined;
-const spSrc2x = sp && !isSvg ? `${basePath}_sp@2x.webp` : undefined;
-const spSrc3x = sp && !isSvg ? `${basePath}_sp@3x.webp` : undefined;
+// SP WebP パス
+const hasSp = sp && !isSvg;
+const spWebp = hasSp ? `${basePath}_sp.webp` : null;
+const spWebp2x = hasSp ? `${basePath}_sp@2x.webp` : null;
+const spWebp3x = hasSp ? `${basePath}_sp@3x.webp` : null;
 
-// --- image-size による自動寸法取得 ---
+// --- width/height 自動取得 ---
+let imgWidth: number | undefined = propWidth ?? undefined;
+let imgHeight: number | undefined = propHeight ?? undefined;
 
-const parseString = xml2js.parseString;
-
-/**
- * public/ ディレクトリ基準でファイルパスを解決
- */
-function resolveImagePath(imgSrc: string): string {
-  const publicDir = path.resolve(process.cwd(), "public");
-  return path.join(publicDir, imgSrc);
-}
-
-/**
- * SVG の width/height を取得（viewBox フォールバック）
- */
-function getSvgSize(filePath: string): { width: number; height: number } | null {
+if (imgWidth === undefined || imgHeight === undefined) {
   try {
-    const svgContent = readFileSync(filePath, "utf8");
-    let width = 0;
-    let height = 0;
+    const publicDir = resolve(process.cwd(), 'public');
+    const filePath = resolve(publicDir, src.replace(/^\//, ''));
 
-    parseString(svgContent, (err: any, result: { svg: any }) => {
-      if (err) return;
-      const svgRoot = result.svg;
-      if (svgRoot?.$) {
-        width = parseInt(svgRoot.$.width) || 0;
-        height = parseInt(svgRoot.$.height) || 0;
-
-        if (svgRoot.$.viewBox) {
-          const vb = svgRoot.$.viewBox.split(" ");
-          width = width || parseInt(vb[2]) - parseInt(vb[0]);
-          height = height || parseInt(vb[3]) - parseInt(vb[1]);
+    if (existsSync(filePath)) {
+      if (isSvg) {
+        // SVG: viewBox から取得
+        const svgContent = readFileSync(filePath, 'utf-8');
+        const viewBoxMatch = svgContent.match(/viewBox=["']([^"']+)["']/);
+        if (viewBoxMatch) {
+          const parts = viewBoxMatch[1].split(/\s+/).map(Number);
+          if (parts.length === 4) {
+            imgWidth = imgWidth ?? Math.round(parts[2]);
+            imgHeight = imgHeight ?? Math.round(parts[3]);
+          }
+        }
+        // width/height属性フォールバック
+        if (imgWidth === undefined) {
+          const wMatch = svgContent.match(/\bwidth=["'](\d+(?:\.\d+)?)(?:px)?["']/);
+          if (wMatch) imgWidth = Math.round(parseFloat(wMatch[1]));
+        }
+        if (imgHeight === undefined) {
+          const hMatch = svgContent.match(/\bheight=["'](\d+(?:\.\d+)?)(?:px)?["']/);
+          if (hMatch) imgHeight = Math.round(parseFloat(hMatch[1]));
+        }
+      } else {
+        // WebP/PNG/JPG: image-size パッケージで取得
+        try {
+          const { default: sizeOf } = await import('image-size');
+          const dimensions = sizeOf(filePath);
+          if (dimensions?.width && dimensions?.height) {
+            const isRetina = src.includes('@2x');
+            const divisor = isRetina ? 2 : 1;
+            imgWidth = imgWidth ?? Math.round(dimensions.width / divisor);
+            imgHeight = imgHeight ?? Math.round(dimensions.height / divisor);
+          }
+        } catch {
+          // image-size が未インストールの場合はスキップ
         }
       }
-    });
-
-    return width && height ? { width, height } : null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * ラスタ画像の寸法を取得（÷2 なし、生の値を返す）
- * image-size v2.x は Buffer のみ受け付ける
- */
-function getImageSize(filePath: string): { width: number; height: number } | null {
-  try {
-    const buffer = readFileSync(filePath);
-    const dimensions = sizeOf(buffer);
-    if (!dimensions?.width || !dimensions?.height) return null;
-    return {
-      width: dimensions.width,
-      height: dimensions.height,
-    };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * 画像の表示寸法を自動取得
- * @2x ファイルがあれば ÷2 で表示寸法を算出、なければ 1x をそのまま使用
- */
-function autoDetectSize(
-  imgSrc: string,
-  imgSrc2x?: string
-): { width: number; height: number } | null {
-  // SVG
-  if (imgSrc.toLowerCase().endsWith(".svg")) {
-    const filePath = resolveImagePath(imgSrc);
-    if (!existsSync(filePath)) return null;
-    return getSvgSize(filePath);
-  }
-
-  // @2x を優先的に読み、÷2 で表示寸法を算出
-  if (imgSrc2x) {
-    const filePath2x = resolveImagePath(imgSrc2x);
-    if (existsSync(filePath2x)) {
-      const size = getImageSize(filePath2x);
-      if (size) {
-        return {
-          width: Math.round(size.width / 2),
-          height: Math.round(size.height / 2),
-        };
-      }
     }
+  } catch {
+    // ファイルアクセスエラーは無視
   }
-
-  // フォールバック: 1x をそのまま使用
-  const filePath = resolveImagePath(imgSrc);
-  if (!existsSync(filePath)) return null;
-  return getImageSize(filePath);
 }
-
-// 自動取得（手動指定がなければ）
-const autoSize =
-  manualWidth == null || manualHeight == null ? autoDetectSize(pcSrc, pcSrc2x) : null;
-
-const width = manualWidth ?? autoSize?.width;
-const height = manualHeight ?? autoSize?.height;
-
-// data-* 等のカスタム属性
-const customAttrs = Object.fromEntries(
-  Object.entries(rest).filter(([_, v]) => v != null && v !== "")
-);
-
-const hasSp = !!(spSrc && spSrc2x && spSrc3x);
 ---
 
-{
-  isSvg ? (
+{isSvg ? (
+  <img
+    src={src}
+    width={imgWidth}
+    height={imgHeight}
+    alt={alt}
+    loading={loading}
+    class={className}
+  />
+) : hasSp ? (
+  <picture class={wrapperClass}>
+    <source
+      media={`(max-width: ${breakpoint}px)`}
+      srcset={`${spWebp} 1x, ${spWebp2x} 2x, ${spWebp3x} 3x`}
+    />
     <img
-      src={src}
-      width={width}
-      height={height}
+      src={pcWebp}
+      srcset={`${pcWebp} 1x, ${pcWebp2x} 2x`}
+      width={imgWidth}
+      height={imgHeight}
       alt={alt}
       loading={loading}
       class={className}
-      {...customAttrs}
     />
-  ) : hasSp ? (
-    <picture class={wrapperClass} {...customAttrs}>
-      <source
-        media={`(max-width: ${breakpoint}px)`}
-        srcset={`${spSrc} 1x, ${spSrc2x} 2x, ${spSrc3x} 3x`}
-      />
-      <img
-        src={pcSrc}
-        srcset={`${pcSrc} 1x, ${pcSrc2x} 2x`}
-        width={width}
-        height={height}
-        alt={alt}
-        loading={loading}
-        class={className}
-      />
-    </picture>
-  ) : (
-    <img
-      src={pcSrc}
-      srcset={`${pcSrc} 1x, ${pcSrc2x} 2x`}
-      width={width}
-      height={height}
-      alt={alt}
-      loading={loading}
-      class={className}
-      {...customAttrs}
-    />
-  )
-}
+  </picture>
+) : (
+  <img
+    src={pcWebp}
+    srcset={`${pcWebp} 1x, ${pcWebp2x} 2x`}
+    width={imgWidth}
+    height={imgHeight}
+    alt={alt}
+    loading={loading}
+    class={className}
+  />
+)}

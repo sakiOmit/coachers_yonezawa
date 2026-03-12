@@ -1,7 +1,8 @@
-import { build } from "esbuild";
-import fs from "fs";
-import path from "path";
-import { glob } from "glob";
+import { build } from 'esbuild';
+import chokidar from 'chokidar';
+import fs from 'fs';
+import path from 'path';
+import { glob } from 'glob';
 
 /**
  * Vite plugin: JS bundler (esbuild)
@@ -11,22 +12,25 @@ import { glob } from "glob";
  *
  * - ES modules (import/export) を解決してバンドル
  * - 開発時: minify なし、ビルド時: minify あり
- * - HMR: Vite内蔵watcherでフルリロード
+ * - HMR: フルリロード
  */
 export default function jsBundler({ rootDir }) {
-  const srcJsDir = path.join(rootDir, "src/js");
-  const outDir = path.join(rootDir, "astro/public/assets/js");
+  const srcJsDir = path.join(rootDir, 'src/js');
+  const outDir = path.join(rootDir, 'astro/public/assets/js');
   let isDev = true;
 
+  // エントリーポイントパターン
+  // - src/js/main.js（共通）
+  // - src/js/pages/*/index.js（ページ別、存在する場合）
   function getEntryPoints() {
     const entries = [];
 
-    const mainJs = path.join(srcJsDir, "main.js");
+    const mainJs = path.join(srcJsDir, 'main.js');
     if (fs.existsSync(mainJs)) {
       entries.push(mainJs);
     }
 
-    const pageEntries = glob.sync(path.join(srcJsDir, "pages/*/index.js"));
+    const pageEntries = glob.sync(path.join(srcJsDir, 'pages/*/index.js'));
     entries.push(...pageEntries);
 
     return entries;
@@ -49,12 +53,11 @@ export default function jsBundler({ rootDir }) {
         entryPoints: [entryPoint],
         outfile: outFile,
         bundle: true,
-        format: "iife",
-        platform: "browser",
+        format: 'iife',
+        platform: 'browser',
         minify: !isDev,
-        sourcemap: isDev ? "inline" : false,
-        logLevel: "warning",
-        nodePaths: [path.join(rootDir, "node_modules")],
+        sourcemap: isDev ? 'inline' : false,
+        logLevel: 'warning',
       });
       console.log(`[js-bundler] Bundled: ${path.relative(rootDir, outFile)}`);
     } catch (error) {
@@ -68,37 +71,34 @@ export default function jsBundler({ rootDir }) {
   }
 
   return {
-    name: "vite-js-bundler",
+    name: 'vite-js-bundler',
 
     configResolved(config) {
-      isDev = config.command === "serve";
+      isDev = config.command === 'serve';
     },
 
     async buildStart() {
+      // 初回: 全バンドル
       await bundleAll();
+
+      // chokidar で src/js/ を監視
+      const watcher = chokidar.watch(path.join(srcJsDir, '**/*.js'), {
+        ignoreInitial: true,
+      });
+
+      watcher.on('change', async () => {
+        // どのファイルが変わっても全エントリーを再バンドル
+        // （import 依存関係の追跡が複雑なため）
+        await bundleAll();
+      });
+
+      watcher.on('add', async () => {
+        await bundleAll();
+      });
     },
 
-    configureServer(server) {
-      // Vite 内蔵 watcher に外部ディレクトリを追加
-      server.watcher.add(srcJsDir);
-      console.log(`[js-bundler] Added to Vite watcher: ${srcJsDir}`);
-
-      server.watcher.on("change", async (filePath) => {
-        if (!filePath.endsWith(".js")) return;
-        if (!filePath.startsWith(srcJsDir)) return;
-
-        console.log(`[js-bundler] Change detected: ${filePath}`);
-        await bundleAll();
-        server.ws.send({ type: "full-reload", path: "*" });
-      });
-
-      server.watcher.on("add", async (filePath) => {
-        if (!filePath.endsWith(".js")) return;
-        if (!filePath.startsWith(srcJsDir)) return;
-
-        await bundleAll();
-        server.ws.send({ type: "full-reload", path: "*" });
-      });
+    handleHotUpdate({ server }) {
+      server.ws.send({ type: 'full-reload', path: '*' });
     },
   };
 }

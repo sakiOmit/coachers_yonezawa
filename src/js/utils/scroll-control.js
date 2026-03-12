@@ -79,7 +79,9 @@ export function scrollToElement(target, options = {}) {
  * 以下のCSSをグローバルに追加する必要があります:
  *
  * body.is-scroll-locked {
- *   height: 100%;
  *   overflow: hidden;
+ *   position: fixed;
+ *   width: 100%;
+ *   height: 100%;
  * }
  */

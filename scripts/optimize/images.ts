@@ -30,6 +30,9 @@ const CONFIG = {
 // グローバルにメタデータオブジェクトを保持
 const imagesMeta = {};
 
+// 生成されたファイルパスを記録（差分削除用）
+const generatedFiles = new Set<string>();
+
 /**
  * WordPress出力ファイルをAstro出力先にもコピー
  */
@@ -38,6 +41,8 @@ async function copyToAstro(wpFilePath: string): Promise<void> {
   const astroFilePath = path.join(CONFIG.astroOutputDir, relativePath);
   await fs.mkdir(path.dirname(astroFilePath), { recursive: true });
   await fs.cp(wpFilePath, astroFilePath);
+  generatedFiles.add(wpFilePath);
+  generatedFiles.add(astroFilePath);
 }
 
 /**
@@ -94,8 +99,6 @@ async function optimizeSvg(inputPath) {
     // 最適化されたSVGを出力
     const outputPath = path.join(outputBasePath, `${parsedPath.name}.svg`);
     await fs.writeFile(outputPath, result.data);
-
-    // Astro側にもコピー
     await copyToAstro(outputPath);
 
     // ファイルサイズを取得
@@ -172,11 +175,9 @@ async function generateRetinaImages(inputPath: string): Promise<void> {
       .webp({ quality: CONFIG.quality.webp })
       .toFile(outputWebp1xPath);
 
+    await copyToAstro(outputWebp1xPath);
     const scaleLabel = isSPImage ? " [SP: 1.15x downscale]" : " [PC: 0.5x downscale]";
     console.log(`   ✅ Generated: ${baseName}.webp (${size1x}x${height1x}px)${scaleLabel}`);
-
-    // Astro側にもコピー
-    await copyToAstro(outputWebp1xPath);
 
     // 2x画像サイズ計算（SP画像のみ1.15倍補正）
     // PC: original2xWidth（元画像そのまま）
@@ -190,6 +191,7 @@ async function generateRetinaImages(inputPath: string): Promise<void> {
     if (SCALE_FACTOR === 1.0) {
       // PC画像: 元画像をそのまま使用（リサイズなし、最高品質）
       await sharp(inputPath).webp({ quality: CONFIG.quality.webp }).toFile(outputWebp2xPath);
+      await copyToAstro(outputWebp2xPath);
       console.log(
         `   ✅ Generated: ${baseName}@2x.webp (${size2x}x${height2x}px) [PC: original, no resize]`
       );
@@ -199,13 +201,11 @@ async function generateRetinaImages(inputPath: string): Promise<void> {
         .resize(size2x, null, { kernel: sharp.kernel.lanczos3 })
         .webp({ quality: CONFIG.quality.webp })
         .toFile(outputWebp2xPath);
+      await copyToAstro(outputWebp2xPath);
       console.log(
         `   ✅ Generated: ${baseName}@2x.webp (${size2x}x${height2x}px) [SP: 1.15x resize]`
       );
     }
-
-    // Astro側にもコピー
-    await copyToAstro(outputWebp2xPath);
 
     // WebP 3x画像（SP画像のみ: 元画像の1.5倍 * 1.15倍補正）
     if (isSPImage) {
@@ -217,12 +217,10 @@ async function generateRetinaImages(inputPath: string): Promise<void> {
         .resize(size3x, null, { kernel: sharp.kernel.lanczos3 })
         .webp({ quality: CONFIG.quality.webp })
         .toFile(outputWebp3xPath);
+      await copyToAstro(outputWebp3xPath);
       console.log(
         `   ✅ Generated: ${baseName}@3x.webp (${size3x}x${height3x}px) [SP: 1.5x * 1.15x]`
       );
-
-      // Astro側にもコピー
-      await copyToAstro(outputWebp3xPath);
     }
 
     // メタデータを保存（1xサイズを記録、パスは/区切りで統一、拡張子を除去）
@@ -234,6 +232,39 @@ async function generateRetinaImages(inputPath: string): Promise<void> {
   } catch (error) {
     console.error(`   ❌ Error processing:`, error instanceof Error ? error.message : String(error));
   }
+}
+
+/**
+ * 出力ディレクトリを走査し、今回生成されなかったファイルを削除（リネーム残骸の掃除）
+ * ディレクトリ自体は削除しないので dev server の404を防ぐ
+ */
+async function removeStaleFiles(dir: string): Promise<number> {
+  let removed = 0;
+  let entries: Awaited<ReturnType<typeof fs.readdir>>;
+  try {
+    entries = await fs.readdir(dir);
+  } catch {
+    return 0;
+  }
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry);
+    const stat = await fs.stat(fullPath);
+
+    if (stat.isDirectory()) {
+      removed += await removeStaleFiles(fullPath);
+      // 空ディレクトリを削除
+      const remaining = await fs.readdir(fullPath);
+      if (remaining.length === 0) {
+        await fs.rmdir(fullPath);
+      }
+    } else if (!generatedFiles.has(fullPath)) {
+      await fs.rm(fullPath);
+      console.log(`   🗑️  Removed stale: ${path.relative(dir, fullPath)}`);
+      removed++;
+    }
+  }
+  return removed;
 }
 
 /**
@@ -276,17 +307,7 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
-    // 出力ディレクトリをクリーンアップ（既存の画像を削除）
-    console.log("🧹 Cleaning output directories...");
-    try {
-      await fs.rm(CONFIG.outputDir, { recursive: true, force: true });
-      await fs.rm(CONFIG.astroOutputDir, { recursive: true, force: true });
-      console.log("   ✅ Old images removed\n");
-    } catch (error) {
-      // エラーは無視（ディレクトリが存在しない場合など）
-    }
-
-    // 出力ディレクトリを作成
+    // 出力ディレクトリを作成（存在しなければ）
     await fs.mkdir(CONFIG.outputDir, { recursive: true });
     await fs.mkdir(CONFIG.astroOutputDir, { recursive: true });
 
@@ -309,6 +330,16 @@ async function main(): Promise<void> {
       } else {
         await generateRetinaImages(imagePath);
       }
+    }
+
+    // リネーム等で不要になったファイルを差分削除
+    console.log("\n🧹 Cleaning stale files...");
+    const wpRemoved = await removeStaleFiles(CONFIG.outputDir);
+    const astroRemoved = await removeStaleFiles(CONFIG.astroOutputDir);
+    if (wpRemoved + astroRemoved > 0) {
+      console.log(`   ✅ Removed ${wpRemoved + astroRemoved} stale files`);
+    } else {
+      console.log("   ✅ No stale files found");
     }
 
     // メタデータをPHP配列形式に変換
